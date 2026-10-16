@@ -26,6 +26,8 @@ static func impact_damage(delta_v: float, other_mass: float) -> float:
 static func apply_impact(truck: TruckSim, zone: String, amount: float) -> Array[String]:
 	var broken: Array[String] = []
 	var remaining: float = amount
+	if zone == "left" or zone == "right":
+		truck.side_hits += 1
 	for part in truck.loadout:      # ordem da lista = da mais externa para a mais interna
 		if remaining <= 0.0:
 			break

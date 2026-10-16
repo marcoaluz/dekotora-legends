@@ -13,7 +13,8 @@ var _res: Dictionary = {}
 
 func show_result(res: Dictionary) -> void:
 	_res = res
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
+	size = Vector2(480, 270)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	for c in get_children():
 		c.queue_free()

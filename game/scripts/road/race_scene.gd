@@ -21,6 +21,7 @@ var autoplay: bool = false          # usado em testes/capturas: acelera sozinho
 
 
 func _ready() -> void:
+	scale = Vector2(2, 2)   # layout legado em 480x270 sobre a base 960x540
 	sim = RaceSim.new(Track.make_test_track())
 	player = sim.add_truck()
 	_bg = ParallaxBg.new()

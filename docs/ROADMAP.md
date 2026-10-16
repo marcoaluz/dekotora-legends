@@ -34,10 +34,10 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)
 - [x] [P41] Dados das peças e motores em Resources
-- [ ] [P42] Tela da garagem (montar, comprar, ver peso/durabilidade/Fama)
-- [ ] [P43] Reparo e custo
+- [x] [P42] Tela da garagem (montar, comprar, ver peso/durabilidade/Fama)
+- [x] [P43] Reparo e custo
 - [x] [P44] Motor, turbo, escape e freio-motor na simulação
-- [ ] [P45] Save local e campanha de Kanto (3 trechos + chefe)
+- [x] [P45] Save local e campanha de Kanto (3 trechos + chefe)
 - [ ] [P46] Bots, tráfego e cenário de Kanto no Blender
 
 ## Fase 5 — Áudio

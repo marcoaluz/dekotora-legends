@@ -23,7 +23,8 @@ func bind(sim_: RaceSim, player_: int) -> void:
 	sim = sim_
 	player = player_
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
+	size = Vector2(480, 270)        # layout de 480x270 (o CanvasLayer pai escala 2x)
 
 
 func show_banner(text: String, seconds: float = 1.6) -> void:
@@ -99,7 +100,7 @@ func _draw() -> void:
 	var kmh: int = roundi(t.speed * 3.6)
 	_text(Vector2(cx - 74, by - 22), "%d" % kmh, 34, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, 90.0)
 	_text(Vector2(cx - 74, by - 8), "km/h", 9, Color(1, 1, 1, 0.7), HORIZONTAL_ALIGNMENT_CENTER, 90.0)
-	var rpm_frac: float = clampf((t.rpm - EngineModel.IDLE_RPM) / (EngineModel.REDLINE_RPM - EngineModel.IDLE_RPM), 0.0, 1.0)
+	var rpm_frac: float = clampf((t.rpm - EngineModel.IDLE_RPM) / (t.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
 	_text(Vector2(cx + 20, by - 30), "%d" % t.gear, 26, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 24.0)
 	_text(Vector2(cx + 20, by - 8), "MARCHA", 7, Color(1, 1, 1, 0.7), HORIZONTAL_ALIGNMENT_CENTER, 36.0)
 	# arco de RPM

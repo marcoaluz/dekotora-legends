@@ -27,10 +27,10 @@ static func create(parent: Node3D) -> void:
 	env.fog_light_color = Color("#241f4d")
 	env.fog_density = 0.0028
 	env.glow_enabled = true
-	env.glow_intensity = 0.9
-	env.glow_strength = 1.1
-	env.glow_bloom = 0.08
-	env.glow_hdr_threshold = 0.9
+	env.glow_intensity = 0.6
+	env.glow_strength = 0.9
+	env.glow_bloom = 0.03
+	env.glow_hdr_threshold = 1.3
 	var we := WorldEnvironment.new()
 	we.environment = env
 	parent.add_child(we)

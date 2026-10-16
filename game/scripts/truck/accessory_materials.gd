@@ -15,12 +15,12 @@ const DEFS: Dictionary = {
 	"steel": {"c": "#aeb8c8", "metal": 1.0, "rough": 0.32, "coat": 0.0},
 	"rubber": {"c": "#1a1a1d", "metal": 0.0, "rough": 0.88, "coat": 0.0},
 	"plastic": {"c": "#121214", "metal": 0.0, "rough": 0.55, "coat": 0.0},
-	"lamp_amber": {"c": "#ffb347", "emit": 5.0},
-	"lamp_white": {"c": "#ffe9c2", "emit": 7.0},
-	"lamp_red": {"c": "#ff2a2a", "emit": 5.0},
-	"lamp_cyan": {"c": "#21e6ff", "emit": 5.0},
-	"lamp_pink": {"c": "#ff2e88", "emit": 5.0},
-	"lamp_yellow": {"c": "#fff35c", "emit": 5.0},
+	"lamp_amber": {"c": "#ffb347", "emit": 2.5},
+	"lamp_white": {"c": "#ffe9c2", "emit": 3.5},
+	"lamp_red": {"c": "#ff2a2a", "emit": 2.5},
+	"lamp_cyan": {"c": "#21e6ff", "emit": 2.5},
+	"lamp_pink": {"c": "#ff2e88", "emit": 2.5},
+	"lamp_yellow": {"c": "#fff35c", "emit": 2.5},
 }
 
 

@@ -24,10 +24,19 @@ var _shake: float = 0.0
 var _result_shown: bool = false
 var _fps_printed: bool = false
 var _debug_events: bool = false
+var gs: Node
+var route: RouteDef
+var _pause_layer: CanvasLayer
 
 
 func _ready() -> void:
-	sim = RaceSim.new(Track.make_test_track(), TrafficSim.Density.NORMAL)
+	process_mode = Node.PROCESS_MODE_ALWAYS     # recebe o botao de pausa mesmo pausado
+	gs = get_node("/root/GameState")
+	route = gs.pending_route
+	var track: Track = route.build_track() if route != null else Track.make_test_track()
+	var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
+	sim = RaceSim.new(track, density)
+	sim.freight = route.freight if route != null else 25000
 	path = TrackPath.new(sim.track)
 	WorldEnv.create(self)
 	var road := RoadMesh.new()
@@ -44,20 +53,7 @@ func _ready() -> void:
 	_traffic3d = Traffic3D.new()
 	add_child(_traffic3d)
 	_traffic3d.setup(path, sim.traffic)
-	var xs: Array[float] = [0.25, -0.75, -0.25, 0.75]
-	var diffs: Array[int] = [-1, BotDriver.Difficulty.EASY, BotDriver.Difficulty.NORMAL, BotDriver.Difficulty.HARD]
-	for i in 4:
-		var idx: int = sim.add_truck(-float(i) * 14.0, xs[i])
-		var t: TruckSim = sim.trucks[idx]
-		t.is_bot = i != 0
-		t.set_loadout(_default_loadout(i))
-		var node := TruckNode.new()
-		add_child(node)
-		if i != 0:
-			node.set_paint_color(FIELD_COLORS[i])
-			_bots.append(BotDriver.new(diffs[i], 100 + i, xs[i]))
-		_trucks.append(node)
-		_prev.append(Vector2(t.z, t.x))
+	_spawn_field()
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2
@@ -66,6 +62,7 @@ func _ready() -> void:
 	_cam.make_current()
 	var layer := CanvasLayer.new()
 	layer.layer = 5
+	layer.scale = Vector2(2, 2)          # HUD e toque desenhados em 480x270
 	add_child(layer)
 	_hud = RaceHud.new()
 	_hud.bind(sim, player)
@@ -81,29 +78,101 @@ func _ready() -> void:
 				sim.trucks[k].speed = 30.0
 				_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 			_countdown = 0.0
-	if DisplayServer.is_touchscreen_available() or "--touch" in args:
+	if DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false):
 		var tc := TouchControls.new()
 		tc.target = input
 		layer.add_child(tc)
+	_build_pause_menu()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
 
 
-func _default_loadout(i: int) -> Array[Dictionary]:
-	match i:
-		0:   # jogador: build "Equilibrado" do BALANCEAMENTO
-			return [
-				DamageModel.make_part("fb_chrome_steps", ["front"], 420.0, 220.0, 25),
-				DamageModel.make_part("skirt_light_bar", ["left", "right"], 180.0, 90.0, 25),
-				DamageModel.make_part("andon_kanji", ["rear"], 60.0, 30.0, 15),
-				DamageModel.make_part("roof_lights_row", ["roof"], 30.0, 20.0, 15),
-			]
-		_:
-			return [DamageModel.make_part("fb_basic", ["front"], 120.0, 80.0, 5),
-				DamageModel.make_part("rb_basic", ["rear"], 100.0, 80.0, 3)]
+## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
+func _spawn_field() -> void:
+	var xs: Array[float] = [0.25, -0.75, -0.25, 0.75]
+	var rival: RivalDef = null
+	if route != null:
+		rival = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
+	var base_diff: int = rival.difficulty if rival != null else BotDriver.Difficulty.NORMAL
+	for i in 4:
+		var idx: int = sim.add_truck(-float(i) * 14.0, xs[i])
+		var t: TruckSim = sim.trucks[idx]
+		t.is_bot = i != 0
+		var node := TruckNode.new()
+		add_child(node)
+		if i == 0:
+			gs.configure_truck(t)
+			node.apply_loadout(gs.installed_part_defs())
+			node.set_paint_color(Color(String(gs.profile.get("paint", "#e9eef5"))))
+		else:
+			var defs: Array[PartDef] = []
+			var paint: Color = FIELD_COLORS[i]
+			var diff: int = clampi(base_diff + (i - 2), 0, 2)
+			if i == 1 and rival != null:
+				for pid in rival.part_ids:
+					var d: PartDef = gs.part(String(pid))
+					if d != null:
+						defs.append(d)
+				paint = rival.paint
+				diff = rival.difficulty
+			else:
+				for pid in ["fb_basic", "rb_basic"]:
+					defs.append(gs.part(pid))
+			var parts: Array[Dictionary] = []
+			for d in defs:
+				parts.append(d.to_sim_part())
+			t.set_loadout(parts)
+			node.apply_loadout(defs)
+			node.set_paint_color(paint)
+			_bots.append(BotDriver.new(diff, 100 + i, xs[i]))
+		_trucks.append(node)
+		_prev.append(Vector2(t.z, t.x))
+
+
+func _build_pause_menu() -> void:
+	_pause_layer = CanvasLayer.new()
+	_pause_layer.layer = 30
+	_pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	_pause_layer.visible = false
+	add_child(_pause_layer)
+	var root := Control.new()
+	root.theme = UiTheme.make()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_pause_layer.add_child(root)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.6)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(dim)
+	var box := VBoxContainer.new()
+	box.position = Vector2(340, 170)
+	box.custom_minimum_size = Vector2(280, 0)
+	root.add_child(box)
+	box.add_child(UiTheme.label(Tr.t("race.paused"), 36, UiTheme.PINK))
+	var resume: Button = UiTheme.button(Tr.t("race.resume"))
+	resume.pressed.connect(_toggle_pause)
+	box.add_child(resume)
+	var leave: Button = UiTheme.button(Tr.t("race.exit"))
+	leave.pressed.connect(func() -> void:
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	box.add_child(leave)
+
+
+func _toggle_pause() -> void:
+	if _result_shown:
+		return
+	get_tree().paused = not get_tree().paused
+	_pause_layer.visible = get_tree().paused
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		_toggle_pause()
 
 
 func _process(delta: float) -> void:
+	if get_tree().paused:
+		return
 	var dt: float = minf(delta, 0.1)
 	if _countdown > 0.0:
 		_countdown -= dt
@@ -127,6 +196,8 @@ func _process(delta: float) -> void:
 	_update_visuals(alpha, dt)
 	_update_camera(dt)
 	_update_hud()
+	for k in sim.trucks.size():
+		_trucks[k].sync_damage(sim.trucks[k].loadout)
 	if _autoplay and not _fps_printed and Time.get_ticks_msec() > 6000:
 		_fps_printed = true
 		print("FPS_MEDIDO: ", Engine.get_frames_per_second())
@@ -223,10 +294,12 @@ func _update_hud() -> void:
 func _show_result() -> void:
 	var res: Dictionary = sim.result_for(player)
 	print("RESULTADO: ", res)
+	gs.apply_race_result(res, String(route.id) if route != null else "", sim.trucks[player])
 	var layer := CanvasLayer.new()
 	layer.layer = 20
+	layer.scale = Vector2(2, 2)
 	add_child(layer)
 	var screen := ResultScreen.new()
 	layer.add_child(screen)
 	screen.show_result(res)
-	screen.continue_pressed.connect(func() -> void: get_tree().reload_current_scene())
+	screen.continue_pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))

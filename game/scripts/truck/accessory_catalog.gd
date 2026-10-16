@@ -95,3 +95,18 @@ func swap_material(acc: Node3D, from_name: String, to_name: String) -> void:
 			var cur: Material = m.get_active_material(s)
 			if cur != null and cur.resource_name == from_name:
 				m.set_surface_override_material(s, mat)
+
+
+## Aplica as variantes de material de um PartDef ({"main": "...", "accent": "..."}) a um acessorio montado.
+func apply_variant(acc: Node3D, id: String, variant: Dictionary) -> void:
+	var e: Dictionary = entry(id)
+	if e.is_empty() or variant.is_empty():
+		return
+	var avail: Dictionary = e.get("materials_available", {})
+	var used: Array = e.get("materials_used", [])
+	for slot in variant:
+		var opts: Array = avail.get(slot, [])
+		for u in used:
+			if String(u) in opts and String(u) != String(variant[slot]):
+				swap_material(acc, String(u), String(variant[slot]))
+				break

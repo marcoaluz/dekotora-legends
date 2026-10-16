@@ -9,6 +9,7 @@ var _label: Label
 
 
 func _ready() -> void:
+	scale = Vector2(2, 2)   # layout legado em 480x270 sobre a base 960x540
 	var bg := ColorRect.new()
 	bg.color = Color(0.0431, 0.0392, 0.0784)
 	bg.size = Vector2(480, 270)

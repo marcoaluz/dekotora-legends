@@ -15,7 +15,8 @@ var _labels: Dictionary = {"left": "<", "right": ">", "throttle": "GO", "brake":
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_preset(Control.PRESET_TOP_LEFT)
+	size = Vector2(480, 270)
 	layout()
 
 
@@ -33,19 +34,21 @@ func layout() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
-		if event.pressed:
-			var b: String = _hit(event.position)
+		var t: InputEventScreenTouch = make_input_local(event) as InputEventScreenTouch
+		if t.pressed:
+			var b: String = _hit(t.position)
 			if b != "":
-				_fingers[event.index] = b
+				_fingers[t.index] = b
 		else:
-			_fingers.erase(event.index)
+			_fingers.erase(t.index)
 		_apply()
 	elif event is InputEventScreenDrag:
-		var b: String = _hit(event.position)
-		if b != "":
-			_fingers[event.index] = b
+		var d: InputEventScreenDrag = make_input_local(event) as InputEventScreenDrag
+		var b2: String = _hit(d.position)
+		if b2 != "":
+			_fingers[d.index] = b2
 		else:
-			_fingers.erase(event.index)
+			_fingers.erase(d.index)
 		_apply()
 
 

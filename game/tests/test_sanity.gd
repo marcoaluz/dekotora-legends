@@ -8,5 +8,5 @@ func test_math_basics() -> void:
 
 
 func test_project_settings() -> void:
-	check_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 480, "largura base")
-	check_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 270, "altura base")
+	check_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 960, "largura base")
+	check_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 540, "altura base")

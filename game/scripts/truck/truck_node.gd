@@ -13,6 +13,8 @@ var _headlight: SpotLight3D
 var _tail_glow: OmniLight3D
 var _spin: float = 0.0
 var tint: Color = Color.WHITE
+var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
+var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 
 
 func _ready() -> void:
@@ -62,3 +64,48 @@ func set_paint_color(c: Color) -> void:
 			var mat: StandardMaterial3D = (m.get_active_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
 			mat.albedo_color = c
 			m.material_override = mat
+
+
+## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao.
+func apply_loadout(defs: Array[PartDef]) -> void:
+	for id in _acc_nodes:
+		for n in _acc_nodes[id]:
+			if is_instance_valid(n):
+				n.queue_free()
+	_acc_nodes.clear()
+	_acc_state.clear()
+	if model == null:
+		return
+	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
+	for d in defs:
+		var entry: Dictionary = catalog.entry(d.accessory_id)
+		if entry.is_empty():
+			continue
+		var list: Array = []
+		for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
+			var n: Node3D = catalog.attach(model, d.accessory_id, side)
+			if n != null:
+				catalog.apply_variant(n, d.accessory_id, d.variant)
+				list.append(n)
+		_acc_nodes[String(d.id)] = list
+		_acc_state[String(d.id)] = "ok"
+
+
+## Estado visual de uma peca: "ok", "dent" (opaca/amassada) ou "broken" (some do caminhao).
+func set_part_state(part_id: String, state: String) -> void:
+	if not _acc_nodes.has(part_id) or _acc_state.get(part_id, "ok") == state:
+		return
+	_acc_state[part_id] = state
+	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
+	for n in _acc_nodes[part_id]:
+		var node: Node3D = n
+		node.visible = state != "broken"
+		if state == "dent":
+			catalog.swap_material(node, "chrome", "steel")
+			node.rotation.x = 0.06
+
+
+## Sincroniza todos os acessorios com o dano da simulacao (lista de pecas de TruckSim.loadout).
+func sync_damage(loadout: Array[Dictionary]) -> void:
+	for p in loadout:
+		set_part_state(String(p["id"]), DamageModel.part_state(p))
