@@ -4,6 +4,14 @@ extends Node
 ## Fase 6 em diante: o servidor passa a ser a fonte; este arquivo vira cache (docs/MULTIPLAYER.md).
 
 signal profile_changed
+## Acao de perfil feita (compra, reparo...). A rede escuta e repassa ao servidor quando online.
+signal action_performed(action: String, arg: String)
+var _mute_actions: bool = false
+
+
+func _act(action: String, arg: String) -> void:
+	if not _mute_actions:
+		action_performed.emit(action, arg)
 
 const SAVE_PATH := "user://profile.json"
 const START_MONEY: int = 50000
@@ -14,6 +22,7 @@ const DEFAULT_PARTS: Array[String] = ["fb_basic", "rb_basic"]
 const SAVE_VERSION: int = 1
 
 var profile: Dictionary = {}
+var save_path: String = SAVE_PATH               # o servidor usa user://profiles/<codigo>.json
 
 # Preenchido pelo menu antes de iniciar uma corrida
 var pending_route: RouteDef = null
@@ -63,8 +72,8 @@ func _make_player_code() -> String:
 
 
 func load_profile() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	if FileAccess.file_exists(save_path):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 		if parsed is Dictionary and int(parsed.get("version", 0)) == SAVE_VERSION:
 			profile = parsed
 			profile_changed.emit()
@@ -73,19 +82,28 @@ func load_profile() -> void:
 
 
 ## Escrita atomica: grava num arquivo temporario e renomeia (nao corrompe se o app fechar no meio).
+## Cada gravacao incrementa `rev` (usada para sincronizar perfil offline/online).
 func save_profile() -> void:
-	var tmp: String = SAVE_PATH + ".tmp"
+	profile["rev"] = int(profile.get("rev", 0)) + 1
+	var tmp: String = save_path + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
-		push_warning("GameState: nao consegui salvar o perfil")
+		push_warning("GameState: nao consegui salvar o perfil em " + save_path)
 		return
-	f.store_string(JSON.stringify(profile, "\t"))
+	f.store_string(JSON.stringify(profile, "	"))
 	f.close()
-	var dir := DirAccess.open("user://")
+	var dir := DirAccess.open(save_path.get_base_dir())
 	if dir != null:
-		if FileAccess.file_exists(SAVE_PATH):
-			dir.remove("profile.json")
-		dir.rename("profile.json.tmp", "profile.json")
+		if FileAccess.file_exists(save_path):
+			dir.remove(save_path.get_file())
+		dir.rename(tmp.get_file(), save_path.get_file())
+
+
+## Grava o perfil vindo do servidor sem incrementar `rev` (o servidor ja incrementou).
+func save_profile_cache_only() -> void:
+	var rev: int = int(profile.get("rev", 0))
+	save_profile()
+	profile["rev"] = rev
 
 
 func money() -> int:
@@ -158,6 +176,7 @@ func buy(d: PartDef) -> bool:
 	profile["money"] = money() - d.price
 	add_owned(d)
 	save_profile()
+	_act("buy_part", String(d.id))
 	profile_changed.emit()
 	return true
 
@@ -172,6 +191,7 @@ func install(id: String) -> bool:
 		return false
 	(profile["installed"] as Dictionary)[String(d.slot)] = id
 	save_profile()
+	_act("install", id)
 	profile_changed.emit()
 	return true
 
@@ -179,6 +199,7 @@ func install(id: String) -> bool:
 func uninstall(slot: String) -> void:
 	(profile["installed"] as Dictionary).erase(slot)
 	save_profile()
+	_act("uninstall", slot)
 	profile_changed.emit()
 
 
@@ -191,6 +212,7 @@ func sell(id: String) -> void:
 	if installed_id(String(d.slot)) == id:
 		(profile["installed"] as Dictionary).erase(String(d.slot))
 	save_profile()
+	_act("sell", id)
 	profile_changed.emit()
 
 
@@ -285,6 +307,7 @@ func buy_mech(id: String) -> bool:
 	profile["money"] = money() - int(mech_def(id).get("price"))
 	(profile["owned_mech"] as Dictionary)[id] = true
 	save_profile()
+	_act("buy_mech", id)
 	profile_changed.emit()
 	return true
 
@@ -302,6 +325,7 @@ func install_mech(id: String) -> bool:
 			else:
 				profile["sport_tires"] = not bool(profile["sport_tires"])
 	save_profile()
+	_act("install_mech", id)
 	profile_changed.emit()
 	return true
 
@@ -329,22 +353,21 @@ func preview(changes: Dictionary) -> Dictionary:
 	return out
 
 
+## Descritor do caminhao do jogador (para TruckConfig.apply e para o servidor).
+func truck_descriptor() -> Dictionary:
+	var parts: Array = []
+	for d in installed_part_defs():
+		var own: Dictionary = profile["owned"][String(d.id)]
+		parts.append({"id": String(d.id), "dur": float(own["dur"]), "broken": bool(own["broken"])})
+	return {
+		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
+		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"),
+		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
+	}
+
+
 func configure_truck(t: TruckSim) -> void:
-	var loadout: Array[Dictionary] = build_sim_loadout()
-	var weight: float = 0.0
-	for p in loadout:
-		if not bool(p["broken"]):
-			weight += float(p["weight"])
-	t.loadout = loadout
-	var eng: EngineDef = load("res://data/engines/%s.tres" % profile["engine"]) as EngineDef
-	var tur: TurboDef = load("res://data/engines/%s.tres" % profile["turbo"]) as TurboDef
-	var exh: ExhaustDef = load("res://data/engines/%s.tres" % profile["exhaust"]) as ExhaustDef
-	t.engine.configure(eng, tur, exh, bool(profile["jake_brake"]))
-	t.set_mass(weight + (eng.weight_kg if eng != null else 0.0))
-	t.systems["engine"] = float(profile["systems"]["engine"])
-	t.systems["steering"] = float(profile["systems"]["steering"])
-	t.systems["cargo"] = 100.0                         # carga nova a cada viagem
-	t.refresh_damage_effects()
+	TruckConfig.apply(t, truck_descriptor())
 
 
 ## Fama total das pecas instaladas e inteiras + bonus do escape.
@@ -417,6 +440,7 @@ func repair_part(id: String) -> bool:
 	profile["money"] = money() - c
 	profile["owned"][id] = {"dur": d.durability, "broken": false, "scratch": 0.0}
 	save_profile()
+	_act("repair_part", id)
 	profile_changed.emit()
 	return true
 
@@ -428,6 +452,7 @@ func repair_system(system: String) -> bool:
 	profile["money"] = money() - c
 	profile["systems"][system] = 100.0
 	save_profile()
+	_act("repair_system", system)
 	profile_changed.emit()
 	return true
 
@@ -435,6 +460,7 @@ func repair_system(system: String) -> bool:
 ## Repara tudo o que o dinheiro permitir, do mais barato ao mais caro. Devolve o total gasto.
 func repair_all() -> int:
 	var spent: int = 0
+	_mute_actions = true
 	var items: Array = []
 	for id in profile["owned"]:
 		var c: int = part_repair_cost(String(id))
@@ -451,6 +477,9 @@ func repair_all() -> int:
 		var ok: bool = repair_part(String(it["id"])) if it["kind"] == "part" else repair_system(String(it["id"]))
 		if ok:
 			spent += int(it["cost"])
+	_mute_actions = false
+	if spent > 0:
+		_act("repair_all", "")
 	return spent
 
 
@@ -462,8 +491,38 @@ func buy_new_replacement(id: String) -> bool:
 	profile["money"] = money() - d.price
 	profile["owned"][id] = {"dur": d.durability, "broken": false, "scratch": 0.0}
 	save_profile()
+	_act("buy_new", id)
 	profile_changed.emit()
 	return true
+
+
+## Executa uma acao de perfil pelo nome (o servidor usa isto para validar compras/reparos online).
+func apply_action(action: String, arg: String) -> bool:
+	match action:
+		"buy_part":
+			var d: PartDef = part(arg)
+			return d != null and buy(d)
+		"install":
+			return install(arg)
+		"uninstall":
+			uninstall(arg)
+			return true
+		"sell":
+			sell(arg)
+			return true
+		"buy_mech":
+			return buy_mech(arg)
+		"install_mech":
+			return install_mech(arg)
+		"repair_part":
+			return repair_part(arg)
+		"repair_system":
+			return repair_system(arg)
+		"repair_all":
+			return repair_all() > 0
+		"buy_new":
+			return buy_new_replacement(arg)
+	return false
 
 
 # ---------------------------------------------------------------- resultado da corrida
