@@ -6,8 +6,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 ## Fase 0 — Setup
 - [ ] Instalar ferramentas (`SETUP.md`) — Marco
 - [x] [P00] Claude lê o projeto e confere o ambiente
-- [ ] [P01] Configurar projeto Godot (resolução, controles, exportações)
-- [ ] [P02] Primeira build: tela de teste no celular e no PC
+- [x] [P01] Configurar projeto Godot (resolução, controles, exportações)
+- [~] [P02] Primeira build: tela de teste no celular e no PC — Windows OK (builds/dekotora.exe); Android PRECISA MARCO (falta Android SDK + JDK17, ver docs/SETUP.md passo 5)
 
 ## Fase 1 — Teste do pipeline Blender (decisão de visual)
 - [ ] [P10] Biblioteca comum dos scripts Blender
