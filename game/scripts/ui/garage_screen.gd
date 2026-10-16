@@ -72,7 +72,7 @@ func _ready() -> void:
 	bh.add_child(_bar)
 	var back: Button = UiTheme.button(Tr.t("menu.back"), Vector2(150, 30))
 	back.add_theme_font_size_override("font_size", 16)
-	back.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	back.pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	bh.add_child(back)
 	_msg = UiTheme.label("", 16, UiTheme.CYAN)
 	_msg.position = Vector2(330, 440)

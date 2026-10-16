@@ -140,6 +140,15 @@ func set_layout(right_panel_open: bool) -> void:
 	_zoom_goal = 1.5 if right_panel_open else 1.15
 
 
+## Enquadramento de vitrine da tela inicial: 3/4 frontal baixo, caminhao deslocado para a direita
+## (o menu fica a esquerda), girando bem devagar.
+func focus_hero() -> void:
+	_goal = {"target": Vector3(-1.0, 1.6, -6.8), "dist": 15.5, "az": 36.0, "el": 5.0}
+	_shift_goal = 0.22
+	_zoom_goal = 1.0
+	auto_rotate = false
+
+
 func focus_default() -> void:
 	_goal = FOCUS["default"]
 	auto_rotate = true

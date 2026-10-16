@@ -46,7 +46,7 @@ func _ready() -> void:
 	Net.room_joined.connect(func(_c: String) -> void: _show_room())
 	Net.lobby_updated.connect(_on_lobby)
 	Net.race_setup_received.connect(func(_s: Dictionary, _t: int) -> void:
-		get_tree().change_scene_to_file("res://scenes/race/race3d.tscn"))
+		SceneFader.go(get_tree(), "res://scenes/race/race3d.tscn"))
 	_apply_auto_args()
 	if Net.online:
 		if Net.room_code != "":
@@ -110,7 +110,7 @@ func _show_connect() -> void:
 			_set_status("Erro ao iniciar a conexao (%d)" % err, true))
 	v.add_child(go)
 	var back: Button = UiTheme.button(Tr.t("menu.back"))
-	back.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	back.pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	v.add_child(back)
 
 

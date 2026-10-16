@@ -4,8 +4,13 @@ extends RefCounted
 ## versionado. Base 960x540. Use `UiTheme.make()` e aplique em um Control raiz (`theme = ...`).
 
 const NIGHT := Color("#0b0a14")
-const PANEL_BG := Color(0.06, 0.05, 0.14, 0.88)
-const PANEL_EDGE := Color("#3c3a73")
+const NAVY := Color("#0d1426")                   # base: azul-marinho
+const GRAPHITE := Color("#1b1f2a")               # base: grafite
+const PANEL_BG := Color(0.05, 0.06, 0.11, 0.86)  # vidro escuro (transparencia moderada)
+const PANEL_EDGE := Color(1, 1, 1, 0.1)
+const HEADING_FONT := "res://assets/fonts/Rajdhani-Bold.ttf"
+const HEADING_FONT_SEMI := "res://assets/fonts/Rajdhani-SemiBold.ttf"
+const BODY_FONT := "res://assets/fonts/ui_font.tres"
 const PINK := Color("#ff2e88")
 const CYAN := Color("#21e6ff")
 const GOLD := Color("#f5cc5a")
@@ -16,6 +21,22 @@ const WARN := Color("#f5cc5a")
 const BAD := Color("#d1303f")
 
 static var _cached: Theme
+static var _fonts: Dictionary = {}
+
+
+## Fonte de titulos/botoes/numeros (Rajdhani) com reserva Noto Sans JP para japones e simbolos.
+## `skew` inclina (logo); `bold` = Bold, senao SemiBold.
+static func heading_font(bold: bool = true, skew: float = 0.0) -> Font:
+	var key: String = "%s_%.2f" % [bold, skew]
+	if _fonts.has(key):
+		return _fonts[key]
+	var fv := FontVariation.new()
+	fv.base_font = load(HEADING_FONT if bold else HEADING_FONT_SEMI) as Font
+	fv.fallbacks = [load(BODY_FONT) as Font]
+	if skew != 0.0:
+		fv.variation_transform = Transform2D(Vector2(1, 0), Vector2(skew, 1), Vector2.ZERO)
+	_fonts[key] = fv
+	return fv
 
 
 static func box(bg: Color, border: Color = PANEL_EDGE, border_w: int = 2, radius: int = 6, pad: int = 10) -> StyleBoxFlat:
@@ -75,7 +96,17 @@ static func make() -> Theme:
 	t.set_color("font_hover_color", "Button", Color.WHITE)
 	t.set_color("font_pressed_color", "Button", GOLD)
 	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
-	t.set_font_size("font_size", "Button", 20)
+	t.set_font_size("font_size", "Button", 22)
+	t.set_font("font", "Button", heading_font(false))
+	t.set_font("font", "OptionButton", heading_font(false))
+	t.set_font("font", "CheckButton", load(BODY_FONT) as Font)
+	t.set_constant("h_separation", "Button", 12)
+	t.set_constant("icon_max_width", "Button", 26)
+	t.set_color("icon_normal_color", "Button", Color(1, 1, 1, 0.85))
+	t.set_color("icon_hover_color", "Button", Color.WHITE)
+	t.set_color("icon_pressed_color", "Button", PINK)
+	t.set_color("icon_focus_color", "Button", Color.WHITE)
+	t.set_color("icon_disabled_color", "Button", Color(1, 1, 1, 0.3))
 	t.set_stylebox("normal", "Button", box(Color(0.1, 0.1, 0.2, 0.82), Color(1, 1, 1, 0.14), 1, 10))
 	t.set_stylebox("hover", "Button", box(Color(0.14, 0.15, 0.3, 0.92), CYAN, 1, 10))
 	t.set_stylebox("pressed", "Button", box(Color(0.26, 0.08, 0.2, 1.0), PINK, 1, 10))

@@ -171,7 +171,7 @@ func _connect_net() -> void:
 		if st == Protocol.RoomState.RACING:
 			_countdown = 0.0)
 	Net.race_ended.connect(_on_net_end)
-	Net.disconnected_from_server.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	Net.disconnected_from_server.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--latency="):
 			Net.debug_latency_ms = int(a.substr(10))
@@ -194,7 +194,7 @@ func _on_net_end(result: Dictionary) -> void:
 	var screen := ResultScreen.new()
 	layer.add_child(screen)
 	screen.show_result(result)
-	screen.continue_pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn"))
+	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/lobby/lobby.tscn"))
 
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
@@ -266,7 +266,7 @@ func _build_pause_menu() -> void:
 	var leave: Button = UiTheme.button(Tr.t("race.exit"))
 	leave.pressed.connect(func() -> void:
 		get_tree().paused = false
-		get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+		SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	box.add_child(leave)
 
 
@@ -467,4 +467,4 @@ func _show_result() -> void:
 	var screen := ResultScreen.new()
 	layer.add_child(screen)
 	screen.show_result(res)
-	screen.continue_pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
