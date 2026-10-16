@@ -47,3 +47,25 @@ def diamond_plate(name: str = "tex_diamond", n: int = 8, size: int = 256):
     hi = np.array(hex_to_rgb("#c4ccd8"))
     arr = lo * (1 - bump[..., None]) + hi * bump[..., None]
     return _image(name, arr)
+
+
+def grime_panel(name: str = "tex_grime", w: int = 512, h: int = 256, seed: int = 7):
+    """Sujeira discreta para chapa pintada (multiplica a cor): escurece a parte de baixo (poeira da estrada),
+    riscos de água escorrendo de cima e pontinhos de uso. Valores 0,82..1,0 (nunca preto)."""
+    rng = np.random.default_rng(seed)
+    v = np.linspace(0, 1, h)[:, None]                       # 0 = embaixo, 1 = em cima
+    grime = 0.16 * np.clip(1 - v / 0.35, 0, 1) ** 1.5       # poeira na barra inferior
+    streaks = np.zeros((h, w))
+    for _ in range(26):                                     # riscos verticais
+        x = rng.integers(0, w)
+        wd = rng.integers(1, 4)
+        top = rng.uniform(0.5, 1.0)
+        a = rng.uniform(0.02, 0.07)
+        y1 = int((1 - top) * h)
+        y0 = int(h * rng.uniform(0.0, 0.5))
+        ramp = np.linspace(a, 0, max(h - y1 - y0, 1))
+        streaks[y1:h - y0, x:x + wd] += ramp[:, None][: streaks[y1:h - y0, x:x + wd].shape[0]]
+    speck = np.clip(rng.normal(0, 1, (h, w)), 1.6, 4) - 1.6   # arranhoes/pontinhos raros
+    speck = (speck > 0.9) * 0.05
+    val = np.clip(1.0 - grime - streaks - speck, 0.78, 1.0)
+    return _image(name, np.repeat(val[..., None], 3, axis=2))

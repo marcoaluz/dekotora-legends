@@ -71,15 +71,29 @@ def emissive(name: str, hex_color: str, strength: float = 6.0):
     return pbr(name, hex_color, metallic=0.0, roughness=0.3, emission=hex_color, emission_strength=strength)
 
 
-def textured(name: str, image, metallic: float = 0.8, roughness: float = 0.4):
-    """Material PBR com a textura de `image` na cor base (exportada no .glb)."""
+def textured(name: str, image, metallic: float = 0.8, roughness: float = 0.4, tint: str | None = None,
+             coat: float = 0.0, coat_rough: float = 0.05):
+    """Material PBR com a textura de `image` na cor base (exportada no .glb). `tint` multiplica a textura
+    (vira o fator de cor do glTF, então o jogo ainda consegue retingir a pintura)."""
     m, b = _principled(name)
     nt = m.node_tree
     tex = nt.nodes.new("ShaderNodeTexImage")
     tex.image = image
-    nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
+    if tint:
+        mix = nt.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.blend_type = "MULTIPLY"
+        mix.inputs[0].default_value = 1.0
+        mix.inputs[7].default_value = lin(hex_to_rgb(tint)) + (1.0,)
+        nt.links.new(tex.outputs["Color"], mix.inputs[6])
+        nt.links.new(mix.outputs[2], b.inputs["Base Color"])
+    else:
+        nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
     _set(b, "Metallic", metallic)
     _set(b, "Roughness", roughness)
+    if coat > 0:
+        _set(b, "Coat Weight", coat)
+        _set(b, "Coat Roughness", coat_rough)
     m["px_kind"] = "pbr"
     return m
 
@@ -99,6 +113,8 @@ def standard_set() -> dict:
         "glass": glass(),
         "mesh_perf": textured("mesh_perf", tex.perforated_mesh(), 0.85, 0.38),
         "mesh_perf_vent": textured("mesh_perf_vent", tex.perforated_mesh("tex_perf_vent", 12, 2, 768, 128), 0.85, 0.38),
+        "mesh_perf_grille": textured("mesh_perf_grille", tex.perforated_mesh("tex_perf_grille", 14, 6, 840, 360), 0.85, 0.38),
+        "paint_white_panel": textured("paint_white_panel", tex.grime_panel(), 0.35, 0.32, tint="#d6dce6", coat=0.8, coat_rough=0.04),
         "diamond": textured("diamond", tex.diamond_plate(), 0.7, 0.45),
         "lamp_amber": emissive("lamp_amber", "#ffb347", 3.0),
         "lamp_white": emissive("lamp_white", "#ffe9c2", 3.5),

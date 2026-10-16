@@ -45,9 +45,9 @@ func _ready() -> void:
 	floor_mi.mesh = disc
 	floor_mi.position = Vector3(0, -0.1, -6.0)
 	var fm := StandardMaterial3D.new()
-	fm.albedo_color = Color(0.05, 0.05, 0.09)
-	fm.metallic = 0.6
-	fm.roughness = 0.3
+	fm.albedo_color = Color(0.2, 0.2, 0.23)           # concreto polido
+	fm.metallic = 0.2
+	fm.roughness = 0.42
 	floor_mi.material_override = fm
 	add_child(floor_mi)
 	var ring := MeshInstance3D.new()
@@ -60,7 +60,7 @@ func _ready() -> void:
 	rm.albedo_color = UiTheme.PINK
 	rm.emission_enabled = true
 	rm.emission = UiTheme.PINK
-	rm.emission_energy_multiplier = 3.0
+	rm.emission_energy_multiplier = 1.4
 	ring.material_override = rm
 	add_child(ring)
 	var big_floor := MeshInstance3D.new()
@@ -68,8 +68,8 @@ func _ready() -> void:
 	plane.size = Vector2(400, 400)
 	big_floor.mesh = plane
 	var bm := StandardMaterial3D.new()
-	bm.albedo_color = Color(0.03, 0.03, 0.06)
-	bm.roughness = 0.6
+	bm.albedo_color = Color(0.1, 0.1, 0.12)
+	bm.roughness = 0.75
 	big_floor.material_override = bm
 	big_floor.position.y = -0.25
 	add_child(big_floor)
@@ -91,15 +91,27 @@ func _ready() -> void:
 
 func _spawn_truck() -> void:
 	truck = TruckNode.new()
-	truck.body_kind = String(get_node("/root/GameState").profile.get("body", "base"))
+	var prof: Dictionary = get_node("/root/GameState").profile
+	truck.body_kind = String(prof.get("body", "base"))
+	truck.cab_kind = String(prof.get("cab", "padrao"))
 	add_child(truck)
 
 
 ## Troca a carroceria do caminhao mostrado (recria o no e reaplica pecas e tinta).
 func set_body(kind: String) -> void:
+	get_node("/root/GameState").profile["body"] = kind
+	_respawn()
+
+
+## Troca a cabine do caminhao mostrado.
+func set_cab(kind: String) -> void:
+	get_node("/root/GameState").profile["cab"] = kind
+	_respawn()
+
+
+func _respawn() -> void:
 	if truck != null:
 		truck.queue_free()
-	get_node("/root/GameState").profile["body"] = kind
 	_spawn_truck()
 	refresh_truck()
 

@@ -1,6 +1,6 @@
 """Caminhão base 3D (PBR) para o Godot: cabine cab-over arredondada (referência Volvo FH) + baú, ~12 x 2,5 x 3,4 m.
 
-Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora] [--variant base|leve|longo|carreta]
+Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora] [--variant base|leve|longo|carreta] [--cab padrao|classica|aero|alta]
 Saída: <out>/truck/dekotora_truck_base.glb, <out>/source_blend/truck_base.blend, <out>/previews/truck_base_*.png
 
 Convenções: metros, +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro. As peças usam os pontos
@@ -16,7 +16,7 @@ import bpy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import mesh3d as M, pbr, preview, scene  # noqa: E402
 from truck3d.body import build_body  # noqa: E402
-from truck3d.cab import build_cab  # noqa: E402
+from truck3d.cab import CAB_STYLES, build_cab, cab_mounts  # noqa: E402
 from truck3d.chassis import build_chassis  # noqa: E402
 from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB_Y0, CAB_Y1,  # noqa: E402,F401
                           CAB_Z0, FRONT_AXLE_Y, MOUNTS, REAR_AXLES_Y, WHEEL_R)
@@ -24,7 +24,7 @@ from truck3d.variants import LENGTH_DELTA, VARIANTS, apply_variant
 from truck3d.wheels import make_wheel  # noqa: E402
 
 
-def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base"):
+def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = "padrao"):
     """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set)."""
     if paint_name != "paint_white":
         m = dict(m)
@@ -39,14 +39,16 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base")
     spec = VARIANTS[variant]
     build_chassis(m, add, spec["rear_axles"], spec["tanks"])
     build_body(m, add)
-    build_cab(m, add)
+    build_cab(m, add, cab)
     for sx in (-1, 1):
         side = "L" if sx < 0 else "R"
         for y in spec["rear_axles"]:
             for tx in (0.72, 1.06):
                 wheels.append(make_wheel(f"wheel_r_{side}_{y}_{tx}", (sx * tx, y, WHEEL_R), m, rim=(tx > 1.0), seg=spec["seg"]))
         wheels.append(make_wheel(f"wheel_f_{side}", (sx * 1.0, FRONT_AXLE_Y, 0.5), m, rim=True, radius=0.5))
-    empties = [M.empty(n, p) for n, p in MOUNTS.items()]
+    mounts = dict(MOUNTS)
+    mounts.update(cab_mounts(cab))                 # teto/para-brisa mudam com a cabine
+    empties = [M.empty(n, p) for n, p in mounts.items()]
     apply_variant(variant, m, parts, wheels, empties)
     return parts, wheels, empties
 
@@ -56,14 +58,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="game/assets/vehicles/dekotora")
     ap.add_argument("--paint", default="paint_white")
+    ap.add_argument("--cab", default="padrao", choices=list(CAB_STYLES), help="padrao | classica | aero | alta")
+    ap.add_argument("--no-preview", action="store_true")
     ap.add_argument("--variant", default="base", choices=list(VARIANTS), help="base | leve | longo | carreta")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     scene.reset_scene()
     m = pbr.standard_set()
-    parts, wheels, empties = build_truck(m, args.paint, args.variant)
+    parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab)
     for o in parts:                                  # texturas precisam de UV que cubra cada face
-        if o.active_material and o.active_material.name in ("mesh_perf", "mesh_perf_vent", "diamond"):
+        if o.active_material and o.active_material.name in ("mesh_perf", "mesh_perf_vent", "mesh_perf_grille", "diamond", "paint_white_panel"):
             M.uv_planar(o)
     all_meshes = parts + [w for ws in wheels for w in ws]
     M.smooth(all_meshes, 35.0)
@@ -88,11 +92,14 @@ def main():
         o.parent = root
     final = [root] + merged + wheel_objs + empties
     print(f"triangulos: {tris}  objetos: {len(final)}  materiais: {len(bpy.data.materials)}")
-    tag = args.variant
+    tag = args.variant if args.cab == "padrao" else f"{args.variant}_{args.cab}"
     glb = os.path.join(out, "truck", f"dekotora_truck_{tag}.glb")
     M.export_glb(glb, final)
     os.makedirs(os.path.join(out, "source_blend"), exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "source_blend", f"truck_{tag}.blend"))
+    if args.no_preview:
+        print("OK build_truck_3d ->", glb)
+        return
     d = LENGTH_DELTA[args.variant]
     pdir = os.path.join(out, "previews")
     preview.render_views(os.path.join(pdir, f"truck_{tag}"), merged + wheel_objs, size=(960, 540),

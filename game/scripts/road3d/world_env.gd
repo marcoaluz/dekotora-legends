@@ -6,10 +6,10 @@ extends RefCounted
 
 static func create(parent: Node3D) -> void:
 	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color("#141440")
-	sky_mat.sky_horizon_color = Color("#6a58b8")
-	sky_mat.ground_horizon_color = Color("#8a78d8")
-	sky_mat.ground_bottom_color = Color("#2a2260")
+	sky_mat.sky_top_color = Color("#101a3a")           # hora azul: ceu azul-petroleo, horizonte rosado
+	sky_mat.sky_horizon_color = Color("#b8706a")
+	sky_mat.ground_horizon_color = Color("#8a6a78")
+	sky_mat.ground_bottom_color = Color("#1c1c2c")
 	sky_mat.sky_curve = 0.18
 	sky_mat.sky_energy_multiplier = 1.3
 	sky_mat.sun_angle_max = 30.0
@@ -25,7 +25,10 @@ static func create(parent: Node3D) -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.0
 	env.fog_enabled = true
-	env.fog_light_color = Color("#241f4d")
+	env.fog_light_color = Color("#3a3552")
+	env.adjustment_enabled = true                  # um pouco menos saturado e mais contraste = tom mais realista
+	env.adjustment_saturation = 0.9
+	env.adjustment_contrast = 1.07
 	env.fog_density = 0.0028
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
 	env.glow_enabled = q >= 1
@@ -37,9 +40,9 @@ static func create(parent: Node3D) -> void:
 	we.environment = env
 	parent.add_child(we)
 	var moon := DirectionalLight3D.new()
-	moon.light_color = Color("#9db2ff")
-	moon.light_energy = 0.55
-	moon.rotation_degrees = Vector3(-48, 28, 0)
+	moon.light_color = Color("#ffcfa8")          # sol baixo do fim de tarde
+	moon.light_energy = 0.8
+	moon.rotation_degrees = Vector3(-26, 32, 0)
 	moon.shadow_enabled = q >= 2
 	moon.directional_shadow_max_distance = 90.0
 	parent.add_child(moon)

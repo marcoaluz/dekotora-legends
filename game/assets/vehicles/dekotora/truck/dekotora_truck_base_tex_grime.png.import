@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cntjorxu4boa2"
-path="res://.godot/imported/dekotora_truck_flat_tex_perf_vent.png-6a79f11d94056e1749dc0998f44c166a.ctex"
+uid="uid://blph8vd7smqgu"
+path="res://.godot/imported/dekotora_truck_base_tex_grime.png-e0853af1f5125155308e6025a68c4f1a.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "5643719a21cd23cdc212261e96b830e1"
+"md5": "82670dadddd6a07b264de11d69fd9e9c"
 }
 
 [deps]
 
-source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_flat_tex_perf_vent.png"
-dest_files=["res://.godot/imported/dekotora_truck_flat_tex_perf_vent.png-6a79f11d94056e1749dc0998f44c166a.ctex"]
+source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_base_tex_grime.png"
+dest_files=["res://.godot/imported/dekotora_truck_base_tex_grime.png-e0853af1f5125155308e6025a68c4f1a.ctex"]
 
 [params]
 

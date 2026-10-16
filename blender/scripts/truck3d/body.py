@@ -31,7 +31,7 @@ def _rear_common(m, add):
 
 
 def _box(m, add):
-    add(M.box("body", (BODY_W, BODY_L, BODY_TOP - BODY_Z0), (0, BODY_L / 2, (BODY_Z0 + BODY_TOP) / 2), m["paint_white"], bevel=0.08, seg=3))
+    add(M.box("body", (BODY_W, BODY_L, BODY_TOP - BODY_Z0), (0, BODY_L / 2, (BODY_Z0 + BODY_TOP) / 2), m["paint_white_panel"], bevel=0.08, seg=3))
     # tábuas horizontais (frestas finas) + montantes verticais com trava, como no baú de madeira da referência
     for sx in (-1, 1):
         for k in range(11):

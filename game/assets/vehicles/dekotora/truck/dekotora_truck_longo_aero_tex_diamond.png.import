@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d3fkiot2qo570"
-path="res://.godot/imported/dekotora_truck_flat_tex_diamond.png-b06bb45f75b595bf10ead5d67ce8e02f.ctex"
+uid="uid://4tfy2gn0et2p"
+path="res://.godot/imported/dekotora_truck_longo_aero_tex_diamond.png-d7a6d6ccf3904752c1782392c2911467.ctex"
 metadata={
 "vram_texture": false
 }
@@ -13,8 +13,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_flat_tex_diamond.png"
-dest_files=["res://.godot/imported/dekotora_truck_flat_tex_diamond.png-b06bb45f75b595bf10ead5d67ce8e02f.ctex"]
+source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_longo_aero_tex_diamond.png"
+dest_files=["res://.godot/imported/dekotora_truck_longo_aero_tex_diamond.png-d7a6d6ccf3904752c1782392c2911467.ctex"]
 
 [params]
 

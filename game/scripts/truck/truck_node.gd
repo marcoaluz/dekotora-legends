@@ -11,11 +11,14 @@ const MODEL_PATHS: Dictionary = {
 	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo.glb",
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 }
+const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
 const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5}
 const WHEEL_RADIUS: float = 0.52
 ## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
 var body_kind: String = "base"
+## Cabine: "padrao", "classica", "aero" ou "alta". Definir antes de add_child.
+var cab_kind: String = "padrao"
 
 var model: Node3D
 var _wheels: Array[Node3D] = []
@@ -28,7 +31,7 @@ var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 
 
 func _ready() -> void:
-	var path: String = String(MODEL_PATHS.get(body_kind, MODEL_PATH))
+	var path: String = model_path(body_kind, cab_kind)
 	var scene: PackedScene = load(path) as PackedScene
 	if scene == null:
 		push_warning("TruckNode: modelo nao encontrado: " + path)
@@ -76,6 +79,13 @@ func set_paint_color(c: Color) -> void:
 			var mat: StandardMaterial3D = (m.get_active_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
 			mat.albedo_color = c
 			m.material_override = mat
+
+
+## Caminho do .glb para a combinacao carroceria + cabine (a cabine "padrao" nao tem sufixo).
+static func model_path(body: String, cab: String) -> String:
+	if cab == "padrao" or not ResourceLoader.exists(MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]):
+		return String(MODEL_PATHS.get(body, MODEL_PATH))
+	return MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]
 
 
 ## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao.

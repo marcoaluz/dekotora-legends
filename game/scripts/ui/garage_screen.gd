@@ -170,17 +170,23 @@ func _flash(text: String) -> void:
 # ---------------------------------------------------------------- pecas
 
 func _build_body_picker() -> void:
-	_left.add_child(_wl(Tr.t("garage.body"), 16, UiTheme.PINK))
+	_picker("garage.body", "body", ["leve", "base", "longo"], "base", func(k: String) -> void: stage.set_body(k))
+	_picker("garage.cab", "cab", ["padrao", "classica", "aero", "alta"], "padrao", func(k: String) -> void: stage.set_cab(k))
+
+
+## Seletor de opcoes em grade (carroceria / cabine): a escolha fica salva no perfil.
+func _picker(title_key: String, field: String, kinds: Array, default_kind: String, apply: Callable) -> void:
+	_left.add_child(_wl(Tr.t(title_key), 16, UiTheme.PINK))
 	var row := GridContainer.new()
 	row.columns = 2
-	var cur: String = String(gs.profile.get("body", "base"))
-	for kind in ["leve", "base", "longo", "carreta"]:
-		var b: Button = UiTheme.button(Tr.t("body." + String(kind)), Vector2(0, 40))
+	var cur: String = String(gs.profile.get(field, default_kind))
+	for kind in kinds:
+		var b: Button = UiTheme.button(Tr.t(field + "." + String(kind)), Vector2(0, 40))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if String(kind) == cur:
 			b.add_theme_color_override("font_color", UiTheme.GOLD)
 		b.pressed.connect(func() -> void:
-			stage.set_body(String(kind))
+			apply.call(String(kind))
 			gs.save_profile()
 			_refresh())
 		row.add_child(b)

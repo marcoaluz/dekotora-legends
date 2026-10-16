@@ -17,7 +17,13 @@ func _ready() -> void:
 	_ui.theme = UiTheme.make()
 	_ui.set_anchors_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(_ui)
-	_show_main()
+	match "".join(OS.get_cmdline_user_args()).replace("--screen=", ""):    # debug: --screen=options|campaign
+		"options":
+			_show_options()
+		"campaign":
+			_show_campaign()
+		_:
+			_show_main()
 
 
 func _clear_panel() -> void:
@@ -30,15 +36,34 @@ func _clear_panel() -> void:
 
 func _show_main() -> void:
 	_clear_panel()
-	var title := UiTheme.label(Tr.t("game.title"), 54, UiTheme.PINK)
-	title.position = Vector2(48, 36)
+	# faixa escura a esquerda (leitura do texto) com degrade para a direita
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0.02, 0.02, 0.07, 0.88))
+	grad.set_color(1, Color(0.02, 0.02, 0.07, 0.0))
+	var gt := GradientTexture2D.new()
+	gt.gradient = grad
+	gt.fill_from = Vector2(0, 0)
+	gt.fill_to = Vector2(1, 0)
+	var scrim := TextureRect.new()
+	scrim.texture = gt
+	scrim.stretch_mode = TextureRect.STRETCH_SCALE
+	scrim.size = Vector2(520, 540)
+	_panel.add_child(scrim)
+	var title := UiTheme.label(Tr.t("game.title"), 52, Color.WHITE)
+	title.position = Vector2(48, 34)
 	_panel.add_child(title)
-	var sub := UiTheme.label(Tr.t("game.subtitle"), 26, UiTheme.CYAN)
-	sub.position = Vector2(52, 100)
+	var bar := ColorRect.new()
+	bar.color = UiTheme.PINK
+	bar.position = Vector2(52, 104)
+	bar.size = Vector2(72, 4)
+	_panel.add_child(bar)
+	var sub := UiTheme.label(Tr.t("game.subtitle").to_upper(), 22, UiTheme.CYAN)
+	sub.position = Vector2(52, 114)
 	_panel.add_child(sub)
 	var box := VBoxContainer.new()
-	box.position = Vector2(48, 170)
-	box.custom_minimum_size = Vector2(300, 0)
+	box.position = Vector2(40, 150)
+	box.custom_minimum_size = Vector2(320, 0)
+	box.add_theme_constant_override("separation", 2)
 	_panel.add_child(box)
 	var items: Array = [
 		[Tr.t("menu.campaign"), _show_campaign],
@@ -49,15 +74,15 @@ func _show_main() -> void:
 		[Tr.t("menu.quit"), func() -> void: get_tree().quit()],
 	]
 	for it in items:
-		var b: Button = UiTheme.button(String(it[0]), Vector2(300, 54))
+		var b: Button = UiTheme.menu_button(String(it[0]), Vector2(320, 46))
 		b.pressed.connect(it[1])
 		box.add_child(b)
 	var gs: Node = get_node("/root/GameState")
-	var info := UiTheme.label("%s    Fama %d" % [Tr.yen(gs.money()), gs.fame()], 20, UiTheme.GOLD)
-	info.position = Vector2(48, 490)
+	var info := UiTheme.label("%s     FAMA %d" % [Tr.yen(gs.money()), gs.fame()], 20, UiTheme.GOLD)
+	info.position = Vector2(52, 502)
 	_panel.add_child(info)
 	var code := UiTheme.label("Código do jogador: %s" % gs.profile["player_code"], 14, UiTheme.TEXT_DIM)
-	code.position = Vector2(620, 505)
+	code.position = Vector2(700, 510)
 	_panel.add_child(code)
 	stage.focus_default()
 
@@ -111,99 +136,9 @@ func _show_campaign() -> void:
 
 func _show_options() -> void:
 	_clear_panel()
-	var s: Node = get_node("/root/Settings")
-	var panel := PanelContainer.new()
-	panel.position = Vector2(40, 30)
-	panel.custom_minimum_size = Vector2(520, 0)
-	_panel.add_child(panel)
-	var v := VBoxContainer.new()
-	panel.add_child(v)
-	v.add_child(UiTheme.label(Tr.t("options.title"), 30, UiTheme.PINK))
-	v.add_child(UiTheme.label(Tr.t("options.touch_size"), 18))
-	var hs := HSlider.new()
-	hs.min_value = 0.7
-	hs.max_value = 1.5
-	hs.step = 0.05
-	hs.value = s.touch_scale
-	hs.custom_minimum_size = Vector2(300, 30)
-	hs.value_changed.connect(func(val: float) -> void:
-		s.touch_scale = val
-		s.save_settings())
-	v.add_child(hs)
-	var tilt := CheckButton.new()
-	tilt.text = Tr.t("options.tilt")
-	tilt.button_pressed = s.use_tilt
-	tilt.toggled.connect(func(on: bool) -> void:
-		s.use_tilt = on
-		s.save_settings())
-	v.add_child(tilt)
-	var inv := CheckButton.new()
-	inv.text = Tr.t("options.tilt_invert")
-	inv.button_pressed = s.tilt_invert
-	inv.toggled.connect(func(on: bool) -> void:
-		s.tilt_invert = on
-		s.save_settings())
-	v.add_child(inv)
-	v.add_child(UiTheme.label("Qualidade gráfica (baixa = mais FPS no celular)", 18))
-	var qual := OptionButton.new()
-	for qn in ["Baixa", "Média", "Alta"]:
-		qual.add_item(qn)
-	qual.selected = s.quality
-	qual.item_selected.connect(func(i: int) -> void:
-		s.quality = i
-		s.save_settings())
-	v.add_child(qual)
-	var fps := CheckButton.new()
-	fps.text = "Mostrar FPS na corrida"
-	fps.button_pressed = s.show_fps
-	fps.toggled.connect(func(on: bool) -> void:
-		s.show_fps = on
-		s.save_settings())
-	v.add_child(fps)
-	v.add_child(UiTheme.label(Tr.t("options.music"), 18))
-	var ms := HSlider.new()
-	ms.min_value = 0.0
-	ms.max_value = 1.0
-	ms.step = 0.05
-	ms.value = s.music_volume
-	ms.value_changed.connect(func(val: float) -> void:
-		s.music_volume = val
-		s.save_settings()
-		AudioBus.apply_settings())
-	v.add_child(ms)
-	v.add_child(UiTheme.label(Tr.t("options.sfx"), 18))
-	var fs := HSlider.new()
-	fs.min_value = 0.0
-	fs.max_value = 1.0
-	fs.step = 0.05
-	fs.value = s.sfx_volume
-	fs.value_changed.connect(func(val: float) -> void:
-		s.sfx_volume = val
-		s.save_settings()
-		AudioBus.apply_settings())
-	v.add_child(fs)
-	v.add_child(UiTheme.label("Código do jogador (use o mesmo em outro aparelho para ter a mesma garagem)", 14, UiTheme.TEXT_DIM))
-	var code_row := HBoxContainer.new()
-	v.add_child(code_row)
-	var code_edit := LineEdit.new()
-	code_edit.text = String(get_node("/root/GameState").profile["player_code"])
-	code_edit.max_length = 12
-	code_edit.custom_minimum_size = Vector2(240, 44)
-	code_row.add_child(code_edit)
-	var code_btn: Button = UiTheme.button("USAR CÓDIGO", Vector2(180, 44))
-	code_btn.pressed.connect(func() -> void:
-		var new_code: String = code_edit.text.strip_edges().to_upper()
-		if new_code.length() >= 6 and new_code != String(get_node("/root/GameState").profile["player_code"]):
-			get_node("/root/GameState").adopt_player_code(new_code)
-			stage.refresh_truck()
-			_show_main())
-	code_row.add_child(code_btn)
-	var reset: Button = UiTheme.button(Tr.t("options.reset"))
-	reset.pressed.connect(func() -> void:
-		get_node("/root/GameState").new_profile()
+	var op := OptionsPanel.new()
+	op.back_pressed.connect(_show_main)
+	op.profile_changed.connect(func() -> void:
 		stage.refresh_truck()
 		_show_main())
-	v.add_child(reset)
-	var back: Button = UiTheme.button(Tr.t("menu.back"))
-	back.pressed.connect(_show_main)
-	v.add_child(back)
+	_panel.add_child(op)

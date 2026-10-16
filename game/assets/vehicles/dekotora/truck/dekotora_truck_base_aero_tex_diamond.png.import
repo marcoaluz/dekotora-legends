@@ -2,23 +2,24 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bp3qw2a8tgqab"
-path="res://.godot/imported/dekotora_truck_flat_tex_perforated.png-e78fb246c905476513b24e0ee36e2612.ctex"
+uid="uid://bxjsdofr8a3q2"
+path.s3tc="res://.godot/imported/dekotora_truck_base_aero_tex_diamond.png-2e4bd3e76720923959bb4c761e2d1ae8.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
-"md5": "b4d1522d946627493e7b8fdd4116fbce"
+"md5": "31d9612df917e12e00ead8268b73e4f9"
 }
 
 [deps]
 
-source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_flat_tex_perforated.png"
-dest_files=["res://.godot/imported/dekotora_truck_flat_tex_perforated.png-e78fb246c905476513b24e0ee36e2612.ctex"]
+source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_base_aero_tex_diamond.png"
+dest_files=["res://.godot/imported/dekotora_truck_base_aero_tex_diamond.png-2e4bd3e76720923959bb4c761e2d1ae8.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

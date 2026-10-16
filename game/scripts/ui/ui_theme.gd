@@ -31,6 +31,40 @@ static func box(bg: Color, border: Color = PANEL_EDGE, border_w: int = 2, radius
 	return s
 
 
+static func _disc(d: int, col: Color, ring: Color = Color(0, 0, 0, 0)) -> ImageTexture:
+	var img := Image.create(d, d, false, Image.FORMAT_RGBA8)
+	var c: float = (d - 1) / 2.0
+	for y in d:
+		for x in d:
+			var r: float = Vector2(x - c, y - c).length()
+			var a: float = clampf(c + 0.5 - r, 0.0, 1.0)
+			var col_px: Color = col
+			if ring.a > 0.0 and r > c - 2.5:
+				col_px = ring
+			img.set_pixel(x, y, Color(col_px.r, col_px.g, col_px.b, col_px.a * a))
+	return ImageTexture.create_from_image(img)
+
+
+## Interruptor (pilula) 56x28: desligado = escuro; ligado = ciano com bolinha branca.
+static func _switch(on: bool) -> ImageTexture:
+	var w: int = 56
+	var h: int = 28
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	var fill: Color = Color("#1d9fb8") if on else Color(0.16, 0.16, 0.26)
+	var kx: float = w - h / 2.0 if on else h / 2.0
+	for y in h:
+		for x in w:
+			var cx: float = clampf(float(x), h / 2.0, w - h / 2.0)
+			var d: float = Vector2(x - cx, y - (h - 1) / 2.0).length()
+			var a: float = clampf(h / 2.0 + 0.5 - d, 0.0, 1.0)
+			var col: Color = fill
+			var kd: float = Vector2(x - kx, y - (h - 1) / 2.0).length()
+			if kd < h / 2.0 - 3.0:
+				col = Color.WHITE if on else Color(0.7, 0.72, 0.85)
+			img.set_pixel(x, y, Color(col.r, col.g, col.b, a))
+	return ImageTexture.create_from_image(img)
+
+
 static func make() -> Theme:
 	if _cached != null:
 		return _cached
@@ -42,19 +76,75 @@ static func make() -> Theme:
 	t.set_color("font_pressed_color", "Button", GOLD)
 	t.set_color("font_disabled_color", "Button", Color(0.5, 0.5, 0.6))
 	t.set_font_size("font_size", "Button", 20)
-	t.set_stylebox("normal", "Button", box(Color(0.1, 0.09, 0.22, 0.95), PANEL_EDGE))
-	t.set_stylebox("hover", "Button", box(Color(0.16, 0.12, 0.32, 0.98), CYAN))
-	t.set_stylebox("pressed", "Button", box(Color(0.3, 0.08, 0.2, 1.0), PINK))
-	t.set_stylebox("disabled", "Button", box(Color(0.07, 0.07, 0.12, 0.8), Color(0.2, 0.2, 0.3)))
-	t.set_stylebox("focus", "Button", box(Color(0, 0, 0, 0), GOLD, 2))
-	t.set_stylebox("panel", "PanelContainer", box(PANEL_BG, PANEL_EDGE, 2, 8, 12))
-	t.set_stylebox("panel", "Panel", box(PANEL_BG, PANEL_EDGE, 2, 8, 12))
-	t.set_stylebox("normal", "LineEdit", box(Color(0.04, 0.04, 0.1), PANEL_EDGE))
+	t.set_stylebox("normal", "Button", box(Color(0.1, 0.1, 0.2, 0.82), Color(1, 1, 1, 0.14), 1, 10))
+	t.set_stylebox("hover", "Button", box(Color(0.14, 0.15, 0.3, 0.92), CYAN, 1, 10))
+	t.set_stylebox("pressed", "Button", box(Color(0.26, 0.08, 0.2, 1.0), PINK, 1, 10))
+	t.set_stylebox("disabled", "Button", box(Color(0.07, 0.07, 0.12, 0.7), Color(1, 1, 1, 0.06), 1, 10))
+	t.set_stylebox("focus", "Button", box(Color(0, 0, 0, 0), GOLD, 2, 10))
+	t.set_stylebox("panel", "PanelContainer", box(PANEL_BG, Color(1, 1, 1, 0.12), 1, 16, 14))
+	t.set_stylebox("panel", "Panel", box(PANEL_BG, Color(1, 1, 1, 0.12), 1, 16, 14))
+	t.set_stylebox("normal", "LineEdit", box(Color(0.04, 0.04, 0.1, 0.9), Color(1, 1, 1, 0.16), 1, 10))
+	t.set_stylebox("focus", "LineEdit", box(Color(0.04, 0.04, 0.1, 0.9), CYAN, 1, 10))
 	t.set_constant("separation", "VBoxContainer", 8)
 	t.set_constant("separation", "HBoxContainer", 10)
-	t.set_icon("grabber", "HSlider", null)
+	# sliders: trilho fino + parte preenchida + bolinha visivel
+	var track: StyleBoxFlat = box(Color(1, 1, 1, 0.1), Color(0, 0, 0, 0), 0, 4, 0)
+	track.content_margin_top = 4
+	track.content_margin_bottom = 4
+	var fill: StyleBoxFlat = box(CYAN, Color(0, 0, 0, 0), 0, 4, 0)
+	fill.content_margin_top = 4
+	fill.content_margin_bottom = 4
+	for sl in ["HSlider", "VSlider"]:
+		t.set_stylebox("slider", sl, track)
+		t.set_stylebox("grabber_area", sl, fill)
+		t.set_stylebox("grabber_area_highlight", sl, fill)
+		t.set_icon("grabber", sl, _disc(30, Color.WHITE, CYAN))
+		t.set_icon("grabber_highlight", sl, _disc(34, Color.WHITE, PINK))
+		t.set_icon("grabber_disabled", sl, _disc(30, Color(0.5, 0.5, 0.6)))
+	# interruptores
+	for cb in ["CheckButton"]:
+		t.set_icon("checked", cb, _switch(true))
+		t.set_icon("unchecked", cb, _switch(false))
+		t.set_icon("checked_disabled", cb, _switch(true))
+		t.set_icon("unchecked_disabled", cb, _switch(false))
+		t.set_stylebox("normal", cb, box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 6))
+		t.set_stylebox("hover", cb, box(Color(1, 1, 1, 0.05), Color(0, 0, 0, 0), 0, 6, 6))
+		t.set_stylebox("pressed", cb, box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 6))
+		t.set_stylebox("hover_pressed", cb, box(Color(1, 1, 1, 0.05), Color(0, 0, 0, 0), 0, 6, 6))
+		t.set_constant("h_separation", cb, 14)
+	# listas suspensas e menu popup
+	t.set_stylebox("panel", "PopupMenu", box(Color(0.06, 0.06, 0.14, 0.98), Color(1, 1, 1, 0.2), 1, 10, 8))
+	t.set_stylebox("hover", "PopupMenu", box(Color(0.16, 0.2, 0.36), CYAN, 0, 6, 6))
+	t.set_font_size("font_size", "PopupMenu", 20)
+	t.set_constant("v_separation", "PopupMenu", 10)
+	# barra de rolagem fina
+	var sb_track: StyleBoxFlat = box(Color(1, 1, 1, 0.04), Color(0, 0, 0, 0), 0, 4, 0)
+	var sb_grab: StyleBoxFlat = box(Color(1, 1, 1, 0.3), Color(0, 0, 0, 0), 0, 4, 0)
+	var sb_grab_h: StyleBoxFlat = box(CYAN, Color(0, 0, 0, 0), 0, 4, 0)
+	for sc in ["VScrollBar", "HScrollBar"]:
+		t.set_stylebox("scroll", sc, sb_track)
+		t.set_stylebox("grabber", sc, sb_grab)
+		t.set_stylebox("grabber_highlight", sc, sb_grab_h)
+		t.set_stylebox("grabber_pressed", sc, sb_grab_h)
 	_cached = t
 	return t
+
+
+## Botao de menu principal: sem caixa, texto grande a esquerda; ao passar o mouse/foco aparece a barra rosa.
+static func menu_button(text: String, min_size: Vector2 = Vector2(320, 54)) -> Button:
+	var b: Button = button(text, min_size)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.add_theme_font_size_override("font_size", 24)
+	var flat: StyleBoxFlat = box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 18)
+	var hov: StyleBoxFlat = box(Color(1, 1, 1, 0.08), PINK, 0, 6, 18)
+	hov.border_width_left = 4
+	var prs: StyleBoxFlat = box(Color(1, 0.18, 0.53, 0.2), PINK, 0, 6, 18)
+	prs.border_width_left = 4
+	b.add_theme_stylebox_override("normal", flat)
+	b.add_theme_stylebox_override("hover", hov)
+	b.add_theme_stylebox_override("focus", hov)
+	b.add_theme_stylebox_override("pressed", prs)
+	return b
 
 
 ## Botao padrao com altura minima boa para o dedo.
