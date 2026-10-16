@@ -20,6 +20,9 @@ func _ready() -> void:
 	if OS.has_feature("mobile"):
 		quality = 1
 	load_settings()
+	for a in OS.get_cmdline_user_args():          # depuracao: --quality=0|1|2 (nao grava)
+		if a.begins_with("--quality="):
+			quality = clampi(int(a.substr(10)), 0, 2)
 
 
 func load_settings() -> void:

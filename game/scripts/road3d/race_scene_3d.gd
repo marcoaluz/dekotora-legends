@@ -118,6 +118,8 @@ func _ready() -> void:
 		layer.add_child(tc)
 	_build_pause_menu()
 	_fps_log = "--fps-log" in args
+	if _fps_log:
+		_print_surface_budget()
 	if "--paused" in args:                       # depuracao: abre ja na tela de pausa (capturas)
 		_toggle_pause.call_deferred()
 	_setup_audio()
@@ -526,3 +528,18 @@ func _show_result() -> void:
 	layer.add_child(screen)
 	screen.show_result(res)
 	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
+
+
+## Depuracao (--fps-log): quantas superficies (≈ chamadas de desenho) cada parte da cena tem.
+func _print_surface_budget() -> void:
+	var out: Dictionary = {}
+	for c in get_children():
+		var key: String = c.get_class() if c.get_script() == null else String(c.get_script().get_global_name())
+		var n: int = 0
+		for m in c.find_children("*", "GeometryInstance3D", true, false) + ([c] if c is GeometryInstance3D else []):
+			if m is MeshInstance3D and (m as MeshInstance3D).mesh != null:
+				n += (m as MeshInstance3D).mesh.get_surface_count()
+			elif m is MultiMeshInstance3D and (m as MultiMeshInstance3D).multimesh.mesh != null:
+				n += (m as MultiMeshInstance3D).multimesh.mesh.get_surface_count()
+		out[key] = int(out.get(key, 0)) + n
+	print("SUPERFICIES: ", out)

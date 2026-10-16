@@ -57,4 +57,5 @@ static func create(parent: Node3D, indoor: bool = false) -> void:
 		moon.rotation_degrees = Vector3(-72, 20, 0)
 		moon.shadow_enabled = q >= 1
 	moon.directional_shadow_max_distance = 90.0
+	moon.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # 2 cortes em vez de 4: metade das chamadas de sombra
 	parent.add_child(moon)
