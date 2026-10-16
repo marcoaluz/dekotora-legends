@@ -132,3 +132,6 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 - [ ] Nomes exatamente como na tabela
 - [ ] Pastas certas
 - [ ] Avisar o Claude: "Áudio da seção X salvo". Ele confere duração, volume e cria os loops.
+
+## Chave da API
+A chave fica em `.chaves.env` (raiz do projeto, fora do git) na variavel `ELEVENLABS_API_KEY`. Nunca escreva o valor em docs ou commits.

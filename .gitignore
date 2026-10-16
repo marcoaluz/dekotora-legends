@@ -27,3 +27,7 @@ desktop.ini
 __pycache__/
 *.pyc
 builds/
+
+# Segredos (chaves de API) - NUNCA commitar
+.chaves.env
+*.env

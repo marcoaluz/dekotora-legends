@@ -9,6 +9,11 @@ Atualize este arquivo ao fim de CADA tarefa. Leia antes: CLAUDE.md, docs/AGENTES
 - Projeto: `D:\DEV\dekotora-legends\dekotora-legends` (git local iniciado; sem remoto GitHub ainda).
 - Android SDK/JDK17: NÃO verificados. Celular: só o Marco testa.
 
+## Segredos / chaves de API
+- Arquivo `.chaves.env` na raiz do projeto (formato `NOME=valor`), **ignorado pelo git** (`.gitignore`: `.chaves.env`, `*.env`). NUNCA commitar nem colar o valor em docs/logs.
+- Variáveis: `ELEVENLABS_API_KEY` (geração dos sons do jogo, ver docs/AUDIO_ELEVENLABS.md) e `PIXELLAB_API_KEY` (não usada: arte é toda Blender).
+- Para usar num script: ler o arquivo em tempo de execução (ex.: `set -a; source .chaves.env; set +a`), sem imprimir o valor.
+
 ## Modo de trabalho combinado (2026-10-15)
 Marco autorizou seguir os prompts P01→P81 até o fim sem parar e voltará para validar. O que exige
 o Marco (celular, áudio ElevenLabs, contratar VPS, chave de assinatura, aprovar visual/plano A×B)
