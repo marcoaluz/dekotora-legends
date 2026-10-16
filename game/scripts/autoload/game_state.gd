@@ -236,6 +236,20 @@ func sell(id: String) -> void:
 	profile_changed.emit()
 
 
+## Perfil de demonstracao (capturas de tela, loja): caminhao cheio de pecas, dinheiro e Fama de sobra.
+func apply_demo_profile() -> void:
+	new_profile()
+	profile["money"] = 900000
+	profile["fame"] = 500
+	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning", "hub_chrome",
+			"grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "fender_extension", "side_ornament_wave", "rear_lamp_cluster", "mudflap_designed"]:
+		var d: PartDef = part(id)
+		if d != null and buy(d):
+			install(id)
+	profile["engine"] = "eng_v8"
+	profile["turbo"] = "turbo_twin"
+
+
 ## Buzina da primeira peca instalada que traga uma; senao a buzina de ar basica.
 func installed_horn() -> String:
 	for d in installed_part_defs():

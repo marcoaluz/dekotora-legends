@@ -23,4 +23,8 @@ func _ready() -> void:
 		bot.name = "BotClient"
 		add_child(bot)
 		return
-	get_tree().change_scene_to_file.call_deferred("res://scenes/menu/main_menu.tscn")
+	var target: String = "res://scenes/menu/main_menu.tscn"
+	for a in args:
+		if a.begins_with("--goto="):          # depuracao de builds exportadas: --goto=res://scenes/race/race3d.tscn
+			target = a.substr(7)
+	get_tree().change_scene_to_file.call_deferred(target)

@@ -58,8 +58,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 ## Fase 7 — Polimento e teste com amigos
 - [~] [P70] — PC: 75 FPS (limite do vsync), ~400 draw calls; presets de qualidade criados; medir no celular PRECISA MARCO Desempenho no celular
 - [x] [P71] Menus e UI finais
-- [ ] [P72] Rodada de testes e lista de ajustes de equilíbrio
+- [x] [P72] (guia docs/TESTE_AMIGOS.md; APK e a rodada em si PRECISAM MARCO) Rodada de testes e lista de ajustes de equilíbrio
 
 ## Fase 8 — Publicação (opcional)
-- [ ] [P80] Builds de release (AAB assinado, .exe)
-- [ ] [P81] Ficha da Play Store / itch.io
+- [x] [P80] (guia docs/RELEASE_ANDROID.md; chave e AAB PRECISAM MARCO) Builds de release (AAB assinado, .exe)
+- [x] [P81] (docs/LOJA.md, docs/store/, docs/POLITICA_PRIVACIDADE.md) Ficha da Play Store / itch.io

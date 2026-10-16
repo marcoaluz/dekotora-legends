@@ -13,7 +13,7 @@ config_version=5
 config/name="Kaido Bakuso"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/ui/icon.png"
 
 [autoload]
 
@@ -86,4 +86,4 @@ pointing/emulate_touch_from_mouse=true
 
 [gui]
 
-theme/custom_font="res://assets/fonts/NotoSansJP.ttf"
+theme/custom_font="res://assets/fonts/ui_font.tres"
