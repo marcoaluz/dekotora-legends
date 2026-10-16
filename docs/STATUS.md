@@ -59,7 +59,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 - **Ouvir** os áudios e pedir regeração dos ruins: `python tools/gen_audio.py --only nome --force` (lista: `python tools/gen_audio.py --list`).
 - Jogar e ajustar equilíbrio (0–100 do caminhão padrão é 22 s; V8+turbo duplo 14 s; ver `docs/BALANCEAMENTO.md`).
 - ~~GitHub~~ FEITO: `origin` = https://github.com/marcoaluz/dekotora-legends.git (push em 2026-10-16).
-- **Arte do caminhão (pedido do Marco, prioridade)**: visual 3D aprovado em geral; refinar o modelo para ficar mais próximo de um caminhão real (portas, cabine, chassi, rodas, detalhes), seguindo `docs/dekotora_volvo_3d_references/` (Volvo FH + dekotora). O caminhão é o coração do jogo: investir em detalhe.
+- **Arte do caminhão — 1ª rodada FEITA (2026-10-16)**: cabine arredondada (loft), grade/faróis/para-choque, chassi, tanques, eixos, rodas com pneu de sulcos, baú corrugado (código em `blender/scripts/truck3d/`). Falta: refinar as 32 peças para a nova escala (para-choque, grade, luzes de teto), garagem com o caminhão centralizado, vidros com reflexo.
+- **Arte do caminhão (pedido original do Marco)**: visual 3D aprovado em geral; refinar o modelo para ficar mais próximo de um caminhão real (portas, cabine, chassi, rodas, detalhes), seguindo `docs/dekotora_volvo_3d_references/` (Volvo FH + dekotora). O caminhão é o coração do jogo: investir em detalhe.
 - Opcional: contratar VPS (`server/README.md`), chave de assinatura Android (`docs/RELEASE_ANDROID.md`), conta Play Console / itch.io.
 
 ## Problemas conhecidos / ideias

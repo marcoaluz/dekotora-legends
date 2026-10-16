@@ -39,7 +39,7 @@ def _setup_world():
     nt.links.new(mapn.outputs["Vector"], grad.inputs["Vector"])
     nt.links.new(grad.outputs["Fac"], ramp.inputs["Fac"])
     nt.links.new(ramp.outputs["Color"], bg.inputs["Color"])
-    bg.inputs["Strength"].default_value = 1.2
+    bg.inputs["Strength"].default_value = 2.0
     nt.links.new(bg.outputs[0], out.inputs[0])
 
 
@@ -67,16 +67,16 @@ def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), vie
     sc.render.image_settings.file_format = "PNG"
     sc.view_settings.view_transform = "Standard"
     _setup_world()
-    _light("key", "AREA", (8, -10, 12), 2200, (1.0, 0.95, 0.9), 6)
-    _light("rim", "AREA", (-9, 14, 8), 1800, (0.55, 0.65, 1.0), 6)
-    _light("fill", "AREA", (-8, -8, 4), 500, (0.8, 0.85, 1.0), 6)
+    _light("key", "AREA", (8, -10, 12), 4200, (1.0, 0.95, 0.9), 6)
+    _light("rim", "AREA", (-9, 14, 8), 3000, (0.55, 0.65, 1.0), 6)
+    _light("fill", "AREA", (-8, -8, 4), 1400, (0.8, 0.85, 1.0), 6)
     # chão escuro refletivo
     bpy.ops.mesh.primitive_plane_add(size=80, location=(0, 6, 0))
     ground = bpy.context.active_object
     gm = bpy.data.materials.new("ground")
     gm.use_nodes = True
     bsdf = next(n for n in gm.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
-    bsdf.inputs["Base Color"].default_value = (0.02, 0.02, 0.025, 1)
+    bsdf.inputs["Base Color"].default_value = (0.06, 0.06, 0.07, 1)
     bsdf.inputs["Roughness"].default_value = 0.35
     ground.data.materials.append(gm)
     cam = bpy.data.cameras.new("cam")
@@ -87,10 +87,13 @@ def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), vie
     views = views or {"34": (35, 14), "rear": (180, 8), "side": (90, 4), "front": (0, 10)}
     os.makedirs(os.path.dirname(prefix), exist_ok=True)
     c = Vector(center)
-    for name, (az, el) in views.items():
+    for name, v in views.items():
+        az, el = v[0], v[1]
+        dist_v = v[2] if len(v) > 2 else dist
+        c = Vector(v[3]) if len(v) > 3 else Vector(center)
         a, e = math.radians(az), math.radians(el)
         # az=0 -> câmera na frente (+Y); az=180 -> atrás
-        pos = c + Vector((math.sin(a) * math.cos(e), math.cos(a) * math.cos(e), math.sin(e))) * dist
+        pos = c + Vector((math.sin(a) * math.cos(e), math.cos(a) * math.cos(e), math.sin(e))) * dist_v
         camo.location = pos
         camo.rotation_euler = (c - pos).to_track_quat("-Z", "Y").to_euler()
         sc.render.filepath = f"{prefix}_{name}.png"

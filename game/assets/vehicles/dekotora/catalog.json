@@ -242,7 +242,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/fb_standard_chrome.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/fb_standard_chrome_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -284,7 +284,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/fb_ornate_steps.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/fb_ornate_steps_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -322,7 +322,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/grille_frame_chrome.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/grille_frame_chrome_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -363,7 +363,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/visor_sunshade.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/visor_sunshade_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -401,7 +401,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/bumper_extension_lip.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/bumper_extension_lip_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -440,7 +440,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/aux_round_lamps_pair.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/aux_round_lamps_pair_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -478,7 +478,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/front_trim_set.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/front_trim_set_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -517,7 +517,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/front_crest_ornament.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/front_crest_ornament_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -554,7 +554,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_bracket.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_bracket_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -594,7 +594,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_bar_rect.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_bar_rect_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -633,7 +633,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_round_lamps_set.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_round_lamps_set_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -674,7 +674,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_marker_small_lamps.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_marker_small_lamps_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -714,7 +714,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/antenna_decor_mount.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/antenna_decor_mount_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -759,7 +759,7 @@
         "face_node": "SIGN_FACE"
       },
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_sign_lightbox.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_sign_lightbox_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -798,7 +798,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_frame_halo.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_frame_halo_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -839,7 +839,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_torii_ornament.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_torii_ornament_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -878,7 +878,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/skirt_chrome_panel.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/skirt_chrome_panel_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -921,7 +921,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/skirt_lit_neon.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/skirt_lit_neon_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -961,7 +961,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/fender_extension.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/fender_extension_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1003,7 +1003,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/hubcap_decorative.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/hubcap_decorative_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1040,7 +1040,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/step_metal.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/step_metal_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1079,7 +1079,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_trim_set.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/side_trim_set_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1120,7 +1120,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_box_decor.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/side_box_decor_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1160,7 +1160,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_ornament_wave.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/side_ornament_wave_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1200,7 +1200,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rb_decorative.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/rb_decorative_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1241,7 +1241,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_panel_frame.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_panel_frame_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1282,7 +1282,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_lamp_cluster.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_lamp_cluster_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1322,7 +1322,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/side_panel_decor.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/side_panel_decor_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1367,7 +1367,7 @@
         "face_node": "PLATE_FACE"
       },
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_plate_custom.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_plate_custom_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1407,7 +1407,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/mudflap_designed.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/mudflap_designed_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1447,7 +1447,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_ornament_metal.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_ornament_metal_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     },
@@ -1487,7 +1487,7 @@
       },
       "customizable": null,
       "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/panel_japanese_theme.blend",
-      "preview": "",
+      "preview": "res://assets/vehicles/dekotora/previews/panel_japanese_theme_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
     }
