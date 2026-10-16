@@ -6,6 +6,18 @@ from lib import mesh3d as M
 CHROMES = ["chrome", "steel", "paint_gold"]
 
 
+_LAMP_CYCLE = ["lamp_cyan", "lamp_pink", "lamp_amber", "lamp_blue", "lamp_green", "lamp_orange", "lamp_white"]
+
+
+def _light_row(add, m, y, z, n, span, h, offset=0, depth=0.05):
+    """Fileira de painéis luminosos coloridos com moldura cromada (visual dekotora)."""
+    w = span / n
+    for i in range(n):
+        x = -span / 2 + w * (i + 0.5)
+        add(M.box(f"pframe_{z:.2f}_{i}", (w * 0.96, depth, h + 0.04), (x, y, z), m["chrome"], bevel=0.012, seg=1))
+        add(M.box(f"panel_{z:.2f}_{i}", (w * 0.8, depth + 0.02, h), (x, y + 0.012, z), m[_LAMP_CYCLE[(i + offset) % len(_LAMP_CYCLE)]], bevel=0.01, seg=1))
+
+
 def fb_ornate_steps(m):
     """Para-choque ornamentado: 3 degraus cromados, aletas laterais, medalhão central e neon."""
     o = []
@@ -26,6 +38,11 @@ def fb_ornate_steps(m):
     add(M.cylinder("medal_disc", 0.3, 0.05, (0, 0.44, 0.2), m["paint_gold"], axis="Y", seg=32, bevel=0.01, bevel_seg=1))
     add(M.cylinder("medal_gem", 0.09, 0.07, (0, 0.5, 0.2), m["lamp_pink"], axis="Y", seg=16))
     add(M.box("neon_under", (2.5, 0.03, 0.04), (0, 0.55, -0.27), m["lamp_pink"], bevel=0.008, seg=1))
+    _light_row(add, m, 0.54, -0.1, 9, 2.5, 0.2)
+    _light_row(add, m, 0.4, 0.2, 7, 2.2, 0.18, offset=3)
+    for sx in (-1, 1):                                  # painéis inclinados nas pontas, como nas referências
+        add(M.box(f"wing_frame_{sx}", (0.36, 0.08, 0.5), (sx * 1.3, 0.38, 0.1), m["chrome"], bevel=0.02, seg=1, rot=(0, 0, -sx * 14)))
+        add(M.box(f"wing_lamp_{sx}", (0.26, 0.09, 0.4), (sx * 1.3, 0.4, 0.1), m["lamp_blue" if sx < 0 else "lamp_orange"], bevel=0.015, seg=1, rot=(0, 0, -sx * 14)))
     for i in range(9):   # rebites
         add(M.cylinder(f"rivet_{i}", 0.025, 0.04, (-1.0 + i * 0.25, 0.4, 0.2), m["steel"], axis="Y", seg=8))
     return o
@@ -42,6 +59,7 @@ def fb_standard_chrome(m):
         add(M.box(f"blinker_{sx}", (0.22, 0.05, 0.1), (sx * 1.0, 0.35, 0.02), m["lamp_amber"], bevel=0.015, seg=1))
         add(M.box(f"step_{sx}", (0.5, 0.3, 0.05), (sx * 0.6, 0.25, 0.17), m["steel"], bevel=0.01, seg=1))
         add(M.box(f"strut_{sx}", (0.16, 0.3, 0.4), (sx * 0.7, -0.08, 0.0), m["plastic"], bevel=0.03))
+    _light_row(add, m, 0.35, 0.0, 6, 1.1, 0.14, offset=1)
     add(M.box("plate", (0.55, 0.03, 0.16), (0, 0.36, -0.02), m["paint_white"], bevel=0.008, seg=1))
     add(M.box("plate_frame", (0.6, 0.025, 0.21), (0, 0.345, -0.02), m["steel"], bevel=0.008, seg=1))
     return o

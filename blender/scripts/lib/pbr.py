@@ -63,7 +63,7 @@ def plastic_black(name: str = "plastic_black"):
 
 
 def glass(name: str = "glass"):
-    return pbr(name, "#0b1226", metallic=0.2, roughness=0.04, coat=1.0, coat_rough=0.02)
+    return pbr(name, "#1a2c52", metallic=0.55, roughness=0.03, coat=1.0, coat_rough=0.02)
 
 
 def emissive(name: str, hex_color: str, strength: float = 6.0):
@@ -89,4 +89,7 @@ def standard_set() -> dict:
         "lamp_cyan": emissive("lamp_cyan", "#21e6ff", 3.0),
         "lamp_pink": emissive("lamp_pink", "#ff2e88", 3.0),
         "lamp_yellow": emissive("lamp_yellow", "#fff35c", 3.0),
+        "lamp_green": emissive("lamp_green", "#3dff7a", 3.0),
+        "lamp_blue": emissive("lamp_blue", "#2f7bff", 3.0),
+        "lamp_orange": emissive("lamp_orange", "#ff7a1a", 3.0),
     }

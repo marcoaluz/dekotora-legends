@@ -218,13 +218,18 @@
         "y": 0.45,
         "z": 0.63
       },
-      "triangles": 1888,
+      "triangles": 2416,
       "compatibility": [
         "dekotora_truck_base"
       ],
       "materials_used": [
         "chrome",
         "lamp_amber",
+        "lamp_blue",
+        "lamp_green",
+        "lamp_orange",
+        "lamp_pink",
+        "lamp_white",
         "paint_white",
         "plastic_black",
         "steel"
@@ -255,18 +260,23 @@
       "mount_point_left": null,
       "mirror_for_left": false,
       "dimensions_m": {
-        "x": 2.951,
+        "x": 2.959,
         "y": 0.88,
-        "z": 0.68
+        "z": 0.687
       },
-      "triangles": 2268,
+      "triangles": 3852,
       "compatibility": [
         "dekotora_truck_base"
       ],
       "materials_used": [
         "chrome",
         "lamp_amber",
+        "lamp_blue",
+        "lamp_cyan",
+        "lamp_green",
+        "lamp_orange",
         "lamp_pink",
+        "lamp_white",
         "paint_gold",
         "plastic_black",
         "steel"

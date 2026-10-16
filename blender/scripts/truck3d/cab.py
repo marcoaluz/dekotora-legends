@@ -37,9 +37,8 @@ def _headlight(add, m, sx):
     add(M.box(f"hl_lens_{sx}", (0.4, 0.05, 0.3), (x, y + 0.05, z), m["glass"], bevel=0.04))
     add(M.cylinder(f"hl_proj_ring_{sx}", 0.095, 0.03, (x + sx * 0.04, y + 0.075, z + 0.02), m["chrome"], axis="Y", seg=20))
     add(M.cylinder(f"hl_proj_{sx}", 0.075, 0.03, (x + sx * 0.04, y + 0.085, z + 0.02), m["lamp_white"], axis="Y", seg=20))
-    for k, s2 in enumerate((-1, 1)):           # luz diurna em V (apontando para baixo, ao centro)
-        add(M.box(f"hl_drl_{sx}_{k}", (0.15, 0.02, 0.022), (x + s2 * 0.075, y + 0.08, z - 0.12),
-                  m["lamp_white"], bevel=0.008, seg=1, rot=(0, -s2 * 25, 0)))
+    add(M.box(f"hl_drl_{sx}", (0.38, 0.02, 0.025), (x, y + 0.075, z - 0.135), m["lamp_white"], bevel=0.01, seg=1))
+    add(M.box(f"hl_drl_v_{sx}", (0.025, 0.02, 0.2), (x - sx * 0.19, y + 0.075, z), m["lamp_white"], bevel=0.01, seg=1))
     add(M.box(f"hl_blinker_{sx}", (0.22, 0.045, 0.06), (x, y + 0.045, z - 0.2), m["lamp_amber"], bevel=0.02, seg=1))
 
 
@@ -114,12 +113,12 @@ def _wipers_mirrors_doors(add, m, sx):
     add(M.box(f"door_handle_{sx}", (0.045, 0.24, 0.045), (xs(1.9) + sx * 0.02, 9.5, 1.95), m["chrome"], bevel=0.012, seg=2))
     add(M.box(f"door_handle_bed_{sx}", (0.03, 0.3, 0.1), (xs(1.9) + sx * 0.008, 9.5, 1.95), m["plastic"], bevel=0.02))
     # espelho principal + braços + espelho de aproximação
-    mx = sx * (cab_hw(2.4) + 0.4)
-    add(M.box(f"mirror_{sx}", (0.1, 0.22, 0.62), (mx, 11.05, 2.38), m["plastic"], bevel=0.04))
-    add(M.box(f"mirror_face_{sx}", (0.02, 0.19, 0.55), (mx + sx * 0.055, 11.05, 2.38), m["chrome"], bevel=0.01, seg=1))
-    add(M.box(f"mirror_low_{sx}", (0.08, 0.2, 0.22), (mx, 11.05, 1.98), m["plastic"], bevel=0.03))
-    add(M.box(f"mirror_low_face_{sx}", (0.02, 0.17, 0.18), (mx + sx * 0.045, 11.05, 1.98), m["chrome"], bevel=0.008, seg=1))
-    for zz in (2.15, 2.75):
+    mx = sx * (cab_hw(2.4) + 0.38)
+    add(M.box(f"mirror_{sx}", (0.09, 0.2, 0.46), (mx, 11.05, 2.45), m["plastic"], bevel=0.04, seg=3))
+    add(M.box(f"mirror_face_{sx}", (0.02, 0.17, 0.4), (mx + sx * 0.05, 11.05, 2.45), m["chrome"], bevel=0.015, seg=2))
+    add(M.box(f"mirror_low_{sx}", (0.08, 0.17, 0.17), (mx, 11.05, 2.05), m["plastic"], bevel=0.04, seg=3))
+    add(M.box(f"mirror_low_face_{sx}", (0.02, 0.14, 0.13), (mx + sx * 0.045, 11.05, 2.05), m["chrome"], bevel=0.015, seg=2))
+    for zz in (2.2, 2.65):
         add(M.tube(f"mirror_arm_{sx}_{zz}", [(sx * cab_hw(2.4), 10.95, zz), (mx - sx * 0.03, 11.03, zz)], 0.022, m["steel"], seg=8))
     # pisca lateral e marcador
     add(M.box(f"side_blinker_{sx}", (0.03, 0.14, 0.07), (xs(1.2) + sx * 0.005, 11.2, 1.25), m["lamp_amber"], bevel=0.015, seg=1))
@@ -134,6 +133,12 @@ def _wipers_mirrors_doors(add, m, sx):
     add(A.arch_shell(f"front_fender_lip_{sx}", (FRONT_AXLE_Y, 0.5), 0.62, 0.655, x0 + sx * 0.0 if sx > 0 else x0, x1 if sx > 0 else x1, m["chrome"], seg=22))
 
 def _roof(add, m):
+    # defletor de teto (cunha que sobe em direção ao baú) e defletores laterais
+    fair = [(9.6, CAB_TOP - 0.02), (8.62, CAB_TOP - 0.02), (8.62, CAB_TOP + 0.3), (8.9, CAB_TOP + 0.3)]
+    add(M.plane_extrude("roof_fairing", fair, 2.0, (0, 0, 0), m["paint_white"], plane="YZ", bevel=0.04, seg=2))
+    for sx in (-1, 1):
+        side = [(9.5, CAB_TOP - 0.06), (8.55, CAB_TOP - 0.06), (8.55, CAB_TOP + 0.2), (8.8, CAB_TOP + 0.2)]
+        add(M.plane_extrude(f"roof_wing_{sx}", side, 0.05, (sx * 1.02, 0, 0), m["paint_white"], plane="YZ", bevel=0.01))
     add(M.box("roof_hatch", (0.9, 0.9, 0.04), (0, 9.6, CAB_TOP + 0.005), m["plastic"], bevel=0.015, seg=1))
     add(M.box("roof_hatch_rim", (0.98, 0.98, 0.03), (0, 9.6, CAB_TOP - 0.005), m["steel"], bevel=0.012, seg=1))
     add(M.box("cab_rear_panel", (2.0, 0.06, 1.6), (0, CAB_Y0 - 0.005, 2.1), m["plastic"], bevel=0.03))
