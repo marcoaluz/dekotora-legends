@@ -96,6 +96,13 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 	elif _lane_timer <= 0.0 and absf(target_x - preferred_x) > 0.05:
 		if _obstacle_ahead(sim, me, index, preferred_x, horizon * 1.4).is_empty():
 			target_x = preferred_x
+	# abre espaco para quem usa Passing logo atras
+	for j in sim.trucks.size():
+		var o: TruckSim = sim.trucks[j]
+		if j != index and o.passing_active and me.z - o.z > 0.0 and me.z - o.z < 35.0 and absf(me.x - o.x) < 0.3:
+			var dir: float = 1.0 if me.x >= o.x else -1.0
+			target_x = clampf(me.x + dir * 0.55, -0.8, 0.8)
+			_lane_timer = 1.5
 	# as vezes fecha o jogador (indice 0) se estiver ao lado/atras proximo
 	if BLOCK_CHANCE[difficulty] > 0.0 and index != 0 and not sim.trucks.is_empty():
 		_block_timer -= dt
