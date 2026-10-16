@@ -1,0 +1,28 @@
+# Godot
+game/.godot/
+game/export/
+game/*.translation
+game/export_credentials.cfg
+*.apk
+*.aab
+*.exe
+*.pck
+*.keystore
+!debug.keystore
+
+# Blender (saída bruta e backups; os scripts são a fonte da arte)
+blender/renders/
+*.blend1
+*.blend2
+
+# Servidor local
+server/data/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+__pycache__/
+*.pyc

@@ -1,0 +1,17 @@
+{
+  "name": "dekotora-night",
+  "version": 1,
+  "notes": "Paleta inicial de 40 cores. Pode ser alterada; rode o render de novo.",
+  "outline": "#0b0a14",
+  "colors": {
+    "night": ["#0b0a14", "#14122a", "#1e1b3d", "#2b2757", "#3c3a73", "#545394"],
+    "neon": ["#ff2e88", "#ff6fb1", "#21e6ff", "#8af4ff", "#b14cff", "#fff35c"],
+    "chrome": ["#2a2f3a", "#4a5262", "#7a8597", "#aeb8c8", "#dfe6f0", "#ffffff"],
+    "gold": ["#5a3a10", "#94621c", "#d29a2e", "#f5cc5a", "#fff0a8"],
+    "paint_red": ["#4a0f18", "#8e1b2a", "#d1303f", "#ff6b6b"],
+    "paint_blue": ["#0f2149", "#1d3f8a", "#3a73d6"],
+    "paint_green": ["#123a2a", "#1f6e48", "#3fb26f"],
+    "rubber_road": ["#121214", "#26262b", "#3d3d44", "#5c5c66"],
+    "lights": ["#ffe9c2", "#ffb347", "#ff4d4d"]
+  }
+}
