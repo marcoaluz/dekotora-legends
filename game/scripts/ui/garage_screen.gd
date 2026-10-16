@@ -9,6 +9,7 @@ var _tab: String = "parts"          # parts | mech | repair
 var _slot: String = ""
 var _left: VBoxContainer
 var _right: VBoxContainer
+var _rp: PanelContainer
 var _bar: Label
 var _msg: Label
 var _preview_cache: Dictionary = {}
@@ -48,6 +49,7 @@ func _ready() -> void:
 	sc.add_child(_left)
 	# coluna direita
 	var rp := PanelContainer.new()
+	_rp = rp
 	rp.position = Vector2(650, 10)
 	rp.custom_minimum_size = Vector2(300, 470)
 	root.add_child(rp)
@@ -123,6 +125,7 @@ func _set_tab(t: String) -> void:
 
 func _clear(c: Control) -> void:
 	for n in c.get_children():
+		c.remove_child(n)
 		n.queue_free()
 
 
@@ -140,6 +143,10 @@ func _refresh() -> void:
 			_build_mech()
 		"repair":
 			_build_repair()
+	# painel direito vazio some e o caminhao ocupa o espaco livre (sem ficar escondido atras dos paineis)
+	var right_on: bool = _right.get_child_count() > 0
+	_rp.visible = right_on
+	stage.set_layout(right_on)
 	var pv: Dictionary = _preview({})
 	_bar.text = "%s    Fama %d    %s: %d kg    %s: %.1f s    %s: %d" % [
 		Tr.yen(gs.money()), gs.fame(), Tr.t("garage.mass"), roundi(float(pv["mass"])),

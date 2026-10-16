@@ -28,6 +28,10 @@ var _dist: float = 22.0
 var _target: Vector3 = Vector3(0, 1.6, -6.0)
 var _goal: Dictionary = FOCUS["default"]
 var _dragging: bool = false
+var _shift: float = 0.0            # desloca o caminhao para a direita (fracao da distancia) ao liberar a tela
+var _shift_goal: float = 0.0
+var _zoom: float = 1.0
+var _zoom_goal: float = 1.0
 
 
 func _ready() -> void:
@@ -104,6 +108,12 @@ func focus_slot(slot: String) -> void:
 	auto_rotate = false
 
 
+## Layout da garagem: com os dois paineis abertos sobra so o terco central; com um so, desloca o caminhao.
+func set_layout(right_panel_open: bool) -> void:
+	_shift_goal = 0.0 if right_panel_open else 0.2
+	_zoom_goal = 1.5 if right_panel_open else 1.15
+
+
 func focus_default() -> void:
 	_goal = FOCUS["default"]
 	auto_rotate = true
@@ -130,8 +140,11 @@ func _process(delta: float) -> void:
 	var a: float = deg_to_rad(_az)
 	var e: float = deg_to_rad(_el)
 	var dir := Vector3(sin(a) * cos(e), sin(e), -cos(a) * cos(e))
-	cam.global_position = _target + dir * _dist
+	_shift = lerpf(_shift, _shift_goal, k)
+	_zoom = lerpf(_zoom, _zoom_goal, k)
+	cam.global_position = _target + dir * _dist * _zoom
 	cam.look_at(_target, Vector3.UP)
+	cam.global_position -= cam.global_transform.basis.x * (_shift * _dist * _zoom)
 
 
 func _unhandled_input(event: InputEvent) -> void:

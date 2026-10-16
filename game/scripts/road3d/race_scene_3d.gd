@@ -420,8 +420,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
-	var pos: Vector3 = path.world_point(z - 11.5, x * 0.85, 4.4)
-	var look: Vector3 = path.world_point(z + 16.0, x * 0.45, 1.5)
+	var pos: Vector3 = path.world_point(z - 14.5, x * 0.85, 5.6)
+	var look: Vector3 = path.world_point(z + 14.0, x * 0.45, 1.8)
 	return [pos, look]
 
 

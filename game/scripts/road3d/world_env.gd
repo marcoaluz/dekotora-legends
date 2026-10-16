@@ -6,11 +6,12 @@ extends RefCounted
 
 static func create(parent: Node3D) -> void:
 	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color("#0a0a24")
+	sky_mat.sky_top_color = Color("#141440")
 	sky_mat.sky_horizon_color = Color("#6a58b8")
 	sky_mat.ground_horizon_color = Color("#8a78d8")
 	sky_mat.ground_bottom_color = Color("#2a2260")
 	sky_mat.sky_curve = 0.18
+	sky_mat.sky_energy_multiplier = 1.3
 	sky_mat.sun_angle_max = 30.0
 	sky_mat.sun_curve = 0.1
 	var sky := Sky.new()
