@@ -156,9 +156,14 @@ func _process(delta: float) -> void:
 	var dir := Vector3(sin(a) * cos(e), sin(e), -cos(a) * cos(e))
 	_shift = lerpf(_shift, _shift_goal, k)
 	_zoom = lerpf(_zoom, _zoom_goal, k)
-	cam.global_position = _target + dir * _dist * _zoom
-	cam.look_at(_target, Vector3.UP)
-	cam.global_position -= cam.global_transform.basis.x * (_shift * _dist * _zoom)
+	# modelos mais longos/curtos: recua a camera e acompanha o centro (partes da frente andam junto com o comprimento)
+	var len_d: float = float(TruckNode.LENGTH_DELTA.get(truck.body_kind, 0.0))
+	var tg: Vector3 = _target
+	tg.z -= len_d * clampf(-_target.z / 11.5, 0.0, 1.0)
+	var reach: float = _dist * _zoom * (1.0 + len_d * 0.04)
+	cam.global_position = tg + dir * reach
+	cam.look_at(tg, Vector3.UP)
+	cam.global_position -= cam.global_transform.basis.x * (_shift * reach)
 
 
 func _unhandled_input(event: InputEvent) -> void:

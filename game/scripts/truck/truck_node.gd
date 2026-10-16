@@ -7,11 +7,14 @@ extends Node3D
 const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb"
 const MODEL_PATHS: Dictionary = {
 	"base": MODEL_PATH,
-	"flat": "res://assets/vehicles/dekotora/truck/dekotora_truck_flat.glb",
-	"tank": "res://assets/vehicles/dekotora/truck/dekotora_truck_tank.glb",
+	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve.glb",
+	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo.glb",
+	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 }
+## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
+const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5}
 const WHEEL_RADIUS: float = 0.52
-## Carroceria: "base" (bau), "flat" (aberta) ou "tank" (tanque). Definir antes de add_child.
+## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
 var body_kind: String = "base"
 
 var model: Node3D
@@ -35,7 +38,7 @@ func _ready() -> void:
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
 	_headlight = SpotLight3D.new()
-	_headlight.position = Vector3(0, 1.2, -11.6)
+	_headlight.position = Vector3(0, 1.2, -11.6 - float(LENGTH_DELTA.get(body_kind, 0.0)))
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
 	_headlight.spot_range = 70.0
 	_headlight.spot_angle = 32.0

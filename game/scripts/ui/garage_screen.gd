@@ -171,9 +171,10 @@ func _flash(text: String) -> void:
 
 func _build_body_picker() -> void:
 	_left.add_child(_wl(Tr.t("garage.body"), 16, UiTheme.PINK))
-	var row := HBoxContainer.new()
+	var row := GridContainer.new()
+	row.columns = 2
 	var cur: String = String(gs.profile.get("body", "base"))
-	for kind in ["base", "flat", "tank"]:
+	for kind in ["leve", "base", "longo", "carreta"]:
 		var b: Button = UiTheme.button(Tr.t("body." + String(kind)), Vector2(0, 40))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if String(kind) == cur:
