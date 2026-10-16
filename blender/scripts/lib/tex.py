@@ -69,3 +69,44 @@ def grime_panel(name: str = "tex_grime", w: int = 512, h: int = 256, seed: int =
     speck = (speck > 0.9) * 0.05
     val = np.clip(1.0 - grime - streaks - speck, 0.78, 1.0)
     return _image(name, np.repeat(val[..., None], 3, axis=2))
+
+
+def concrete(name: str = "tex_concrete", size: int = 512, seed: int = 11):
+    """Concreto polido repetível: ruído suave em várias escalas + manchas leves e juntas de dilatação."""
+    rng = np.random.default_rng(seed)
+    acc = np.zeros((size, size))
+    for k, amp in ((8, 0.5), (32, 0.3), (128, 0.2)):          # ruído de valor em 3 escalas (repetível)
+        g = rng.random((k, k))
+        idx = np.arange(size) * k / size
+        i0 = np.floor(idx).astype(int)
+        f = idx - i0
+        f = f * f * (3 - 2 * f)
+        i1 = (i0 + 1) % k
+        row = g[i0][:, i0] * (1 - f)[None, :] + g[i0][:, i1] * f[None, :]
+        row2 = g[i1][:, i0] * (1 - f)[None, :] + g[i1][:, i1] * f[None, :]
+        acc += amp * (row * (1 - f)[:, None] + row2 * f[:, None])
+    val = 0.42 + 0.16 * (acc - acc.mean())
+    val[:3, :] *= 0.75                                        # junta de dilatação nas bordas do ladrilho
+    val[:, :3] *= 0.75
+    val += (rng.random((size, size)) - 0.5) * 0.025           # granulado fino
+    return _image(name, np.repeat(np.clip(val, 0, 1)[..., None], 3, axis=2) * np.array([1.0, 1.0, 1.04]))
+
+
+def corrugated(name: str = "tex_corrugated", w: int = 256, h: int = 64, waves: int = 8):
+    """Chapa ondulada (parede do galpão): faixas claras/escuras verticais, repetível na horizontal."""
+    x = np.linspace(0, waves * 2 * np.pi, w, endpoint=False)
+    band = 0.5 + 0.5 * np.sin(x)
+    base = np.array(hex_to_rgb("#3a4150"))
+    hi = np.array(hex_to_rgb("#6c7686"))
+    arr = base * (1 - band[None, :, None]) + hi * band[None, :, None]
+    return _image(name, np.repeat(arr, h, axis=0))
+
+
+def hazard(name: str = "tex_hazard", w: int = 256, h: int = 32):
+    """Faixa zebrada amarelo/preto (piso de oficina)."""
+    yy, xx = np.mgrid[0:h, 0:w]
+    s = ((xx + yy) // 16) % 2
+    y = np.array(hex_to_rgb("#e8b512"))
+    k = np.array(hex_to_rgb("#16161a"))
+    arr = y * (1 - s[..., None]) + k * s[..., None]
+    return _image(name, arr)

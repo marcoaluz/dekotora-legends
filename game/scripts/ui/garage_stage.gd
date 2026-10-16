@@ -3,6 +3,7 @@ extends Node3D
 ## Palco 3D do menu e da garagem: plataforma com neon, caminhao com os acessorios instalados,
 ## camera que gira sozinha (ou pelo arraste do dedo/mouse). O destino da camera muda por foco (slot).
 
+const HALL_PATH := "res://assets/scenery/garage_hall.glb"
 const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), distancia e azimute
 	"default": {"target": Vector3(-3.5, 1.6, -6.0), "dist": 22.0, "az": 35.0, "el": 14.0},
 	"front": {"target": Vector3(0, 1.4, -10.5), "dist": 9.0, "az": 25.0, "el": 10.0},
@@ -35,58 +36,45 @@ var _zoom_goal: float = 1.0
 
 
 func _ready() -> void:
-	WorldEnv.create(self)
-	var floor_mi := MeshInstance3D.new()
-	var disc := CylinderMesh.new()
-	disc.top_radius = 11.0
-	disc.bottom_radius = 11.0
-	disc.height = 0.2
-	disc.radial_segments = 48
-	floor_mi.mesh = disc
-	floor_mi.position = Vector3(0, -0.1, -6.0)
-	var fm := StandardMaterial3D.new()
-	fm.albedo_color = Color(0.2, 0.2, 0.23)           # concreto polido
-	fm.metallic = 0.2
-	fm.roughness = 0.42
-	floor_mi.material_override = fm
-	add_child(floor_mi)
-	var ring := MeshInstance3D.new()
-	var torus := TorusMesh.new()
-	torus.inner_radius = 10.7
-	torus.outer_radius = 11.0
-	ring.mesh = torus
-	ring.position = Vector3(0, 0.02, -6.0)
-	var rm := StandardMaterial3D.new()
-	rm.albedo_color = UiTheme.PINK
-	rm.emission_enabled = true
-	rm.emission = UiTheme.PINK
-	rm.emission_energy_multiplier = 1.4
-	ring.material_override = rm
-	add_child(ring)
-	var big_floor := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(400, 400)
-	big_floor.mesh = plane
-	var bm := StandardMaterial3D.new()
-	bm.albedo_color = Color(0.1, 0.1, 0.12)
-	bm.roughness = 0.75
-	big_floor.material_override = bm
-	big_floor.position.y = -0.25
-	add_child(big_floor)
+	WorldEnv.create(self, true)
+	var hall: PackedScene = load(HALL_PATH) as PackedScene if ResourceLoader.exists(HALL_PATH) else null
+	if hall != null:                                  # galpao industrial (blender/scripts/build_garage_env.py)
+		add_child(hall.instantiate())
+	_studio_lights()
 	_spawn_truck()
 	cam = Camera3D.new()
 	cam.fov = 42.0
 	add_child(cam)
 	cam.make_current()
-	var key := SpotLight3D.new()
-	key.position = Vector3(8, 14, 6)
-	key.look_at_from_position(key.position, Vector3(0, 1, -6), Vector3.UP)
-	key.spot_range = 50.0
-	key.spot_angle = 40.0
-	key.light_energy = 4.0
-	add_child(key)
 	_apply_goal(true)
 	refresh_truck()
+
+
+## Luz de estudio: principal fria de cima/frente (com sombra quando a qualidade permite), recorte rosa atras
+## e preenchimento ciano do outro lado. Poucas luzes para caber no celular.
+func _studio_lights() -> void:
+	var q: int = int(get_node("/root/Settings").quality)
+	var key := SpotLight3D.new()
+	key.position = Vector3(9, 12, 4)
+	key.look_at_from_position(key.position, Vector3(0, 1, -6), Vector3.UP)
+	key.spot_range = 40.0
+	key.spot_angle = 42.0
+	key.light_energy = 5.0
+	key.light_color = Color(1.0, 0.97, 0.92)
+	key.shadow_enabled = q >= 1
+	add_child(key)
+	var rim := OmniLight3D.new()
+	rim.position = Vector3(-6, 5, -16)
+	rim.omni_range = 16.0
+	rim.light_energy = 2.2
+	rim.light_color = UiTheme.PINK
+	add_child(rim)
+	var fill := OmniLight3D.new()
+	fill.position = Vector3(-9, 4, 3)
+	fill.omni_range = 18.0
+	fill.light_energy = 1.0
+	fill.light_color = Color("#9fd8ff")
+	add_child(fill)
 
 
 func _spawn_truck() -> void:
@@ -132,6 +120,12 @@ func focus_slot(slot: String) -> void:
 	var key: String = String(SLOT_FOCUS.get(slot, "default"))
 	_goal = FOCUS[key]
 	auto_rotate = false
+
+
+## Vista pedida pelos botoes da garagem: "default", "front", "side", "rear", "roof" ou "wheel".
+func focus_view(view: String) -> void:
+	_goal = FOCUS.get(view, FOCUS["default"])
+	auto_rotate = view == "default"
 
 
 ## Layout da garagem: com os dois paineis abertos sobra so o terco central; com um so, desloca o caminhao.
@@ -192,6 +186,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_dragging = event.pressed
 	elif event is InputEventScreenTouch:
 		_dragging = event.pressed
+	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		_zoom_goal = clampf(_zoom_goal * (0.9 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1), 0.6, 2.0)
 	elif event is InputEventMouseMotion and _dragging:
 		_az -= event.relative.x * 0.4
 		_el = clampf(_el + event.relative.y * 0.3, -2.0, 70.0)

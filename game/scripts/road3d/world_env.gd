@@ -4,7 +4,8 @@ extends RefCounted
 ## ficar versionado e facil de ajustar num lugar so.
 
 
-static func create(parent: Node3D) -> void:
+## `indoor` = galpao da garagem: fundo escuro, sem neblina, luz de teto; o ceu continua so para reflexos.
+static func create(parent: Node3D, indoor: bool = false) -> void:
 	var sky_mat := ProceduralSkyMaterial.new()
 	sky_mat.sky_top_color = Color("#101a3a")           # hora azul: ceu azul-petroleo, horizonte rosado
 	sky_mat.sky_horizon_color = Color("#b8706a")
@@ -36,6 +37,12 @@ static func create(parent: Node3D) -> void:
 	env.glow_strength = 0.9
 	env.glow_bloom = 0.03
 	env.glow_hdr_threshold = 1.3
+	if indoor:
+		env.background_mode = Environment.BG_COLOR
+		env.background_color = Color("#07080d")
+		env.fog_enabled = false
+		env.ambient_light_energy = 0.45
+		env.adjustment_saturation = 0.95
 	var we := WorldEnvironment.new()
 	we.environment = env
 	parent.add_child(we)
@@ -44,5 +51,10 @@ static func create(parent: Node3D) -> void:
 	moon.light_energy = 0.8
 	moon.rotation_degrees = Vector3(-26, 32, 0)
 	moon.shadow_enabled = q >= 2
+	if indoor:                                     # luz difusa vinda do teto (paineis de LED)
+		moon.light_color = Color("#e6ecff")
+		moon.light_energy = 0.55
+		moon.rotation_degrees = Vector3(-72, 20, 0)
+		moon.shadow_enabled = q >= 1
 	moon.directional_shadow_max_distance = 90.0
 	parent.add_child(moon)

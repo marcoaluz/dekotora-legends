@@ -315,3 +315,18 @@ def uv_planar(o) -> None:
             u = (co[a] - lo[a]) / max(hi[a] - lo[a], 1e-6)
             v = (co[b] - lo[b]) / max(hi[b] - lo[b], 1e-6)
             uvl.data[li].uv = (u, v)
+
+
+def uv_world(o, tile: float = 4.0) -> None:
+    """UV em metros (repete a textura a cada `tile` m): projeta cada face nos 2 eixos perpendiculares à
+    sua normal dominante. Para pisos/paredes grandes com textura repetível. Aplique transformações antes."""
+    me = o.data
+    uvl = me.uv_layers.active or me.uv_layers.new(name="UVMap")
+    mw = o.matrix_world
+    for poly in me.polygons:
+        n = poly.normal
+        k = max(range(3), key=lambda i: abs(n[i]))
+        a, b = [i for i in range(3) if i != k]
+        for li in poly.loop_indices:
+            co = mw @ me.vertices[me.loops[li].vertex_index].co
+            uvl.data[li].uv = (co[a] / tile, co[b] / tile)
