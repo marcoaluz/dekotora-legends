@@ -83,3 +83,7 @@ renderer/rendering_method.mobile="gl_compatibility"
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true
+
+[gui]
+
+theme/custom_font="res://assets/fonts/NotoSansJP.ttf"

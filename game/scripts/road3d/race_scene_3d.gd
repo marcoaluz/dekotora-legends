@@ -57,6 +57,9 @@ func _ready() -> void:
 		sim = RaceSim.new(track, density)
 		sim.freight = route.freight if route != null else 25000
 	path = TrackPath.new(sim.track)
+	var q: int = int(Settings.quality)
+	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
+	get_viewport().msaa_3d = Viewport.MSAA_2X if q >= 2 else Viewport.MSAA_DISABLED
 	WorldEnv.create(self)
 	var road := RoadMesh.new()
 	add_child(road)
@@ -311,7 +314,7 @@ func _process(delta: float) -> void:
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 	if _autoplay and not _fps_printed and Time.get_ticks_msec() > 6000:
 		_fps_printed = true
-		print("FPS_MEDIDO: ", Engine.get_frames_per_second())
+		print("FPS_MEDIDO: ", Engine.get_frames_per_second(), "  draw_calls=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME), "  tris=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), "  mem_MB=", OS.get_static_memory_usage() / 1048576)
 	if sim.is_over() and not _result_shown:
 		_result_shown = true
 		_show_result()

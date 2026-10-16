@@ -133,4 +133,5 @@ func _build_chunk(s0: int, s1: int, road_mat: Material, line_mat: Material) -> v
 	lines.commit(mesh)
 	mesh.surface_set_material(1, line_mat)
 	mi.mesh = mesh
+	mi.visibility_range_end = 520.0 if int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1 else 380.0
 	add_child(mi)

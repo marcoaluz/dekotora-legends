@@ -66,6 +66,8 @@ func _draw() -> void:
 		return
 	var t: TruckSim = sim.trucks[player]
 	var w: float = size.x
+	if Settings.show_fps:
+		_text(Vector2(w * 0.5 - 30, 44), "FPS %d" % Engine.get_frames_per_second(), 9, Color(1, 1, 1, 0.6))
 	# --- posicao (topo esquerdo)
 	var pos: int = 1
 	for k in sim.trucks.size():

@@ -144,6 +144,22 @@ func _show_options() -> void:
 		s.tilt_invert = on
 		s.save_settings())
 	v.add_child(inv)
+	v.add_child(UiTheme.label("Qualidade gráfica (baixa = mais FPS no celular)", 18))
+	var qual := OptionButton.new()
+	for qn in ["Baixa", "Média", "Alta"]:
+		qual.add_item(qn)
+	qual.selected = s.quality
+	qual.item_selected.connect(func(i: int) -> void:
+		s.quality = i
+		s.save_settings())
+	v.add_child(qual)
+	var fps := CheckButton.new()
+	fps.text = "Mostrar FPS na corrida"
+	fps.button_pressed = s.show_fps
+	fps.toggled.connect(func(on: bool) -> void:
+		s.show_fps = on
+		s.save_settings())
+	v.add_child(fps)
 	v.add_child(UiTheme.label(Tr.t("options.music"), 18))
 	var ms := HSlider.new()
 	ms.min_value = 0.0

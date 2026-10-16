@@ -12,9 +12,13 @@ var language: String = "pt-BR"
 var player_name: String = "Jogador"
 var server_address: String = "127.0.0.1:24600"   # IP:porta do servidor (campo manual de depuracao)
 var show_touch_controls: bool = false   # forca os botoes na tela (teste no PC)
+var quality: int = 2                    # 0 baixa, 1 media, 2 alta (celular comeca em media)
+var show_fps: bool = false
 
 
 func _ready() -> void:
+	if OS.has_feature("mobile"):
+		quality = 1
 	load_settings()
 
 
@@ -30,6 +34,8 @@ func load_settings() -> void:
 	language = String(cfg.get_value("general", "language", language))
 	player_name = String(cfg.get_value("net", "player_name", player_name))
 	server_address = String(cfg.get_value("net", "server_address", server_address))
+	quality = clampi(int(cfg.get_value("graphics", "quality", quality)), 0, 2)
+	show_fps = bool(cfg.get_value("graphics", "show_fps", show_fps))
 
 
 func save_settings() -> void:
@@ -42,6 +48,8 @@ func save_settings() -> void:
 	cfg.set_value("general", "language", language)
 	cfg.set_value("net", "player_name", player_name)
 	cfg.set_value("net", "server_address", server_address)
+	cfg.set_value("graphics", "quality", quality)
+	cfg.set_value("graphics", "show_fps", show_fps)
 	cfg.save(PATH)
 
 

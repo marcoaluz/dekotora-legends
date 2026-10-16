@@ -26,7 +26,8 @@ static func create(parent: Node3D) -> void:
 	env.fog_enabled = true
 	env.fog_light_color = Color("#241f4d")
 	env.fog_density = 0.0028
-	env.glow_enabled = true
+	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
+	env.glow_enabled = q >= 1
 	env.glow_intensity = 0.6
 	env.glow_strength = 0.9
 	env.glow_bloom = 0.03
@@ -38,6 +39,6 @@ static func create(parent: Node3D) -> void:
 	moon.light_color = Color("#9db2ff")
 	moon.light_energy = 0.55
 	moon.rotation_degrees = Vector3(-48, 28, 0)
-	moon.shadow_enabled = true
+	moon.shadow_enabled = q >= 2
 	moon.directional_shadow_max_distance = 90.0
 	parent.add_child(moon)

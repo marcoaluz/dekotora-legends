@@ -56,8 +56,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P66] (docs + scripts; contratar VPS PRECISA MARCO) Servidor no VPS + teste com amigos
 
 ## Fase 7 — Polimento e teste com amigos
-- [ ] [P70] Desempenho no celular
-- [ ] [P71] Menus e UI finais
+- [~] [P70] — PC: 75 FPS (limite do vsync), ~400 draw calls; presets de qualidade criados; medir no celular PRECISA MARCO Desempenho no celular
+- [x] [P71] Menus e UI finais
 - [ ] [P72] Rodada de testes e lista de ajustes de equilíbrio
 
 ## Fase 8 — Publicação (opcional)

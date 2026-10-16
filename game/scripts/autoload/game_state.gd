@@ -152,11 +152,21 @@ func parts_for_slot(slot: String) -> Array[PartDef]:
 	return out
 
 
+const SLOT_ORDER: Array[String] = ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "visor",
+	"roof_lights", "roof_frame", "roof_ornament", "andon", "body_ornament", "side_skirts", "fenders", "steps", "side_trim",
+	"side_box", "side_ornament", "mural", "hubcaps", "rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament"]
+
+
+## Slots na ordem logica do caminhao (frente -> teto -> laterais -> traseira).
 func slots() -> Array[String]:
 	var seen: Array[String] = []
 	for d in all_parts():
 		if String(d.slot) not in seen:
 			seen.append(String(d.slot))
+	seen.sort_custom(func(a: String, b: String) -> bool:
+		var ia: int = SLOT_ORDER.find(a)
+		var ib: int = SLOT_ORDER.find(b)
+		return (ia if ia >= 0 else 99) < (ib if ib >= 0 else 99))
 	return seen
 
 

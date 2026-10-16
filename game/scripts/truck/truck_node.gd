@@ -34,6 +34,7 @@ func _ready() -> void:
 	_headlight.light_energy = 3.0
 	_headlight.light_color = Color(1.0, 0.93, 0.78)
 	_headlight.shadow_enabled = false
+	_headlight.visible = int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1
 	add_child(_headlight)
 
 
