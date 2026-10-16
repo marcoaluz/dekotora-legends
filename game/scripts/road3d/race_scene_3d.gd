@@ -61,6 +61,8 @@ func _ready() -> void:
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 		sim = RaceSim.new(track, density)
 		sim.freight = route.freight if route != null else 25000
+		if not gs.pending_contract.is_empty():         # contrato do Mercado: o valor dele e o frete da corrida
+			sim.freight = int(gs.pending_contract["reward"])
 	path = TrackPath.new(sim.track)
 	var q: int = int(Settings.quality)
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular

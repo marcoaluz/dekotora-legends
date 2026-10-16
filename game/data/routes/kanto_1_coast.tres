@@ -6,6 +6,7 @@
 script = ExtResource("1_fo2tm")
 id = &"kanto_1_coast"
 display_key = "route.kanto_1_coast"
+places = PackedStringArray("Yokohama", "Fujisawa", "Chigasaki", "Odawara", "Atami")
 freight = 20000
 sections = Array[Dictionary]([{
 "curve": 0.0,

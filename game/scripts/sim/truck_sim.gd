@@ -43,6 +43,7 @@ var overtakes: int = 0
 var finish_time: float = -1.0
 var finish_position: int = 0
 var side_hits: int = 0                  # batidas laterais (riscam murais)
+var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (eletronicos/ceramica > 1)
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:

@@ -26,6 +26,7 @@ var save_path: String = SAVE_PATH               # o servidor usa user://profiles
 
 # Preenchido pelo menu antes de iniciar uma corrida
 var pending_route: RouteDef = null
+var pending_contract: Dictionary = {}          # contrato aceito no Mercado (vazio = corrida sem contrato)
 var last_result: Dictionary = {}
 
 var _part_cache: Dictionary = {}
@@ -397,7 +398,7 @@ func truck_descriptor() -> Dictionary:
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"),
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
-	}
+	}.merged(Contracts.sim_fields(pending_contract))
 
 
 func configure_truck(t: TruckSim) -> void:
@@ -586,6 +587,16 @@ func apply_race_result(res: Dictionary, route_id: String, truck: TruckSim) -> vo
 		if int(res["position"]) == 1:
 			rec["won"] = true
 		(profile["routes_done"] as Dictionary)[route_id] = rec
+	if not pending_contract.is_empty():           # contrato concluido: historico + quadro novo
+		var c: Dictionary = pending_contract.duplicate()
+		c["paid"] = int(res["pay"])
+		c["position"] = int(res["position"])
+		var hist: Array = contracts_state()["done"]
+		hist.push_front(c)
+		if hist.size() > 10:
+			hist.resize(10)
+		refresh_contracts(false)
+		pending_contract = {}
 	last_result = res
 	save_profile()
 	profile_changed.emit()
@@ -597,3 +608,47 @@ func route_unlocked(r: RouteDef) -> bool:
 
 func route_won(id: String) -> bool:
 	return bool(((profile["routes_done"] as Dictionary).get(id, {}) as Dictionary).get("won", false))
+
+
+# ---------------------------------------------------------------- contratos (Mercado de fretes)
+
+## Estado salvo dos contratos: {"seed", "list", "done"} (cria se o perfil e antigo).
+func contracts_state() -> Dictionary:
+	if not profile.has("contracts") or not (profile["contracts"] is Dictionary):
+		profile["contracts"] = {"seed": randi() % 1000000, "list": [], "done": []}
+	return profile["contracts"]
+
+
+## Quadro atual (gera se estiver vazio).
+func contract_board() -> Array:
+	var st: Dictionary = contracts_state()
+	if (st["list"] as Array).is_empty():
+		refresh_contracts(false)
+	return st["list"]
+
+
+## Sorteia um quadro novo (nova semente). `save` = gravar ja.
+func refresh_contracts(save: bool = true) -> void:
+	var st: Dictionary = contracts_state()
+	st["seed"] = (int(st["seed"]) * 1103515245 + 12345) % 2147483647
+	st["list"] = Contracts.generate(int(st["seed"]), FreightMarket.all_routes(), route_unlocked, String(profile.get("body", "base")))
+	if save:
+		save_profile()
+		profile_changed.emit()
+
+
+func capacity_t() -> float:
+	return Contracts.capacity_t(String(profile.get("body", "base")))
+
+
+## Motivo para nao poder aceitar ("" = pode).
+func contract_block_reason(c: Dictionary) -> String:
+	if float(c["weight_t"]) > capacity_t():
+		return "BAÚ PEQUENO"
+	return ""
+
+
+## Aceita o contrato: a proxima corrida usa o trecho, o valor e a carga dele.
+func accept_contract(c: Dictionary) -> void:
+	pending_contract = c.duplicate()
+	pending_route = load("res://data/routes/%s.tres" % c["route"]) as RouteDef

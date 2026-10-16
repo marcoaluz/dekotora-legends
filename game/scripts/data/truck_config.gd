@@ -45,7 +45,8 @@ static func apply(t: TruckSim, desc: Dictionary) -> void:
 	var tur: TurboDef = load("res://data/engines/%s.tres" % desc.get("turbo", "turbo_none")) as TurboDef
 	var exh: ExhaustDef = load("res://data/engines/%s.tres" % desc.get("exhaust", "exh_std")) as ExhaustDef
 	t.engine.configure(eng, tur, exh, bool(desc.get("jake", false)))
-	t.set_mass(weight + (eng.weight_kg if eng != null else 0.0))
+	t.set_mass(weight + (eng.weight_kg if eng != null else 0.0), float(desc.get("cargo_kg", TruckSim.DEFAULT_CARGO)))
+	t.cargo_fragility = float(desc.get("cargo_fragility", 1.0))
 	var sys: Dictionary = desc.get("systems", {})
 	t.systems["engine"] = float(sys.get("engine", 100.0))
 	t.systems["steering"] = float(sys.get("steering", 100.0))

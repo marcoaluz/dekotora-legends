@@ -1,7 +1,7 @@
 class_name GarageInfoPanel
 extends RefCounted
 ## Ficha tecnica da garagem: SO dados reais do jogo (GameState + EngineDef/TurboDef/ExhaustDef).
-## Potencia, capacidade de carga e tanque NAO existem nos dados e nao sao inventados (aviso no rodape).
+## Capacidade de carga vem de Contracts.CAPACITY_T (por bau). Potencia e tanque NAO existem nos dados e nao sao inventados (aviso no rodape).
 
 
 static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Callable) -> void:
@@ -21,6 +21,7 @@ static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Ca
 	box.add_child(UiKit.stat_row("zap", Tr.t("garage.torque"), torque))
 	box.add_child(UiKit.stat_row("cog", Tr.t("garage.engine"), Tr.t("engine." + String(gs.profile["engine"]))))
 	box.add_child(UiKit.stat_row("gauge", Tr.t("garage.redline"), "%s rpm" % _thousands(roundi(eng.redline_rpm) if eng else 0)))
+	box.add_child(UiKit.stat_row("package", Tr.t("garage.capacity"), "%d t" % roundi(Contracts.capacity_t(body))))
 	box.add_child(UiKit.stat_row("weight", Tr.t("garage.mass"), "%s kg" % _thousands(roundi(float(pv["mass"])))))
 	box.add_child(UiKit.stat_row("gauge", Tr.t("garage.zero100"), "%.1f s" % float(pv["zero100"])))
 	box.add_child(UiKit.stat_row("star", Tr.t("garage.rating"), "%d" % int(pv["rating"]), UiTheme.GOLD))

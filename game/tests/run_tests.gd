@@ -7,6 +7,10 @@ const TEST_DIR := "res://tests/"
 
 
 func _initialize() -> void:
+	# os testes criam perfis novos: grava num arquivo separado para nunca apagar o perfil do jogador
+	var gs: Node = root.get_node_or_null("GameState")
+	if gs != null:
+		gs.save_path = "user://test_profile.json"
 	var total := 0
 	var failed := 0
 	var files := DirAccess.get_files_at(TEST_DIR)

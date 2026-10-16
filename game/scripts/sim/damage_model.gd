@@ -50,6 +50,8 @@ static func apply_impact(truck: TruckSim, zone: String, amount: float) -> Array[
 
 
 static func _hurt_system(truck: TruckSim, system: String, points: float) -> void:
+	if system == "cargo":
+		points *= truck.cargo_fragility
 	truck.systems[system] = maxf(float(truck.systems[system]) - points / POINTS_PER_HEALTH, 0.0)
 
 

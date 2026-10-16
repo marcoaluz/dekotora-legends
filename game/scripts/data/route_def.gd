@@ -12,6 +12,7 @@ extends Resource
 @export var traffic: int = 1                   # TrafficSim.Density
 @export var night: bool = true
 @export var fame_required: int = 0
+@export var places: PackedStringArray = []      # cidades do trecho (origem/destino dos contratos)
 
 
 func build_track(seed_: int = 7) -> Track:

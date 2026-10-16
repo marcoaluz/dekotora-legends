@@ -10,6 +10,7 @@ var _panel: Control
 
 func _ready() -> void:
 	AudioBus.play_music("menu_citypop")
+	get_node("/root/GameState").pending_contract = {}   # corrida abandonada nao leva o contrato adiante
 	stage = GarageStage.new()
 	add_child(stage)
 	var layer := CanvasLayer.new()
@@ -120,13 +121,19 @@ func _continue() -> void:
 	if r == null:                                 # tudo vencido: abre o mercado para escolher
 		_show_market()
 		return
-	get_node("/root/GameState").pending_route = r
+	var gs: Node = get_node("/root/GameState")
+	gs.pending_route = r
+	for c in gs.contract_board():                 # usa o melhor contrato do trecho que cabe no bau
+		if String(c["route"]) == String(r.id) and gs.contract_block_reason(c) == "":
+			if gs.pending_contract.is_empty() or int(c["reward"]) > int(gs.pending_contract["reward"]):
+				gs.pending_contract = (c as Dictionary).duplicate()
 	SceneFader.go(get_tree(), "res://scenes/race/race3d.tscn")
 
 
 func _quick_race() -> void:
 	var gs: Node = get_node("/root/GameState")
 	gs.pending_route = null
+	gs.pending_contract = {}
 	SceneFader.go(get_tree(), "res://scenes/race/race3d.tscn")
 
 
@@ -135,8 +142,8 @@ func _show_market() -> void:
 	stage.focus_default()
 	var fm := FreightMarket.new()
 	fm.back_pressed.connect(_show_main)
-	fm.route_chosen.connect(func(r: RouteDef) -> void:
-		get_node("/root/GameState").pending_route = r
+	fm.contract_chosen.connect(func(c: Dictionary) -> void:
+		get_node("/root/GameState").accept_contract(c)
 		SceneFader.go(get_tree(), "res://scenes/race/race3d.tscn"))
 	_panel.add_child(fm)
 

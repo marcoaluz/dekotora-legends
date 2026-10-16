@@ -1,12 +1,12 @@
 class_name FreightMarket
 extends Control
-## Mercado de fretes: lista os trechos (RouteDef) com dados REAIS — nome, cenario, rival, distancia
-## (soma das secoes da pista), valor do frete, fama exigida, estado (disponivel / bloqueado / concluido e
-## melhor tempo). ACEITAR inicia a corrida pelo GameState.pending_route (mesmo fluxo da antiga campanha).
-## Ainda NAO existem nos dados: origem/destino, tipo e peso da carga (ver docs/STATUS.md, etapa G).
+## Mercado de fretes: contratos com dados REAIS do jogo (Contracts): origem -> destino (cidades do trecho),
+## tipo e peso da carga, distancia da corrida (soma das secoes da pista), valor e estado (disponivel, bau
+## pequeno ou trecho bloqueado por Fama). ACEITAR grava o contrato no GameState e inicia a corrida.
+## ATUALIZAR sorteia um quadro novo; o quadro tambem muda sozinho ao concluir um frete.
 
 signal back_pressed
-signal route_chosen(route: RouteDef)
+signal contract_chosen(contract: Dictionary)
 
 const SCENERY_ICON: Dictionary = {"coast": "waves", "city": "building-2", "mountain": "mountain"}
 
@@ -31,6 +31,7 @@ func _ready() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
+	head.add_child(UiKit.chip("truck", "%s · %s %d t" % [Tr.t("body." + String(_gs.profile.get("body", "base"))), Tr.t("market.capacity"), roundi(_gs.capacity_t())]))
 	head.add_child(UiKit.chip("coins", Tr.yen(_gs.money()), UiTheme.GOLD))
 	head.add_child(UiKit.chip("star", "%s %d" % [Tr.t("hud.fame"), _gs.fame()]))
 	root.add_child(head)
@@ -43,10 +44,13 @@ func _ready() -> void:
 	list.add_theme_constant_override("separation", 8)
 	scroll.add_child(list)
 	var first_btn: Button = null
-	for r in all_routes():
-		var b: Button = _row(list, r)
-		if first_btn == null and b != null and not b.disabled:
+	for c in _gs.contract_board():
+		var b: Button = _contract_row(list, c)
+		if first_btn == null and not b.disabled:
 			first_btn = b
+	for r in all_routes():                            # trechos ainda bloqueados aparecem no fim
+		if not _gs.route_unlocked(r):
+			_row(list, r)
 	var foot := HBoxContainer.new()
 	var back: Button = UiKit.back_button()
 	back.pressed.connect(func() -> void: back_pressed.emit())
@@ -54,10 +58,80 @@ func _ready() -> void:
 	var sp2 := Control.new()
 	sp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	foot.add_child(sp2)
-	foot.add_child(UiTheme.label(Tr.t("market.note"), 13, UiTheme.TEXT_DIM))
+	var done: Array = _gs.contracts_state()["done"]
+	if not done.is_empty():
+		var last: Dictionary = done[0]
+		foot.add_child(UiTheme.label(Tr.t("market.last", [String(last["origin"]), String(last["destination"]), Tr.yen(int(last["paid"]))]), 14, UiTheme.GOOD))
+	var refresh: Button = UiTheme.button(Tr.t("market.refresh"), Vector2(170, 44))
+	refresh.icon = UiKit.icon("rotate-ccw")
+	refresh.pressed.connect(func() -> void:
+		_gs.refresh_contracts()
+		_rebuild())
+	foot.add_child(refresh)
 	root.add_child(foot)
 	if first_btn != null:
 		first_btn.grab_focus.call_deferred()
+
+
+## Redesenha a tela inteira (depois de ATUALIZAR).
+func _rebuild() -> void:
+	for c in get_children():
+		c.queue_free()
+	_ready()
+
+
+func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
+	var r: RouteDef = load("res://data/routes/%s.tres" % c["route"]) as RouteDef
+	var cargo: CargoDef = load("res://data/cargo/%s.tres" % c["cargo"]) as CargoDef
+	var reason: String = _gs.contract_block_reason(c)
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", UiTheme.box(Color(1, 1, 1, 0.035 if reason == "" else 0.015), Color(1, 1, 1, 0.08), 1, 10, 12))
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 14)
+	card.add_child(h)
+	var ic := TextureRect.new()
+	ic.texture = UiKit.icon(cargo.icon if cargo else "package")
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.custom_minimum_size = Vector2(36, 36)
+	ic.modulate = UiTheme.CYAN if reason == "" else UiTheme.TEXT_DIM
+	h.add_child(ic)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override("separation", 0)
+	var title := HBoxContainer.new()
+	title.add_child(UiKit.heading("%s · %s t" % [Tr.t("cargo." + String(c["cargo"])), _num(float(c["weight_t"]))], 21, UiTheme.TEXT if reason == "" else UiTheme.TEXT_DIM))
+	if float(c.get("fragility", 1.0)) >= 1.5:
+		title.add_child(UiKit.heading("  " + Tr.t("market.fragile"), 15, UiTheme.WARN))
+	info.add_child(title)
+	info.add_child(UiTheme.label("%s  →  %s" % [String(c["origin"]), String(c["destination"])], 16, UiTheme.TEXT))
+	info.add_child(UiTheme.label("%s  ·  %s" % [Tr.t("route." + String(c["route"])), Tr.t("scenery." + String(r.scenery))], 13, UiTheme.TEXT_DIM))
+	h.add_child(info)
+	var money := VBoxContainer.new()
+	money.add_theme_constant_override("separation", -2)
+	var val: Label = UiKit.heading(Tr.yen(int(c["reward"])), 24, UiTheme.GOLD)
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	money.add_child(val)
+	var km: Label = UiTheme.label("%.1f km" % route_km(r), 15, UiTheme.TEXT_DIM)
+	km.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	money.add_child(km)
+	h.add_child(money)
+	var b: Button
+	if reason == "":
+		b = UiKit.primary_button(Tr.t("market.accept"), "", Vector2(150, 46))
+		b.pressed.connect(func() -> void: contract_chosen.emit(c))
+	else:
+		b = UiTheme.button(reason, Vector2(150, 46))
+		b.add_theme_font_size_override("font_size", 15)
+		b.disabled = true
+	h.add_child(b)
+	list.add_child(card)
+	return b
+
+
+## 9.5 -> "9,5"; 12.0 -> "12".
+static func _num(v: float) -> String:
+	return (str(int(v)) if is_equal_approx(v, round(v)) else "%.1f" % v).replace(".", ",")
 
 
 ## Rotas ordenadas pelo valor do frete (a ordem da progressao).
@@ -116,11 +190,10 @@ func _row(list: VBoxContainer, r: RouteDef) -> Button:
 	money.add_child(km)
 	h.add_child(money)
 	var b: Button
-	if unlocked:
-		b = UiKit.primary_button(Tr.t("market.again") if won else Tr.t("market.accept"), "", Vector2(170, 46))
-		b.pressed.connect(func() -> void: route_chosen.emit(r))
+	if unlocked:                                     # (trechos liberados aparecem como contratos)
+		b = UiKit.primary_button(Tr.t("market.accept"), "", Vector2(150, 46))
 	else:
-		b = UiTheme.button(Tr.t("market.locked", [r.fame_required]), Vector2(170, 46))
+		b = UiTheme.button(Tr.t("market.locked", [r.fame_required]), Vector2(150, 46))
 		b.icon = UiKit.icon("lock")
 		b.add_theme_font_size_override("font_size", 16)
 		b.disabled = true
