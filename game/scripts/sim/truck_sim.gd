@@ -25,13 +25,36 @@ var rpm: float = 700.0
 var gear: int = 1
 var boost: float = 0.0
 var mass: float = BASE_MASS + DEFAULT_CARGO
-var damage: Dictionary = {}             # id da peca/sistema -> durabilidade atual (P32)
+var loadout: Array[Dictionary] = []     # pecas instaladas (ver DamageModel.make_part), da mais externa para a interna
+var systems: Dictionary = {"engine": 100.0, "steering": 100.0, "cargo": 100.0}   # saude 0..100
+var steer_pull: float = 0.0             # puxao constante da direcao danificada (x/s)
+var steer_pull_dir: float = 1.0
 var engine: EngineModel = EngineModel.new()
 var offroad: bool = false
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
 	mass = BASE_MASS + cargo_kg + parts_kg
+
+
+func set_loadout(parts: Array[Dictionary]) -> void:
+	loadout = parts
+	var w: float = 0.0
+	for p in parts:
+		p["broken"] = false
+		w += float(p["weight"])
+	set_mass(w)
+	refresh_damage_effects()
+
+
+func cargo_integrity() -> float:
+	return float(systems["cargo"]) / 100.0
+
+
+## Recalcula os efeitos mecanicos do dano (potencia do motor, puxao da direcao).
+func refresh_damage_effects() -> void:
+	engine.power_factor = 0.5 + 0.5 * float(systems["engine"]) / 100.0
+	steer_pull = 0.1 * (1.0 - float(systems["steering"]) / 100.0)
 
 
 func grip() -> float:
@@ -56,7 +79,7 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	var target_lat: float = cmd.steer * authority
 	lateral_vel += (target_lat - lateral_vel) * minf(STEER_RESPONSE * dt, 1.0)
 	var push: float = -track.curve_at(z) * speed * speed * CURVE_PUSH
-	x += (lateral_vel + push) * dt
+	x += (lateral_vel + push + steer_pull * steer_pull_dir) * dt
 	x = clampf(x, -1.6, 1.6)   # limite fisico (fora do acostamento)
 	# 4) avanco
 	z += speed * dt

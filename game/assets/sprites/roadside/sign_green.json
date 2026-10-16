@@ -1,0 +1,13 @@
+{
+  "id": "sign_green",
+  "size": [
+    112,
+    120
+  ],
+  "anchor": [
+    56,
+    118
+  ],
+  "ppm": 22.0,
+  "glow": false
+}

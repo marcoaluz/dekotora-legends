@@ -11,6 +11,8 @@ var curves: PackedFloat32Array = PackedFloat32Array()
 var hills: PackedFloat32Array = PackedFloat32Array()
 var heights: PackedFloat32Array = PackedFloat32Array()   # altura no INICIO de cada segmento (m)
 var length_m: float = 0.0
+## Objetos de beira de estrada: {z, x, kind}. Ordenados por z (adicione em ordem crescente).
+var objects: Array[Dictionary] = []
 
 
 func segment_count() -> int:
@@ -53,6 +55,45 @@ func add_section(length: float, curve: float, hill: float = 0.0, ease_m: float =
 	length_m = curves.size() * SEG_LEN
 
 
+func add_object(z: float, x: float, kind: String) -> void:
+	objects.append({"z": z, "x": x, "kind": kind})
+
+
+## Primeiro indice de `objects` com z >= z0 (busca binaria).
+func first_object_at(z0: float) -> int:
+	var lo: int = 0
+	var hi: int = objects.size()
+	while lo < hi:
+		var mid: int = (lo + hi) / 2
+		if float(objects[mid]["z"]) < z0:
+			lo = mid + 1
+		else:
+			hi = mid
+	return lo
+
+
+## Enfeita a pista com postes, arvores, placas e guard-rails (determinístico).
+func decorate_roadside(seed_: int = 7) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var z: float = 20.0
+	var n: int = 0
+	while z < length_m:
+		if n % 3 == 0:
+			add_object(z, -1.35, "lamp_post")
+			add_object(z + 30.0, 1.35, "lamp_post")
+		var side: float = -1.0 if rng.randf() < 0.5 else 1.0
+		add_object(z + rng.randf_range(0.0, 20.0), side * rng.randf_range(1.7, 3.2), "tree")
+		if n % 11 == 5:
+			add_object(z, 1.9, "sign_green")
+		if absf(curve_at(z)) > 0.5:
+			add_object(z, -1.12, "guardrail")
+			add_object(z, 1.12, "guardrail")
+		z += 4.0 * 4.0
+		n += 1
+	objects.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["z"]) < float(b["z"]))
+
+
 ## Pista de teste (P20): retas, curvas para os dois lados e uma subida.
 static func make_test_track() -> Track:
 	var t := Track.new()
@@ -65,4 +106,5 @@ static func make_test_track() -> Track:
 	t.add_section(300.0, 1.4)     # curva forte a direita
 	t.add_section(300.0, -1.2)    # curva forte a esquerda
 	t.add_section(600.0, 0.0)
+	t.decorate_roadside()
 	return t

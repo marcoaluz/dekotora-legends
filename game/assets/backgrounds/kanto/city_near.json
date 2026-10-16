@@ -1,0 +1,13 @@
+{
+  "id": "city_near",
+  "size": [
+    960,
+    88
+  ],
+  "anchor": [
+    480,
+    86
+  ],
+  "ppm": 3.0,
+  "glow": false
+}

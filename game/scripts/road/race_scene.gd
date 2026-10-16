@@ -12,6 +12,8 @@ var _prev_z: float = 0.0
 var _prev_x: float = 0.0
 var _steer_smooth: float = 0.0
 var _road: RoadRenderer
+var _bg: ParallaxBg
+var _roadside: RoadsideLayer
 var _truck: TruckView
 var _hud: Label
 var _fps_timer: float = 0.0
@@ -21,8 +23,13 @@ var autoplay: bool = false          # usado em testes/capturas: acelera sozinho
 func _ready() -> void:
 	sim = RaceSim.new(Track.make_test_track())
 	player = sim.add_truck()
+	_bg = ParallaxBg.new()
+	add_child(_bg)
 	_road = RoadRenderer.new()
+	_road.draw_sky = false
 	add_child(_road)
+	_roadside = RoadsideLayer.new()
+	add_child(_roadside)
 	_truck = TruckView.new()
 	add_child(_truck)
 	_hud = Label.new()
@@ -61,6 +68,8 @@ func _process(delta: float) -> void:
 	var vz: float = lerpf(_prev_z, t.z, a)
 	var vx: float = lerpf(_prev_x, t.x, a)
 	_road.update_view(sim.track, vz, vx)
+	_roadside.update_view(_road.projector)
+	_bg.advance(sim.track.curve_at(vz) * t.speed * delta * 0.05)
 	# caminhao: ancora na traseira, a CAM_BEHIND metros da camera
 	var p: Vector3 = _road.projector.project(vx, vz, 0.0)
 	_truck.position = Vector2(SpriteProjector.SCREEN_W * 0.5, roundf(p.y))

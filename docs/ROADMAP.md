@@ -20,12 +20,12 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P20] Simulação da pista e do caminhão (sem gráficos)
 - [x] [P21] Renderizador pseudo-3D com o caminhão real
 - [~] [P22] Controles touch, teclado e controle — teclado/controle/toque prontos; build Android PRECISA MARCO (sem SDK)
-- [ ] [P23] Cenário de teste (parallax + beira de estrada provisória)
+- [x] [P23] Cenário de teste (parallax + beira de estrada provisória)
 - [ ] **Marco decide: plano A (pseudo-3D) ou plano B (3D PS1)**
 
 ## Fase 3 — Corrida contra bots
-- [ ] [P30] Tráfego
-- [ ] [P31] Bots rivais
+- [x] [P30] Tráfego
+- [x] [P31] Bots rivais
 - [ ] [P32] Colisões e dano por zona
 - [ ] [P33] Passing, vácuo, carga, chegada e pagamento
 - [ ] [P34] HUD de corrida

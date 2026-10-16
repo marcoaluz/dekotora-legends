@@ -17,7 +17,7 @@ const LANE := Color("#ffe9c2")
 const BAND_LEN: int = 4            # segmentos por faixa alternada
 
 var projector := SpriteProjector.new()
-var scroll_speed: float = 0.0
+var draw_sky: bool = true           # false quando o ParallaxBg desenha o ceu
 
 
 func update_view(track: Track, player_z: float, player_x: float) -> void:
@@ -41,10 +41,10 @@ func _draw() -> void:
 	var w: float = SpriteProjector.SCREEN_W
 	var h: float = SpriteProjector.SCREEN_H
 	var hy: float = SpriteProjector.HORIZON_Y
-	# ceu em tres faixas
-	draw_rect(Rect2(0, 0, w, hy * 0.45), NIGHT_SKY_TOP)
-	draw_rect(Rect2(0, hy * 0.45, w, hy * 0.35), NIGHT_SKY_MID)
-	draw_rect(Rect2(0, hy * 0.8, w, hy * 0.2 + 1.0), NIGHT_SKY_LOW)
+	if draw_sky:   # ceu em tres faixas
+		draw_rect(Rect2(0, 0, w, hy * 0.45), NIGHT_SKY_TOP)
+		draw_rect(Rect2(0, hy * 0.45, w, hy * 0.35), NIGHT_SKY_MID)
+		draw_rect(Rect2(0, hy * 0.8, w, hy * 0.2 + 1.0), NIGHT_SKY_LOW)
 	# chao base
 	draw_rect(Rect2(0, hy, w, h - hy), GRASS_A)
 	var n: int = p.draw_dist

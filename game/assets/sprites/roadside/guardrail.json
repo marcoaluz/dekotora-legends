@@ -1,0 +1,13 @@
+{
+  "id": "guardrail",
+  "size": [
+    112,
+    36
+  ],
+  "anchor": [
+    56,
+    34
+  ],
+  "ppm": 24.0,
+  "glow": false
+}

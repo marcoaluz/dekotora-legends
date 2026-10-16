@@ -1,0 +1,13 @@
+{
+  "id": "city_far",
+  "size": [
+    960,
+    64
+  ],
+  "anchor": [
+    480,
+    62
+  ],
+  "ppm": 3.0,
+  "glow": false
+}

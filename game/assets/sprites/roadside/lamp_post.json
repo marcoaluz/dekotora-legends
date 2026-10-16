@@ -1,0 +1,13 @@
+{
+  "id": "lamp_post",
+  "size": [
+    56,
+    128
+  ],
+  "anchor": [
+    28,
+    126
+  ],
+  "ppm": 16.0,
+  "glow": true
+}
