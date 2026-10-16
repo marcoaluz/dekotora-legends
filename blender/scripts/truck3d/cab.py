@@ -68,19 +68,48 @@ def _bumper(add, m):
         add(M.box(f"bumper_corner_{sx}", (0.1, 0.3, 0.34), (sx * 1.2, y + 0.04, 0.72), m["paint_white"], bevel=0.04))
 
 
+def _door_path():
+    """Contorno (y, z) da porta: cantos arredondados, frente inclinada e borda inferior que contorna o arco da roda."""
+    pts = []
+    def arc(cy, cz, r, a0, a1, n=5):
+        for k in range(n + 1):
+            a = math.radians(a0 + (a1 - a0) * k / n)
+            pts.append((cy + r * math.cos(a), cz + r * math.sin(a)))
+    pts.append((9.2, 1.0))
+    pts.append((9.2, 2.85))
+    arc(9.4, 2.85, 0.2, 180, 90)                       # canto superior traseiro
+    pts.append((10.55, 3.05))
+    arc(10.55, 2.85, 0.2, 90, 40)                      # canto superior dianteiro (cai para a frente)
+    pts.append((10.98, 2.0))
+    pts.append((10.98, 1.15))
+    arc(10.86, 1.15, 0.12, 0, -90, 3)                  # canto inferior dianteiro
+    k = 0.76
+    for a in range(0, 181, 15):                        # contorna o arco da roda
+        yy = 10.2 + k * math.cos(math.radians(a))
+        zz = 0.5 + k * math.sin(math.radians(a))
+        if zz >= 1.03:
+            pts.append((yy, zz))
+    pts.append((9.4, 1.0))
+    pts.append((9.2, 1.0))
+    return pts
+
+
 def _wipers_mirrors_doors(add, m, sx):
     xs = lambda z: sx * cab_hw(z)
     # limpadores
     ywp = cab_yf(2.3) + 0.03
     add(M.box(f"wiper_{sx}", (0.78, 0.015, 0.03), (sx * 0.45, ywp, 2.28), m["plastic"], bevel=0.005, seg=1, rot=(SLOPE_DEG, 0, 0)))
-    # porta: frestas
-    for i, (y0, y1, z0, z1) in enumerate(((10.95, 10.95, 1.05, 3.1), (9.2, 9.2, 1.05, 3.1))):
-        add(M.box(f"seam_v_{sx}_{i}", (0.02, 0.02, z1 - z0), (xs(2.0) + sx * 0.005, y0, (z0 + z1) / 2), m["plastic"], bevel=0.004, seg=1))
-    add(M.box(f"seam_h_{sx}", (0.02, 1.75, 0.02), (xs(1.05) + sx * 0.005, 10.07, 1.05), m["plastic"], bevel=0.004, seg=1))
-    add(M.box(f"seam_h2_{sx}", (0.02, 1.75, 0.02), (xs(3.08) - sx * 0.005, 10.07, 3.08), m["plastic"], bevel=0.004, seg=1))
-    # janela
-    add(M.box(f"win_frame_{sx}", (0.04, 1.42, 0.9), (xs(2.55) - sx * 0.01, 10.1, 2.58), m["plastic"], bevel=0.03))
-    add(M.box(f"side_window_{sx}", (0.04, 1.34, 0.82), (xs(2.55) + sx * 0.005, 10.1, 2.58), m["glass"], bevel=0.03))
+    # porta: contorno com cantos arredondados, aba inferior acompanhando o arco da roda
+    door = _door_path()
+    add(M.tube(f"door_seam_{sx}", [(xs(z) + sx * 0.004, y, z) for (y, z) in door], 0.009, m["plastic"], seg=6))
+    # janela trapezoidal (mais estreita na frente, como a coluna A inclinada)
+    wpoly = [(9.55, 2.08), (10.82, 2.08), (10.86, 2.62), (10.62, 2.96), (9.72, 2.96), (9.55, 2.82)]
+    cy = sum(p[0] for p in wpoly) / len(wpoly)
+    cz = sum(p[1] for p in wpoly) / len(wpoly)
+    frame = [(cy + (p[0] - cy) * 1.07, cz + (p[1] - cz) * 1.1) for p in wpoly]
+    add(M.plane_extrude(f"win_frame_{sx}", frame, 0.05, (xs(2.5) - sx * 0.012, 0, 0), m["plastic"], plane="YZ", bevel=0.025))
+    add(M.plane_extrude(f"side_window_{sx}", wpoly, 0.05, (xs(2.5) + sx * 0.003, 0, 0), m["glass"], plane="YZ", bevel=0.02))
+    add(M.box(f"win_divider_{sx}", (0.03, 0.04, 0.8), (xs(2.5) + sx * 0.02, 9.56, 2.5), m["plastic"], bevel=0.01, seg=1))
     # maçaneta e degrau da porta
     add(M.box(f"door_handle_{sx}", (0.045, 0.24, 0.045), (xs(1.9) + sx * 0.02, 9.5, 1.95), m["chrome"], bevel=0.012, seg=2))
     add(M.box(f"door_handle_bed_{sx}", (0.03, 0.3, 0.1), (xs(1.9) + sx * 0.008, 9.5, 1.95), m["plastic"], bevel=0.02))
@@ -99,18 +128,10 @@ def _wipers_mirrors_doors(add, m, sx):
     for k in range(4):
         add(M.box(f"step_tread_{sx}_{k}", (0.24, 0.03, 0.012), (sx * (CAB_W / 2 + 0.12), 9.3 + k * 0.16, 0.58), m["plastic"], bevel=0.003, seg=1))
     add(M.box(f"step_bracket_{sx}", (0.05, 0.5, 0.18), (sx * (CAB_W / 2 + 0.02), 9.55, 0.7), m["steel"], bevel=0.01, seg=1))
-    # recorte do arco da roda dianteira (meia-lua escura acima de z=0.9)
-    pts = []
-    for k in range(0, 13):
-        a = math.radians(180 * k / 12)
-        yy, zz = FRONT_AXLE_Y + 0.64 * math.cos(a), 0.5 + 0.64 * math.sin(a)
-        if zz >= CAB_Z0 + 0.0:
-            pts.append((yy, zz))
-    pts.append((pts[0][0], pts[0][1]))
-    poly = [(pts[i][0], pts[i][1]) for i in range(len(pts) - 1)]
-    poly = sorted(poly, key=lambda p: -p[0])
-    add(M.plane_extrude(f"front_arch_{sx}", poly, 0.03, (xs(1.0) + sx * 0.002, 0, 0), m["plastic"], plane="YZ", bevel=0.004))
-
+    # para-lama plástico em volta da roda dianteira + fundo escuro do arco
+    x0, x1 = (0.8, 1.27) if sx > 0 else (-1.27, -0.8)
+    add(A.arch_shell(f"front_fender_{sx}", (FRONT_AXLE_Y, 0.5), 0.55, 0.62, x0, x1, m["plastic"], seg=22))
+    add(A.arch_shell(f"front_fender_lip_{sx}", (FRONT_AXLE_Y, 0.5), 0.62, 0.655, x0 + sx * 0.0 if sx > 0 else x0, x1 if sx > 0 else x1, m["chrome"], seg=22))
 
 def _roof(add, m):
     add(M.box("roof_hatch", (0.9, 0.9, 0.04), (0, 9.6, CAB_TOP + 0.005), m["plastic"], bevel=0.015, seg=1))
