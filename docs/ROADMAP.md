@@ -26,10 +26,10 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 ## Fase 3 — Corrida contra bots
 - [x] [P30] Tráfego
 - [x] [P31] Bots rivais
-- [ ] [P32] Colisões e dano por zona
-- [ ] [P33] Passing, vácuo, carga, chegada e pagamento
-- [ ] [P34] HUD de corrida
-- [ ] [P35] Efeitos visuais de batida (faísca, fumaça, peça caindo)
+- [x] [P32] Colisões e dano por zona
+- [x] [P33] Passing, vácuo, carga, chegada e pagamento
+- [x] [P34] HUD de corrida
+- [x] [P35] Efeitos visuais de batida (faísca, fumaça, peça caindo)
 
 ## Fase 4 — Garagem e economia
 - [ ] [P40] Todas as peças do MVP no Blender (8 slots)

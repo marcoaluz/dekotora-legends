@@ -57,3 +57,17 @@ static func part_state(part: Dictionary) -> String:
 		return "broken"
 	var ratio: float = float(part["dur"]) / maxf(float(part["max"]), 0.001)
 	return "dent" if ratio < 0.6 else "ok"
+
+
+## Saude de uma zona (0..1) para o HUD/garagem: media ponderada das pecas da zona; se nao ha
+## pecas, usa a saude do sistema da zona.
+static func zone_health(truck: TruckSim, zone: String) -> float:
+	var cur: float = 0.0
+	var mx: float = 0.0
+	for part in truck.loadout:
+		if zone in part["zones"] and float(part["max"]) > 0.0:
+			cur += float(part["dur"])
+			mx += float(part["max"])
+	if mx > 0.0:
+		return cur / mx
+	return float(truck.systems[String(ZONE_SYSTEM.get(zone, "cargo"))]) / 100.0
