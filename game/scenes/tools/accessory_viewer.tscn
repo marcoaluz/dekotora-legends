@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/accessory_viewer.gd" id="1_a"]
+
+[node name="AccessoryViewer" type="Node3D"]
+script = ExtResource("1_a")

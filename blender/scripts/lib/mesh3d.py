@@ -121,14 +121,31 @@ def smooth(objs, angle_deg: float = 35.0) -> None:
                 p.use_smooth = True
 
 
-def join_by_material(objs, prefix: str = "") -> list:
+def mirror_x(objs) -> None:
+    """Espelha objetos em X (geometria já com transformações aplicadas) e corrige as normais."""
+    for o in objs:
+        if o.type != "MESH":
+            continue
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bmesh.ops.scale(bm, vec=Vector((-1, 1, 1)), verts=bm.verts)
+        bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
+        bm.to_mesh(o.data)
+        bm.free()
+        o.data.update()
+
+
+def join_by_material(objs, prefix: str = "", keep=lambda o: False) -> list:
     """Junta objetos que usam o mesmo material (menos draw calls no jogo). Devolve os novos objetos."""
     groups: dict = {}
+    out = []
     for o in objs:
         if o.type != "MESH" or not o.data.materials:
             continue
+        if keep(o):          # objetos editáveis (texto, face) ficam separados
+            out.append(o)
+            continue
         groups.setdefault(o.data.materials[0].name, []).append(o)
-    out = []
     for matname, lst in groups.items():
         bpy.ops.object.select_all(action="DESELECT")
         for o in lst:
@@ -170,3 +187,109 @@ def export_glb(path: str, objs) -> None:
     bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", use_selection=True, export_apply=True,
                               export_yup=True, export_cameras=False, export_lights=False,
                               export_extras=True)
+
+
+def torus(name, R, r, loc, mat=None, axis="Y", seg=28, tube_seg=8, collection=None):
+    """Toro (anel). `axis` = eixo perpendicular ao plano do anel (X, Y ou Z). Para aros de farol, molduras."""
+    bm = bmesh.new()
+    verts = []
+    for i in range(seg):
+        a = math.tau * i / seg
+        ring = []
+        for j in range(tube_seg):
+            b = math.tau * j / tube_seg
+            x = (R + r * math.cos(b)) * math.cos(a)
+            y = (R + r * math.cos(b)) * math.sin(a)
+            z = r * math.sin(b)
+            ring.append(bm.verts.new((x, y, z)))
+        verts.append(ring)
+    for i in range(seg):
+        for j in range(tube_seg):
+            a, b = verts[i][j], verts[i][(j + 1) % tube_seg]
+            c, d = verts[(i + 1) % seg][(j + 1) % tube_seg], verts[(i + 1) % seg][j]
+            bm.faces.new((a, b, c, d))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = _link(name, bm, mat, collection)
+    ob.location = loc
+    if axis == "X":
+        ob.rotation_euler = (0, math.radians(90), 0)
+    elif axis == "Y":
+        ob.rotation_euler = (math.radians(90), 0, 0)
+    return ob
+
+
+def plane_extrude(name, pts, depth, loc, mat=None, plane="XZ", bevel=0.01, seg=1, collection=None):
+    """Polígono 2D extrudado. plane: XZ (extrude em Y, vista de frente/trás), YZ (extrude em X, vista
+    lateral) ou XY (extrude em Z, vista de cima). pts = [(a, b), ...] sentido anti-horário."""
+    bm = bmesh.new()
+    def v(a, b, d):
+        if plane == "XZ":
+            return bm.verts.new((a, d, b))
+        if plane == "YZ":
+            return bm.verts.new((d, a, b))
+        return bm.verts.new((a, b, d))
+    front = [v(a, b, -depth / 2) for a, b in pts]
+    back = [v(a, b, depth / 2) for a, b in pts]
+    bm.faces.new(front[::-1])
+    bm.faces.new(back)
+    n = len(pts)
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((front[i], front[j], back[j], back[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    _bevel(bm, bevel, seg)
+    ob = _link(name, bm, mat, collection)
+    ob.location = loc
+    return ob
+
+
+def text3d(name, text, size, loc, mat=None, font_path=None, extrude=0.01, rot=(90, 0, 0), collection=None):
+    """Texto 3D convertido em malha (sem bpy.ops). Gira 90° em X para ficar de pé, lendo de trás
+    (olhando para +Y). Use rot=(90,0,180) para ler de frente."""
+    curve = bpy.data.curves.new(name, "FONT")
+    curve.body = text
+    curve.size = size
+    curve.align_x = "CENTER"
+    curve.align_y = "CENTER"
+    curve.extrude = extrude
+    curve.offset = size * 0.04
+    if font_path:
+        import os
+        if os.path.exists(font_path):
+            curve.font = bpy.data.fonts.load(font_path)
+    tmp = bpy.data.objects.new(name + "_curve", curve)
+    bpy.context.scene.collection.objects.link(tmp)
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(tmp.evaluated_get(dg))
+    bpy.data.objects.remove(tmp)
+    bpy.data.curves.remove(curve)
+    ob = bpy.data.objects.new(name, me)
+    (collection or bpy.context.scene.collection).objects.link(ob)
+    if mat is not None:
+        ob.data.materials.append(mat)
+    ob.location = loc
+    ob.rotation_euler = [math.radians(a) for a in rot]
+    return ob
+
+
+def apply_transforms(objs) -> None:
+    """Aplica rotação/escala/posição à malha (origem do objeto volta a 0,0,0 e a geometria fica
+    no lugar). Necessário antes de juntar objetos e exportar."""
+    for o in objs:
+        if o.type == "MESH":
+            o.data.transform(o.matrix_basis)
+            o.matrix_basis = Matrix.Identity(4)
+
+
+def bounds(objs):
+    """(min, max) como Vector, em coordenadas Blender, considerando a matriz do objeto."""
+    mn = Vector((1e9, 1e9, 1e9))
+    mx = Vector((-1e9, -1e9, -1e9))
+    for o in objs:
+        if o.type != "MESH":
+            continue
+        for v in o.data.vertices:
+            w = o.matrix_world @ v.co
+            mn = Vector((min(mn.x, w.x), min(mn.y, w.y), min(mn.z, w.z)))
+            mx = Vector((max(mx.x, w.x), max(mx.y, w.y), max(mx.z, w.z)))
+    return mn, mx

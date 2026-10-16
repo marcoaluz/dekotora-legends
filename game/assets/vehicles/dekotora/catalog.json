@@ -1,0 +1,1495 @@
+{
+  "version": 1,
+  "units": "metros",
+  "godot_forward": "-Z",
+  "truck": {
+    "id": "dekotora_truck_base",
+    "model": "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb",
+    "mount_points_godot_xyz": {
+      "MOUNT_FRONT_BUMPER": [
+        0.0,
+        0.45,
+        -11.5
+      ],
+      "MOUNT_FRONT_GRILLE": [
+        0.0,
+        1.25,
+        -11.5
+      ],
+      "MOUNT_FRONT_ORNAMENT": [
+        0.0,
+        1.85,
+        -11.5
+      ],
+      "MOUNT_VISOR": [
+        0.0,
+        3.34,
+        -11.17
+      ],
+      "MOUNT_ROOF": [
+        0.0,
+        3.35,
+        -10.0
+      ],
+      "MOUNT_ROOF_LIGHTS": [
+        0.0,
+        3.35,
+        -10.95
+      ],
+      "MOUNT_BODY_ROOF": [
+        0.0,
+        3.2,
+        -4.0
+      ],
+      "MOUNT_REAR": [
+        0.0,
+        0.7,
+        -0.0
+      ],
+      "MOUNT_REAR_LAMPS": [
+        0.0,
+        1.6,
+        -0.0
+      ],
+      "MOUNT_REAR_PLATE": [
+        0.0,
+        1.0,
+        -0.0
+      ],
+      "MOUNT_REAR_PANEL": [
+        0.0,
+        2.2,
+        -0.0
+      ],
+      "MOUNT_REAR_ROOF": [
+        0.0,
+        3.2,
+        -0.0
+      ],
+      "MOUNT_SIDE_R": [
+        1.25,
+        0.95,
+        -3.95
+      ],
+      "MOUNT_SIDE_L": [
+        -1.25,
+        0.95,
+        -3.95
+      ],
+      "MOUNT_FENDER_R": [
+        1.2,
+        0.52,
+        -2.25
+      ],
+      "MOUNT_FENDER_L": [
+        -1.2,
+        0.52,
+        -2.25
+      ],
+      "MOUNT_STEP_R": [
+        1.2,
+        0.55,
+        -9.4
+      ],
+      "MOUNT_STEP_L": [
+        -1.2,
+        0.55,
+        -9.4
+      ],
+      "MOUNT_SIDE_TRIM_R": [
+        1.25,
+        2.45,
+        -1.2
+      ],
+      "MOUNT_SIDE_TRIM_L": [
+        -1.25,
+        2.45,
+        -1.2
+      ],
+      "MOUNT_SIDE_BOX_R": [
+        1.25,
+        0.4,
+        -4.9
+      ],
+      "MOUNT_SIDE_BOX_L": [
+        -1.25,
+        0.4,
+        -4.9
+      ],
+      "MOUNT_SIDE_ORNAMENT_R": [
+        1.25,
+        2.3,
+        -5.0
+      ],
+      "MOUNT_SIDE_ORNAMENT_L": [
+        -1.25,
+        2.3,
+        -5.0
+      ],
+      "MOUNT_SIDE_PANEL_R": [
+        1.25,
+        2.35,
+        -4.1
+      ],
+      "MOUNT_SIDE_PANEL_L": [
+        -1.25,
+        2.35,
+        -4.1
+      ],
+      "MOUNT_CAB_SIDE_R": [
+        1.2,
+        1.0,
+        -10.0
+      ],
+      "MOUNT_CAB_SIDE_L": [
+        -1.2,
+        1.0,
+        -10.0
+      ],
+      "MOUNT_WHEEL_FRONT_R": [
+        1.0,
+        0.5,
+        -10.2
+      ],
+      "MOUNT_WHEEL_FRONT_L": [
+        -1.0,
+        0.5,
+        -10.2
+      ],
+      "MOUNT_WHEEL_FRONT_FACE_R": [
+        1.165,
+        0.5,
+        -10.2
+      ],
+      "MOUNT_WHEEL_FRONT_FACE_L": [
+        -1.165,
+        0.5,
+        -10.2
+      ],
+      "MOUNT_WHEEL_REAR_FACE_R": [
+        1.215,
+        0.52,
+        -1.5
+      ],
+      "MOUNT_WHEEL_REAR_FACE_L": [
+        -1.215,
+        0.52,
+        -1.5
+      ],
+      "MOUNT_WHEEL_REAR_R": [
+        1.06,
+        0.52,
+        -1.5
+      ],
+      "MOUNT_WHEEL_REAR_L": [
+        -1.06,
+        0.52,
+        -1.5
+      ],
+      "MOUNT_MUDFLAP_R": [
+        0.95,
+        0.8,
+        -0.45
+      ],
+      "MOUNT_MUDFLAP_L": [
+        -0.95,
+        0.8,
+        -0.45
+      ]
+    }
+  },
+  "categories": {
+    "front": "Frente",
+    "lighting": "Teto e iluminação",
+    "sides": "Laterais e rodas",
+    "rear": "Traseira e decoração"
+  },
+  "accessories": [
+    {
+      "id": "fb_standard_chrome",
+      "name": "Para-choque cromado padrão",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/fb_standard_chrome.glb",
+      "mount_point": "MOUNT_FRONT_BUMPER",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.936,
+        "y": 0.45,
+        "z": 0.63
+      },
+      "triangles": 1888,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "paint_white",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_white"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/fb_standard_chrome.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/fb_standard_chrome_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "fb_ornate_steps",
+      "name": "Para-choque ornamentado em degraus",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/fb_ornate_steps.glb",
+      "mount_point": "MOUNT_FRONT_BUMPER",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.951,
+        "y": 0.88,
+        "z": 0.68
+      },
+      "triangles": 2268,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "lamp_pink",
+        "paint_gold",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_gold",
+          "paint_pink"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/fb_ornate_steps.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/fb_ornate_steps_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "grille_frame_chrome",
+      "name": "Grade frontal com moldura metálica",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/grille_frame_chrome.glb",
+      "mount_point": "MOUNT_FRONT_GRILLE",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.06,
+        "y": 0.82,
+        "z": 0.135
+      },
+      "triangles": 1068,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "paint_gold",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/grille_frame_chrome.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/grille_frame_chrome_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "visor_sunshade",
+      "name": "Quebra-sol superior",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/visor_sunshade.glb",
+      "mount_point": "MOUNT_VISOR",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.64,
+        "y": 0.29,
+        "z": 0.605
+      },
+      "triangles": 592,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_cyan",
+        "paint_pink",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_pink",
+          "paint_blue",
+          "paint_red",
+          "paint_white"
+        ],
+        "accent": [
+          "chrome",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/visor_sunshade.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/visor_sunshade_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "bumper_extension_lip",
+      "name": "Extensão decorativa de para-choque",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/bumper_extension_lip.glb",
+      "mount_point": "MOUNT_FRONT_BUMPER",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.9,
+        "y": 0.292,
+        "z": 0.61
+      },
+      "triangles": 528,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/bumper_extension_lip.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/bumper_extension_lip_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "aux_round_lamps_pair",
+      "name": "Par de faróis auxiliares redondos",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/aux_round_lamps_pair.glb",
+      "mount_point": "MOUNT_FRONT_BUMPER",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.07,
+        "y": 0.69,
+        "z": 0.47
+      },
+      "triangles": 3012,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_white",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_white",
+          "lamp_amber"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/aux_round_lamps_pair.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/aux_round_lamps_pair_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "front_trim_set",
+      "name": "Conjunto de frisos frontais",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/front_trim_set.glb",
+      "mount_point": "MOUNT_FRONT_GRILLE",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.276,
+        "y": 0.68,
+        "z": 0.06
+      },
+      "triangles": 764,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/front_trim_set.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/front_trim_set_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "front_crest_ornament",
+      "name": "Ornamento frontal (sol e asas)",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/front_crest_ornament.glb",
+      "mount_point": "MOUNT_FRONT_ORNAMENT",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.602,
+        "y": 1.028,
+        "z": 0.175
+      },
+      "triangles": 1720,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_red",
+        "paint_gold",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_gold",
+          "chrome"
+        ],
+        "accent": [
+          "lamp_red",
+          "lamp_pink"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/front_crest_ornament.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/front_crest_ornament_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_light_bracket",
+      "name": "Suporte de iluminação para o teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_light_bracket.glb",
+      "mount_point": "MOUNT_ROOF_LIGHTS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.38,
+        "y": 0.695,
+        "z": 0.2
+      },
+      "triangles": 1264,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "steel"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_bracket.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_bracket_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_light_bar_rect",
+      "name": "Barra de luzes retangulares",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_light_bar_rect.glb",
+      "mount_point": "MOUNT_ROOF_LIGHTS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.34,
+        "y": 0.538,
+        "z": 0.31
+      },
+      "triangles": 720,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_white",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_bar_rect.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_bar_rect_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_round_lamps_set",
+      "name": "Conjunto de faróis redondos de teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_round_lamps_set.glb",
+      "mount_point": "MOUNT_ROOF_LIGHTS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.3,
+        "y": 0.728,
+        "z": 0.267
+      },
+      "triangles": 2952,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_white",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_white",
+          "lamp_amber"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_round_lamps_set.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_round_lamps_set_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_marker_small_lamps",
+      "name": "Conjunto de lanternas pequenas",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_marker_small_lamps.glb",
+      "mount_point": "MOUNT_ROOF_LIGHTS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.28,
+        "y": 0.233,
+        "z": 0.2
+      },
+      "triangles": 2420,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "lamp_white",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_white",
+          "lamp_pink"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_marker_small_lamps.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_marker_small_lamps_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "antenna_decor_mount",
+      "name": "Suporte de antena decorativa",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/antenna_decor_mount.glb",
+      "mount_point": "MOUNT_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 0.9,
+        "y": 1.995,
+        "z": 0.505
+      },
+      "triangles": 1880,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink",
+        "paint_red",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/antenna_decor_mount.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/antenna_decor_mount_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_sign_lightbox",
+      "name": "Placa luminosa personalizável",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_sign_lightbox.glb",
+      "mount_point": "MOUNT_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.9,
+        "y": 0.69,
+        "z": 0.24
+      },
+      "triangles": 4304,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_yellow",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan",
+          "lamp_white"
+        ]
+      },
+      "customizable": {
+        "text_node": "SIGN_TEXT",
+        "face_node": "SIGN_FACE"
+      },
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_sign_lightbox.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_sign_lightbox_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_light_frame_halo",
+      "name": "Moldura luminosa para teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_light_frame_halo.glb",
+      "mount_point": "MOUNT_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.32,
+        "y": 0.105,
+        "z": 2.72
+      },
+      "triangles": 648,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_cyan"
+      ],
+      "materials_available": {
+        "main": [
+          "lamp_cyan",
+          "lamp_pink",
+          "lamp_yellow"
+        ],
+        "accent": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_light_frame_halo.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_light_frame_halo_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "roof_torii_ornament",
+      "name": "Ornamento superior torii com lanterna",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/roof_torii_ornament.glb",
+      "mount_point": "MOUNT_BODY_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.726,
+        "y": 0.995,
+        "z": 0.3
+      },
+      "triangles": 1060,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_red",
+        "paint_gold",
+        "paint_red",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_red",
+          "paint_gold",
+          "paint_pink"
+        ],
+        "accent": [
+          "lamp_red",
+          "lamp_amber"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/roof_torii_ornament.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/roof_torii_ornament_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "skirt_chrome_panel",
+      "name": "Saia lateral metálica",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/skirt_chrome_panel.glb",
+      "mount_point": "MOUNT_SIDE_R",
+      "mount_point_left": "MOUNT_SIDE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.495,
+        "y": 0.6,
+        "z": 4.2
+      },
+      "triangles": 1304,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/skirt_chrome_panel.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/skirt_chrome_panel_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "skirt_lit_neon",
+      "name": "Saia lateral com iluminação",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/skirt_lit_neon.glb",
+      "mount_point": "MOUNT_SIDE_R",
+      "mount_point_left": "MOUNT_SIDE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.27,
+        "y": 0.54,
+        "z": 4.2
+      },
+      "triangles": 812,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "lamp_cyan",
+        "lamp_pink",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "steel",
+          "chrome",
+          "paint_blue"
+        ],
+        "accent": [
+          "lamp_pink",
+          "lamp_cyan",
+          "lamp_yellow"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/skirt_lit_neon.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/skirt_lit_neon_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "fender_extension",
+      "name": "Extensão de para-lama",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/fender_extension.glb",
+      "mount_point": "MOUNT_FENDER_R",
+      "mount_point_left": "MOUNT_FENDER_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.373,
+        "y": 0.615,
+        "z": 1.94
+      },
+      "triangles": 1056,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "paint_pink"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_pink",
+          "paint_blue",
+          "paint_red",
+          "paint_white"
+        ],
+        "accent": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/fender_extension.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/fender_extension_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "hubcap_decorative",
+      "name": "Calota decorativa",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/hubcap_decorative.glb",
+      "mount_point": "MOUNT_WHEEL_FRONT_FACE_R",
+      "mount_point_left": "MOUNT_WHEEL_FRONT_FACE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.12,
+        "y": 0.72,
+        "z": 0.72
+      },
+      "triangles": 1708,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink",
+        "paint_gold",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_gold",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/hubcap_decorative.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/hubcap_decorative_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "step_metal",
+      "name": "Degrau metálico",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/step_metal.glb",
+      "mount_point": "MOUNT_STEP_R",
+      "mount_point_left": "MOUNT_STEP_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.345,
+        "y": 0.32,
+        "z": 0.75
+      },
+      "triangles": 1252,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "steel",
+          "chrome"
+        ],
+        "accent": [
+          "chrome"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/step_metal.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/step_metal_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "side_trim_set",
+      "name": "Conjunto de frisos laterais",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/side_trim_set.glb",
+      "mount_point": "MOUNT_SIDE_TRIM_R",
+      "mount_point_left": "MOUNT_SIDE_TRIM_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.058,
+        "y": 0.54,
+        "z": 5.28
+      },
+      "triangles": 784,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_trim_set.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/side_trim_set_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "side_box_decor",
+      "name": "Caixa lateral decorativa",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/side_box_decor.glb",
+      "mount_point": "MOUNT_SIDE_BOX_R",
+      "mount_point_left": "MOUNT_SIDE_BOX_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.38,
+        "y": 0.65,
+        "z": 1.4
+      },
+      "triangles": 584,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "paint_blue",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_blue",
+          "paint_pink",
+          "paint_red"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_box_decor.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/side_box_decor_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "side_ornament_wave",
+      "name": "Ornamento lateral (ondas)",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/side_ornament_wave.glb",
+      "mount_point": "MOUNT_SIDE_ORNAMENT_R",
+      "mount_point_left": "MOUNT_SIDE_ORNAMENT_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.095,
+        "y": 1.06,
+        "z": 1.06
+      },
+      "triangles": 2992,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink",
+        "paint_blue",
+        "paint_gold"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_blue",
+          "paint_red",
+          "paint_pink"
+        ],
+        "accent": [
+          "paint_gold",
+          "chrome"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_ornament_wave.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/side_ornament_wave_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "rb_decorative",
+      "name": "Para-choque traseiro decorativo",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rb_decorative.glb",
+      "mount_point": "MOUNT_REAR",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.815,
+        "y": 0.45,
+        "z": 0.7
+      },
+      "triangles": 1732,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_red",
+        "paint_pink",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_pink",
+          "lamp_red"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rb_decorative.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rb_decorative_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "rear_panel_frame",
+      "name": "Painel traseiro com moldura",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rear_panel_frame.glb",
+      "mount_point": "MOUNT_REAR_PANEL",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.417,
+        "y": 1.915,
+        "z": 0.12
+      },
+      "triangles": 2008,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_pink",
+        "paint_blue",
+        "paint_gold"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_blue",
+          "paint_red",
+          "paint_pink"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_panel_frame.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_panel_frame_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "rear_lamp_cluster",
+      "name": "Conjunto de lanternas traseiras",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rear_lamp_cluster.glb",
+      "mount_point": "MOUNT_REAR_LAMPS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 1.0,
+        "z": 0.12
+      },
+      "triangles": 3360,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "lamp_red",
+        "lamp_white"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_red",
+          "lamp_amber",
+          "lamp_white"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_lamp_cluster.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_lamp_cluster_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "side_panel_decor",
+      "name": "Painel lateral decorativo",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/side_panel_decor.glb",
+      "mount_point": "MOUNT_SIDE_PANEL_R",
+      "mount_point_left": "MOUNT_SIDE_PANEL_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.06,
+        "y": 1.07,
+        "z": 4.7
+      },
+      "triangles": 956,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "paint_blue",
+        "paint_gold",
+        "paint_pink"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_blue",
+          "paint_red",
+          "paint_white"
+        ],
+        "accent": [
+          "paint_pink",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/side_panel_decor.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/side_panel_decor_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "rear_plate_custom",
+      "name": "Placa decorativa personalizável",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rear_plate_custom.glb",
+      "mount_point": "MOUNT_REAR_PLATE",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 0.62,
+        "y": 0.39,
+        "z": 0.075
+      },
+      "triangles": 4388,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_white",
+        "paint_white",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_white",
+          "paint_gold",
+          "paint_pink"
+        ]
+      },
+      "customizable": {
+        "text_node": "PLATE_TEXT",
+        "face_node": "PLATE_FACE"
+      },
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_plate_custom.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_plate_custom_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "mudflap_designed",
+      "name": "Para-barro com desenho original",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/mudflap_designed.glb",
+      "mount_point": "MOUNT_MUDFLAP_R",
+      "mount_point_left": "MOUNT_MUDFLAP_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.56,
+        "y": 0.61,
+        "z": 0.075
+      },
+      "triangles": 400,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_cyan",
+        "paint_pink",
+        "rubber",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "rubber"
+        ],
+        "accent": [
+          "paint_pink",
+          "paint_gold",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/mudflap_designed.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/mudflap_designed_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "rear_ornament_metal",
+      "name": "Ornamento traseiro metálico (leque)",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rear_ornament_metal.glb",
+      "mount_point": "MOUNT_REAR_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.2,
+        "y": 0.95,
+        "z": 0.155
+      },
+      "triangles": 1452,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_red",
+        "paint_gold",
+        "paint_pink"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "paint_pink",
+          "lamp_red"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_ornament_metal.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_ornament_metal_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    },
+    {
+      "id": "panel_japanese_theme",
+      "name": "Painel decorativo tema japonês",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/panel_japanese_theme.glb",
+      "mount_point": "MOUNT_REAR_PANEL",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.232,
+        "y": 1.48,
+        "z": 0.075
+      },
+      "triangles": 3896,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "paint_blue",
+        "paint_gold",
+        "paint_red",
+        "paint_white"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_blue",
+          "paint_white"
+        ],
+        "accent": [
+          "paint_red",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/panel_japanese_theme.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/panel_japanese_theme_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": []
+    }
+  ]
+}

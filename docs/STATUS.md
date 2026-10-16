@@ -40,3 +40,4 @@ Ver lista abaixo (mais recente no fim).
 - P32-P35 concluídos (colisão/dano, passing/vácuo/chegada/pagamento, HUD, efeitos 3D). Testes: 31 passam (`godot --headless --path game -s res://tests/run_tests.gd`).
 - Projeto agora usa stretch canvas_items + fractional (3D nítido; HUD em layout 480x270). .blend e previews dentro de game/ têm `.gdignore` (senão o Godot tenta importar .blend e pede o Blender).
 - PRÓXIMO: P40 com `docs/PROMPT_ACESSORIOS_3D.md` (32 acessórios GLB), depois P41 (PartDef .tres) ...
+- 2026-10-16 P40 CONCLUÍDO (prompt do Marco): 32 acessórios 3D em game/assets/vehicles/dekotora/accessories/, catálogo, demo (`scenes/tools/accessory_viewer.tscn`), testes (37 passam). Documentação completa: docs/ACESSORIOS.md. Marco deve olhar as prévias em game/assets/vehicles/dekotora/previews/assembled_*.png e rodar a demo.

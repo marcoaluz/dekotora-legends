@@ -25,10 +25,16 @@ def _setup_world():
     ramp = nt.nodes.new("ShaderNodeValToRGB")
     mapn.inputs["Rotation"].default_value = (math.radians(-90), 0, 0)
     cr = ramp.color_ramp
-    cr.elements[0].position = 0.35
-    cr.elements[0].color = (0.01, 0.012, 0.03, 1)
-    cr.elements[1].position = 0.75
-    cr.elements[1].color = (0.35, 0.4, 0.7, 1)
+    cr.interpolation = "CONSTANT"
+    # faixas claras e escuras (como um estúdio de fotografia): dá o que refletir no cromo
+    stops = [(0.0, (0.01, 0.012, 0.03)), (0.30, (0.25, 0.28, 0.45)), (0.36, (0.01, 0.012, 0.03)),
+             (0.46, (0.9, 0.92, 1.0)), (0.52, (0.02, 0.02, 0.05)), (0.60, (0.35, 0.4, 0.7)),
+             (0.68, (0.05, 0.05, 0.12)), (0.78, (1.0, 0.85, 0.9)), (0.84, (0.08, 0.1, 0.25))]
+    while len(cr.elements) < len(stops):
+        cr.elements.new(0.5)
+    for el, (pos, col) in zip(cr.elements, stops):
+        el.position = pos
+        el.color = col + (1,)
     nt.links.new(coord.outputs["Generated"], mapn.inputs["Vector"])
     nt.links.new(mapn.outputs["Vector"], grad.inputs["Vector"])
     nt.links.new(grad.outputs["Fac"], ramp.inputs["Fac"])

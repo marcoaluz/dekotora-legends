@@ -32,7 +32,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P35] Efeitos visuais de batida (faísca, fumaça, peça caindo)
 
 ## Fase 4 — Garagem e economia
-- [ ] [P40] Todas as peças do MVP no Blender (8 slots)
+- [x] [P40] Todas as peças do MVP no Blender (8 slots)
 - [ ] [P41] Dados das peças e motores em Resources
 - [ ] [P42] Tela da garagem (montar, comprar, ver peso/durabilidade/Fama)
 - [ ] [P43] Reparo e custo
