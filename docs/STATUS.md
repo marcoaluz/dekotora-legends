@@ -28,3 +28,6 @@ Ver lista abaixo (mais recente no fim).
 - P02 parcial: tela de teste + build Windows OK (`builds/dekotora.exe`, ignorada no git). Android BLOQUEADO: sem Android SDK/JDK17 no PC (Marco). Export templates 4.7.2 já instalados.
 - Nome do jogo mudou (pedido do Marco): Kaidō Bakusō — Chrome Legends (ver DECISOES). Alternativas se ele não gostar: "Ichiban Kaidō", "Hoshi Bakusō". Textos de UI devem usar o nome via i18n quando existir.
 - P10 concluído (lib em blender/scripts/lib, test_lib.py OK). P11: build_truck_base.py + render_truck.py rodam; aguardando revisão visual.
+- P11/P12 concluídos (arte): `blender/scripts/build_truck_base.py`, `render_truck.py`, `render_parts.py`, `parts/*.py`. Folha: blender/renders/parts/contact_sheet.png. Quadro 160x120, ângulos ±20/±10, pitch 7°. Kanji ok (fonte baixada em game/assets/fonts/NotoSansJP.ttf, OFL).
+- P13 (visualizador) feito: `game/scenes/tools/truck_viewer.tscn` + `scripts/truck/truck_view.gd`. Teste visual: `godot --path game res://scenes/tools/truck_viewer.tscn`. FALTA Marco aprovar o visual (e Android).
+- ATENÇÃO ferramenta: no Bash tool, heredocs grandes com aspas falham; use a ferramenta Write para criar arquivos.

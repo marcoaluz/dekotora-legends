@@ -13,8 +13,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P10] Biblioteca comum dos scripts Blender
 - [x] [P11] Caminhão base em 5 ângulos
 - [x] [P12] 3 peças de teste (para-choque, luzes de teto, andon) com 3 estados de dano
-- [ ] [P13] Visualizador de camadas no Godot (caminhão girando entre ângulos, troca de peças)
-- [ ] **Marco aprova o visual** ou pede ajustes (repetir P11/P12)
+- [~] [P13] Visualizador de camadas no Godot (caminhão girando entre ângulos, troca de peças)
+- [ ] **Marco aprova o visual (PRECISA MARCO)** ou pede ajustes (repetir P11/P12)
 
 ## Fase 2 — Protótipo da estrada
 - [ ] [P20] Simulação da pista e do caminhão (sem gráficos)
