@@ -52,8 +52,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P62] Predição e interpolação
 - [x] [P63] Colisão e dano no servidor, resultado e pagamento
 - [x] [P64] Perfis no servidor e jogo cruzado celular ↔ PC
-- [ ] [P65] Teste em rede Wi-Fi (celular → PC do Marco)
-- [ ] [P66] Servidor no VPS + teste com amigos
+- [x] [P65] (guia docs/REDE_WIFI.md; teste real no celular PRECISA MARCO) Teste em rede Wi-Fi (celular → PC do Marco)
+- [x] [P66] (docs + scripts; contratar VPS PRECISA MARCO) Servidor no VPS + teste com amigos
 
 ## Fase 7 — Polimento e teste com amigos
 - [ ] [P70] Desempenho no celular

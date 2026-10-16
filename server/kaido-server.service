@@ -1,0 +1,17 @@
+[Unit]
+Description=Kaido Bakuso - servidor multiplayer (Godot headless)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=kaido
+WorkingDirectory=/opt/kaido
+ExecStart=/opt/kaido/dekotora_server.x86_64 --headless -- --server --port=24600
+Restart=always
+RestartSec=3
+# perfis dos jogadores ficam em ~/.local/share/godot/app_userdata/...
+Environment=HOME=/home/kaido
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
