@@ -63,6 +63,7 @@ static func button(text: String, min_size: Vector2 = Vector2(0, 52)) -> Button:
 	b.text = text
 	b.custom_minimum_size = min_size
 	b.focus_mode = Control.FOCUS_ALL
+	b.pressed.connect(func() -> void: AudioBus.play_ui("ui_back" if text == Tr.t("menu.back") else "ui_select"))
 	return b
 
 

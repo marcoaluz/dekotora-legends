@@ -14,3 +14,4 @@ fame = 12
 price = 15000
 fame_required = 20
 accessory_id = "aux_round_lamps_pair"
+horn = "horn_air_basic"

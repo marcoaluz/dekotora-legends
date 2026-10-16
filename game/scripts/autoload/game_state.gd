@@ -194,6 +194,14 @@ func sell(id: String) -> void:
 	profile_changed.emit()
 
 
+## Buzina da primeira peca instalada que traga uma; senao a buzina de ar basica.
+func installed_horn() -> String:
+	for d in installed_part_defs():
+		if d.horn != "":
+			return d.horn
+	return "horn_air_basic"
+
+
 # ---------------------------------------------------------------- montagem -> simulacao
 
 func installed_part_defs() -> Array[PartDef]:

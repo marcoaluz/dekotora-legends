@@ -41,10 +41,10 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P46] Bots, tráfego e cenário de Kanto no Blender
 
 ## Fase 5 — Áudio
-- [ ] Marco gera os sons de `AUDIO_ELEVENLABS.md`
-- [ ] [P50] Preparar loops e importar áudio
-- [ ] [P51] Som do motor em camadas
-- [ ] [P52] Efeitos e música no jogo
+- [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins
+- [x] [P50] Preparar loops e importar áudio
+- [x] [P51] Som do motor em camadas
+- [x] [P52] Efeitos e música no jogo
 
 ## Fase 6 — Multiplayer
 - [ ] [P60] Servidor headless + salas por código (2 janelas no mesmo PC)

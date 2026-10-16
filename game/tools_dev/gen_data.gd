@@ -67,6 +67,13 @@ const UPGRADES: Array = [
 ]
 
 
+## Pecas que trazem buzina propria (som em audio/sfx/truck/)
+const HORNS: Dictionary = {
+	"fb_gold_wing": "horn_musical_1", "front_crest_ornament": "horn_musical_2",
+	"roof_lights_crown": "horn_musical_1", "andon_big_panel": "horn_musical_2", "aux_round_lamps_pair": "horn_air_basic",
+}
+
+
 func _fame_required(price: int) -> int:
 	if price < 15000:
 		return 0
@@ -97,6 +104,7 @@ func _initialize() -> void:
 		d.fame_required = _fame_required(int(p[6]))
 		d.accessory_id = String(p[7])
 		d.variant = p[8]
+		d.horn = String(HORNS.get(String(p[0]), ""))
 		_save(d, "res://data/parts/%s.tres" % p[0])
 	for e in ENGINES:
 		var d := EngineDef.new()

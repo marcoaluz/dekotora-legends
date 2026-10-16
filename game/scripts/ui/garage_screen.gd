@@ -15,6 +15,7 @@ var _preview_cache: Dictionary = {}
 
 
 func _ready() -> void:
+	AudioBus.play_music("garage_chill")
 	gs = get_node("/root/GameState")
 	stage = GarageStage.new()
 	add_child(stage)
@@ -222,7 +223,10 @@ func _part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 			v.add_child(_wl(reason, 13, UiTheme.BAD))
 		b.pressed.connect(func() -> void:
 			if gs.buy(d):
-				_flash("Comprou " + Tr.t("part." + String(d.id))))
+				AudioBus.play_ui("ui_buy")
+				_flash("Comprou " + Tr.t("part." + String(d.id)))
+			else:
+				AudioBus.play_ui("ui_error"))
 		row.add_child(b)
 	else:
 		if not installed:
@@ -300,6 +304,7 @@ func _build_repair() -> void:
 	all.disabled = total <= 0 or gs.money() < 1
 	all.pressed.connect(func() -> void:
 		var spent: int = gs.repair_all()
+		AudioBus.play_ui("ui_repair" if spent > 0 else "ui_error")
 		_flash("Reparos pagos: " + Tr.yen(spent)))
 	_left.add_child(all)
 	_left.add_child(_wl("Fórmula: preço da peça × % de dano × 0,5.\nMural riscado: repintar = 30% do preço.", 13, UiTheme.TEXT_DIM))
@@ -329,7 +334,9 @@ func _build_repair() -> void:
 		var rb: Button = UiTheme.button("%s  %s" % [Tr.t("garage.repaint") if d.durability <= 0.0 else Tr.t("garage.repair_one"), Tr.yen(cost)], Vector2(0, 38))
 		rb.add_theme_font_size_override("font_size", 14)
 		rb.disabled = gs.money() < cost
-		rb.pressed.connect(func() -> void: gs.repair_part(String(id)))
+		rb.pressed.connect(func() -> void:
+			if gs.repair_part(String(id)):
+				AudioBus.play_ui("ui_repair"))
 		row.add_child(rb)
 		if bool(own["broken"]):
 			var nb: Button = UiTheme.button("%s  %s" % [Tr.t("garage.buy_new"), Tr.yen(d.price)], Vector2(0, 38))
@@ -352,7 +359,9 @@ func _build_repair() -> void:
 		var sb: Button = UiTheme.button("%s  %s" % [Tr.t("garage.repair_one"), Tr.yen(c2)], Vector2(0, 38))
 		sb.add_theme_font_size_override("font_size", 14)
 		sb.disabled = gs.money() < c2
-		sb.pressed.connect(func() -> void: gs.repair_system(String(sys)))
+		sb.pressed.connect(func() -> void:
+			if gs.repair_system(String(sys)):
+				AudioBus.play_ui("ui_repair"))
 		v2.add_child(sb)
 		_right.add_child(card2)
 	if not any:

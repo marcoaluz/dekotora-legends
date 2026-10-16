@@ -14,3 +14,4 @@ fame = 30
 price = 35000
 fame_required = 60
 accessory_id = "roof_round_lamps_set"
+horn = "horn_musical_1"

@@ -8,6 +8,7 @@ var _panel: Control
 
 
 func _ready() -> void:
+	AudioBus.play_music("menu_citypop")
 	stage = GarageStage.new()
 	add_child(stage)
 	var layer := CanvasLayer.new()
@@ -150,7 +151,8 @@ func _show_options() -> void:
 	ms.value = s.music_volume
 	ms.value_changed.connect(func(val: float) -> void:
 		s.music_volume = val
-		s.save_settings())
+		s.save_settings()
+		AudioBus.apply_settings())
 	v.add_child(ms)
 	v.add_child(UiTheme.label(Tr.t("options.sfx"), 18))
 	var fs := HSlider.new()
@@ -160,7 +162,8 @@ func _show_options() -> void:
 	fs.value = s.sfx_volume
 	fs.value_changed.connect(func(val: float) -> void:
 		s.sfx_volume = val
-		s.save_settings())
+		s.save_settings()
+		AudioBus.apply_settings())
 	v.add_child(fs)
 	var reset: Button = UiTheme.button(Tr.t("options.reset"))
 	reset.pressed.connect(func() -> void:

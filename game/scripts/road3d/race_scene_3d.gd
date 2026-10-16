@@ -27,6 +27,9 @@ var _debug_events: bool = false
 var gs: Node
 var route: RouteDef
 var _pause_layer: CanvasLayer
+var _audio: RaceAudio
+var _rival_audio: Array[EngineAudio] = []
+var _prev_passing: bool = false
 
 
 func _ready() -> void:
@@ -86,8 +89,27 @@ func _ready() -> void:
 		tc.target = input
 		layer.add_child(tc)
 	_build_pause_menu()
+	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
+
+
+func _setup_audio() -> void:
+	_audio = RaceAudio.new()
+	add_child(_audio)
+	var sets: Dictionary = {"eng_i6_std": "i6_std", "eng_i6_tuned": "i6_tuned", "eng_v8": "v8"}
+	var eng_id: String = String(gs.profile["engine"])
+	var music: String = "race_night_synthwave"
+	if route != null:
+		var rv: RivalDef = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
+		if rv != null and rv.boss:
+			music = "boss_enka_rock"
+		elif not route.night:
+			music = "race_day_rock"
+	_audio.setup(sim.trucks[player], String(sets.get(eng_id, "i6_std")), String(gs.profile["turbo"]),
+		String(gs.profile["exhaust"]) == "exh_straight", music)
+	for k in range(1, _trucks.size()):
+		_rival_audio.append(_audio.make_rival_engine(_trucks[k], "i6_std"))
 
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
@@ -199,6 +221,7 @@ func _process(delta: float) -> void:
 	_update_visuals(alpha, dt)
 	_update_camera(dt)
 	_update_hud()
+	_update_audio(dt)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 	if _autoplay and not _fps_printed and Time.get_ticks_msec() > 6000:
@@ -209,8 +232,21 @@ func _process(delta: float) -> void:
 		_show_result()
 
 
+func _update_audio(dt: float) -> void:
+	var t: TruckSim = sim.trucks[player]
+	_audio.update(dt, t, _countdown)
+	for k in _rival_audio.size():
+		var rt: TruckSim = sim.trucks[k + 1]
+		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
+		_rival_audio[k].update(dt, r01, rt.engine.throttle_now, rt.boost, 1.0, rt.speed)
+	if t.passing_active and not _prev_passing:
+		_audio.passing_pressed(gs.installed_horn())
+	_prev_passing = t.passing_active
+
+
 func _handle_events(events: Array[Dictionary]) -> void:
 	for e in events:
+		_audio.on_event(e, player)
 		if _debug_events:
 			print("EVENTO frame=%d %s" % [Engine.get_frames_drawn(), e])
 		match String(e["type"]):
@@ -297,6 +333,7 @@ func _update_hud() -> void:
 func _show_result() -> void:
 	var res: Dictionary = sim.result_for(player)
 	print("RESULTADO: ", res)
+	_audio.finish_race(int(res["position"]) == 1)
 	gs.apply_race_result(res, String(route.id) if route != null else "", sim.trucks[player])
 	var layer := CanvasLayer.new()
 	layer.layer = 20
