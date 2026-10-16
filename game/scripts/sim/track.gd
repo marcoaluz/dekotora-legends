@@ -76,10 +76,11 @@ func first_object_at(z0: float) -> int:
 func decorate_roadside(seed_: int = 7) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
+	add_object(150.0, 0.0, "toll_gate")
 	var z: float = 20.0
 	var n: int = 0
 	while z < length_m:
-		if n % 3 == 0:
+		if n % 3 == 0 and absf(z - 150.0) > 12.0:
 			add_object(z, -1.35, "lamp_post")
 			add_object(z + 30.0, 1.35, "lamp_post")
 		var side: float = -1.0 if rng.randf() < 0.5 else 1.0

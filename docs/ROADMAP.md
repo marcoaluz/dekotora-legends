@@ -38,7 +38,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P43] Reparo e custo
 - [x] [P44] Motor, turbo, escape e freio-motor na simulação
 - [x] [P45] Save local e campanha de Kanto (3 trechos + chefe)
-- [ ] [P46] Bots, tráfego e cenário de Kanto no Blender
+- [x] [P46] Bots, tráfego e cenário de Kanto no Blender
 
 ## Fase 5 — Áudio
 - [ ] Marco gera os sons de `AUDIO_ELEVENLABS.md`

@@ -243,7 +243,7 @@ def plane_extrude(name, pts, depth, loc, mat=None, plane="XZ", bevel=0.01, seg=1
     return ob
 
 
-def text3d(name, text, size, loc, mat=None, font_path=None, extrude=0.01, rot=(90, 0, 0), collection=None):
+def text3d(name, text, size, loc, mat=None, font_path=None, extrude=0.01, rot=(90, 0, 0), collection=None, resolution=12):
     """Texto 3D convertido em malha (sem bpy.ops). Gira 90° em X para ficar de pé, lendo de trás
     (olhando para +Y). Use rot=(90,0,180) para ler de frente."""
     curve = bpy.data.curves.new(name, "FONT")
@@ -253,6 +253,7 @@ def text3d(name, text, size, loc, mat=None, font_path=None, extrude=0.01, rot=(9
     curve.align_y = "CENTER"
     curve.extrude = extrude
     curve.offset = size * 0.04
+    curve.resolution_u = resolution
     if font_path:
         import os
         if os.path.exists(font_path):

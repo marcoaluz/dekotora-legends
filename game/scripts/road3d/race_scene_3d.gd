@@ -33,6 +33,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS     # recebe o botao de pausa mesmo pausado
 	gs = get_node("/root/GameState")
 	route = gs.pending_route
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--route="):
+			route = load("res://data/routes/%s.tres" % a.substr(8)) as RouteDef
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
 	var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 	sim = RaceSim.new(track, density)
@@ -44,7 +47,7 @@ func _ready() -> void:
 	road.build(path)
 	var city := CityBuilder.new()
 	add_child(city)
-	city.build(path)
+	city.build(path, 21, route.scenery if route != null else &"city")
 	var side := Roadside3D.new()
 	add_child(side)
 	side.build(path)

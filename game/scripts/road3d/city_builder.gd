@@ -30,8 +30,9 @@ void fragment() {
 var path: TrackPath
 
 
-func build(path_: TrackPath, seed_: int = 21) -> void:
+func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city") -> void:
 	path = path_
+	_add_ground(kind)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
 	var mat := ShaderMaterial.new()
@@ -44,8 +45,8 @@ func build(path_: TrackPath, seed_: int = 21) -> void:
 	var z: float = 0.0
 	while z < path.track.length_m + 200.0:
 		for side in [-1.0, 1.0]:
-			if rng.randf() < 0.75:
-				var dist: float = rng.randf_range(95.0, 260.0)
+			if rng.randf() < _building_chance(kind):
+				var dist: float = rng.randf_range(95.0, 260.0) if kind == &"city" else rng.randf_range(160.0, 420.0)
 				var w: float = rng.randf_range(14.0, 34.0)
 				var d: float = rng.randf_range(14.0, 34.0)
 				var h: float = rng.randf_range(25.0, 110.0)
@@ -74,13 +75,13 @@ func build(path_: TrackPath, seed_: int = 21) -> void:
 	var mtn := MultiMesh.new()
 	mtn.transform_format = MultiMesh.TRANSFORM_3D
 	mtn.mesh = mmesh
-	var count: int = 40
+	var count: int = 90 if kind == &"mountain" else 40
 	mtn.instance_count = count
 	for i in count:
 		var zz: float = rng.randf_range(0.0, path.track.length_m)
 		var sd: float = -1.0 if rng.randf() < 0.5 else 1.0
-		var c2: Vector3 = path.world_point(zz, sd * rng.randf_range(520.0, 800.0) / Track.ROAD_HALF_WIDTH_M, 0.0)
-		var hh: float = rng.randf_range(90.0, 260.0)
+		var c2: Vector3 = path.world_point(zz, sd * rng.randf_range(300.0 if kind == &"mountain" else 520.0, 800.0) / Track.ROAD_HALF_WIDTH_M, 0.0)
+		var hh: float = rng.randf_range(90.0, 420.0 if kind == &"mountain" else 260.0)
 		var rr: float = rng.randf_range(160.0, 380.0)
 		mtn.set_instance_transform(i, Transform3D(Basis.from_scale(Vector3(rr, hh, rr)), c2 + Vector3.UP * (hh * 0.5 - 6.0)))
 	var mm_mat := StandardMaterial3D.new()
@@ -91,3 +92,33 @@ func build(path_: TrackPath, seed_: int = 21) -> void:
 	mi2.material_override = mm_mat
 	mi2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi2)
+
+
+func _building_chance(kind: StringName) -> float:
+	match kind:
+		&"coast":
+			return 0.3
+		&"mountain":
+			return 0.08
+	return 0.75
+
+
+## Chao do mundo alem da grama: mar escuro refletivo (costa) ou terra escura.
+func _add_ground(kind: StringName) -> void:
+	var mi := MeshInstance3D.new()
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(9000, 9000)
+	mi.mesh = plane
+	var m := StandardMaterial3D.new()
+	if kind == &"coast":
+		m.albedo_color = Color("#07163a")
+		m.metallic = 0.7
+		m.roughness = 0.12
+		m.metallic_specular = 1.0
+	else:
+		m.albedo_color = Color("#080c1c")
+		m.roughness = 0.9
+	mi.material_override = m
+	mi.position = Vector3(0, -1.2, -1400)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mi)
