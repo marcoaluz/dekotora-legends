@@ -31,3 +31,6 @@ Ver lista abaixo (mais recente no fim).
 - P11/P12 concluídos (arte): `blender/scripts/build_truck_base.py`, `render_truck.py`, `render_parts.py`, `parts/*.py`. Folha: blender/renders/parts/contact_sheet.png. Quadro 160x120, ângulos ±20/±10, pitch 7°. Kanji ok (fonte baixada em game/assets/fonts/NotoSansJP.ttf, OFL).
 - P13 (visualizador) feito: `game/scenes/tools/truck_viewer.tscn` + `scripts/truck/truck_view.gd`. Teste visual: `godot --path game res://scenes/tools/truck_viewer.tscn`. FALTA Marco aprovar o visual (e Android).
 - ATENÇÃO ferramenta: no Bash tool, heredocs grandes com aspas falham; use a ferramenta Write para criar arquivos.
+- P20 concluído: sim em game/scripts/sim/ (commands, track, engine_model, truck_sim, race_sim) + game/tests/test_sim_basic.gd (9 testes passam).
+- P21 concluído: game/scripts/road/{sprite_projector,road_renderer,race_scene}.gd + scenes/race/race.tscn. ~60 FPS no PC (RX 580). Teste: `godot --path game res://scenes/race/race.tscn` (setas/WASD). Debug: `-- --autoplay --start=600 --touch`.
+- P22: local_input.gd, touch_controls.gd, Settings (touch_scale, tilt). Falta testar no celular (Marco). Inclinação: eixo y do acelerômetro, `tilt_invert` se vier invertido.

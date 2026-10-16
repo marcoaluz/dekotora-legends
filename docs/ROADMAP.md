@@ -17,9 +17,9 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [ ] **Marco aprova o visual (PRECISA MARCO)** ou pede ajustes (repetir P11/P12)
 
 ## Fase 2 — Protótipo da estrada
-- [ ] [P20] Simulação da pista e do caminhão (sem gráficos)
-- [ ] [P21] Renderizador pseudo-3D com o caminhão real
-- [ ] [P22] Controles touch, teclado e controle
+- [x] [P20] Simulação da pista e do caminhão (sem gráficos)
+- [x] [P21] Renderizador pseudo-3D com o caminhão real
+- [~] [P22] Controles touch, teclado e controle — teclado/controle/toque prontos; build Android PRECISA MARCO (sem SDK)
 - [ ] [P23] Cenário de teste (parallax + beira de estrada provisória)
 - [ ] **Marco decide: plano A (pseudo-3D) ou plano B (3D PS1)**
 
