@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_ddxbw"]
+
+[resource]
+script = ExtResource("1_ddxbw")
+id = &"rear_plate_custom"
+display_key = "part.rear_plate_custom"
+slot = &"plate"
+zones = PackedStringArray("rear")
+weight_kg = 10.0
+durability = 15.0
+fame = 5
+price = 3000
+accessory_id = "rear_plate_custom"

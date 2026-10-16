@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_l4c5y"]
+
+[resource]
+script = ExtResource("1_l4c5y")
+id = &"mural_waves"
+display_key = "part.mural_waves"
+slot = &"mural"
+zones = PackedStringArray("left", "right")
+fame = 20
+price = 20000
+fame_required = 20
+accessory_id = "panel_japanese_theme"

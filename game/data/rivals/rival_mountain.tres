@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RivalDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/rival_def.gd" id="1_8m7tb"]
+
+[resource]
+script = ExtResource("1_8m7tb")
+id = &"rival_mountain"
+display_name = "Lua Cromada"
+paint = Color(0.24705882, 0.69803923, 0.43529412, 1)
+part_ids = PackedStringArray("fb_chrome_steps", "skirt_chrome", "rb_chrome")
+taunt_key = "rival.rival_mountain.taunt"

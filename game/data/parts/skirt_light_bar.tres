@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_yatk7"]
+
+[resource]
+script = ExtResource("1_yatk7")
+id = &"skirt_light_bar"
+display_key = "part.skirt_light_bar"
+slot = &"side_skirts"
+zones = PackedStringArray("left", "right")
+weight_kg = 180.0
+durability = 90.0
+fame = 25
+price = 38000
+fame_required = 60
+accessory_id = "skirt_lit_neon"

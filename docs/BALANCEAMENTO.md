@@ -100,3 +100,17 @@ Murais não têm durabilidade: cada batida lateral **risca** (−10% de Fama do 
 | **Equilibrado** | `fb_chrome_steps`, `skirt_light_bar`, `andon_kanji`, `turbo_single` | Bom em tudo, ótimo em nada |
 
 Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
+
+
+## Notas da implementação (P44, 2026-10-16)
+
+- Motor: 6 marchas, relações 6.4 / 4.1 / 2.75 / 1.9 / 1.35 / 1.0, diferencial 3.3, pneu 0,52 m. Curva de torque
+  normalizada (700 rpm 55%, pico 100% em 1.600 rpm, 62% em 2.500 rpm). Aderência máx. na arrancada: 32 kN.
+- Medido nos testes (0–100 km/h, caminhão 12 t + peças): padrão **22 s**, 6 cil. preparado + turbo simples + escape direto **16 s**,
+  V8 + turbo duplo + escape direto **14 s**. Ajustar jogando (constantes em `game/scripts/sim/engine_model.gd`).
+- Turbo: enche com o acelerador acima da rotação mínima, em `lag_s` segundos; esvazia em ~0,6 s; "pssh" (blow-off)
+  ao soltar com boost > 60%.
+- Freio-motor padrão: 4.500 N × (rpm/corte) com o acelerador solto acima de 1.500 rpm; `jake_brake` multiplica por 1,35.
+- Suposições novas (não estavam no GDD): 1 Fama = 50 ¥ de bônus; ultrapassagem = 2 Fama; vácuo = +20% tração e +2 m/s;
+  Passing enche 4%/s acima de 70% da velocidade máxima e gasta 35%/s; Fama mínima para liberar peças: <15k ¥ livre,
+  <30k = 20, <50k = 60, acima = 120.

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_2b6c1"]
+
+[resource]
+script = ExtResource("1_2b6c1")
+id = &"rear_ornament_metal"
+display_key = "part.rear_ornament_metal"
+slot = &"rear_ornament"
+zones = PackedStringArray("rear")
+weight_kg = 80.0
+durability = 60.0
+fame = 20
+price = 24000
+fame_required = 20
+accessory_id = "rear_ornament_metal"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_mimh2"]
+
+[resource]
+script = ExtResource("1_mimh2")
+id = &"fender_extension"
+display_key = "part.fender_extension"
+slot = &"fenders"
+zones = PackedStringArray("left", "right")
+weight_kg = 110.0
+durability = 90.0
+fame = 12
+price = 16000
+fame_required = 20
+accessory_id = "fender_extension"

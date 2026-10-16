@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RivalDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/rival_def.gd" id="1_p25pa"]
+
+[resource]
+script = ExtResource("1_p25pa")
+id = &"rival_coast"
+display_name = "Trovao Rosa"
+difficulty = 0
+paint = Color(1, 0.43529412, 0.69411767, 1)
+part_ids = PackedStringArray("fb_basic", "rb_basic")
+taunt_key = "rival.rival_coast.taunt"

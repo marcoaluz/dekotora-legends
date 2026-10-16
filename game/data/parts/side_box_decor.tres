@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_vuu7m"]
+
+[resource]
+script = ExtResource("1_vuu7m")
+id = &"side_box_decor"
+display_key = "part.side_box_decor"
+slot = &"side_box"
+zones = PackedStringArray("left", "right")
+weight_kg = 150.0
+durability = 120.0
+fame = 10
+price = 14000
+accessory_id = "side_box_decor"

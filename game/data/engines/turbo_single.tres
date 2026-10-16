@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TurboDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/turbo_def.gd" id="1_71kvm"]
+
+[resource]
+script = ExtResource("1_71kvm")
+id = &"turbo_single"
+display_key = "turbo.turbo_single"
+torque_gain = 0.18
+lag_s = 0.8
+price = 40000

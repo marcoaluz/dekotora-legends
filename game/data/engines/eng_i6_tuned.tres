@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EngineDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/engine_def.gd" id="1_7u1oi"]
+
+[resource]
+script = ExtResource("1_7u1oi")
+id = &"eng_i6_tuned"
+display_key = "engine.eng_i6_tuned"
+weight_kg = 80.0
+max_torque_nm = 1750.0
+redline_rpm = 2600.0
+price = 60000
+sound_set = "eng_i6_tuned"

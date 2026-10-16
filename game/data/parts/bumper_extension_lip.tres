@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_eobpt"]
+
+[resource]
+script = ExtResource("1_eobpt")
+id = &"bumper_extension_lip"
+display_key = "part.bumper_extension_lip"
+slot = &"front_lip"
+zones = PackedStringArray("front")
+weight_kg = 90.0
+durability = 60.0
+fame = 10
+price = 14000
+accessory_id = "bumper_extension_lip"

@@ -5,7 +5,7 @@ extends RefCounted
 
 const GRAVITY: float = 9.8
 const ROLLING_RESISTANCE: float = 0.01
-const DRAG: float = 2.0                 # N por (m/s)^2
+const DRAG: float = 1.5                 # N por (m/s)^2
 const BRAKE_FORCE: float = 60000.0      # N
 const OFFROAD_MAX_SPEED: float = 14.0   # m/s no acostamento
 const OFFROAD_DECEL: float = 8.0        # m/s^2 acima desse limite
@@ -74,7 +74,9 @@ func grip() -> float:
 
 func step(dt: float, cmd: Commands, track: Track) -> void:
 	# 1) longitudinal: tracao - arrasto - rolamento - freio - ladeira
-	var force: float = engine.traction_force(cmd.throttle, speed - draft * DRAFT_SPEED_BONUS) * (1.0 + DRAFT_BOOST * draft)
+	var force: float = engine.step(dt, cmd.throttle, speed, draft * DRAFT_SPEED_BONUS)
+	if force > 0.0:
+		force *= 1.0 + DRAFT_BOOST * draft
 	var resist: float = DRAG * speed * speed + ROLLING_RESISTANCE * mass * GRAVITY
 	if speed > 0.0:
 		force -= resist
@@ -100,6 +102,6 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	x = clampf(x, -1.6, 1.6)   # limite fisico (fora do acostamento)
 	# 4) avanco
 	z += speed * dt
-	var gr: Vector2 = engine.gear_and_rpm(speed)
-	gear = int(gr.x)
-	rpm = gr.y if cmd.throttle > 0.0 or speed > 1.0 else EngineModel.IDLE_RPM
+	gear = engine.gear
+	rpm = engine.rpm
+	boost = engine.boost

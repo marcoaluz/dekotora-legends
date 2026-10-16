@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="UpgradeDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_def.gd" id="1_b604v"]
+
+[resource]
+script = ExtResource("1_b604v")
+id = &"jake_brake"
+display_key = "upgrade.jake_brake"
+effect = &"engine_brake"
+value = 0.35
+price = 25000

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TurboDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/turbo_def.gd" id="1_ux0ym"]
+
+[resource]
+script = ExtResource("1_ux0ym")
+id = &"turbo_none"
+display_key = "turbo.turbo_none"
+min_rpm = 0.0

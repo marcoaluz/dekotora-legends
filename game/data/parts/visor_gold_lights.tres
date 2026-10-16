@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_eu4pt"]
+
+[resource]
+script = ExtResource("1_eu4pt")
+id = &"visor_gold_lights"
+display_key = "part.visor_gold_lights"
+slot = &"visor"
+zones = PackedStringArray("front")
+weight_kg = 110.0
+durability = 70.0
+fame = 20
+price = 30000
+fame_required = 60
+accessory_id = "visor_sunshade"
+variant = {
+"accent": "lamp_yellow",
+"main": "paint_blue"
+}

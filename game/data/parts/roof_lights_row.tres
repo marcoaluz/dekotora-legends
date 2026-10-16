@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_tkj2s"]
+
+[resource]
+script = ExtResource("1_tkj2s")
+id = &"roof_lights_row"
+display_key = "part.roof_lights_row"
+slot = &"roof_lights"
+zones = PackedStringArray("roof")
+weight_kg = 30.0
+durability = 20.0
+fame = 15
+price = 12000
+accessory_id = "roof_light_bar_rect"

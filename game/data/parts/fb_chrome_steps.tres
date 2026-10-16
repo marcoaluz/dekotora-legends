@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_aau6a"]
+
+[resource]
+script = ExtResource("1_aau6a")
+id = &"fb_chrome_steps"
+display_key = "part.fb_chrome_steps"
+slot = &"front_bumper"
+zones = PackedStringArray("front")
+weight_kg = 420.0
+durability = 220.0
+fame = 25
+price = 45000
+fame_required = 60
+accessory_id = "fb_ornate_steps"

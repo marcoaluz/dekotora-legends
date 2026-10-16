@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/upgrade_def.gd" id="1_jp026"]
+
+[resource]
+script = ExtResource("1_jp026")
+id = &"tires_sport"
+display_key = "upgrade.tires_sport"
+effect = &"grip"
+value = 0.12
+side_effect = &"tire_wear"
+side_value = 0.1
+price = 30000

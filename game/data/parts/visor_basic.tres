@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_1d2fg"]
+
+[resource]
+script = ExtResource("1_1d2fg")
+id = &"visor_basic"
+display_key = "part.visor_basic"
+slot = &"visor"
+zones = PackedStringArray("front")
+weight_kg = 40.0
+durability = 40.0
+fame = 5
+price = 5000
+accessory_id = "visor_sunshade"
+variant = {
+"main": "paint_white"
+}

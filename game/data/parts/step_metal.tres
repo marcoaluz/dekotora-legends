@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_fgcsc"]
+
+[resource]
+script = ExtResource("1_fgcsc")
+id = &"step_metal"
+display_key = "part.step_metal"
+slot = &"steps"
+zones = PackedStringArray("left", "right")
+weight_kg = 35.0
+durability = 40.0
+fame = 4
+price = 4000
+accessory_id = "step_metal"

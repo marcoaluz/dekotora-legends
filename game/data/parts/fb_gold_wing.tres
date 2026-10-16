@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_siyu4"]
+
+[resource]
+script = ExtResource("1_siyu4")
+id = &"fb_gold_wing"
+display_key = "part.fb_gold_wing"
+slot = &"front_bumper"
+zones = PackedStringArray("front")
+weight_kg = 560.0
+durability = 300.0
+fame = 40
+price = 90000
+fame_required = 120
+accessory_id = "fb_ornate_steps"
+variant = {
+"accent": "paint_gold",
+"main": "paint_gold"
+}

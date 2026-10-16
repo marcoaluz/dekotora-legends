@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_q674t"]
+
+[resource]
+script = ExtResource("1_q674t")
+id = &"roof_torii_ornament"
+display_key = "part.roof_torii_ornament"
+slot = &"body_ornament"
+zones = PackedStringArray("roof")
+weight_kg = 70.0
+durability = 40.0
+fame = 28
+price = 30000
+fame_required = 60
+accessory_id = "roof_torii_ornament"

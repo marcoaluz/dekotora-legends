@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TurboDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/turbo_def.gd" id="1_b7eku"]
+
+[resource]
+script = ExtResource("1_b7eku")
+id = &"turbo_twin"
+display_key = "turbo.turbo_twin"
+torque_gain = 0.3
+min_rpm = 1300.0
+lag_s = 1.1
+price = 85000

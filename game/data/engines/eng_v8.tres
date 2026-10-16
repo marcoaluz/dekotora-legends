@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EngineDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/engine_def.gd" id="1_wmiay"]
+
+[resource]
+script = ExtResource("1_wmiay")
+id = &"eng_v8"
+display_key = "engine.eng_v8"
+weight_kg = 300.0
+max_torque_nm = 2200.0
+redline_rpm = 2500.0
+price = 150000
+sound_set = "eng_v8"

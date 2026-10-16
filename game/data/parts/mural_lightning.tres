@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_0d0c2"]
+
+[resource]
+script = ExtResource("1_0d0c2")
+id = &"mural_lightning"
+display_key = "part.mural_lightning"
+slot = &"mural"
+zones = PackedStringArray("left", "right")
+fame = 25
+price = 25000
+fame_required = 20
+accessory_id = "side_panel_decor"

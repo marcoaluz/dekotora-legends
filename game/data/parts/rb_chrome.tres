@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_g3did"]
+
+[resource]
+script = ExtResource("1_g3did")
+id = &"rb_chrome"
+display_key = "part.rb_chrome"
+slot = &"rear_bumper"
+zones = PackedStringArray("rear")
+weight_kg = 260.0
+durability = 180.0
+fame = 12
+price = 28000
+fame_required = 20
+accessory_id = "rb_decorative"

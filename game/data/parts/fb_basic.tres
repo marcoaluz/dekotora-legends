@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_tkg0c"]
+
+[resource]
+script = ExtResource("1_tkg0c")
+id = &"fb_basic"
+display_key = "part.fb_basic"
+slot = &"front_bumper"
+zones = PackedStringArray("front")
+weight_kg = 120.0
+durability = 80.0
+fame = 5
+price = 8000
+accessory_id = "fb_standard_chrome"
+variant = {
+"main": "steel"
+}

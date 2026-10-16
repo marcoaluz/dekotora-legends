@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ExhaustDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/exhaust_def.gd" id="1_5ima4"]
+
+[resource]
+script = ExtResource("1_5ima4")
+id = &"exh_std"
+display_key = "exhaust.exh_std"

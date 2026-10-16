@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_vvoco"]
+
+[resource]
+script = ExtResource("1_vvoco")
+id = &"grille_frame_chrome"
+display_key = "part.grille_frame_chrome"
+slot = &"grille"
+zones = PackedStringArray("front")
+weight_kg = 60.0
+durability = 50.0
+fame = 8
+price = 12000
+accessory_id = "grille_frame_chrome"

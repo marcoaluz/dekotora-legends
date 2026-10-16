@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EngineDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/engine_def.gd" id="1_lf2ty"]
+
+[resource]
+script = ExtResource("1_lf2ty")
+id = &"eng_i6_std"
+display_key = "engine.eng_i6_std"
+sound_set = "eng_i6_std"
