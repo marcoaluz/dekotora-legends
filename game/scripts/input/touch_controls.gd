@@ -4,19 +4,22 @@ extends Control
 ## Multitoque: cada dedo guarda o botao em que comecou. Escreve em um LocalInput.
 ## Tamanho ajustavel por Settings.touch_scale; semitransparente para nao esconder a estrada.
 
-const BTN_COLOR := Color(1, 1, 1, 0.22)
+const BTN_COLOR := Color(0.03, 0.04, 0.09, 0.42)     # vidro escuro (nao esconde a estrada)
 const BTN_PRESSED := Color(1, 0.18, 0.53, 0.45)
+const RING := Color(1, 1, 1, 0.45)
 
 var target: LocalInput
 var _buttons: Dictionary = {}      # nome -> {center: Vector2, radius: float}
 var _fingers: Dictionary = {}      # indice do dedo -> nome do botao
-var _labels: Dictionary = {"left": "<", "right": ">", "throttle": "GO", "brake": "FREIO", "passing": "P"}
+var _labels: Dictionary = {"left": "", "right": "", "throttle": "GO", "brake": "FREIO", "passing": "P"}
+var _font: Font
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(480, 270)
+	_font = UiTheme.heading_font(true)
 	layout()
 
 
@@ -79,9 +82,16 @@ func _draw() -> void:
 	for name in _buttons:
 		var c: Vector2 = _buttons[name]["center"]
 		var r: float = _buttons[name]["radius"]
-		draw_circle(c, r, BTN_PRESSED if name in held else BTN_COLOR)
-		draw_arc(c, r, 0.0, TAU, 24, Color(1, 1, 1, 0.5), 1.0)
-		var font: Font = ThemeDB.fallback_font
+		var on: bool = name in held
+		draw_circle(c, r, BTN_PRESSED if on else BTN_COLOR)
+		var ring: Color = UiTheme.PINK if name == "throttle" else (UiTheme.CYAN if name == "passing" else RING)
+		draw_arc(c, r, 0.0, TAU, 40, ring if not on else Color.WHITE, 1.5 if name == "throttle" else 1.0, true)
+		if name == "left" or name == "right":            # seta desenhada (chevron)
+			var d: float = -1.0 if name == "left" else 1.0
+			var k: float = r * 0.28
+			draw_polyline(PackedVector2Array([c + Vector2(-d * k * 0.6, -k), c + Vector2(d * k * 0.6, 0), c + Vector2(-d * k * 0.6, k)]), Color(1, 1, 1, 0.9), 2.5, true)
+			continue
 		var text: String = _labels[name]
-		var sz: Vector2 = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12)
-		draw_string(font, c + Vector2(-sz.x * 0.5, 4.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(1, 1, 1, 0.8))
+		var fs: int = 15 if name == "throttle" else 11
+		var sz: Vector2 = _font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
+		draw_string(_font, c + Vector2(-sz.x * 0.5, fs * 0.36), text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, 0.92))

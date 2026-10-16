@@ -1,13 +1,15 @@
 class_name RaceHud
 extends Control
-## HUD da corrida (480x270 de layout; o Godot escala nitido). Velocimetro, RPM e marcha, turbo,
-## Passing, posicao, distancia ate o destino, integridade da carga e mini-diagrama do caminhao
-## com as zonas coloridas pelo dano. Nao cobre os botoes de toque (cantos inferiores/laterais).
+## HUD da corrida (layout de 480x270; o CanvasLayer pai escala 2x). Regioes fixas e cantos livres para os
+## botoes de toque: topo-esquerda = POSICAO; topo-centro = DESTINO (barra com todos os caminhoes + km);
+## topo-direita = CARGA (integridade + diagrama de dano por zona, motor e direcao); baixo-centro = velocidade,
+## marcha, RPM, turbo e Passing. Tudo vem do TruckSim/RaceSim (nada inventado: sem combustivel no jogo).
+## Fontes da identidade visual (Rajdhani para numeros/titulos, Noto para rotulos).
 
 const PINK := Color("#ff2e88")
 const CYAN := Color("#21e6ff")
 const GOLD := Color("#f5cc5a")
-const PANEL := Color(0.04, 0.04, 0.1, 0.62)
+const LABEL := Color(1, 1, 1, 0.66)
 const OK_COL := Color("#3fb26f")
 const WARN_COL := Color("#f5cc5a")
 const BAD_COL := Color("#d1303f")
@@ -17,6 +19,9 @@ var player: int = 0
 var countdown: float = 0.0
 var banner: String = ""
 var banner_time: float = 0.0
+var _hf: Font
+var _bf: Font
+var _panel_sb: StyleBoxFlat
 
 
 func bind(sim_: RaceSim, player_: int) -> void:
@@ -25,6 +30,9 @@ func bind(sim_: RaceSim, player_: int) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(480, 270)        # layout de 480x270 (o CanvasLayer pai escala 2x)
+	_hf = UiTheme.heading_font(true)
+	_bf = load(UiTheme.BODY_FONT) as Font
+	_panel_sb = UiTheme.box(Color(0.03, 0.04, 0.09, 0.66), Color(1, 1, 1, 0.12), 1, 5, 0)
 
 
 func show_banner(text: String, seconds: float = 1.6) -> void:
@@ -37,20 +45,25 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-func _font() -> Font:
-	return ThemeDB.fallback_font
+func _num(pos: Vector2, text: String, size: int, col: Color = Color.WHITE, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
+	draw_string(_hf, pos + Vector2(0.6, 0.8), text, align, width, size, Color(0, 0, 0, 0.55))
+	draw_string(_hf, pos, text, align, width, size, col)
 
 
-func _text(pos: Vector2, text: String, size: int, col: Color = Color.WHITE, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
-	var f: Font = _font()
-	draw_string(f, pos + Vector2(1, 1), text, align, width, size, Color(0, 0, 0, 0.7))
-	draw_string(f, pos, text, align, width, size, col)
+func _lbl(pos: Vector2, text: String, size: int = 8, col: Color = LABEL, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
+	draw_string(_bf, pos, text, align, width, size, col)
 
 
-func _bar(rect: Rect2, value: float, col: Color, back: Color = Color(0, 0, 0, 0.5)) -> void:
-	draw_rect(rect, back)
-	draw_rect(Rect2(rect.position, Vector2(rect.size.x * clampf(value, 0.0, 1.0), rect.size.y)), col)
-	draw_rect(rect, Color(1, 1, 1, 0.35), false, 1.0)
+func _panel(r: Rect2, accent: Color = Color(0, 0, 0, 0), accent_left: bool = true) -> void:
+	draw_style_box(_panel_sb, r)
+	if accent.a > 0.0:
+		var x: float = r.position.x if accent_left else r.end.x - 2.0
+		draw_rect(Rect2(x, r.position.y + 4, 2, r.size.y - 8), accent)
+
+
+func _bar(r: Rect2, value: float, col: Color) -> void:
+	draw_rect(r, Color(1, 1, 1, 0.1))
+	draw_rect(Rect2(r.position, Vector2(r.size.x * clampf(value, 0.0, 1.0), r.size.y)), col)
 
 
 func _health_color(h: float) -> Color:
@@ -66,73 +79,102 @@ func _draw() -> void:
 		return
 	var t: TruckSim = sim.trucks[player]
 	var w: float = size.x
+	_draw_position(t)
+	_draw_destination(t, w)
+	_draw_cargo(t, w)
+	_draw_dash(t, w)
 	if Settings.show_fps:
-		_text(Vector2(w * 0.5 - 30, 44), "FPS %d" % Engine.get_frames_per_second(), 9, Color(1, 1, 1, 0.6))
-	# --- posicao (topo esquerdo)
+		_lbl(Vector2(w * 0.5 - 20, 52), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
+	if countdown > 0.0:
+		_num(Vector2(0, size.y * 0.44), "%d" % int(ceil(countdown)), 72, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
+	elif banner_time > 0.0:
+		_num(Vector2(0, size.y * 0.36), banner, 26, PINK, HORIZONTAL_ALIGNMENT_CENTER, w)
+
+
+func _draw_position(t: TruckSim) -> void:
 	var pos: int = 1
 	for k in sim.trucks.size():
 		if k != player and sim.trucks[k].z > t.z:
 			pos += 1
-	draw_rect(Rect2(6, 6, 74, 38), PANEL)
-	draw_rect(Rect2(6, 6, 3, 38), PINK)
-	_text(Vector2(14, 41), "%d" % pos, 26, GOLD)
-	_text(Vector2(36, 41), "/ %d" % sim.trucks.size(), 12, Color.WHITE)
-	_text(Vector2(14, 16), "POSICAO", 8, Color(1, 1, 1, 0.7))
-	# --- distancia ate o destino (topo, centro) com marcadores de todos
-	var bar := Rect2(w * 0.5 - 100, 12, 200, 6)
-	draw_rect(Rect2(bar.position - Vector2(4, 4), bar.size + Vector2(8, 22)), PANEL)
-	draw_rect(bar, Color(0, 0, 0, 0.6))
-	for k in sim.trucks.size():
-		var f: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
-		var c: Color = PINK if k == player else Color(0.7, 0.8, 1.0)
-		draw_rect(Rect2(bar.position.x + bar.size.x * f - 2, bar.position.y - 2, 4, 10), c)
+	var r := Rect2(6, 6, 74, 42)
+	_panel(r, PINK)
+	_lbl(Vector2(13, 18), Tr.t("hud.position"), 8)
+	_num(Vector2(13, 44), "%d" % pos, 30, GOLD)
+	_num(Vector2(33, 44), "/ %d" % sim.trucks.size(), 13, Color.WHITE)
+
+
+func _draw_destination(t: TruckSim, w: float) -> void:
+	var r := Rect2(w * 0.5 - 104, 6, 208, 30)
+	_panel(r)
 	var remaining: float = maxf(sim.finish_z - t.z, 0.0)
-	_text(Vector2(bar.position.x, bar.position.y + 22), "DESTINO  %.1f km" % (remaining / 1000.0), 9, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, bar.size.x)
-	# --- carga e mini-diagrama (topo direito)
-	var px: float = w - 94
-	draw_rect(Rect2(px, 6, 88, 92), PANEL)
-	draw_rect(Rect2(px + 85, 6, 3, 92), CYAN)
-	_text(Vector2(px + 6, 16), "CARGA", 8, Color(1, 1, 1, 0.7))
-	_bar(Rect2(px + 6, 20, 76, 6), t.cargo_integrity(), _health_color(t.cargo_integrity()))
-	_draw_truck_diagram(Vector2(px + 44, 62), t)
-	# --- velocimetro / RPM / marcha (embaixo, centro)
+	_lbl(Vector2(r.position.x + 8, 17), Tr.t("hud.destination"), 8)
+	_num(Vector2(r.position.x, 17), "%.1f km" % (remaining / 1000.0), 11, Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT, r.size.x - 8)
+	var bar := Rect2(r.position.x + 8, 23, r.size.x - 16, 4)
+	draw_rect(bar, Color(1, 1, 1, 0.12))
+	var f_me: float = clampf(t.z / sim.finish_z, 0.0, 1.0)
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * f_me, bar.size.y)), Color(CYAN, 0.55))
+	for k in sim.trucks.size():                      # marcadores de todos (rosa = voce)
+		var f: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
+		var c: Color = PINK if k == player else Color(0.75, 0.82, 1.0, 0.9)
+		draw_rect(Rect2(bar.position.x + bar.size.x * f - 1.5, bar.position.y - 2, 3, 8), c)
+
+
+func _draw_cargo(t: TruckSim, w: float) -> void:
+	var r := Rect2(w - 94, 6, 88, 96)
+	_panel(r, CYAN, false)
+	var ci: float = t.cargo_integrity()
+	_lbl(Vector2(r.position.x + 7, 17), Tr.t("hud.cargo"), 8)
+	_num(Vector2(r.position.x, 17), "%d%%" % roundi(ci * 100.0), 11, _health_color(ci), HORIZONTAL_ALIGNMENT_RIGHT, r.size.x - 8)
+	_bar(Rect2(r.position.x + 7, 21, r.size.x - 15, 4), ci, _health_color(ci))
+	_draw_truck_diagram(Vector2(r.position.x + 44, 62), t)
+
+
+func _draw_dash(t: TruckSim, w: float) -> void:
 	var cx: float = w * 0.5
-	var by: float = size.y - 6
-	draw_rect(Rect2(cx - 78, by - 62, 156, 62), PANEL)
+	var r := Rect2(cx - 82, size.y - 66, 164, 60)    # nao encosta nos botoes de toque
+	_panel(r)
+	var x0: float = r.position.x + 8
+	var y0: float = r.position.y
+	# turbo e Passing (barras finas no topo do painel)
+	_lbl(Vector2(x0, y0 + 10), "TURBO", 7)
+	_bar(Rect2(x0 + 34, y0 + 5, 52, 4), t.boost, CYAN)
+	_lbl(Vector2(x0 + 92, y0 + 10), "PASSING", 7)
+	_bar(Rect2(x0 + 126, y0 + 5, 24, 4), t.passing_charge, PINK if t.passing_active else GOLD)
+	# velocidade
 	var kmh: int = roundi(t.speed * 3.6)
-	_text(Vector2(cx - 74, by - 22), "%d" % kmh, 34, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, 90.0)
-	_text(Vector2(cx - 74, by - 8), "km/h", 9, Color(1, 1, 1, 0.7), HORIZONTAL_ALIGNMENT_CENTER, 90.0)
+	_num(Vector2(x0 - 4, y0 + 44), "%d" % kmh, 34, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, 66.0)
+	_lbl(Vector2(x0 - 4, y0 + 55), "km/h", 8, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 66.0)
+	# marcha
+	_num(Vector2(x0 + 62, y0 + 44), "%d" % t.gear, 30, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 34.0)
+	_lbl(Vector2(x0 + 54, y0 + 55), Tr.t("hud.gear"), 7, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 50.0)
+	# RPM: arco com marcas e faixa vermelha
+	var c := Vector2(x0 + 128, y0 + 38)
+	var rad: float = 16.0
 	var rpm_frac: float = clampf((t.rpm - EngineModel.IDLE_RPM) / (t.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
-	_text(Vector2(cx + 20, by - 30), "%d" % t.gear, 26, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 24.0)
-	_text(Vector2(cx + 20, by - 8), "MARCHA", 7, Color(1, 1, 1, 0.7), HORIZONTAL_ALIGNMENT_CENTER, 36.0)
-	# arco de RPM
-	draw_arc(Vector2(cx + 60, by - 26), 20.0, deg_to_rad(150), deg_to_rad(390), 24, Color(0, 0, 0, 0.6), 5.0)
-	draw_arc(Vector2(cx + 60, by - 26), 20.0, deg_to_rad(150), deg_to_rad(150 + 240 * rpm_frac), 24, PINK if rpm_frac > 0.85 else CYAN, 5.0)
-	_text(Vector2(cx + 40, by - 22), "RPM", 7, Color(1, 1, 1, 0.7), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
-	# turbo e passing
-	_text(Vector2(cx - 74, by - 56), "TURBO", 7, Color(1, 1, 1, 0.7))
-	_bar(Rect2(cx - 40, by - 62, 114, 5), t.boost, CYAN)
-	_text(Vector2(cx - 74, by - 47), "PASSING", 7, Color(1, 1, 1, 0.7))
-	var pcol: Color = PINK if t.passing_active else GOLD
-	_bar(Rect2(cx - 40, by - 52, 114, 5), t.passing_charge, pcol)
-	if t.draft > 0.1:
-		_text(Vector2(cx - 74, by - 38), "VACUO", 8, CYAN)
-	# --- contagem e avisos
-	if countdown > 0.0:
-		_text(Vector2(0, size.y * 0.4), "%d" % int(ceil(countdown)), 64, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
-	elif banner_time > 0.0:
-		_text(Vector2(0, size.y * 0.35), banner, 28, PINK, HORIZONTAL_ALIGNMENT_CENTER, w)
+	var a0: float = deg_to_rad(150.0)
+	var span: float = deg_to_rad(240.0)
+	draw_arc(c, rad, a0, a0 + span, 28, Color(1, 1, 1, 0.12), 4.0)
+	draw_arc(c, rad, a0 + span * 0.85, a0 + span, 8, Color(BAD_COL, 0.7), 4.0)
+	draw_arc(c, rad, a0, a0 + span * rpm_frac, 28, PINK if rpm_frac > 0.85 else CYAN, 4.0)
+	for i in 7:
+		var a: float = a0 + span * i / 6.0
+		draw_line(c + Vector2.from_angle(a) * (rad - 6), c + Vector2.from_angle(a) * (rad - 3), Color(1, 1, 1, 0.4), 1.0)
+	_lbl(Vector2(c.x - 15, c.y + 3), "RPM", 7, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 30.0)
+	if t.draft > 0.1:                                # chip de vacuo acima do painel
+		var dr := Rect2(cx - 24, r.position.y - 14, 48, 11)
+		draw_style_box(_panel_sb, dr)
+		_lbl(Vector2(dr.position.x, dr.position.y + 8.5), Tr.t("hud.draft"), 7, CYAN, HORIZONTAL_ALIGNMENT_CENTER, dr.size.x)
 
 
-## Caminhao visto de cima, com as 4 zonas coloridas pelo dano + motor/direcao.
+## Caminhao visto de cima, com as 4 zonas coloridas pelo dano + motor (M) e direcao (D).
 func _draw_truck_diagram(c: Vector2, t: TruckSim) -> void:
 	var body := Rect2(c - Vector2(11, 28), Vector2(22, 56))
-	draw_rect(body, Color(0.15, 0.15, 0.22, 0.9))
+	draw_rect(body, Color(0.15, 0.16, 0.24, 0.9))
 	var zones: Dictionary = {
-		"front": Rect2(c + Vector2(-11, -30), Vector2(22, 8)),
-		"rear": Rect2(c + Vector2(-11, 22), Vector2(22, 8)),
-		"left": Rect2(c + Vector2(-14, -18), Vector2(4, 36)),
-		"right": Rect2(c + Vector2(10, -18), Vector2(4, 36)),
+		"front": Rect2(c + Vector2(-11, -30), Vector2(22, 7)),
+		"rear": Rect2(c + Vector2(-11, 23), Vector2(22, 7)),
+		"left": Rect2(c + Vector2(-14, -18), Vector2(3, 36)),
+		"right": Rect2(c + Vector2(11, -18), Vector2(3, 36)),
 	}
 	for z in zones:
 		draw_rect(zones[z], _health_color(DamageModel.zone_health(t, String(z))))
@@ -140,5 +182,7 @@ func _draw_truck_diagram(c: Vector2, t: TruckSim) -> void:
 	var stg: float = float(t.systems["steering"]) / 100.0
 	draw_circle(c + Vector2(0, -12), 4.0, _health_color(eng))
 	draw_circle(c + Vector2(0, 4), 3.0, _health_color(stg))
-	_text(c + Vector2(-30, 30), "M", 7, Color(1, 1, 1, 0.6))
-	_text(c + Vector2(16, 30), "D", 7, Color(1, 1, 1, 0.6))
+	_lbl(c + Vector2(-34, -9), "M", 8, LABEL)
+	_lbl(c + Vector2(-34, 7), "D", 8, LABEL)
+	draw_line(c + Vector2(-28, -12), c + Vector2(-5, -12), Color(1, 1, 1, 0.25), 1.0)
+	draw_line(c + Vector2(-28, 4), c + Vector2(-4, 4), Color(1, 1, 1, 0.25), 1.0)

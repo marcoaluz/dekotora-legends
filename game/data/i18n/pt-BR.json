@@ -28,6 +28,13 @@
  "scenery.city": "Cidade",
  "scenery.mountain": "Montanha",
  "hud.fame": "Fama",
+ "hud.position": "POSIÇÃO",
+ "hud.destination": "DESTINO",
+ "hud.cargo": "CARGA",
+ "hud.gear": "MARCHA",
+ "hud.draft": "VÁCUO",
+ "hud.overtake": "ULTRAPASSAGEM!",
+ "hud.finish": "CHEGADA! %dº LUGAR",
  "garage.title": "GARAGEM",
  "garage.parts": "PEÇAS",
  "garage.mechanics": "MECÂNICA",
@@ -174,7 +181,8 @@
  "route.kanto_3_mountain": "Trecho 3 · Montanha (chefe)",
  "repair.engine": "Motor",
  "repair.steering": "Direção",
- "race.paused": "PAUSADO",
+ "race.paused": "JOGO EM PAUSA",
  "race.resume": "CONTINUAR",
- "race.exit": "SAIR DA CORRIDA"
+ "race.exit": "SAIR PARA O MENU",
+ "race.quit_game": "SAIR DO JOGO"
 }

@@ -27,6 +27,8 @@ var _debug_events: bool = false
 var gs: Node
 var route: RouteDef
 var _pause_layer: CanvasLayer
+var _pause_root: Control
+var _pause_first: Button
 var _audio: RaceAudio
 var _rival_audio: Array[EngineAudio] = []
 var _prev_passing: bool = false
@@ -109,6 +111,8 @@ func _ready() -> void:
 		tc.target = input
 		layer.add_child(tc)
 	_build_pause_menu()
+	if "--paused" in args:                       # depuracao: abre ja na tela de pausa (capturas)
+		_toggle_pause.call_deferred()
 	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
@@ -255,19 +259,57 @@ func _build_pause_menu() -> void:
 	dim.color = Color(0, 0, 0, 0.6)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(dim)
-	var box := VBoxContainer.new()
-	box.position = Vector2(340, 170)
-	box.custom_minimum_size = Vector2(280, 0)
-	root.add_child(box)
-	box.add_child(UiTheme.label(Tr.t("race.paused"), 36, UiTheme.PINK))
-	var resume: Button = UiTheme.button(Tr.t("race.resume"))
-	resume.pressed.connect(_toggle_pause)
-	box.add_child(resume)
-	var leave: Button = UiTheme.button(Tr.t("race.exit"))
-	leave.pressed.connect(func() -> void:
-		get_tree().paused = false
-		SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
-	box.add_child(leave)
+	# tela de pausa: titulo + 4 blocos com icone (continuar, opcoes, menu, sair do jogo)
+	var col := VBoxContainer.new()
+	col.position = Vector2(150, 140)
+	col.custom_minimum_size = Vector2(660, 0)
+	col.add_theme_constant_override("separation", 18)
+	root.add_child(col)
+	var ic := TextureRect.new()
+	ic.texture = UiKit.icon("pause")
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ic.custom_minimum_size = Vector2(0, 40)
+	col.add_child(ic)
+	var title: Label = UiKit.heading(Tr.t("race.paused"), 36)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(title)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	col.add_child(row)
+	var tiles: Array = [
+		[Tr.t("race.resume"), "play", _toggle_pause],
+		[Tr.t("menu.settings"), "settings", _pause_options],
+		[Tr.t("race.exit"), "house", func() -> void:
+			get_tree().paused = false
+			SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn")],
+		[Tr.t("race.quit_game"), "log-out", func() -> void: get_tree().quit()],
+	]
+	_pause_first = null
+	for t in tiles:
+		var b: Button = UiTheme.button(String(t[0]), Vector2(150, 120))
+		b.icon = UiKit.icon(String(t[1]))
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.add_theme_constant_override("icon_max_width", 40)
+		b.add_theme_font_size_override("font_size", 17)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.pressed.connect(t[2])
+		row.add_child(b)
+		if _pause_first == null:
+			_pause_first = b
+			b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.22), UiTheme.PINK, 1, 10, 10))
+	_pause_root = root
+
+
+## Opcoes durante a pausa (mesma tela do menu; volume e controles valem na hora).
+func _pause_options() -> void:
+	var op := OptionsPanel.new()
+	op.back_pressed.connect(func() -> void:
+		op.queue_free()
+		_pause_first.grab_focus())
+	_pause_root.add_child(op)
 
 
 func _toggle_pause() -> void:
@@ -275,6 +317,8 @@ func _toggle_pause() -> void:
 		return
 	get_tree().paused = not get_tree().paused
 	_pause_layer.visible = get_tree().paused
+	if _pause_layer.visible and _pause_first != null:
+		_pause_first.grab_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -374,10 +418,10 @@ func _handle_events(events: Array[Dictionary]) -> void:
 		match String(e["type"]):
 			"overtake":
 				if int(e["truck"]) == player:
-					_hud.show_banner("ULTRAPASSAGEM!")
+					_hud.show_banner(Tr.t("hud.overtake"))
 			"finish":
 				if int(e["truck"]) == player:
-					_hud.show_banner("CHEGADA! %do LUGAR" % int(e["position"]), 3.0)
+					_hud.show_banner(Tr.t("hud.finish", [int(e["position"])]), 3.0)
 			"truck":
 				var f: float = float(e["force"])
 				var ia: int = int(e["a"])

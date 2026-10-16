@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-085 | UI premium etapa E: HUD da corrida, botões de toque e tela de pausa | prompt UI/UX | médio | coordenador | concluída | 2026-10-16 | 2026-10-16 |
 | T-082 | UI premium etapa B: identidade visual (fonte Rajdhani, ícones Lucide, tema, componentes, transição) | prompt UI/UX | médio | coordenador | concluída | 2026-10-16 | 2026-10-16 |
 | T-083 | UI premium etapa C: tela inicial (Continuar, Nova carreira, Mercado de fretes) | prompt UI/UX | médio | coordenador | concluída | 2026-10-16 | |
 | T-084 | UI premium etapa D: garagem (galpão 3D, ficha técnica real, vistas) | prompt UI/UX | difícil | coordenador | concluída | 2026-10-16 | 2026-10-16 |
