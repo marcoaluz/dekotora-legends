@@ -209,6 +209,7 @@ func _spawn_field() -> void:
 		var t: TruckSim = sim.trucks[idx]
 		t.is_bot = i != 0
 		var node := TruckNode.new()
+		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "flat", "tank"][i % 3]
 		add_child(node)
 		if i == 0:
 			gs.configure_truck(t)

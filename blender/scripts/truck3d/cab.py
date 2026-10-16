@@ -46,10 +46,11 @@ def _grille(add, m):
     y = CAB_Y1
     add(M.box("grille_frame", (1.3, 0.07, 0.64), (0, y + 0.02, 1.22), m["chrome"], bevel=0.04))
     add(M.box("grille", (1.18, 0.08, 0.52), (0, y + 0.025, 1.22), m["plastic"], bevel=0.03))
-    for i in range(7):
-        add(M.box(f"grille_bar_{i}", (1.16, 0.045, 0.022), (0, y + 0.06, 0.99 + i * 0.075), m["chrome"], bevel=0.008, seg=1))
-    for i in range(-3, 4):
-        add(M.box(f"grille_div_{i}", (0.018, 0.04, 0.5), (i * 0.17, y + 0.056, 1.22), m["steel"], bevel=0.005, seg=1))
+    # tela perfurada (textura) em 5 faixas separadas por barras cromadas
+    for i in range(5):
+        add(M.box(f"grille_mesh_{i}", (1.12, 0.012, 0.075), (0, y + 0.066, 1.0 + i * 0.1), m["mesh_perf"], bevel=0.002, seg=1))
+    for i in range(6):
+        add(M.box(f"grille_bar_{i}", (1.16, 0.045, 0.02), (0, y + 0.06, 0.95 + i * 0.1), m["chrome"], bevel=0.008, seg=1))
     add(M.cylinder("badge_ring", 0.115, 0.04, (0, y + 0.075, 1.22), m["chrome"], axis="Y", seg=28))
     add(M.cylinder("badge_core", 0.085, 0.04, (0, y + 0.082, 1.22), m["paint_blue"], axis="Y", seg=28))
 
@@ -58,12 +59,12 @@ def _bumper(add, m):
     y = CAB_Y1
     add(M.box("bumper", (2.36, 0.3, 0.3), (0, y + 0.085, 0.74), m["paint_white"], bevel=0.09, seg=3))
     add(M.box("bumper_valance", (2.22, 0.24, 0.16), (0, y + 0.06, 0.5), m["plastic"], bevel=0.05))
-    add(M.box("bumper_step", (0.9, 0.12, 0.05), (0, y + 0.2, 0.56), m["steel"], bevel=0.01, seg=1))
+    add(M.box("bumper_step", (0.9, 0.12, 0.05), (0, y + 0.2, 0.56), m["diamond"], bevel=0.01, seg=1))
     add(M.box("plate_front", (0.52, 0.02, 0.13), (0, y + 0.24, 0.76), m["paint_white"], bevel=0.01, seg=1))
     for sx in (-1, 1):
         add(M.cylinder(f"fog_ring_{sx}", 0.085, 0.03, (sx * 0.78, y + 0.235, 0.74), m["chrome"], axis="Y", seg=20))
         add(M.cylinder(f"fog_{sx}", 0.065, 0.03, (sx * 0.78, y + 0.245, 0.74), m["lamp_white"], axis="Y", seg=20))
-        add(M.box(f"bumper_vent_{sx}", (0.5, 0.02, 0.07), (sx * 0.45, y + 0.235, 0.7), m["plastic"], bevel=0.01, seg=1))
+        add(M.box(f"bumper_vent_{sx}", (0.5, 0.02, 0.09), (sx * 0.45, y + 0.235, 0.7), m["mesh_perf_vent"], bevel=0.01, seg=1))
         add(M.box(f"bumper_corner_{sx}", (0.1, 0.3, 0.34), (sx * 1.2, y + 0.04, 0.72), m["paint_white"], bevel=0.04))
 
 
@@ -109,6 +110,8 @@ def _wipers_mirrors_doors(add, m, sx):
     add(M.plane_extrude(f"win_frame_{sx}", frame, 0.05, (xs(2.5) - sx * 0.012, 0, 0), m["plastic"], plane="YZ", bevel=0.025))
     add(M.plane_extrude(f"side_window_{sx}", wpoly, 0.05, (xs(2.5) + sx * 0.003, 0, 0), m["glass"], plane="YZ", bevel=0.02))
     add(M.box(f"win_divider_{sx}", (0.03, 0.04, 0.8), (xs(2.5) + sx * 0.02, 9.56, 2.5), m["plastic"], bevel=0.01, seg=1))
+    # vinco de cintura (linha de caráter) ao longo da lateral da cabine
+    add(M.tube(f"belt_crease_{sx}", [(xs(1.62) + sx * 0.006, y, 1.62) for y in (8.6, 9.2, 10.2, 11.0, 11.3)], 0.016, m["paint_white"], seg=6))
     # maçaneta e degrau da porta
     add(M.box(f"door_handle_{sx}", (0.045, 0.24, 0.045), (xs(1.9) + sx * 0.02, 9.5, 1.95), m["chrome"], bevel=0.012, seg=2))
     add(M.box(f"door_handle_bed_{sx}", (0.03, 0.3, 0.1), (xs(1.9) + sx * 0.008, 9.5, 1.95), m["plastic"], bevel=0.02))
@@ -123,7 +126,7 @@ def _wipers_mirrors_doors(add, m, sx):
     # pisca lateral e marcador
     add(M.box(f"side_blinker_{sx}", (0.03, 0.14, 0.07), (xs(1.2) + sx * 0.005, 11.2, 1.25), m["lamp_amber"], bevel=0.015, seg=1))
     # degrau da porta (dois níveis)
-    add(M.box(f"step_{sx}", (0.28, 0.75, 0.05), (sx * (CAB_W / 2 + 0.12), 9.55, 0.55), m["steel"], bevel=0.01, seg=1))
+    add(M.box(f"step_{sx}", (0.28, 0.75, 0.05), (sx * (CAB_W / 2 + 0.12), 9.55, 0.55), m["diamond"], bevel=0.01, seg=1))
     for k in range(4):
         add(M.box(f"step_tread_{sx}_{k}", (0.24, 0.03, 0.012), (sx * (CAB_W / 2 + 0.12), 9.3 + k * 0.16, 0.58), m["plastic"], bevel=0.003, seg=1))
     add(M.box(f"step_bracket_{sx}", (0.05, 0.5, 0.18), (sx * (CAB_W / 2 + 0.02), 9.55, 0.7), m["steel"], bevel=0.01, seg=1))
@@ -156,4 +159,7 @@ def build_cab(m, add):
     add(M.box("windshield_frame", (1.9, 0.05, 1.2), (0, yw - 0.012, 2.65), m["plastic"], bevel=0.03, seg=2, rot=(SLOPE_DEG, 0, 0)))
     add(M.box("windshield", (1.8, 0.05, 1.1), (0, yw + 0.006, 2.65), m["glass"], bevel=0.025, seg=2, rot=(SLOPE_DEG, 0, 0)))
     add(M.box("stripe_cab", (CAB_W + 0.01, CAB_Y1 - CAB_Y0 - 0.5, 0.22), (0, (CAB_Y0 + CAB_Y1) / 2 - 0.2, 1.85), m["paint_pink"], bevel=0.02, seg=1))
+    # juntas de painel na frente: abaixo do para-brisa e acima do para-choque
+    for z in (1.78, 0.98):
+        add(M.tube(f"front_seam_{z}", [(sx * (cab_hw(z) - 0.12), cab_yf(z) + 0.004, z) for sx in (-1, 1)], 0.01, m["plastic"], seg=6))
     _roof(add, m)

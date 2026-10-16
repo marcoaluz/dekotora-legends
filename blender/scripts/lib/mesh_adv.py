@@ -44,10 +44,11 @@ def loft(name, rings, mat=None, cap_bottom=True, cap_top=True, collection=None):
     return _link(name, bm, mat, collection)
 
 
-def lathe(name, profile, loc, mat=None, axis="X", seg=32, sweep=360.0, collection=None, start=0.0):
+def lathe(name, profile, loc, mat=None, axis="X", seg=32, sweep=360.0, collection=None, start=0.0, disp=None):
     """Sólido de revolução. `profile` = polígono fechado de (raio, posição_axial); gira em torno do eixo
     local Z e depois o eixo é virado para `axis` (X, Y ou Z). `sweep` < 360 gera um arco (arcos de roda).
-    Pontos com raio ~0 viram um único vértice (sem faces degeneradas)."""
+    Pontos com raio ~0 viram um único vértice (sem faces degeneradas).
+    `disp(r, a, t)` opcional devolve o raio deslocado (ex.: sulcos do pneu); t em radianos."""
     bm = bmesh.new()
     full = sweep >= 359.99
     steps = seg if full else seg + 1
@@ -61,7 +62,8 @@ def lathe(name, profile, loc, mat=None, axis="X", seg=32, sweep=360.0, collectio
                 row.append(shared)
                 continue
             t = math.radians(start + sweep * s / seg)
-            row.append(bm.verts.new((r * math.cos(t), r * math.sin(t), a)))
+            rr = disp(r, a, t) if disp else r
+            row.append(bm.verts.new((rr * math.cos(t), rr * math.sin(t), a)))
         grid.append(row)
     m = len(profile)
     cols = seg if full else seg

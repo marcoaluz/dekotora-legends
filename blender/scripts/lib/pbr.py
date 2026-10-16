@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import bpy
 
+from . import tex
 from .palette import hex_to_rgb, lin
 
 
@@ -70,6 +71,19 @@ def emissive(name: str, hex_color: str, strength: float = 6.0):
     return pbr(name, hex_color, metallic=0.0, roughness=0.3, emission=hex_color, emission_strength=strength)
 
 
+def textured(name: str, image, metallic: float = 0.8, roughness: float = 0.4):
+    """Material PBR com a textura de `image` na cor base (exportada no .glb)."""
+    m, b = _principled(name)
+    nt = m.node_tree
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.image = image
+    nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
+    _set(b, "Metallic", metallic)
+    _set(b, "Roughness", roughness)
+    m["px_kind"] = "pbr"
+    return m
+
+
 def standard_set() -> dict:
     """Conjunto padrão usado por caminhão e acessórios (nomes estáveis para o Godot)."""
     return {
@@ -83,6 +97,9 @@ def standard_set() -> dict:
         "rubber": rubber(),
         "plastic": plastic_black(),
         "glass": glass(),
+        "mesh_perf": textured("mesh_perf", tex.perforated_mesh(), 0.85, 0.38),
+        "mesh_perf_vent": textured("mesh_perf_vent", tex.perforated_mesh("tex_perf_vent", 12, 2, 768, 128), 0.85, 0.38),
+        "diamond": textured("diamond", tex.diamond_plate(), 0.7, 0.45),
         "lamp_amber": emissive("lamp_amber", "#ffb347", 3.0),
         "lamp_white": emissive("lamp_white", "#ffe9c2", 3.5),
         "lamp_red": emissive("lamp_red", "#ff2a2a", 3.0),

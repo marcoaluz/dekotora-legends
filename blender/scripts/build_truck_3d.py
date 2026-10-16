@@ -1,6 +1,6 @@
 """Caminhão base 3D (PBR) para o Godot: cabine cab-over arredondada (referência Volvo FH) + baú, ~12 x 2,5 x 3,4 m.
 
-Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora]
+Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora] [--body box|flat|tank]
 Saída: <out>/truck/dekotora_truck_base.glb, <out>/source_blend/truck_base.blend, <out>/previews/truck_base_*.png
 
 Convenções: metros, +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro. As peças usam os pontos
@@ -15,7 +15,7 @@ import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import mesh3d as M, pbr, preview, scene  # noqa: E402
-from truck3d.body import build_body  # noqa: E402
+from truck3d.body import KINDS, build_body  # noqa: E402
 from truck3d.cab import build_cab  # noqa: E402
 from truck3d.chassis import build_chassis  # noqa: E402
 from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB_Y0, CAB_Y1,  # noqa: E402,F401
@@ -23,7 +23,7 @@ from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB
 from truck3d.wheels import make_wheel  # noqa: E402
 
 
-def build_truck(m: dict, paint_name: str = "paint_white"):
+def build_truck(m: dict, paint_name: str = "paint_white", body: str = "box"):
     """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set)."""
     if paint_name != "paint_white":
         m = dict(m)
@@ -36,7 +36,7 @@ def build_truck(m: dict, paint_name: str = "paint_white"):
         return o
 
     build_chassis(m, add)
-    build_body(m, add)
+    build_body(m, add, body)
     build_cab(m, add)
     for sx in (-1, 1):
         side = "L" if sx < 0 else "R"
@@ -53,11 +53,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="game/assets/vehicles/dekotora")
     ap.add_argument("--paint", default="paint_white")
+    ap.add_argument("--body", default="box", choices=KINDS, help="box = baú, flat = carroceria aberta, tank = tanque")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     scene.reset_scene()
     m = pbr.standard_set()
-    parts, wheels, empties = build_truck(m, args.paint)
+    parts, wheels, empties = build_truck(m, args.paint, args.body)
+    for o in parts:                                  # texturas precisam de UV que cubra cada face
+        if o.active_material and o.active_material.name in ("mesh_perf", "mesh_perf_vent", "diamond"):
+            M.uv_planar(o)
     all_meshes = parts + [w for ws in wheels for w in ws]
     M.smooth(all_meshes, 35.0)
     tris = M.count_tris(all_meshes)
@@ -81,14 +85,16 @@ def main():
         o.parent = root
     final = [root] + merged + wheel_objs + empties
     print(f"triangulos: {tris}  objetos: {len(final)}  materiais: {len(bpy.data.materials)}")
-    glb = os.path.join(out, "truck", "dekotora_truck_base.glb")
+    tag = "base" if args.body == "box" else args.body        # "base" = nome histórico do baú
+    glb = os.path.join(out, "truck", f"dekotora_truck_{tag}.glb")
     M.export_glb(glb, final)
     os.makedirs(os.path.join(out, "source_blend"), exist_ok=True)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "source_blend", "truck_base.blend"))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "source_blend", f"truck_{tag}.blend"))
     pdir = os.path.join(out, "previews")
-    preview.render_views(os.path.join(pdir, "truck_base"), merged + wheel_objs, size=(960, 540),
+    preview.render_views(os.path.join(pdir, f"truck_{tag}"), merged + wheel_objs, size=(960, 540),
                          views={"34": (35, 14), "rear": (180, 8), "side": (90, 4), "front": (0, 10),
-                                "cab34": (38, 10, 9.0, (0, 10.0, 1.8)), "cabside": (90, 3, 9.0, (0, 10.0, 1.8))})
+                                "cab34": (38, 10, 9.0, (0, 10.0, 1.8)), "cabside": (90, 3, 9.0, (0, 10.0, 1.8)),
+                                "wheel": (55, 6, 3.2, (1.0, 10.2, 0.5)), "tread": (12, 40, 3.0, (0.0, 10.2, 0.4)), "grille": (15, 8, 3.5, (0, 11.5, 1.1))})
     print("OK build_truck_3d ->", glb)
 
 

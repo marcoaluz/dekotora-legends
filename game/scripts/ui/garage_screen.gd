@@ -169,7 +169,25 @@ func _flash(text: String) -> void:
 
 # ---------------------------------------------------------------- pecas
 
+func _build_body_picker() -> void:
+	_left.add_child(_wl(Tr.t("garage.body"), 16, UiTheme.PINK))
+	var row := HBoxContainer.new()
+	var cur: String = String(gs.profile.get("body", "base"))
+	for kind in ["base", "flat", "tank"]:
+		var b: Button = UiTheme.button(Tr.t("body." + String(kind)), Vector2(0, 40))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if String(kind) == cur:
+			b.add_theme_color_override("font_color", UiTheme.GOLD)
+		b.pressed.connect(func() -> void:
+			stage.set_body(String(kind))
+			gs.save_profile()
+			_refresh())
+		row.add_child(b)
+	_left.add_child(row)
+
+
 func _build_slots() -> void:
+	_build_body_picker()
 	for slot in gs.slots():
 		var inst: String = gs.installed_id(String(slot))
 		var txt: String = Tr.t("slot." + String(slot))

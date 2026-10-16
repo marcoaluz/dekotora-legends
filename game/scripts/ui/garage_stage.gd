@@ -73,8 +73,7 @@ func _ready() -> void:
 	big_floor.material_override = bm
 	big_floor.position.y = -0.25
 	add_child(big_floor)
-	truck = TruckNode.new()
-	add_child(truck)
+	_spawn_truck()
 	cam = Camera3D.new()
 	cam.fov = 42.0
 	add_child(cam)
@@ -87,6 +86,21 @@ func _ready() -> void:
 	key.light_energy = 4.0
 	add_child(key)
 	_apply_goal(true)
+	refresh_truck()
+
+
+func _spawn_truck() -> void:
+	truck = TruckNode.new()
+	truck.body_kind = String(get_node("/root/GameState").profile.get("body", "base"))
+	add_child(truck)
+
+
+## Troca a carroceria do caminhao mostrado (recria o no e reaplica pecas e tinta).
+func set_body(kind: String) -> void:
+	if truck != null:
+		truck.queue_free()
+	get_node("/root/GameState").profile["body"] = kind
+	_spawn_truck()
 	refresh_truck()
 
 

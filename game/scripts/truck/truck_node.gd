@@ -5,7 +5,14 @@ extends Node3D
 ## Pecas (acessorios) entram nos nos MOUNT_* do modelo.
 
 const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb"
+const MODEL_PATHS: Dictionary = {
+	"base": MODEL_PATH,
+	"flat": "res://assets/vehicles/dekotora/truck/dekotora_truck_flat.glb",
+	"tank": "res://assets/vehicles/dekotora/truck/dekotora_truck_tank.glb",
+}
 const WHEEL_RADIUS: float = 0.52
+## Carroceria: "base" (bau), "flat" (aberta) ou "tank" (tanque). Definir antes de add_child.
+var body_kind: String = "base"
 
 var model: Node3D
 var _wheels: Array[Node3D] = []
@@ -18,9 +25,10 @@ var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 
 
 func _ready() -> void:
-	var scene: PackedScene = load(MODEL_PATH) as PackedScene
+	var path: String = String(MODEL_PATHS.get(body_kind, MODEL_PATH))
+	var scene: PackedScene = load(path) as PackedScene
 	if scene == null:
-		push_warning("TruckNode: modelo nao encontrado: " + MODEL_PATH)
+		push_warning("TruckNode: modelo nao encontrado: " + path)
 		return
 	model = scene.instantiate() as Node3D
 	add_child(model)

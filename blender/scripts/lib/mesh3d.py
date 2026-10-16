@@ -294,3 +294,24 @@ def bounds(objs):
             mn = Vector((min(mn.x, w.x), min(mn.y, w.y), min(mn.z, w.z)))
             mx = Vector((max(mx.x, w.x), max(mx.y, w.y), max(mx.z, w.z)))
     return mn, mx
+
+
+def uv_planar(o) -> None:
+    """UV por face: projeta cada face nos 2 eixos perpendiculares à sua normal dominante, normalizado
+    pela caixa do objeto (a textura cobre a face inteira 0..1). Usar antes de juntar os objetos."""
+    me = o.data
+    uvl = me.uv_layers.active or me.uv_layers.new(name="UVMap")
+    xs = [v.co for v in me.vertices]
+    lo = [min(c[i] for c in xs) for i in range(3)]
+    hi = [max(c[i] for c in xs) for i in range(3)]
+    for poly in me.polygons:
+        n = poly.normal
+        k = max(range(3), key=lambda i: abs(n[i]))
+        a, b = [i for i in range(3) if i != k]
+        if k == 1:                      # frente/trás: u = X, v = Z
+            a, b = 0, 2
+        for li in poly.loop_indices:
+            co = me.vertices[me.loops[li].vertex_index].co
+            u = (co[a] - lo[a]) / max(hi[a] - lo[a], 1e-6)
+            v = (co[b] - lo[b]) / max(hi[b] - lo[b], 1e-6)
+            uvl.data[li].uv = (u, v)
