@@ -1,124 +1,247 @@
 class_name CityBuilder
 extends Node3D
-## Cidade noturna ao fundo: predios (caixas) com janelas iluminadas por shader procedural, em
-## MultiMesh (um unico draw call por grupo) ao longo da pista, e montanhas escuras ao longe.
-## Determinístico (semente fixa).
+## Cenario de fundo, todo em MultiMesh (poucos draw calls) e determinístico (semente fixa):
+## - predios com janelas por shader; cada predio tem cor de parede e estilo de janela proprios (cor da instancia),
+##   alguns com recuo no topo, luz vermelha de aviacao piscando e letreiro de neon na fachada virada para a pista;
+## - litoral (`coast`): predios so do lado da terra (esquerda), mar animado a direita e o skyline de uma cidade do
+##   outro lado da baia com o reflexo das luzes na agua;
+## - montanhas escuras ao longe (mais altas no cenario `mountain`).
 
-const WINDOW_SHADER := """
+const BUILDING_SHADER := """
 shader_type spatial;
 render_mode cull_back;
-uniform vec3 wall_color : source_color = vec3(0.07, 0.07, 0.16);
-uniform vec3 window_color : source_color = vec3(1.0, 0.85, 0.4);
-uniform float energy = 2.2;
+uniform float energy = 2.0;
 varying vec3 wpos;
 varying vec3 wnormal;
+varying vec4 tint;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; wnormal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz); }
+void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; wnormal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz); tint = COLOR; }
 void fragment() {
 	vec2 uv = abs(wnormal.x) > 0.5 ? vec2(wpos.z, wpos.y) : vec2(wpos.x, wpos.y);
 	vec2 cell = floor(uv / vec2(3.0, 3.5));
 	vec2 f = fract(uv / vec2(3.0, 3.5));
-	float win = step(0.2, f.x) * step(f.x, 0.8) * step(0.25, f.y) * step(f.y, 0.75);
-	float on = step(0.55, hash(cell + floor(wpos.xz * 0.01)));
-	float side = step(0.5, abs(wnormal.y) < 0.5 ? 1.0 : 0.0);
-	ALBEDO = wall_color;
-	EMISSION = window_color * win * on * side * energy * (0.6 + 0.8 * hash(cell * 3.1));
-	ROUGHNESS = 0.8;
+	float win = step(0.18, f.x) * step(f.x, 0.82) * step(0.28, f.y) * step(f.y, 0.78);
+	float on = step(0.5, hash(cell + floor(wpos.xz * 0.01)));
+	float floor_dark = step(0.86, hash(vec2(cell.y, floor(wpos.x * 0.02 + wpos.z * 0.02))));
+	float side = abs(wnormal.y) < 0.5 ? 1.0 : 0.0;
+	vec3 warm = vec3(1.0, 0.8, 0.45);
+	vec3 cool = vec3(0.75, 0.88, 1.0);
+	vec3 pink = vec3(1.0, 0.3, 0.6);
+	vec3 wc = tint.a < 0.4 ? warm : (tint.a < 0.75 ? cool : mix(warm, pink, step(0.7, hash(cell * 1.7))));
+	ALBEDO = tint.rgb * (0.85 + 0.15 * step(0.5, f.y));
+	EMISSION = wc * win * on * side * (1.0 - floor_dark) * energy * (0.55 + 0.8 * hash(cell * 3.1));
+	ROUGHNESS = 0.75;
+	METALLIC = 0.2;
 }
 """
+
+const GLOW_SHADER := """
+shader_type spatial;
+render_mode unshaded, cull_disabled, blend_add;
+uniform float blink = 0.0;
+varying vec4 tint;
+void vertex() { tint = COLOR; }
+void fragment() {
+	float b = blink > 0.5 ? step(0.0, sin(TIME * 3.0 + tint.a * 20.0)) : 1.0;
+	ALBEDO = tint.rgb * 2.2 * b;
+}
+"""
+
+const REFLECT_SHADER := """
+shader_type spatial;
+render_mode unshaded, cull_disabled, blend_add, depth_draw_never;
+varying vec4 tint;
+varying vec2 luv;
+void vertex() { tint = COLOR; luv = UV; }
+void fragment() {
+	float w = sin(luv.y * 60.0 + TIME * 2.0) * 0.5 + 0.5;
+	float fade = (1.0 - luv.y) * (1.0 - abs(luv.x - 0.5) * 2.0);
+	ALBEDO = tint.rgb * fade * (0.35 + 0.65 * w) * 0.9;
+}
+"""
+
+const WATER_SHADER := """
+shader_type spatial;
+uniform vec3 deep : source_color = vec3(0.005, 0.03, 0.08);
+uniform sampler2D waves : hint_normal;
+varying vec3 wpos;
+void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	vec2 uv1 = wpos.xz * 0.02 + vec2(TIME * 0.01, TIME * 0.006);
+	vec2 uv2 = wpos.xz * 0.05 - vec2(TIME * 0.008, -TIME * 0.012);
+	NORMAL_MAP = mix(texture(waves, uv1).rgb, texture(waves, uv2).rgb, 0.5);
+	NORMAL_MAP_DEPTH = 0.6;
+	ALBEDO = deep;
+	METALLIC = 0.05;
+	ROUGHNESS = 0.14;
+	SPECULAR = 0.55;
+}
+"""
+
+const SIGN_COLORS: Array = [Color("#ff2e88"), Color("#21e6ff"), Color("#ffb347"), Color("#b44dff")]
 
 var path: TrackPath
 
 
 func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city") -> void:
 	path = path_
-	_add_ground(kind)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
-	var mat := ShaderMaterial.new()
-	var sh := Shader.new()
-	sh.code = WINDOW_SHADER
-	mat.shader = sh
+	_add_ground(kind)
+	var blds: Array = []       # [Transform3D, Color]
+	var lights: Array = []     # luz de aviacao
+	var signs: Array = []      # letreiros de neon
+	var refl: Array = []       # reflexos na agua (litoral)
+	var z: float = 0.0
+	var L: float = path.track.length_m
+	while z < L + 200.0:
+		var zz: float = minf(z, L - 1.0)
+		var yaw: float = path.yaw_at(zz)
+		for side in [-1.0, 1.0]:
+			if kind == &"coast" and side > 0.0:
+				continue
+			if rng.randf() < _building_chance(kind):
+				var dist: float = rng.randf_range(95.0, 260.0) if kind == &"city" else rng.randf_range(140.0, 380.0)
+				_building(rng, zz, yaw, side, dist, 25.0, 110.0, blds, lights, signs, true)
+		if kind == &"coast" and rng.randf() < 0.85:                 # skyline do outro lado da baia
+			var far: float = rng.randf_range(380.0, 560.0)          # dentro da neblina visivel
+			var h: float = _building(rng, zz, yaw, 1.0, far, 30.0, 170.0, blds, lights, signs, false)
+			var cw: Color = Color(1.0, 0.75, 0.45) if rng.randf() < 0.6 else SIGN_COLORS[rng.randi() % SIGN_COLORS.size()]
+			var start: Vector3 = path.world_point(zz, (far - 30.0) / Track.ROAD_HALF_WIDTH_M, -1.15)
+			var span: float = minf(far - 60.0, h * 3.5)
+			var b := Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(span, 1.0, rng.randf_range(4.0, 10.0)))
+			refl.append([Transform3D(b, start - path.right_at(zz) * span * 0.5), cw])
+		z += rng.randf_range(18.0, 40.0)
+	_multi(_box(), blds, _shader_mat(BUILDING_SHADER), false)
+	_multi(_box(), lights, _glow_mat(true), false)
+	_multi(_box(), signs, _glow_mat(false), false)
+	if not refl.is_empty():
+		var q := PlaneMesh.new()
+		q.size = Vector2.ONE
+		_multi(q, refl, _shader_mat(REFLECT_SHADER), false)
+	_mountains(rng, kind)
+
+
+## Um predio (e as vezes recuo no topo, luz de aviacao e letreiro). Devolve a altura.
+func _building(rng: RandomNumberGenerator, z: float, yaw: float, side: float, dist: float, hmin: float, hmax: float,
+		blds: Array, lights: Array, signs: Array, near: bool) -> float:
+	var w: float = rng.randf_range(14.0, 34.0)
+	var d: float = rng.randf_range(14.0, 34.0)
+	var h: float = rng.randf_range(hmin, hmax)
+	var c: Vector3 = path.world_point(z, side * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
+	var wall: Color = Color.from_hsv(rng.randf_range(0.55, 0.75), rng.randf_range(0.15, 0.45), rng.randf_range(0.06, 0.16))
+	wall.a = rng.randf()                                             # estilo das janelas (shader)
+	var by := Basis(Vector3.UP, yaw)
+	blds.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), c + Vector3.UP * (h * 0.5 - 4.0)), wall])
+	var top: float = h - 4.0
+	if rng.randf() < 0.4:                                            # recuo no topo
+		var h2: float = h * rng.randf_range(0.15, 0.35)
+		blds.append([Transform3D(by * Basis.from_scale(Vector3(w * 0.6, h2, d * 0.6)), c + Vector3.UP * (top + h2 * 0.5)), wall])
+		top += h2
+	if h > 70.0:                                                     # luz de aviacao (pisca)
+		lights.append([Transform3D(by * Basis.from_scale(Vector3.ONE * 1.2), c + Vector3.UP * (top + 0.8)), Color(1.0, 0.1, 0.1, rng.randf())])
+	if near and rng.randf() < 0.35:                                  # letreiro de neon na fachada da pista
+		var sw: float = rng.randf_range(4.0, 9.0)
+		var sh: float = rng.randf_range(10.0, minf(26.0, h * 0.6))
+		var face: Vector3 = c - path.right_at(z) * side * (w * 0.5 + 0.3)
+		var col: Color = SIGN_COLORS[rng.randi() % SIGN_COLORS.size()]
+		signs.append([Transform3D(by * Basis.from_scale(Vector3(0.3, sh, sw)), face + Vector3.UP * rng.randf_range(sh * 0.6, maxf(h - sh, sh * 0.7))), col])
+	return h
+
+
+func _box() -> BoxMesh:
 	var box := BoxMesh.new()
 	box.size = Vector3.ONE
-	var xforms: Array[Transform3D] = []
-	var z: float = 0.0
-	while z < path.track.length_m + 200.0:
-		for side in [-1.0, 1.0]:
-			if rng.randf() < _building_chance(kind):
-				var dist: float = rng.randf_range(95.0, 260.0) if kind == &"city" else rng.randf_range(160.0, 420.0)
-				var w: float = rng.randf_range(14.0, 34.0)
-				var d: float = rng.randf_range(14.0, 34.0)
-				var h: float = rng.randf_range(25.0, 110.0)
-				var c: Vector3 = path.world_point(minf(z, path.track.length_m - 1.0), side * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
-				var yaw: float = path.yaw_at(minf(z, path.track.length_m - 1.0))
-				var t := Transform3D(Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(w, h, d)), c + Vector3.UP * (h * 0.5 - 4.0))
-				xforms.append(t)
-		z += rng.randf_range(18.0, 40.0)
+	return box
+
+
+func _shader_mat(code: String) -> ShaderMaterial:
+	var mat := ShaderMaterial.new()
+	var sh := Shader.new()
+	sh.code = code
+	mat.shader = sh
+	return mat
+
+
+func _glow_mat(blink: bool) -> ShaderMaterial:
+	var m: ShaderMaterial = _shader_mat(GLOW_SHADER)
+	m.set_shader_parameter("blink", 1.0 if blink else 0.0)
+	return m
+
+
+func _multi(mesh: Mesh, items: Array, mat: Material, shadows: bool) -> void:
+	if items.is_empty():
+		return
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = box
-	mm.instance_count = xforms.size()
-	for i in xforms.size():
-		mm.set_instance_transform(i, xforms[i])
+	mm.use_colors = true
+	mm.mesh = mesh
+	mm.instance_count = items.size()
+	for i in items.size():
+		mm.set_instance_transform(i, items[i][0])
+		mm.set_instance_color(i, items[i][1])
 	var mmi := MultiMeshInstance3D.new()
 	mmi.multimesh = mm
 	mmi.material_override = mat
-	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadows else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)
-	# montanhas: cones achatados bem longe
+
+
+## Montanhas: cones achatados bem longe (do lado da terra no litoral).
+func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
 	var mmesh := CylinderMesh.new()
 	mmesh.top_radius = 0.0
 	mmesh.bottom_radius = 1.0
 	mmesh.height = 1.0
 	mmesh.radial_segments = 7
-	var mtn := MultiMesh.new()
-	mtn.transform_format = MultiMesh.TRANSFORM_3D
-	mtn.mesh = mmesh
 	var count: int = 90 if kind == &"mountain" else 40
-	mtn.instance_count = count
+	var items: Array = []
 	for i in count:
 		var zz: float = rng.randf_range(0.0, path.track.length_m)
-		var sd: float = -1.0 if rng.randf() < 0.5 else 1.0
+		var sd: float = -1.0 if (kind == &"coast" or rng.randf() < 0.5) else 1.0
 		var c2: Vector3 = path.world_point(zz, sd * rng.randf_range(300.0 if kind == &"mountain" else 520.0, 800.0) / Track.ROAD_HALF_WIDTH_M, 0.0)
 		var hh: float = rng.randf_range(90.0, 420.0 if kind == &"mountain" else 260.0)
 		var rr: float = rng.randf_range(160.0, 380.0)
-		mtn.set_instance_transform(i, Transform3D(Basis.from_scale(Vector3(rr, hh, rr)), c2 + Vector3.UP * (hh * 0.5 - 6.0)))
-	var mm_mat := StandardMaterial3D.new()
-	mm_mat.albedo_color = Color("#16143a")
-	mm_mat.roughness = 1.0
-	var mi2 := MultiMeshInstance3D.new()
-	mi2.multimesh = mtn
-	mi2.material_override = mm_mat
-	mi2.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(mi2)
+		items.append([Transform3D(Basis.from_scale(Vector3(rr, hh, rr)), c2 + Vector3.UP * (hh * 0.5 - 6.0)), Color.WHITE])
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color("#16143a")
+	m.roughness = 1.0
+	_multi(mmesh, items, m, false)
 
 
 func _building_chance(kind: StringName) -> float:
 	match kind:
 		&"coast":
-			return 0.3
+			return 0.35
 		&"mountain":
 			return 0.08
 	return 0.75
 
 
-## Chao do mundo alem da grama: mar escuro refletivo (costa) ou terra escura.
+## Chao do mundo alem da grama: mar animado (litoral) ou terra escura.
 func _add_ground(kind: StringName) -> void:
 	var mi := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(9000, 9000)
 	mi.mesh = plane
-	var m := StandardMaterial3D.new()
 	if kind == &"coast":
-		m.albedo_color = Color("#07163a")
-		m.metallic = 0.7
-		m.roughness = 0.12
-		m.metallic_specular = 1.0
+		var wm: ShaderMaterial = _shader_mat(WATER_SHADER)
+		var n := FastNoiseLite.new()
+		n.frequency = 0.04
+		var nt := NoiseTexture2D.new()
+		nt.noise = n
+		nt.seamless = true
+		nt.as_normal_map = true
+		nt.bump_strength = 6.0
+		nt.width = 256
+		nt.height = 256
+		wm.set_shader_parameter("waves", nt)
+		mi.material_override = wm
 	else:
+		var m := StandardMaterial3D.new()
 		m.albedo_color = Color("#080c1c")
 		m.roughness = 0.9
-	mi.material_override = m
+		mi.material_override = m
 	mi.position = Vector3(0, -1.2, -1400)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)

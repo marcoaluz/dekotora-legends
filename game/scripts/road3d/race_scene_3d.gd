@@ -28,6 +28,9 @@ var gs: Node
 var route: RouteDef
 var _pause_layer: CanvasLayer
 var _pause_root: Control
+var _fps_log: bool = false
+var _fps_t: float = 0.0
+var _fps_n: int = 0
 var _pause_first: Button
 var _audio: RaceAudio
 var _rival_audio: Array[EngineAudio] = []
@@ -63,15 +66,16 @@ func _ready() -> void:
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
 	get_viewport().msaa_3d = Viewport.MSAA_2X if q >= 2 else Viewport.MSAA_DISABLED
 	WorldEnv.create(self)
+	var scenery: StringName = route.scenery if route != null else &"city"
 	var road := RoadMesh.new()
 	add_child(road)
-	road.build(path)
+	road.build(path, scenery)
 	var city := CityBuilder.new()
 	add_child(city)
-	city.build(path, 21, route.scenery if route != null else &"city")
+	city.build(path, 21, scenery)
 	var side := Roadside3D.new()
 	add_child(side)
-	side.build(path)
+	side.build(path, scenery)
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_traffic3d = Traffic3D.new()
@@ -111,6 +115,7 @@ func _ready() -> void:
 		tc.target = input
 		layer.add_child(tc)
 	_build_pause_menu()
+	_fps_log = "--fps-log" in args
 	if "--paused" in args:                       # depuracao: abre ja na tela de pausa (capturas)
 		_toggle_pause.call_deferred()
 	_setup_audio()
@@ -329,6 +334,13 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if get_tree().paused:
 		return
+	if _fps_log:                                 # depuracao: media de FPS a cada 5 s no terminal
+		_fps_t += delta
+		_fps_n += 1
+		if _fps_t >= 5.0:
+			print("FPS medio: %.1f  (desenhos: %d, triangulos: %d)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)])
+			_fps_t = 0.0
+			_fps_n = 0
 	var dt: float = minf(delta, 0.1)
 	if _countdown > 0.0:
 		_countdown -= dt

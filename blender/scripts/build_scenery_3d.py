@@ -162,7 +162,47 @@ def toll_gate(m):
     return o
 
 
-SCENERY = {"lamp_post": lamp_post, "tree_pine": tree_pine, "tree_round": tree_round, "sign_green": sign_green,
+def palm(m):
+    """Palmeira do litoral: tronco curvo em gomos, 9 folhas caídas (lâminas finas) e cocos."""
+    import math
+    o = []
+    pts = [(0.0, 0.0, 0.0), (0.25, 0.0, 2.0), (0.7, 0.0, 4.0), (1.3, 0.0, 5.8), (1.9, 0.0, 7.2)]
+    for i in range(len(pts) - 1):
+        (x0, _, z0), (x1, _, z1) = pts[i], pts[i + 1]
+        r = 0.24 - i * 0.03
+        o.append(M.tube(f"trunk{i}", [pts[i], pts[i + 1]], r, m["wood"], seg=8))
+        o.append(M.torus(f"ring{i}", r + 0.01, 0.035, ((x0 + x1) / 2, 0, (z0 + z1) / 2), m["wood"], axis="Z", seg=10, tube_seg=4))
+    top = pts[-1]
+    for k in range(9):
+        a = k * math.tau / 9
+        d = (math.cos(a), math.sin(a))
+        pts_f = [top]
+        for j in range(1, 5):
+            t = j / 4
+            pts_f.append((top[0] + d[0] * 2.6 * t, top[1] + d[1] * 2.6 * t, top[2] + 0.5 * t - 1.6 * t * t))
+        o.append(M.tube(f"frond{k}", pts_f, 0.16, m["leaf"], seg=4))
+    for k in range(3):
+        a = k * math.tau / 3
+        o.append(M.sphere(f"coco{k}", 0.13, (top[0] + 0.2 * math.cos(a), 0.2 * math.sin(a), top[2] - 0.25), m["wood"], seg=8, rings=5))
+    return o
+
+
+def rock(m):
+    """Pedra da orla: esfera achatada com vértices deslocados (semente fixa)."""
+    import random
+    rnd = random.Random(5)
+    o = M.sphere("rock", 1.0, (0, 0, 0.35), m["stone"], seg=10, rings=7, scale=(1.4, 1.0, 0.7))
+    for v in o.data.vertices:
+        v.co *= 0.82 + 0.3 * rnd.random()
+    return [o, M.sphere("rock2", 0.55, (1.1, 0.5, 0.2), m["stone"], seg=8, rings=5, scale=(1.0, 0.9, 0.7))]
+
+
+def bush(m):
+    return [M.sphere(f"b{i}", r, (x, y, z), m["leaf"], seg=8, rings=5)
+            for i, (x, y, z, r) in enumerate(((0, 0, 0.5, 0.8), (0.7, 0.2, 0.4, 0.6), (-0.6, -0.1, 0.4, 0.65), (0.1, 0.5, 0.6, 0.55)))]
+
+
+SCENERY = {"palm": palm, "rock": rock, "bush": bush, "lamp_post": lamp_post, "tree_pine": tree_pine, "tree_round": tree_round, "sign_green": sign_green,
            "guardrail": guardrail, "toll_gate": toll_gate}
 
 
@@ -172,13 +212,18 @@ def main():
     ap.add_argument("--traffic", default="game/assets/vehicles/traffic")
     ap.add_argument("--scenery", default="game/assets/scenery")
     ap.add_argument("--previews", default="game/assets/vehicles/dekotora/previews")
+    ap.add_argument("--only", default="", help="lista separada por vírgula (ex.: palm,rock,bush)")
     args = ap.parse_args(argv)
+    only = [x for x in args.only.split(",") if x]
     for kind, table, outdir in (("cars", CARS, args.traffic), ("scenery", SCENERY, args.scenery)):
         for name, fn in table.items():
+            if only and name not in only:
+                continue
             scene.reset_scene()
             m = pbr.standard_set()
             m["wood"] = pbr.pbr("wood", "#5a3a1a", roughness=0.9)
             m["leaf"] = pbr.pbr("leaf", "#1c5a3c", roughness=0.85)
+            m["stone"] = pbr.pbr("stone", "#5a5650", roughness=0.9)
             m["sign_green"] = pbr.pbr("sign_green", "#1f7a4f", metallic=0.2, roughness=0.5)
             m["lamp_green"] = pbr.emissive("lamp_green", "#3fe67a", 3.0)
             objs = fn(m)

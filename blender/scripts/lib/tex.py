@@ -110,3 +110,68 @@ def hazard(name: str = "tex_hazard", w: int = 256, h: int = 32):
     k = np.array(hex_to_rgb("#16161a"))
     arr = y * (1 - s[..., None]) + k * s[..., None]
     return _image(name, arr)
+
+
+def _value_noise(size: int, rng, octaves=((8, 0.5), (32, 0.3), (128, 0.2))) -> np.ndarray:
+    """Ruído de valor repetível (as bordas casam) em várias escalas; média ~0,5."""
+    acc = np.zeros((size, size))
+    for k, amp in octaves:
+        g = rng.random((k, k))
+        idx = np.arange(size) * k / size
+        i0 = np.floor(idx).astype(int)
+        f = idx - i0
+        f = f * f * (3 - 2 * f)
+        i1 = (i0 + 1) % k
+        row = g[i0][:, i0] * (1 - f)[None, :] + g[i0][:, i1] * f[None, :]
+        row2 = g[i1][:, i0] * (1 - f)[None, :] + g[i1][:, i1] * f[None, :]
+        acc += amp * (row * (1 - f)[:, None] + row2 * f[:, None])
+    return acc
+
+
+def asphalt(size: int = 512, seed: int = 31):
+    """(cor, rugosidade) do asfalto: brita clara/escura salpicada, manchas de piche e trechos mais lisos
+    (parecem molhados à noite). Repetível."""
+    rng = np.random.default_rng(seed)
+    base = _value_noise(size, rng)
+    speck = rng.random((size, size))
+    val = 0.16 + 0.07 * (base - 0.5)
+    val += np.where(speck > 0.985, 0.12, 0.0) + np.where(speck < 0.02, -0.05, 0.0)   # pedrinhas
+    tar = _value_noise(size, rng, ((4, 0.7), (16, 0.3)))
+    val -= np.where(tar > 0.62, 0.035, 0.0)                                            # remendos de piche
+    col = np.repeat(np.clip(val, 0, 1)[..., None], 3, axis=2) * np.array([1.0, 1.0, 1.06])
+    rough = np.clip(0.62 - 0.32 * np.clip((tar - 0.45) * 3, 0, 1) + (speck - 0.5) * 0.08, 0.2, 0.9)
+    return col, np.repeat(rough[..., None], 3, axis=2)
+
+
+def grass(size: int = 512, seed: int = 41):
+    rng = np.random.default_rng(seed)
+    n = _value_noise(size, rng, ((6, 0.5), (24, 0.3), (96, 0.2)))
+    blades = rng.random((size, size)) * 0.12
+    g = np.array(hex_to_rgb("#1f4a2a"))
+    y = np.array(hex_to_rgb("#4a5a2a"))
+    t = np.clip((n - 0.35) * 1.6, 0, 1)[..., None]
+    return (g * (1 - t) + y * t) * (0.85 + blades[..., None])
+
+
+def sand(size: int = 512, seed: int = 51):
+    rng = np.random.default_rng(seed)
+    n = _value_noise(size, rng, ((5, 0.5), (40, 0.3), (160, 0.2)))
+    grain = (rng.random((size, size)) - 0.5) * 0.08
+    a = np.array(hex_to_rgb("#9c8a6a"))
+    b = np.array(hex_to_rgb("#c9b48c"))
+    t = np.clip(n + grain, 0, 1)[..., None]
+    return a * (1 - t) + b * t
+
+
+def save_png(arr: np.ndarray, path: str) -> None:
+    """Grava um array (h, w, 3) 0..1 como PNG (sRGB, sem conversão)."""
+    import os
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    h, w = arr.shape[:2]
+    rgba = np.concatenate([arr, np.ones((h, w, 1))], axis=2)
+    img = bpy.data.images.new(os.path.basename(path), w, h, alpha=False)
+    img.colorspace_settings.name = "Non-Color"
+    img.pixels.foreach_set(np.clip(rgba, 0, 1).astype(np.float32).ravel())
+    img.filepath_raw = path
+    img.file_format = "PNG"
+    img.save()
