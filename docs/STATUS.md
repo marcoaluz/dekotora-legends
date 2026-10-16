@@ -1,48 +1,71 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
-Atualize este arquivo ao fim de CADA tarefa. Leia antes: CLAUDE.md, docs/AGENTES.md, docs/ROADMAP.md.
+Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
+Última atualização: **2026-10-16**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
-- Godot 4.7.2: `D:\DEV\Godot\Godot_v4.7.2-stable_win64.exe` (não está no PATH). Templates: `D:\DEV\Godot\dl\*.tpz`.
-- Blender 5.2.2 LTS: `D:\Blender\blender.exe` (não está no PATH). bpy + numpy OK.
+
+- Godot 4.7.2: `D:\DEV\Godot\Godot_v4.7.2-stable_win64.exe` (fora do PATH). Modelos de exportação completos em
+  `%APPDATA%\Godot\export_templates\4.7.2.stable` (extraídos de `D:\DEV\Godot\dl\*.tpz`).
+- Blender 5.2.2 LTS: `D:\Blender\blender.exe` (fora do PATH). `bpy` + numpy OK.
 - No bash: `source tools/env.sh` define `$GODOT` e `$BLENDER`.
-- Projeto: `D:\DEV\dekotora-legends\dekotora-legends` (git local iniciado; sem remoto GitHub ainda).
-- Android SDK/JDK17: NÃO verificados. Celular: só o Marco testa.
+- Projeto em `D:\DEV\dekotora-legends\dekotora-legends` (git local; **sem remoto GitHub** ainda; LFS ativo para mp3/ttf/blend).
+- Android SDK / JDK 17: **não instalados** (bloqueia APK). Python do sistema não tem numpy/Pillow (use o Python do Blender, ver `tools/image_resize.py`).
+- Chave da API de áudio: `.chaves.env` (ignorado pelo git; variáveis `ELEVENLABS_API_KEY`, `PIXELLAB_API_KEY`). Nunca imprimir o valor.
+- **Ferramenta Bash do Claude Code**: comandos grandes com heredocs/aspas às vezes falham ("unexpected EOF"). Crie arquivos com a
+  ferramenta Write e rode patches Python por arquivo. `rm -rf $VAR/*` é bloqueado: use `"${VAR:?}"/*`.
 
-## Segredos / chaves de API
-- Arquivo `.chaves.env` na raiz do projeto (formato `NOME=valor`), **ignorado pelo git** (`.gitignore`: `.chaves.env`, `*.env`). NUNCA commitar nem colar o valor em docs/logs.
-- Variáveis: `ELEVENLABS_API_KEY` (geração dos sons do jogo, ver docs/AUDIO_ELEVENLABS.md) e `PIXELLAB_API_KEY` (não usada: arte é toda Blender).
-- Para usar num script: ler o arquivo em tempo de execução (ex.: `set -a; source .chaves.env; set +a`), sem imprimir o valor.
+## Como validar tudo (o Marco pode rodar)
 
-## Modo de trabalho combinado (2026-10-15)
-Marco autorizou seguir os prompts P01→P81 até o fim sem parar e voltará para validar. O que exige
-o Marco (celular, áudio ElevenLabs, contratar VPS, chave de assinatura, aprovar visual/plano A×B)
-fica marcado como "precisa Marco" em docs/ROADMAP.md e no QUADRO; seguir adiante no que não depende disso.
+| O quê | Comando (na raiz do projeto) |
+| --- | --- |
+| Testes automáticos (84) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Jogo (menu) | `godot --path game` |
+| Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
+| Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
+| Demonstração dos acessórios | `godot --path game res://scenes/tools/accessory_viewer.tscn` |
+| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` |
+| Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
+| Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
+| Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
-## Estado atual
-Ver lista abaixo (mais recente no fim).
+## O que existe (resumo por fase)
 
-## Histórico
-- P00 concluído: ambiente conferido.
-- P01 concluído: project.godot (Input Map, 4 autoloads vazios), export_presets.cfg (Android/Windows/Server), --server no main.gd.
-- P02 parcial: tela de teste + build Windows OK (`builds/dekotora.exe`, ignorada no git). Android BLOQUEADO: sem Android SDK/JDK17 no PC (Marco). Export templates 4.7.2 já instalados.
-- Nome do jogo mudou (pedido do Marco): Kaidō Bakusō — Chrome Legends (ver DECISOES). Alternativas se ele não gostar: "Ichiban Kaidō", "Hoshi Bakusō". Textos de UI devem usar o nome via i18n quando existir.
-- P10 concluído (lib em blender/scripts/lib, test_lib.py OK). P11: build_truck_base.py + render_truck.py rodam; aguardando revisão visual.
-- P11/P12 concluídos (arte): `blender/scripts/build_truck_base.py`, `render_truck.py`, `render_parts.py`, `parts/*.py`. Folha: blender/renders/parts/contact_sheet.png. Quadro 160x120, ângulos ±20/±10, pitch 7°. Kanji ok (fonte baixada em game/assets/fonts/NotoSansJP.ttf, OFL).
-- P13 (visualizador) feito: `game/scenes/tools/truck_viewer.tscn` + `scripts/truck/truck_view.gd`. Teste visual: `godot --path game res://scenes/tools/truck_viewer.tscn`. FALTA Marco aprovar o visual (e Android).
-- ATENÇÃO ferramenta: no Bash tool, heredocs grandes com aspas falham; use a ferramenta Write para criar arquivos.
-- P20 concluído: sim em game/scripts/sim/ (commands, track, engine_model, truck_sim, race_sim) + game/tests/test_sim_basic.gd (9 testes passam).
-- P21 concluído: game/scripts/road/{sprite_projector,road_renderer,race_scene}.gd + scenes/race/race.tscn. ~60 FPS no PC (RX 580). Teste: `godot --path game res://scenes/race/race.tscn` (setas/WASD). Debug: `-- --autoplay --start=600 --touch`.
-- P22: local_input.gd, touch_controls.gd, Settings (touch_scale, tilt). Falta testar no celular (Marco). Inclinação: eixo y do acelerômetro, `tilt_invert` se vier invertido.
-- 2026-10-16 Marco colou o prompt das peças -> `docs/PROMPT_ACESSORIOS_3D.md` (vale para o P40; seguir as 7 etapas dele, protótipos primeiro: para-choque, suporte de luzes de teto, saia lateral). Reconciliação: os modelos 3D (.glb) são a fonte; os sprites do jogo (plano A) são renderizados deles. Pastas do prompt: assets/vehicles/dekotora/... (dentro de game/). Já existe caminhão base (blender/scripts/build_truck_base.py, +Y frente, metros) para medir encaixes. Marco pediu para AGUARDAR esse prompt: não iniciar a produção das 32 peças antes de apresentar o plano/protótipos.
-- P23 concluído (cenário de teste). P30/P31 concluídos (transito e bots, testes passam). P32 em andamento (collision.gd, damage_model.gd, testes em test_collision_damage.gd).
-- 2026-10-16 SALTO DE QUALIDADE (pedido do Marco): apresentação 3D = `game/scenes/race/race3d.tscn` (scripts em game/scripts/road3d/, truck/truck_node.gd, truck/fx_3d.gd, ui/race_hud.gd, ui/result_screen.gd). Caminhão PBR: `blender/scripts/build_truck_3d.py` -> game/assets/vehicles/dekotora/truck/dekotora_truck_base.glb (24k tris). Teste: `godot --path game res://scenes/race/race3d.tscn` (setas/WASD; `-- --autoplay --start=0 --debug-events`). ~75 FPS no PC. Plano A (2D) segue em scenes/race/race.tscn.
-- P32-P35 concluídos (colisão/dano, passing/vácuo/chegada/pagamento, HUD, efeitos 3D). Testes: 31 passam (`godot --headless --path game -s res://tests/run_tests.gd`).
-- Projeto agora usa stretch canvas_items + fractional (3D nítido; HUD em layout 480x270). .blend e previews dentro de game/ têm `.gdignore` (senão o Godot tenta importar .blend e pede o Blender).
-- PRÓXIMO: P40 com `docs/PROMPT_ACESSORIOS_3D.md` (32 acessórios GLB), depois P41 (PartDef .tres) ...
-- 2026-10-16 P40 CONCLUÍDO (prompt do Marco): 32 acessórios 3D em game/assets/vehicles/dekotora/accessories/, catálogo, demo (`scenes/tools/accessory_viewer.tscn`), testes (37 passam). Documentação completa: docs/ACESSORIOS.md. Marco deve olhar as prévias em game/assets/vehicles/dekotora/previews/assembled_*.png e rodar a demo.
-- 2026-10-16 P41/P44/P42/P43/P45 concluídos: dados .tres (game/data/, gerador game/tools_dev/gen_data.gd), motor completo (sim/engine_model.gd), GameState com save (user://profile.json), garagem (scenes/garage/garage.tscn: peças, mecânica, reparo), menu (scenes/menu/main_menu.tscn) e campanha de Kanto (3 trechos em data/routes/, rivais em data/rivals/ com nomes PROVISÓRIOS). main.tscn agora só roteia para o menu. Base de tela agora 960x540 (UI nova em 960x540; HUD/toque em 480x270 dentro de CanvasLayer scale 2). 60 testes passam.
-- Para ver: `godot --path game` (abre o menu). Debug garagem: `-- --demo --damage --tab=repair --slot=front_bumper`.
-- 2026-10-16 FASE 6 (rede) pronta e testada localmente: servidor `--server` (scripts/net/server_main.gd + autoload Net), salas (room.gd), snapshots, predicao/interpolacao (client_sync.gd), perfis no servidor (profile_store.gd), lobby (scenes/lobby/lobby.tscn), cliente automatico (bot_client.gd). Teste ponta a ponta: `bash tools/net_test.sh [latencia] [perda]` (passou com 0 ms e com 150 ms/2%). 84 testes unitarios passam. Guias: docs/REDE_WIFI.md e server/README.md. Binario Linux do servidor gerado: builds/dekotora_server.x86_64 (ignorado pelo git). Templates de exportacao completos agora instalados em %APPDATA%\Godot\export_templates.7.2.stable.
-- Sons: 66 arquivos MP3 gerados via API (tools/gen_audio.py, ~3% a 15% dos creditos). NINGUEM OUVIU ainda: Marco precisa ouvir e pedir regeracao (python tools/gen_audio.py --only nome --force).
-- PENDENTE com Marco: celular (APK precisa Android SDK + JDK17), aprovar visual/plano B 3D, aprovar nome, ouvir audios, contratar VPS (opcional), jogar e ajustar equilibrio (Fase 7).
+- **Fase 0**: projeto Godot configurado (Input Map, autoloads, presets Android/Windows/Server).
+- **Fase 1**: pipeline Blender. Plano A (pixel art): `blender/scripts/render_truck.py`, `render_parts.py`, cenas `scenes/tools/truck_viewer.tscn`,
+  `scenes/race/race.tscn` (2D, mantido). **Plano B (3D PBR, o usado agora)**: `build_truck_3d.py` → `game/assets/vehicles/dekotora/truck/*.glb`.
+- **Fase 2–3**: simulação em `game/scripts/sim/` (pista, caminhão, motor, colisão, dano por zona, trânsito, bots, Passing, vácuo,
+  chegada, pagamento) + apresentação 3D `game/scripts/road3d/` (estrada em malha, cidade, cenário `.glb`, HUD, efeitos, resultado).
+- **Fase 4**: 32 acessórios 3D (`docs/ACESSORIOS.md`), dados em `.tres` (`game/data/`, gerador `game/tools_dev/gen_data.gd`),
+  perfil/save (`autoload/game_state.gd`), garagem 3D (peças, mecânica, reparo), menu, campanha de Kanto (3 trechos + chefe).
+- **Fase 5**: 66 sons MP3 gerados via ElevenLabs (`tools/gen_audio.py`); `autoload/audio_bus.gd`, `audio/engine_audio.gd`, `audio/race_audio.gd`.
+- **Fase 6**: servidor autoritativo (`net/server_main.gd` + `autoload/net.gd`), salas, snapshots, predição/interpolação (`net/client_sync.gd`),
+  perfis no servidor (`net/profile_store.gd`), lobby, cliente automático de teste (`net/bot_client.gd`). Docs: `docs/MULTIPLAYER.md`, `docs/REDE_WIFI.md`, `server/README.md`.
+- **Fase 7–8**: qualidade gráfica ajustável (Opções), guias `docs/TESTE_AMIGOS.md`, `docs/RELEASE_ANDROID.md`, `docs/LOJA.md`, `docs/POLITICA_PRIVACIDADE.md`, arte da loja em `docs/store/`.
+
+## Decisões que o Claude tomou sem o Marco (confirmar!) — ver `docs/DECISOES.md`
+
+1. **Nome**: Kaidō Bakusō — Chrome Legends (homenagem discreta a *Bakusō Dekotora Densetsu*). Alternativas: "Ichiban Kaidō", "Hoshi Bakusō".
+2. **Plano B (3D real) em vez do pixel art**, em resposta a "quero muito mais qualidade nas imagens". O plano A continua no repositório.
+3. **32 acessórios** (prompt do Marco) em vez de 16 peças só em sprite; valores de preço/peso/durabilidade das 18 peças extras são **propostas**.
+4. Regras que o GDD não definia (1 Fama = 50 ¥; ultrapassagem = 2 Fama; vácuo +20% tração; Passing 4%/s e 35%/s; revenda 50%; reparo de motor 30.000 ¥ e direção 20.000 ¥; Fama mínima para liberar peças).
+5. Rivais de Kanto com **nomes provisórios** (Trovão Rosa, Dragão de Aço, Lua Cromada, Imperador da Estrada).
+6. Áudio em **MP3** (sem ffmpeg para converter) e músicas com 100 s (não 2:30) para economizar créditos; ~5 mil créditos gastos de ~80 mil.
+
+## PENDENTE — precisa do Marco
+
+- Instalar **Android SDK + JDK 17** e gerar/testar o APK no celular (P02, P22, P65, P70, P72). Sem isso o Android não foi testado.
+- **Olhar** as imagens (previews em `game/assets/vehicles/dekotora/previews/`, capturas em `docs/store/`) e **aprovar o visual** / escolher plano A ou B.
+- **Ouvir** os áudios e pedir regeração dos ruins: `python tools/gen_audio.py --only nome --force` (lista: `python tools/gen_audio.py --list`).
+- Jogar e ajustar equilíbrio (0–100 do caminhão padrão é 22 s; V8+turbo duplo 14 s; ver `docs/BALANCEAMENTO.md`).
+- Criar o repositório no GitHub (`docs/SETUP.md` passo 3) e fazer `git remote add` + push.
+- Opcional: contratar VPS (`server/README.md`), chave de assinatura Android (`docs/RELEASE_ANDROID.md`), conta Play Console / itch.io.
+
+## Problemas conhecidos / ideias
+
+- Cromo à noite reflete o céu escuro (parece escuro); ver `docs/ACESSORIOS.md` (ajuste em `road3d/world_env.gd`).
+- Trânsito e rivais usam carrocerias/modelos simples; sem LOD (160k triângulos, ~400 draw calls na corrida: ok no PC, medir no celular).
+- Dano visual dos acessórios: amassado = material opaco + inclinação leve; quebrado = some + detrito genérico.
+- Sem login: o código de jogador é a "senha". Servidor aceita perfil do cliente se `rev` for maior (confiança entre amigos).
+- Mural riscado só conta batidas laterais; sem textura de risco.
+- Teste de rede ainda não foi feito com celular real (só localhost com atraso simulado).

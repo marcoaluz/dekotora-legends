@@ -1,6 +1,7 @@
-# CLAUDE.md — Dekotora Legends
+# CLAUDE.md — Kaidō Bakusō (nome de trabalho; pasta/repositório: dekotora-legends)
 
 Leia este arquivo inteiro antes de qualquer tarefa. Ele é o contexto permanente do projeto.
+**Depois leia `docs/STATUS.md`**: estado atual, ambiente do PC, como validar e o que está pendente.
 
 ## O projeto
 

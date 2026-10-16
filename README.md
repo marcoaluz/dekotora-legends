@@ -23,4 +23,4 @@ Arte em pixel art renderizada a partir de modelos do Blender. Feito por Marco + 
 
 ## Status
 
-Fase 0 — Setup. Acompanhe em `docs/ROADMAP.md`.
+Todas as fases do roteiro foram executadas até onde dá sem o celular do Marco. Veja `docs/STATUS.md` (estado e pendências) e `docs/ROADMAP.md`.
