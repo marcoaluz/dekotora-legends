@@ -9,6 +9,8 @@ var tilt_invert: bool = false
 var music_volume: float = 0.8
 var sfx_volume: float = 1.0
 var language: String = "pt-BR"
+var player_name: String = "Jogador"
+var server_address: String = "127.0.0.1:24600"   # IP:porta do servidor (campo manual de depuracao)
 var show_touch_controls: bool = false   # forca os botoes na tela (teste no PC)
 
 
@@ -26,6 +28,8 @@ func load_settings() -> void:
 	music_volume = float(cfg.get_value("audio", "music_volume", music_volume))
 	sfx_volume = float(cfg.get_value("audio", "sfx_volume", sfx_volume))
 	language = String(cfg.get_value("general", "language", language))
+	player_name = String(cfg.get_value("net", "player_name", player_name))
+	server_address = String(cfg.get_value("net", "server_address", server_address))
 
 
 func save_settings() -> void:
@@ -36,6 +40,8 @@ func save_settings() -> void:
 	cfg.set_value("audio", "music_volume", music_volume)
 	cfg.set_value("audio", "sfx_volume", sfx_volume)
 	cfg.set_value("general", "language", language)
+	cfg.set_value("net", "player_name", player_name)
+	cfg.set_value("net", "server_address", server_address)
 	cfg.save(PATH)
 
 

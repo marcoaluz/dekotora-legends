@@ -37,12 +37,13 @@ func _show_main() -> void:
 	sub.position = Vector2(52, 100)
 	_panel.add_child(sub)
 	var box := VBoxContainer.new()
-	box.position = Vector2(48, 190)
+	box.position = Vector2(48, 170)
 	box.custom_minimum_size = Vector2(300, 0)
 	_panel.add_child(box)
 	var items: Array = [
 		[Tr.t("menu.campaign"), _show_campaign],
 		[Tr.t("menu.garage"), func() -> void: get_tree().change_scene_to_file("res://scenes/garage/garage.tscn")],
+		["MULTIPLAYER", func() -> void: get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn")],
 		[Tr.t("menu.race_quick"), _quick_race],
 		[Tr.t("menu.options"), _show_options],
 		[Tr.t("menu.quit"), func() -> void: get_tree().quit()],
@@ -165,6 +166,22 @@ func _show_options() -> void:
 		s.save_settings()
 		AudioBus.apply_settings())
 	v.add_child(fs)
+	v.add_child(UiTheme.label("Código do jogador (use o mesmo em outro aparelho para ter a mesma garagem)", 14, UiTheme.TEXT_DIM))
+	var code_row := HBoxContainer.new()
+	v.add_child(code_row)
+	var code_edit := LineEdit.new()
+	code_edit.text = String(get_node("/root/GameState").profile["player_code"])
+	code_edit.max_length = 12
+	code_edit.custom_minimum_size = Vector2(240, 44)
+	code_row.add_child(code_edit)
+	var code_btn: Button = UiTheme.button("USAR CÓDIGO", Vector2(180, 44))
+	code_btn.pressed.connect(func() -> void:
+		var new_code: String = code_edit.text.strip_edges().to_upper()
+		if new_code.length() >= 6 and new_code != String(get_node("/root/GameState").profile["player_code"]):
+			get_node("/root/GameState").adopt_player_code(new_code)
+			stage.refresh_truck()
+			_show_main())
+	code_row.add_child(code_btn)
 	var reset: Button = UiTheme.button(Tr.t("options.reset"))
 	reset.pressed.connect(func() -> void:
 		get_node("/root/GameState").new_profile()

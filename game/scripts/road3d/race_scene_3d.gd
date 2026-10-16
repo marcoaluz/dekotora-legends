@@ -30,6 +30,11 @@ var _pause_layer: CanvasLayer
 var _audio: RaceAudio
 var _rival_audio: Array[EngineAudio] = []
 var _prev_passing: bool = false
+var online: bool = false
+var sync: ClientSync
+var _rival_idx: Array[int] = []
+var _cmd_acc: float = 0.0
+var _auto_driver: BotDriver
 
 
 func _ready() -> void:
@@ -39,10 +44,18 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--route="):
 			route = load("res://data/routes/%s.tres" % a.substr(8)) as RouteDef
-	var track: Track = route.build_track() if route != null else Track.make_test_track()
-	var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
-	sim = RaceSim.new(track, density)
-	sim.freight = route.freight if route != null else 25000
+	online = not Net.pending_setup.is_empty() and Net.online
+	if online:
+		route = load("res://data/routes/%s.tres" % Net.pending_setup["rules"]["route"]) as RouteDef
+		sync = ClientSync.new()
+		sync.setup(Net.pending_setup, Net.pending_truck)
+		sim = sync.sim
+		player = Net.pending_truck
+	else:
+		var track: Track = route.build_track() if route != null else Track.make_test_track()
+		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
+		sim = RaceSim.new(track, density)
+		sim.freight = route.freight if route != null else 25000
 	path = TrackPath.new(sim.track)
 	WorldEnv.create(self)
 	var road := RoadMesh.new()
@@ -59,7 +72,11 @@ func _ready() -> void:
 	_traffic3d = Traffic3D.new()
 	add_child(_traffic3d)
 	_traffic3d.setup(path, sim.traffic)
-	_spawn_field()
+	if online:
+		_spawn_field_online()
+		_connect_net()
+	else:
+		_spawn_field()
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2
@@ -108,8 +125,73 @@ func _setup_audio() -> void:
 			music = "race_day_rock"
 	_audio.setup(sim.trucks[player], String(sets.get(eng_id, "i6_std")), String(gs.profile["turbo"]),
 		String(gs.profile["exhaust"]) == "exh_straight", music)
-	for k in range(1, _trucks.size()):
-		_rival_audio.append(_audio.make_rival_engine(_trucks[k], "i6_std"))
+	for k in range(_trucks.size()):
+		if k != player:
+			if not online:
+				_rival_idx.append(k)
+			_rival_audio.append(_audio.make_rival_engine(_trucks[k], "i6_std"))
+
+
+## Corrida online: monta os caminhoes do grid recebido do servidor (pecas, tinta, bots).
+func _spawn_field_online() -> void:
+	var grid: Array = Net.pending_setup["grid"]
+	for entry in grid:
+		var i: int = int(entry["idx"])
+		var node := TruckNode.new()
+		add_child(node)
+		var defs: Array[PartDef] = []
+		for p in entry["loadout"]["parts"]:
+			var d: PartDef = gs.part(String(p["id"]))
+			if d != null:
+				defs.append(d)
+		node.apply_loadout(defs)
+		var paint: String = String(entry.get("paint", "#e9eef5"))
+		if bool(entry["bot"]):
+			paint = FIELD_COLORS[i % FIELD_COLORS.size()].to_html(false)
+			paint = "#" + paint if not paint.begins_with("#") else paint
+		node.set_paint_color(Color(paint))
+		_trucks.append(node)
+		var t: TruckSim = sim.trucks[i]
+		_prev.append(Vector2(t.z, t.x))
+		if i != player:
+			_rival_idx.append(i)
+
+
+func _connect_net() -> void:
+	Net.snapshot_received.connect(func(d: PackedByteArray) -> void: sync.on_snapshot(d, Time.get_ticks_msec()))
+	Net.damage_received.connect(func(d: Dictionary) -> void: sync.apply_damage(d))
+	Net.events_received.connect(func(evs: Array) -> void:
+		var typed: Array[Dictionary] = []
+		typed.assign(evs)
+		_handle_events(typed))
+	Net.race_state_changed.connect(func(st: int) -> void:
+		if st == Protocol.RoomState.RACING:
+			_countdown = 0.0)
+	Net.race_ended.connect(_on_net_end)
+	Net.disconnected_from_server.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn"))
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--latency="):
+			Net.debug_latency_ms = int(a.substr(10))
+		elif a.begins_with("--loss="):
+			Net.debug_loss = float(a.substr(7))
+		elif a == "--nopredict":
+			sync.predict = false
+
+
+func _on_net_end(result: Dictionary) -> void:
+	if _result_shown:
+		return
+	_result_shown = true
+	Net.pending_setup = {}
+	_audio.finish_race(int(result["position"]) == 1)
+	var layer := CanvasLayer.new()
+	layer.layer = 20
+	layer.scale = Vector2(2, 2)
+	add_child(layer)
+	var screen := ResultScreen.new()
+	layer.add_child(screen)
+	screen.show_result(result)
+	screen.continue_pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn"))
 
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
@@ -184,7 +266,7 @@ func _build_pause_menu() -> void:
 
 
 func _toggle_pause() -> void:
-	if _result_shown:
+	if _result_shown or online:
 		return
 	get_tree().paused = not get_tree().paused
 	_pause_layer.visible = get_tree().paused
@@ -201,6 +283,9 @@ func _process(delta: float) -> void:
 	var dt: float = minf(delta, 0.1)
 	if _countdown > 0.0:
 		_countdown -= dt
+	if online:
+		_process_online(dt)
+		return
 	var racing: bool = _countdown <= 0.0 and not sim.is_over()
 	if racing:
 		var cmd: Commands = input.poll()
@@ -232,11 +317,43 @@ func _process(delta: float) -> void:
 		_show_result()
 
 
+func _process_online(dt: float) -> void:
+	if _countdown > 0.0:
+		pass
+	elif not _result_shown:
+		var cmd: Commands = input.poll()
+		if _autoplay:
+			if _auto_driver == null:
+				_auto_driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 31, 0.25)
+			cmd = _auto_driver.command_for(sim, player, dt)
+		_steer_smooth = lerpf(_steer_smooth, cmd.steer, minf(8.0 * dt, 1.0))
+		_cmd_acc += dt
+		while _cmd_acc >= RaceSim.FIXED_DT:
+			_cmd_acc -= RaceSim.FIXED_DT
+			var tk: int = sync.local_step(cmd)
+			Net.send_commands(tk, cmd)
+		sync.interpolate(Time.get_ticks_msec(), dt)
+	_update_visuals(1.0, dt)
+	_update_camera(dt)
+	_update_hud()
+	_update_audio(dt)
+	for k in sim.trucks.size():
+		_trucks[k].sync_damage(sim.trucks[k].loadout)
+
+
+func _player_z() -> float:
+	return sync.my_draw_z() if online else sim.trucks[player].z
+
+
+func _player_x() -> float:
+	return sync.my_draw_x() if online else sim.trucks[player].x
+
+
 func _update_audio(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	_audio.update(dt, t, _countdown)
 	for k in _rival_audio.size():
-		var rt: TruckSim = sim.trucks[k + 1]
+		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
 		_rival_audio[k].update(dt, r01, rt.engine.throttle_now, rt.boost, 1.0, rt.speed)
 	if t.passing_active and not _prev_passing:
@@ -290,6 +407,9 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		var t: TruckSim = sim.trucks[k]
 		var z: float = lerpf(_prev[k].x, t.z, alpha)
 		var x: float = lerpf(_prev[k].y, t.x, alpha)
+		if online:
+			z = _player_z() if k == player else t.z
+			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
 		node.transform = path.vehicle_transform(z, x, 12.0, -t.lateral_vel * 0.12, t.lateral_vel * 0.02)
 		node.animate(t.speed, dt, clampf(t.lateral_vel / 1.6, -1.0, 1.0))
@@ -304,14 +424,14 @@ func _cam_target(z: float, x: float) -> Array[Vector3]:
 
 func _snap_camera() -> void:
 	var t: TruckSim = sim.trucks[player]
-	var c: Array[Vector3] = _cam_target(t.z, t.x)
+	var c: Array[Vector3] = _cam_target(_player_z(), _player_x())
 	_cam.global_position = c[0]
 	_cam.look_at(c[1], Vector3.UP)
 
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
-	var c: Array[Vector3] = _cam_target(t.z + t.speed * 0.02, t.x)
+	var c: Array[Vector3] = _cam_target(_player_z() + t.speed * 0.02, _player_x())
 	var k: float = 1.0 - exp(-14.0 * dt)
 	_cam.global_position = _cam.global_position.lerp(c[0], k)
 	var look: Vector3 = c[1]

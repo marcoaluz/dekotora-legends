@@ -99,6 +99,16 @@ func save_profile() -> void:
 		dir.rename(tmp.get_file(), save_path.get_file())
 
 
+## Usa o codigo de jogador de OUTRO aparelho: o perfil local vira "vazio" (rev 0) e, ao conectar,
+## o servidor manda a garagem guardada para esse codigo (MULTIPLAYER.md: perfil unico celular/PC).
+func adopt_player_code(code: String) -> void:
+	new_profile()
+	profile["player_code"] = code.strip_edges().to_upper()
+	profile["rev"] = 0
+	save_profile_cache_only()
+	profile_changed.emit()
+
+
 ## Grava o perfil vindo do servidor sem incrementar `rev` (o servidor ja incrementou).
 func save_profile_cache_only() -> void:
 	var rev: int = int(profile.get("rev", 0))

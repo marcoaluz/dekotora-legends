@@ -29,6 +29,8 @@ var room_code: String = ""
 var lobby: Dictionary = {}
 var ping_ms: int = 0
 var player_name: String = "Jogador"
+var pending_setup: Dictionary = {}          # corrida online a montar (preenchido em s_race_setup)
+var pending_truck: int = -1
 
 # --- depuracao de rede (P62): simula latencia e perda de pacotes
 var debug_latency_ms: int = 0
@@ -280,6 +282,8 @@ func s_lobby(state: Dictionary) -> void:
 
 @rpc("authority", "reliable")
 func s_race_setup(setup: Dictionary, my_truck: int) -> void:
+	pending_setup = setup
+	pending_truck = my_truck
 	race_setup_received.emit(setup, my_truck)
 
 

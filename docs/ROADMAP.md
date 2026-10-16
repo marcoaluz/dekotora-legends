@@ -47,11 +47,11 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P52] Efeitos e música no jogo
 
 ## Fase 6 — Multiplayer
-- [ ] [P60] Servidor headless + salas por código (2 janelas no mesmo PC)
-- [ ] [P61] Corrida sincronizada (comandos → servidor → snapshots)
-- [ ] [P62] Predição e interpolação
-- [ ] [P63] Colisão e dano no servidor, resultado e pagamento
-- [ ] [P64] Perfis no servidor e jogo cruzado celular ↔ PC
+- [x] [P60] Servidor headless + salas por código (2 janelas no mesmo PC)
+- [x] [P61] Corrida sincronizada (comandos → servidor → snapshots)
+- [x] [P62] Predição e interpolação
+- [x] [P63] Colisão e dano no servidor, resultado e pagamento
+- [x] [P64] Perfis no servidor e jogo cruzado celular ↔ PC
 - [ ] [P65] Teste em rede Wi-Fi (celular → PC do Marco)
 - [ ] [P66] Servidor no VPS + teste com amigos
 
