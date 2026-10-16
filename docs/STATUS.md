@@ -26,3 +26,5 @@ Ver lista abaixo (mais recente no fim).
 - P00 concluído: ambiente conferido.
 - P01 concluído: project.godot (Input Map, 4 autoloads vazios), export_presets.cfg (Android/Windows/Server), --server no main.gd.
 - P02 parcial: tela de teste + build Windows OK (`builds/dekotora.exe`, ignorada no git). Android BLOQUEADO: sem Android SDK/JDK17 no PC (Marco). Export templates 4.7.2 já instalados.
+- Nome do jogo mudou (pedido do Marco): Kaidō Bakusō — Chrome Legends (ver DECISOES). Alternativas se ele não gostar: "Ichiban Kaidō", "Hoshi Bakusō". Textos de UI devem usar o nome via i18n quando existir.
+- P10 concluído (lib em blender/scripts/lib, test_lib.py OK). P11: build_truck_base.py + render_truck.py rodam; aguardando revisão visual.

@@ -1,4 +1,4 @@
-# Dekotora Legends — GDD (v0.2, 15/10/2026)
+# Kaidō Bakusō: Chrome Legends — GDD (v0.2, 15/10/2026)
 
 Versão em Markdown para o Claude Code. A versão editável com diagramas fica no claude.ai
 (documento "Dekotora Legends — Game Design Document"). Se as duas divergirem, a do claude.ai vale;

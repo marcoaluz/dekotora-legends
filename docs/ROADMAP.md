@@ -10,9 +10,9 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [~] [P02] Primeira build: tela de teste no celular e no PC — Windows OK (builds/dekotora.exe); Android PRECISA MARCO (falta Android SDK + JDK17, ver docs/SETUP.md passo 5)
 
 ## Fase 1 — Teste do pipeline Blender (decisão de visual)
-- [ ] [P10] Biblioteca comum dos scripts Blender
-- [ ] [P11] Caminhão base em 5 ângulos
-- [ ] [P12] 3 peças de teste (para-choque, luzes de teto, andon) com 3 estados de dano
+- [x] [P10] Biblioteca comum dos scripts Blender
+- [x] [P11] Caminhão base em 5 ângulos
+- [x] [P12] 3 peças de teste (para-choque, luzes de teto, andon) com 3 estados de dano
 - [ ] [P13] Visualizador de camadas no Godot (caminhão girando entre ângulos, troca de peças)
 - [ ] **Marco aprova o visual** ou pede ajustes (repetir P11/P12)
 

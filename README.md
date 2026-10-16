@@ -1,4 +1,4 @@
-# Dekotora Legends
+# Kaidō Bakusō — Chrome Legends (nome de trabalho; pasta e repositório seguem "dekotora-legends")
 
 Jogo de corrida de caminhões Dekotora para Android e PC, com multiplayer entre amigos.
 Arte em pixel art renderizada a partir de modelos do Blender. Feito por Marco + Claude.

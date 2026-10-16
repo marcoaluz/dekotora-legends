@@ -1,0 +1,30 @@
+{
+  "id": "fb_chrome_steps",
+  "slot": "front_bumper",
+  "zone": "front",
+  "size": [
+    160,
+    120
+  ],
+  "anchor": [
+    80,
+    101
+  ],
+  "offset": [
+    0,
+    0
+  ],
+  "angles": [
+    "L2",
+    "L1",
+    "C",
+    "R1",
+    "R2"
+  ],
+  "states": [
+    "ok",
+    "dent",
+    "broken"
+  ],
+  "glow": true
+}
