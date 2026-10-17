@@ -10,7 +10,8 @@ extends Resource
 @export var scenery: StringName = &"coast"     # coast, city, mountain
 @export var rival_id: StringName
 @export var traffic: int = 1                   # TrafficSim.Density
-@export var night: bool = true
+@export var night: bool = true                 # musica e farois; derivado da hora do dia (dia = false)
+@export var time_of_day: StringName = &"night" # preset em data/time/ (night, dusk, day)
 @export var fame_required: int = 0
 @export var places: PackedStringArray = []      # cidades do trecho (origem/destino dos contratos)
 

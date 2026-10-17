@@ -70,7 +70,7 @@ func animate(speed: float, dt: float, steer: float = 0.0) -> void:
 
 func set_headlights(on: bool) -> void:
 	if _headlight:
-		_headlight.visible = on
+		_headlight.visible = on and int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1
 
 
 ## Tinge a pintura branca (rivais de cores diferentes) sem duplicar o modelo.

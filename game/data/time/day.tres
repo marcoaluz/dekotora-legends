@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="TimeOfDay" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/time_of_day.gd" id="1_tod"]
+
+[resource]
+script = ExtResource("1_tod")
+id = &"day"
+sky_top = Color(0.13, 0.36, 0.78, 1)
+sky_horizon = Color(0.66, 0.78, 0.9, 1)
+sky_ground = Color(0.35, 0.38, 0.4, 1)
+horizon_glow = Color(0.9, 0.93, 0.98, 1)
+glow_falloff = 10.0
+disk_color = Color(1, 0.97, 0.88, 1)
+disk_energy = 12.0
+disk_size_deg = 1.6
+halo = 0.5
+stars = 0.0
+clouds = 1.0
+cloud_color = Color(1, 1, 1, 1)
+light_color = Color(1, 0.96, 0.88, 1)
+light_energy = 2.1
+light_rotation = Vector3(-52, 35, 0)
+ambient_energy = 0.55
+fog_color = Color(0.6, 0.68, 0.78, 1)
+fog_density = 0.00035
+contrast = 1.12
+saturation = 1.05
+glow_intensity = 0.4
+glow_bloom = 0.0
+glow_threshold = 1.6
+day_amount = 1.0
+window_energy = 0.0
+neon_energy = 0.15
+pool_energy = 0.0
+lamps_on = false
+headlights = false
+road_roughness = 0.9
+line_emission = 0.0
+mountain_color = Color(0.1, 0.15, 0.14, 1)
+land_color = Color(0.2, 0.26, 0.17, 1)
+water_color = Color(0.03, 0.16, 0.28, 1)

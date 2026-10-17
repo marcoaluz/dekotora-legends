@@ -24,12 +24,14 @@ const TEX_DIR := "res://assets/textures/"
 
 var path: TrackPath
 var kind: StringName = &"city"
+var tod: TimeOfDay
 var _mats: Dictionary = {}
 
 
-func build(path_: TrackPath, kind_: StringName = &"city") -> void:
+func build(path_: TrackPath, kind_: StringName = &"city", tod_: TimeOfDay = null) -> void:
 	path = path_
 	kind = kind_
+	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
 	_make_materials()
 	var total: int = path.track.segment_count()
 	var start: int = 0
@@ -48,9 +50,9 @@ func _make_materials() -> void:
 	var road := StandardMaterial3D.new()
 	road.vertex_color_use_as_albedo = true
 	road.albedo_texture = _tex("asphalt_albedo.png")
-	road.albedo_color = Color(1.25, 1.25, 1.3) if road.albedo_texture else Color("#2c2c33")
+	road.albedo_color = Color(1.25, 1.25, 1.3).lerp(Color(1.05, 1.03, 1.0), tod.day_amount) if road.albedo_texture else Color("#2c2c33")
 	road.roughness_texture = _tex("asphalt_rough.png")
-	road.roughness = 0.55                       # PROTOTIPO: asfalto umido
+	road.roughness = tod.road_roughness       # noite: asfalto umido (reflete mais)
 	road.metallic_specular = 0.6
 	road.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	_mats["road"] = road
@@ -60,9 +62,9 @@ func _make_materials() -> void:
 	_mats["paint"] = paint
 	var line := StandardMaterial3D.new()
 	line.albedo_color = Color("#ffe9c2")
-	line.emission_enabled = true
+	line.emission_enabled = tod.line_emission > 0.0
 	line.emission = Color("#ffe9c2")
-	line.emission_energy_multiplier = 0.8
+	line.emission_energy_multiplier = tod.line_emission
 	line.roughness = 0.5
 	_mats["line"] = line
 	var ground := StandardMaterial3D.new()

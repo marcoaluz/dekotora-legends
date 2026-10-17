@@ -5,12 +5,14 @@ extends Node3D
 ##   alguns com recuo no topo, luz vermelha de aviacao piscando e letreiro de neon na fachada virada para a pista;
 ## - litoral (`coast`): predios so do lado da terra (esquerda), mar animado a direita e o skyline de uma cidade do
 ##   outro lado da baia com o reflexo das luzes na agua;
+## - hora do dia (TimeOfDay): de dia as paredes clareiam e o vidro reflete o ceu; a noite as janelas acendem;
 ## - montanhas escuras ao longe (mais altas no cenario `mountain`).
 
 const BUILDING_SHADER := """
 shader_type spatial;
 render_mode cull_back;
 uniform float energy = 2.0;
+uniform float day = 0.0;
 varying vec3 wpos;
 varying vec3 wnormal;
 varying vec4 tint;
@@ -28,10 +30,13 @@ void fragment() {
 	vec3 cool = vec3(0.75, 0.88, 1.0);
 	vec3 pink = vec3(1.0, 0.3, 0.6);
 	vec3 wc = tint.a < 0.4 ? warm : (tint.a < 0.75 ? cool : mix(warm, pink, step(0.7, hash(cell * 1.7))));
-	ALBEDO = tint.rgb * (0.85 + 0.15 * step(0.5, f.y));
+	vec3 wall = tint.rgb * (0.85 + 0.15 * step(0.5, f.y));
+	wall = mix(wall, vec3(dot(wall, vec3(0.333))), day * 0.6) * mix(1.0, 3.2, day);   // dia: concreto claro
+	float glass = win * side * day;
+	ALBEDO = mix(wall, vec3(0.2, 0.28, 0.38) * (0.8 + 0.4 * hash(cell * 5.3)), glass);
 	EMISSION = wc * win * on * side * (1.0 - floor_dark) * energy * (0.55 + 0.8 * hash(cell * 3.1));
-	ROUGHNESS = 0.75;
-	METALLIC = 0.2;
+	ROUGHNESS = mix(0.75, 0.12, glass);
+	METALLIC = mix(0.2, 0.7, glass);
 }
 """
 
@@ -39,11 +44,12 @@ const GLOW_SHADER := """
 shader_type spatial;
 render_mode unshaded, cull_disabled, blend_add;
 uniform float blink = 0.0;
+uniform float energy = 1.0;
 varying vec4 tint;
 void vertex() { tint = COLOR; }
 void fragment() {
 	float b = blink > 0.5 ? step(0.0, sin(TIME * 3.0 + tint.a * 20.0)) : 1.0;
-	ALBEDO = tint.rgb * 2.2 * b;
+	ALBEDO = tint.rgb * 2.2 * b * energy;
 }
 """
 
@@ -81,10 +87,12 @@ void fragment() {
 const SIGN_COLORS: Array = [Color("#ff2e88"), Color("#21e6ff"), Color("#ffb347"), Color("#b44dff")]
 
 var path: TrackPath
+var tod: TimeOfDay
 
 
-func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city") -> void:
+func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
 	path = path_
+	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
 	_add_ground(kind)
@@ -112,10 +120,13 @@ func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city") -> voi
 			var b := Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3(span, 1.0, rng.randf_range(4.0, 10.0)))
 			refl.append([Transform3D(b, start - path.right_at(zz) * span * 0.5), cw])
 		z += rng.randf_range(18.0, 40.0)
-	_multi(_box(), blds, _shader_mat(BUILDING_SHADER), false)
+	var bm: ShaderMaterial = _shader_mat(BUILDING_SHADER)
+	bm.set_shader_parameter("energy", tod.window_energy)
+	bm.set_shader_parameter("day", tod.day_amount)
+	_multi(_box(), blds, bm, tod.day_amount > 0.5)
 	_multi(_box(), lights, _glow_mat(true), false)
 	_multi(_box(), signs, _glow_mat(false), false)
-	if not refl.is_empty():
+	if not refl.is_empty() and tod.window_energy > 0.3:       # reflexo das luzes na agua so com janelas acesas
 		var q := PlaneMesh.new()
 		q.size = Vector2.ONE
 		_multi(q, refl, _shader_mat(REFLECT_SHADER), false)
@@ -166,6 +177,7 @@ func _shader_mat(code: String) -> ShaderMaterial:
 func _glow_mat(blink: bool) -> ShaderMaterial:
 	var m: ShaderMaterial = _shader_mat(GLOW_SHADER)
 	m.set_shader_parameter("blink", 1.0 if blink else 0.0)
+	m.set_shader_parameter("energy", tod.neon_energy if not blink else maxf(tod.neon_energy, 0.6))
 	return m
 
 
@@ -204,7 +216,7 @@ func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
 		var rr: float = rng.randf_range(160.0, 380.0)
 		items.append([Transform3D(Basis.from_scale(Vector3(rr, hh, rr)), c2 + Vector3.UP * (hh * 0.5 - 6.0)), Color.WHITE])
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color("#16143a")
+	m.albedo_color = tod.mountain_color
 	m.roughness = 1.0
 	_multi(mmesh, items, m, false)
 
@@ -236,10 +248,11 @@ func _add_ground(kind: StringName) -> void:
 		nt.width = 256
 		nt.height = 256
 		wm.set_shader_parameter("waves", nt)
+		wm.set_shader_parameter("deep", tod.water_color)
 		mi.material_override = wm
 	else:
 		var m := StandardMaterial3D.new()
-		m.albedo_color = Color("#080c1c")
+		m.albedo_color = tod.land_color
 		m.roughness = 0.9
 		mi.material_override = m
 	mi.position = Vector3(0, -1.2, -1400)

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="TimeOfDay" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/time_of_day.gd" id="1_tod"]
+
+[resource]
+script = ExtResource("1_tod")
+id = &"night"

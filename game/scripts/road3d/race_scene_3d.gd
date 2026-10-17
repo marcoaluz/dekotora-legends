@@ -40,6 +40,7 @@ var sync: ClientSync
 var _rival_idx: Array[int] = []
 var _cmd_acc: float = 0.0
 var _auto_driver: BotDriver
+var tod: TimeOfDay
 
 
 func _ready() -> void:
@@ -67,17 +68,18 @@ func _ready() -> void:
 	var q: int = int(Settings.quality)
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
 	get_viewport().msaa_3d = Viewport.MSAA_2X if q >= 2 else Viewport.MSAA_DISABLED
-	WorldEnv.create(self)
+	tod = _resolve_time_of_day()
 	var scenery: StringName = route.scenery if route != null else &"city"
+	WorldEnv.create(self, false, tod, scenery == &"mountain")
 	var road := RoadMesh.new()
 	add_child(road)
-	road.build(path, scenery)
+	road.build(path, scenery, tod)
 	var city := CityBuilder.new()
 	add_child(city)
-	city.build(path, 21, scenery)
+	city.build(path, 21, scenery, tod)
 	var side := Roadside3D.new()
 	add_child(side)
-	side.build(path, scenery)
+	side.build(path, scenery, tod)
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_traffic3d = Traffic3D.new()
@@ -127,6 +129,15 @@ func _ready() -> void:
 	_snap_camera()
 
 
+## Hora do dia: a da rota, ou --time=night|dusk|day (depuracao/capturas).
+func _resolve_time_of_day() -> TimeOfDay:
+	var tid: StringName = route.time_of_day if route != null else &"night"
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--time="):
+			tid = StringName(a.substr(7))
+	return TimeOfDay.by_id(tid)
+
+
 func _setup_audio() -> void:
 	_audio = RaceAudio.new()
 	add_child(_audio)
@@ -137,7 +148,7 @@ func _setup_audio() -> void:
 		var rv: RivalDef = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
 		if rv != null and rv.boss:
 			music = "boss_enka_rock"
-		elif not route.night:
+		elif not tod.headlights:
 			music = "race_day_rock"
 	_audio.setup(sim.trucks[player], String(sets.get(eng_id, "i6_std")), String(gs.profile["turbo"]),
 		String(gs.profile["exhaust"]) == "exh_straight", music)
@@ -250,6 +261,7 @@ func _spawn_field() -> void:
 			node.apply_loadout(defs)
 			node.set_paint_color(paint)
 			_bots.append(BotDriver.new(diff, 100 + i, xs[i]))
+		node.set_headlights(tod.headlights)
 		_trucks.append(node)
 		_prev.append(Vector2(t.z, t.x))
 

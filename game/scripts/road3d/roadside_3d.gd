@@ -4,16 +4,23 @@ extends Node3D
 ## Blender (assets/scenery/) em MultiMesh: poucos draw calls. Le `track.objects` (mesma lista da versao 2D)
 ## e escolhe a vegetacao pelo cenario: litoral = palmeiras + arbustos + pedras na praia; montanha = pinheiros
 ## + pedras; cidade = arvores redondas/pinheiros + arbustos. Extras so visuais (semente fixa, sem mexer na sim).
+## Postes acesos (TimeOfDay.lamps_on): "poca" de luz de sodio pintada no asfalto (quad aditivo, sem luz real:
+## o Compatibility so aceita 8 luzes por objeto). De dia as lampadas ficam apagadas.
 
 const DIR := "res://assets/scenery/"
 const CHUNK_M: float = 150.0      # um MultiMesh por modelo e por trecho: o corte por distancia (visibility_range)
                                   # usa o centro do bloco; um bloco do tamanho da pista inteira sumia de vez
+const POOL := "pool"              # chave dos grupos das pocas de luz
 
 var path: TrackPath
+var tod: TimeOfDay
+var _pool_mesh: PlaneMesh
+var _lamp_off: ArrayMesh
 
 
-func build(path_: TrackPath, kind: StringName = &"city") -> void:
+func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
 	path = path_
+	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
 	var groups: Dictionary = {}     # nome do modelo -> Array[Transform3D]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
@@ -29,7 +36,8 @@ func build(path_: TrackPath, kind: StringName = &"city") -> void:
 			"lamp_post":
 				if xu < 0.0:
 					b = Basis(Vector3.UP, yaw + PI)   # o braco aponta para a pista
-				_pool(path.world_point(z, xu * 0.6, 0.06), yaw)   # PROTOTIPO: poca de luz de sodio no asfalto
+				if tod.lamps_on and tod.pool_energy > 0.0:
+					_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, xu * 0.6, 0.06)))
 			"tree":
 				model = _tree_model(kind, rng)
 				var sc: float = rng.randf_range(0.8, 1.5)
@@ -38,8 +46,15 @@ func build(path_: TrackPath, kind: StringName = &"city") -> void:
 				b = Basis(Vector3.UP, yaw + PI)       # o texto fica legivel para quem vem pela pista
 		_put(groups, model, Transform3D(b, base))
 	_extras(groups, kind, rng)
+	var pool_mat: StandardMaterial3D = _pool_material()
 	for key in groups:
-		_add_multi(GlbMesh.merged("%s%s.glb" % [DIR, String(key).get_slice("#", 0)]), groups[key])
+		var name: String = String(key).get_slice("#", 0)
+		if name == POOL:
+			_add_multi(_pool(), groups[key], pool_mat)
+		elif name == "lamp_post" and not tod.lamps_on:
+			_add_multi(_lamp_unlit(), groups[key])
+		else:
+			_add_multi(GlbMesh.merged("%s%s.glb" % [DIR, name]), groups[key])
 
 
 func _tree_model(kind: StringName, rng: RandomNumberGenerator) -> String:
@@ -75,7 +90,7 @@ func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator) -
 		z += rng.randf_range(14.0, 30.0)
 
 
-func _add_multi(mesh: ArrayMesh, xforms: Array) -> void:
+func _add_multi(mesh: Mesh, xforms: Array, mat: Material = null) -> void:
 	if xforms.is_empty() or mesh == null or mesh.get_surface_count() == 0:
 		return
 	var mm := MultiMesh.new()
@@ -87,31 +102,47 @@ func _add_multi(mesh: ArrayMesh, xforms: Array) -> void:
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
 	mi.visibility_range_end = 450.0
+	if mat != null:
+		mi.material_override = mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
 
 
-var _pool_mat: StandardMaterial3D
-## PROTOTIPO: "poca" de luz pintada no chao (quad aditivo com gradiente radial); barato no celular.
-func _pool(pos: Vector3, yaw: float) -> void:
-	if _pool_mat == null:
-		var g := Gradient.new()
-		g.set_color(0, Color(1.0, 0.62, 0.25, 0.75))
-		g.set_color(1, Color(1.0, 0.5, 0.15, 0.0))
-		var t := GradientTexture2D.new()
-		t.gradient = g
-		t.fill = GradientTexture2D.FILL_RADIAL
-		t.fill_from = Vector2(0.5, 0.5)
-		t.fill_to = Vector2(1.0, 0.5)
-		_pool_mat = StandardMaterial3D.new()
-		_pool_mat.albedo_texture = t
-		_pool_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_pool_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		_pool_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	var q := MeshInstance3D.new()
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(16, 22)
-	q.mesh = pm
-	q.material_override = _pool_mat
-	q.position = pos
-	q.rotation.y = yaw
-	add_child(q)
+func _pool() -> PlaneMesh:
+	if _pool_mesh == null:
+		_pool_mesh = PlaneMesh.new()
+		_pool_mesh.size = Vector2(16, 22)
+	return _pool_mesh
+
+
+## Gradiente radial laranja (sodio) somado ao asfalto; a forca vem do preset de hora do dia.
+func _pool_material() -> StandardMaterial3D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1.0, 0.62, 0.25, 1.0))
+	g.set_color(1, Color(1.0, 0.5, 0.15, 0.0))
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = t
+	m.albedo_color = Color(1, 1, 1, tod.pool_energy)
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	return m
+
+
+## Poste com a lampada apagada (copia da malha sem emissao): usado de dia.
+func _lamp_unlit() -> ArrayMesh:
+	if _lamp_off == null:
+		_lamp_off = GlbMesh.merged(DIR + "lamp_post.glb").duplicate() as ArrayMesh
+		for s in _lamp_off.get_surface_count():
+			var m: StandardMaterial3D = _lamp_off.surface_get_material(s) as StandardMaterial3D
+			if m != null and m.emission_enabled:
+				var off: StandardMaterial3D = m.duplicate() as StandardMaterial3D
+				off.emission_enabled = false
+				off.albedo_color = Color("#d8dde4")
+				_lamp_off.surface_set_material(s, off)
+	return _lamp_off
