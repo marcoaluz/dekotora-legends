@@ -15,6 +15,10 @@ const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
 const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5}
 const WHEEL_RADIUS: float = 0.52
+## Mural das laterais do bau: troque este PNG (proporcao ~4:1) pela arte que quiser; um
+## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
+const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
+const MURAL_USER := "user://mural_side.png"
 ## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
 var body_kind: String = "base"
 ## Cabine: "padrao", "classica", "aero" ou "alta". Definir antes de add_child.
@@ -31,6 +35,7 @@ var _spin: float = 0.0
 var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
+var _mural_mat: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -43,6 +48,7 @@ func _ready() -> void:
 	add_child(model)
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
+	_apply_mural()
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
 		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
@@ -82,12 +88,38 @@ func set_paint_color(c: Color) -> void:
 	tint = c
 	if model == null:
 		return
+	if _mural_mat != null:
+		_mural_mat.albedo_color = c.lerp(Color.WHITE, 0.45)          # rivais: mural levemente tingido
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
 		if String(m.name).contains("paint_white"):
 			var mat: StandardMaterial3D = (m.get_active_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
 			mat.albedo_color = c
 			m.material_override = mat
+
+
+## Troca a textura do material "mural" (laterais do bau) pelo PNG trocavel.
+func _apply_mural() -> void:
+	var tex: Texture2D = null
+	if FileAccess.file_exists(MURAL_USER):
+		var img := Image.load_from_file(ProjectSettings.globalize_path(MURAL_USER))
+		if img != null and not img.is_empty():
+			img.generate_mipmaps()
+			tex = ImageTexture.create_from_image(img)
+	elif ResourceLoader.exists(MURAL_PATH):
+		tex = load(MURAL_PATH) as Texture2D
+	if tex == null:
+		return
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		var m: MeshInstance3D = mi as MeshInstance3D
+		for s in m.mesh.get_surface_count():
+			var cur: Material = m.get_active_material(s)
+			if cur != null and cur.resource_name == "mural":
+				if _mural_mat == null:
+					_mural_mat = (cur as StandardMaterial3D).duplicate() as StandardMaterial3D if cur is StandardMaterial3D else StandardMaterial3D.new()
+					_mural_mat.albedo_texture = tex
+					_mural_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+				m.set_surface_override_material(s, _mural_mat)
 
 
 ## Caminho do .glb para a combinacao carroceria + cabine (a cabine "padrao" nao tem sufixo).

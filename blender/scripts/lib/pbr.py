@@ -123,6 +123,7 @@ def standard_set() -> dict:
         "lamp_pink": emissive("lamp_pink", "#ff2e88", 3.0),
         "lamp_yellow": emissive("lamp_yellow", "#fff35c", 3.0),
         "lamp_green": emissive("lamp_green", "#3dff7a", 3.0),
+        "andon_panel": emissive("andon_panel", "#7a0f24", 1.2),
         "lamp_blue": emissive("lamp_blue", "#2f7bff", 3.0),
         "lamp_orange": emissive("lamp_orange", "#ff7a1a", 3.0),
     }

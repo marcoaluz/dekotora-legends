@@ -107,6 +107,53 @@ def streaked_concrete(src: str, size: int = 512, seed: int = 5) -> np.ndarray:
     return np.clip(base * val[..., None], 0, 1)[::-1]     # save_png grava a linha 0 embaixo
 
 
+def mural_geometric(w: int = 1024, h: int = 256) -> np.ndarray:
+    """Mural lateral padrão do baú (V7), só formas geométricas fortes: céu noturno violeta, sol poente em
+    faixas, silhueta do Fuji com neve, ondas seigaiha azul/branco embaixo e um raio dourado no alto.
+    Devolve (h, w, 3) sRGB com a linha 0 no TOPO. Arte de pessoa/IA entra trocando o PNG no jogo."""
+    v = np.linspace(0, 1, h)[:, None] * np.ones((1, w))          # 0 = topo
+    u = np.ones((h, 1)) * np.linspace(0, 1, w)[None, :]
+    asp = w / h
+    top = np.array([0.06, 0.04, 0.2])
+    bot = np.array([0.55, 0.12, 0.42])
+    img = top + (bot - top) * (v[..., None] ** 1.3)
+    # sol poente com faixas horizontais na metade de baixo
+    cx, cy, r = 0.7, 0.52, 0.36
+    d = np.sqrt(((u - cx) * asp) ** 2 + (v - cy) ** 2)
+    sun = d < r
+    t = np.clip((v - (cy - r)) / (2 * r), 0, 1)[..., None]
+    sun_col = np.array([1.0, 0.85, 0.25]) * (1 - t) + np.array([1.0, 0.25, 0.45]) * t
+    cut = (v > cy) & (np.modf((v - cy) * 26)[0] < (v - cy) * 2.2)
+    img = np.where((sun & ~cut)[..., None], sun_col, img)
+    # Fuji: trapézio com topo achatado e neve
+    fx, base_v, top_v = 0.3, 0.72, 0.2
+    half = 0.03 + (v - top_v) / (base_v - top_v) * 0.26
+    fuji = (v > top_v) & (v < base_v) & (np.abs(u - fx) * asp / 4 < half)
+    snow = fuji & (v < top_v + 0.16 + 0.03 * np.sin(u * 140))
+    img = np.where(fuji[..., None], np.array([0.12, 0.1, 0.32]), img)
+    img = np.where(snow[..., None], np.array([0.95, 0.95, 1.0]), img)
+    # ondas seigaiha (arcos concentricos) na faixa de baixo
+    cell = 0.11
+    wy = v - 0.66
+    rows = np.floor(wy / (cell * 0.5))
+    off = np.where(rows % 2 == 0, 0.0, 0.5)
+    cxw = (np.floor(u * asp / cell + off) + 0.5 - off) * cell
+    cyw = (rows + 1) * cell * 0.5
+    dd = np.sqrt((u * asp - cxw) ** 2 + (wy - cyw) ** 2) / (cell * 0.5)
+    ring = np.modf(dd * 3)[0]
+    waves = (v > 0.66) & (dd < 1.0)
+    wave_col = np.where((ring < 0.45)[..., None], np.array([0.92, 0.95, 1.0]), np.array([0.05, 0.25, 0.75]))
+    img = np.where(waves[..., None], wave_col, img)
+    img = np.where(((v > 0.66) & ~waves)[..., None], np.array([0.03, 0.12, 0.45]), img)
+    # raio dourado em zigue-zague no alto
+    zz = 0.11 + 0.05 * np.abs(np.modf(u * 9)[0] * 2 - 1)
+    bolt = np.abs(v - zz) < 0.022
+    img = np.where(bolt[..., None], np.array([1.0, 0.78, 0.2]), img)
+    edge = (v < 0.025) | (v > 0.975)                                # filete cromado em cima e embaixo
+    img = np.where(edge[..., None], np.array([0.85, 0.87, 0.92]), img)
+    return np.clip(img, 0, 1)
+
+
 def concrete(name: str = "tex_concrete", size: int = 512, seed: int = 11):
     """Concreto polido repetível: ruído suave em várias escalas + manchas leves e juntas de dilatação."""
     rng = np.random.default_rng(seed)

@@ -33,10 +33,7 @@ def _rear_common(m, add):
 def _box(m, add):
     add(M.box("body", (BODY_W, BODY_L, BODY_TOP - BODY_Z0), (0, BODY_L / 2, (BODY_Z0 + BODY_TOP) / 2), m["paint_white_panel"], bevel=0.08, seg=3))
     # tábuas horizontais (frestas finas) + montantes verticais com trava, como no baú de madeira da referência
-    for sx in (-1, 1):
-        for k in range(11):
-            z = 1.25 + k * 0.18
-            add(M.box(f"plank_seam_{sx}_{k}", (0.012, BODY_L - 0.2, 0.014), (sx * (W2 + 0.004), BODY_L / 2, z), m["plastic"], bevel=0.003, seg=1))
+    for sx in (-1, 1):                                # (as tabuas ficam por baixo do mural: truck3d/deco.py)
         for i, y in enumerate((0.35, 2.75, 5.45, 7.85)):
             add(M.box(f"post_{sx}_{i}", (0.07, 0.1, 2.0), (sx * (W2 + 0.03), y, 2.15), m["steel"], bevel=0.015, seg=1))
             add(M.box(f"post_latch_{sx}_{i}", (0.05, 0.07, 0.16), (sx * (W2 + 0.06), y, 1.35), m["chrome"], bevel=0.015, seg=1))
@@ -44,7 +41,6 @@ def _box(m, add):
         add(M.box(f"front_rib_{i}", (0.1, 0.05, 1.9), (-0.8 + i * 0.8, BODY_L + 0.015, 2.15), m["steel"], bevel=0.012, seg=1))
     for z in (1.3, 3.05):
         add(M.box(f"rail_h_{z}", (BODY_W + 0.05, BODY_L - 0.1, 0.06), (0, BODY_L / 2, z), m["chrome"], bevel=0.015, seg=1))
-    add(M.box("stripe_body", (BODY_W + 0.05, BODY_L + 0.04, 0.22), (0, BODY_L / 2, 1.85), m["paint_pink"], bevel=0.02, seg=1))
     add(M.box("trim_top", (BODY_W + 0.06, BODY_L + 0.02, 0.08), (0, BODY_L / 2, BODY_TOP - 0.02), m["chrome"], bevel=0.02, seg=1))
     add(M.box("roof_panel", (BODY_W - 0.2, BODY_L - 0.2, 0.03), (0, BODY_L / 2, BODY_TOP + 0.005), m["steel"], bevel=0.01, seg=1))
     for sx in (-1, 1):

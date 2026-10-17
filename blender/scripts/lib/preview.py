@@ -57,7 +57,7 @@ def _light(name, kind, loc, energy, color=(1, 1, 1), size=3.0):
     return ob
 
 
-def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), views=None, dist=22.0, lens=60.0):
+def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), views=None, dist=22.0, lens=60.0, night=False):
     """Renderiza vistas (nome -> (azimute°, elevação°)) em <prefix>_<nome>.png."""
     sc = bpy.context.scene
     engines = [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties["engine"].enum_items]
@@ -67,9 +67,16 @@ def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), vie
     sc.render.image_settings.file_format = "PNG"
     sc.view_settings.view_transform = "Standard"
     _setup_world()
-    _light("key", "AREA", (8, -10, 12), 4200, (1.0, 0.95, 0.9), 6)
-    _light("rim", "AREA", (-9, 14, 8), 3000, (0.55, 0.65, 1.0), 6)
-    _light("fill", "AREA", (-8, -8, 4), 1400, (0.8, 0.85, 1.0), 6)
+    k = 0.12 if night else 1.0                      # noite: luzes fracas, so as lampadas e o cromo aparecem
+    if night:
+        sc.world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.25
+        if hasattr(sc.eevee, "use_bloom"):
+            sc.eevee.use_bloom = True
+    _light("key", "AREA", (8, -10, 12), 4200 * k, (1.0, 0.95, 0.9), 6)
+    _light("rim", "AREA", (-9, 14, 8), 3000 * k, (0.55, 0.65, 1.0), 6)
+    _light("fill", "AREA", (-8, -8, 4), 1400 * k, (0.8, 0.85, 1.0), 6)
+    if night:
+        _light("sodium", "AREA", (0, 6, 9), 1800, (1.0, 0.6, 0.3), 10)
     # chão escuro refletivo
     bpy.ops.mesh.primitive_plane_add(size=80, location=(0, 6, 0))
     ground = bpy.context.active_object

@@ -60,6 +60,17 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P71] Menus e UI finais
 - [x] [P72] (guia docs/TESTE_AMIGOS.md; APK e a rodada em si PRECISAM MARCO) Rodada de testes e lista de ajustes de equilíbrio
 
+## Plano visual (docs/PLANO_VISUAL.md)
+- [x] [V0] Correção das rodas + protótipo noturno
+- [~] [V1] 3 propostas de direção de arte (`docs/DIRECAO_ARTE.md`) — **escolha PRECISA MARCO**
+- [x] [V2] Sistema de hora do dia por rota
+- [x] [V3] Estrada com cara de via expressa japonesa (viaduto, pórticos, túneis)
+- [x] [V4] Texturas CC0 com desgaste
+- [x] [V5] Sensação de velocidade (com chaves nas Opções)
+- [x] [V6] Cromo por matcap
+- [x] [V7] Caminhão com cara de Dekotora (luzes, andons, mural trocável)
+- [ ] [V8] Medir no celular — PRECISA MARCO (Android SDK + JDK 17 para gerar o APK)
+
 ## Fase 8 — Publicação (opcional)
 - [x] [P80] (guia docs/RELEASE_ANDROID.md; chave e AAB PRECISAM MARCO) Builds de release (AAB assinado, .exe)
 - [x] [P81] (docs/LOJA.md, docs/store/, docs/POLITICA_PRIVACIDADE.md) Ficha da Play Store / itch.io

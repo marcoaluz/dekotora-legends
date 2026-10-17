@@ -18,6 +18,8 @@ from lib import mesh3d as M, pbr, preview, scene  # noqa: E402
 from truck3d.body import build_body  # noqa: E402
 from truck3d.cab import CAB_STYLES, build_cab, cab_mounts  # noqa: E402
 from truck3d.chassis import build_chassis  # noqa: E402
+from truck3d.deco import build_deco  # noqa: E402
+from truck3d.cab import STYLES  # noqa: E402
 from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB_Y0, CAB_Y1,  # noqa: E402,F401
                           CAB_Z0, FRONT_AXLE_Y, MOUNTS, REAR_AXLES_Y, WHEEL_R)
 from truck3d.variants import LENGTH_DELTA, VARIANTS, apply_variant
@@ -50,6 +52,16 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
     mounts.update(cab_mounts(cab))                 # teto/para-brisa mudam com a cabine
     empties = [M.empty(n, p) for n, p in mounts.items()]
     apply_variant(variant, m, parts, wheels, empties)
+    if variant != "carreta":                        # decoracao Dekotora (V7): luzes, andons, murais
+        body_l = BODY_L + VARIANTS[variant]["delta"]
+        cab_z = STYLES[cab]["top"]                   # altura real da cabine (com defletor de teto, se houver)
+        for o in parts:
+            mw = o.matrix_world
+            for v in o.data.vertices:
+                w = mw @ v.co
+                if w.y > body_l + 0.3 and w.z > cab_z:
+                    cab_z = w.z
+        build_deco(m, add, body_l, cab_z, (CAB_Y1 + VARIANTS[variant]["delta"], STYLES[cab]["wz0"]))
     return parts, wheels, empties
 
 
@@ -60,6 +72,7 @@ def main():
     ap.add_argument("--paint", default="paint_white")
     ap.add_argument("--cab", default="padrao", choices=list(CAB_STYLES), help="padrao | classica | aero | alta")
     ap.add_argument("--no-preview", action="store_true")
+    ap.add_argument("--night", action="store_true", help="previas de revisao a noite (luzes acesas)")
     ap.add_argument("--variant", default="base", choices=list(VARIANTS), help="base | leve | longo | carreta")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
@@ -94,6 +107,10 @@ def main():
     print(f"triangulos: {tris}  objetos: {len(final)}  materiais: {len(bpy.data.materials)}")
     tag = args.variant if args.cab == "padrao" else f"{args.variant}_{args.cab}"
     glb = os.path.join(out, "truck", f"dekotora_truck_{tag}.glb")
+    mural_png = os.path.join(out, "murals", "mural_side.png")      # arte trocavel do mural (nunca sobrescreve)
+    if not os.path.exists(mural_png):
+        from lib import tex
+        tex.save_png(tex.mural_geometric()[::-1], mural_png)
     M.export_glb(glb, final)
     os.makedirs(os.path.join(out, "source_blend"), exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "source_blend", f"truck_{tag}.blend"))
@@ -102,7 +119,7 @@ def main():
         return
     d = LENGTH_DELTA[args.variant]
     pdir = os.path.join(out, "previews")
-    preview.render_views(os.path.join(pdir, f"truck_{tag}"), merged + wheel_objs, size=(960, 540),
+    preview.render_views(os.path.join(pdir, f"truck_{tag}" + ("_night" if args.night else "")), merged + wheel_objs, size=(960, 540), night=args.night,
                          views={"34": (35, 14, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "rear": (180, 8, 22.0 + d, (0, 6.0 + d / 2, 1.6)),
                                 "side": (90, 4, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "front": (0, 10, 22.0 + d, (0, 6.0 + d / 2, 1.6)),
                                 "cab34": (38, 10, 9.0, (0, 10.0 + d, 1.8)), "cabside": (90, 3, 9.0, (0, 10.0 + d, 1.8)),
