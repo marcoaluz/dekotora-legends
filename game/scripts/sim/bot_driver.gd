@@ -49,9 +49,10 @@ var _seen_signal: int = 0
 var _was_off: bool = false
 
 
-func _init(difficulty_: int = Difficulty.NORMAL, seed_: int = 1, preferred_x_: float = 0.0, rival_: bool = false) -> void:
+## `no_duel_`: o bot dirige um HUMANO (piloto automatico, cliente de teste) e nao deve duelar com outros humanos.
+func _init(difficulty_: int = Difficulty.NORMAL, seed_: int = 1, preferred_x_: float = 0.0, rival_: bool = false, no_duel_: bool = false) -> void:
 	difficulty = difficulty_
-	rival = rival_ or difficulty_ >= Difficulty.NORMAL
+	rival = (rival_ or difficulty_ >= Difficulty.NORMAL) and not no_duel_
 	_rng.seed = seed_
 	preferred_lane = clampi(Lanes.nearest(preferred_x_), Lanes.FIRST, Lanes.LAST)
 	target_lane = preferred_lane

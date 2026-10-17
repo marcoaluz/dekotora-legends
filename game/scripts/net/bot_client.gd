@@ -120,7 +120,7 @@ func _on_setup(setup: Dictionary, my_truck: int) -> void:
 	sync = ClientSync.new()
 	sync.predict = not ("--nopredict" in OS.get_cmdline_user_args())
 	sync.setup(setup, my_truck)
-	driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 7 + my_truck, Room.GRID_X[my_truck % 4])
+	driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 7 + my_truck, Room.GRID_X[my_truck % 4], false, true)
 	print("[botclient %s] corrida montada: %d caminhoes, meu indice %d, predicao %s" % [_name, sync.sim.trucks.size(), my_truck, sync.predict])
 
 

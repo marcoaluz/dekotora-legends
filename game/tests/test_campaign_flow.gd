@@ -18,7 +18,7 @@ func _run_route(route_id: String) -> Dictionary:
 		else:
 			t.is_bot = true
 			t.set_loadout([DamageModel.make_part("fb_basic", ["front"], 120.0, 80.0, 5)])
-		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, xs[i]))
+		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, xs[i], false, i == 0))
 	var steps: int = 0
 	while not sim.is_over() and steps < 30 * 400:
 		for i in 4:

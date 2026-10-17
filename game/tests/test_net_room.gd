@@ -68,7 +68,7 @@ func test_race_runs_server_side_and_finishes_with_results() -> void:
 	var steps: int = 0
 	var human_drivers: Dictionary = {}
 	for p in r.order:
-		human_drivers[p] = BotDriver.new(BotDriver.Difficulty.NORMAL, p, 0.0)
+		human_drivers[p] = BotDriver.new(BotDriver.Difficulty.NORMAL, p, 0.0, false, true)
 	while r.state == Protocol.RoomState.RACING and steps < 30 * 300:
 		# os dois humanos "dirigem" mandando comandos de bot
 		for p in r.order:

@@ -428,7 +428,7 @@ func _process_online(dt: float) -> void:
 		var cmd: Commands = input.poll()
 		if _autoplay:
 			if _auto_driver == null:
-				_auto_driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 31, 0.25)
+				_auto_driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 31, 0.0, false, true)
 			cmd = _auto_driver.command_for(sim, player, dt)
 		_steer_smooth = lerpf(_steer_smooth, cmd.steer, minf(8.0 * dt, 1.0))
 		_cmd_acc += dt
