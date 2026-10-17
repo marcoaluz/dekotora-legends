@@ -80,9 +80,13 @@ func _tex(name: String) -> Texture2D:
 func _make_materials() -> void:
 	var road := StandardMaterial3D.new()
 	road.vertex_color_use_as_albedo = true
-	road.albedo_texture = _tex("asphalt_albedo.png")
-	road.albedo_color = Color(1.25, 1.25, 1.3).lerp(Color(1.05, 1.03, 1.0), tod.day_amount) if road.albedo_texture else Color("#2c2c33")
-	road.roughness_texture = _tex("asphalt_rough.png")
+	road.albedo_texture = _tex("cc0/asphalt_02_diff_1k.jpg")              # Poly Haven, CC0 (assets/LICENCAS.md)
+	road.roughness_texture = _tex("cc0/asphalt_02_rough_1k.jpg")
+	if road.albedo_texture == null:                                         # reserva: textura procedural
+		road.albedo_texture = _tex("asphalt_albedo.png")
+		road.roughness_texture = _tex("asphalt_rough.png")
+	road.albedo_color = Color(1.3, 1.3, 1.34).lerp(Color(1.1, 1.08, 1.05), tod.day_amount) if road.albedo_texture else Color("#2c2c33")
+	road.uv1_scale = Vector3(0.7, 0.7, 1.0)                                  # uma repeticao a cada ~5,7 m
 	road.roughness = tod.road_roughness       # noite: asfalto umido (reflete mais)
 	road.metallic_specular = 0.6
 	road.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
@@ -163,8 +167,8 @@ func _strip(st: SurfaceTool, i: int, j: int, l0: float, l1: float, h0: float = 0
 func _wall_strip(st: SurfaceTool, i: int, j: int, l0: float, l1: float, h0: float, h1: float, col: Color = Color.WHITE) -> void:
 	var u0: float = float(i) * Track.SEG_LEN / TEX_TILE
 	var u1: float = float(j) * Track.SEG_LEN / TEX_TILE
-	var vs: Array = [[_edge(i, l0, h0), Vector2(u0, -h0)], [_edge(i, l1, h1), Vector2(u0, -h1)],
-		[_edge(j, l1, h1), Vector2(u1, -h1)], [_edge(j, l0, h0), Vector2(u1, -h0)]]
+	var vs: Array = [[_edge(i, l0, h0), Vector2(u0, 0.85 - h0)], [_edge(i, l1, h1), Vector2(u0, 0.85 - h1)],
+		[_edge(j, l1, h1), Vector2(u1, 0.85 - h1)], [_edge(j, l0, h0), Vector2(u1, 0.85 - h0)]]   # v = 0 no topo da mureta
 	var order: Array = [0, 2, 1, 0, 3, 2] if l0 < l1 else [0, 1, 2, 0, 2, 3]   # mesma orientacao de _strip
 	_used[st] = true
 	for k in order:

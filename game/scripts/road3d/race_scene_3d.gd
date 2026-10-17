@@ -42,6 +42,8 @@ var _cmd_acc: float = 0.0
 var _auto_driver: BotDriver
 var tod: TimeOfDay
 var _tunnel: Tunnel3D
+var _speed_fx: SpeedFx
+var _scrape_t: float = 0.0
 
 
 func _ready() -> void:
@@ -104,6 +106,11 @@ func _ready() -> void:
 	_cam.far = 900.0
 	add_child(_cam)
 	_cam.make_current()
+	_speed_fx = SpeedFx.new()
+	add_child(_speed_fx)
+	var streaks := LightStreaks.new()
+	add_child(streaks)
+	streaks.setup(path, tod, _trucks, player, _traffic3d, func(i: int) -> float: return sim.trucks[i].speed, _cam)
 	var layer := CanvasLayer.new()
 	layer.layer = 5
 	layer.scale = Vector2(2, 2)          # HUD e toque desenhados em 480x270
@@ -445,6 +452,7 @@ func _update_audio(dt: float) -> void:
 		_rival_audio[k].update(dt, r01, rt.engine.throttle_now, rt.boost, 1.0, rt.speed)
 	if t.passing_active and not _prev_passing:
 		_audio.passing_pressed(gs.installed_horn())
+		_speed_fx.passing_flash()
 	_prev_passing = t.passing_active
 
 
@@ -518,16 +526,31 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
-	var c: Array[Vector3] = _cam_target(_player_z() + t.speed * 0.02, _player_x())
+	var z: float = _player_z()
+	var ex: Array = _speed_fx.camera_extra(t.speed, sim.track.curve_at(z + 30.0), dt)   # atraso na curva + tremor
+	var c: Array[Vector3] = _cam_target(z + t.speed * 0.02, _player_x())
+	var right: Vector3 = path.right_at(z) * Track.ROAD_HALF_WIDTH_M
 	var k: float = 1.0 - exp(-14.0 * dt)
-	_cam.global_position = _cam.global_position.lerp(c[0], k)
-	var look: Vector3 = c[1]
+	_cam.global_position = _cam.global_position.lerp(c[0] + right * float(ex[0]), k)
+	var look: Vector3 = c[1] + right * float(ex[1])
 	_shake = maxf(_shake - dt * 2.5, 0.0)
 	var s: float = _shake * 0.25
 	if s > 0.0:
 		_cam.global_position += Vector3(randf_range(-s, s), randf_range(-s, s), randf_range(-s, s))
 	_cam.look_at(look, Vector3.UP)
-	_cam.fov = lerpf(_cam.fov, 58.0 + t.speed * 0.25 + t.draft * 6.0, minf(3.0 * dt, 1.0))
+	_cam.global_position += _cam.global_basis * (ex[2] as Vector3)
+	_cam.fov = lerpf(_cam.fov, 56.0 + _speed_fx.fov_extra(t.speed) + t.draft * 6.0, minf(3.0 * dt, 1.0))
+	_speed_fx.update(t.speed, dt)
+	_scrape_sparks(t, dt)
+
+
+## Faiscas ao raspar na mureta (a sim prende o caminhao no limite lateral |x| = 1,6).
+func _scrape_sparks(t: TruckSim, dt: float) -> void:
+	_scrape_t -= dt
+	if absf(t.x) < 1.58 or t.speed < 8.0 or _scrape_t > 0.0:
+		return
+	_scrape_t = 0.06
+	_fx.sparks(_fx.zone_point(_trucks[player], "left" if t.x < 0.0 else "right"), 6.0)
 
 
 func _update_hud() -> void:

@@ -14,6 +14,10 @@ var server_address: String = "127.0.0.1:24600"   # IP:porta do servidor (campo m
 var show_touch_controls: bool = false   # forca os botoes na tela (teste no PC)
 var quality: int = 2                    # 0 baixa, 1 media, 2 alta (celular comeca em media)
 var show_fps: bool = false
+var fx_speed: bool = true               # linhas de velocidade, tremor, FOV e clarao do Passing
+var fx_reflections: bool = true         # reflexo falso das luzes no asfalto (noite/fim de tarde)
+var fx_trails: bool = true              # rastro das lanternas traseiras
+var fx_rain: bool = false               # chuva (opcional)
 
 
 func _ready() -> void:
@@ -39,6 +43,10 @@ func load_settings() -> void:
 	server_address = String(cfg.get_value("net", "server_address", server_address))
 	quality = clampi(int(cfg.get_value("graphics", "quality", quality)), 0, 2)
 	show_fps = bool(cfg.get_value("graphics", "show_fps", show_fps))
+	fx_speed = bool(cfg.get_value("graphics", "fx_speed", fx_speed))
+	fx_reflections = bool(cfg.get_value("graphics", "fx_reflections", fx_reflections))
+	fx_trails = bool(cfg.get_value("graphics", "fx_trails", fx_trails))
+	fx_rain = bool(cfg.get_value("graphics", "fx_rain", fx_rain))
 
 
 func save_settings() -> void:
@@ -53,6 +61,10 @@ func save_settings() -> void:
 	cfg.set_value("net", "server_address", server_address)
 	cfg.set_value("graphics", "quality", quality)
 	cfg.set_value("graphics", "show_fps", show_fps)
+	cfg.set_value("graphics", "fx_speed", fx_speed)
+	cfg.set_value("graphics", "fx_reflections", fx_reflections)
+	cfg.set_value("graphics", "fx_trails", fx_trails)
+	cfg.set_value("graphics", "fx_rain", fx_rain)
 	cfg.save(PATH)
 
 

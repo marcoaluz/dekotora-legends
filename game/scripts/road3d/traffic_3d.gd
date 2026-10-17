@@ -41,6 +41,17 @@ func setup(path_: TrackPath, traffic_: TrafficSim) -> void:
 		_nodes.append(n)
 
 
+func car_count() -> int:
+	return _nodes.size()
+
+
+func car_transforms() -> Array[Transform3D]:
+	var out: Array[Transform3D] = []
+	for n in _nodes:
+		out.append(n.global_transform)
+	return out
+
+
 func refresh() -> void:
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]

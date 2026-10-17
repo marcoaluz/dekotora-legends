@@ -8,8 +8,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 | T-097 | V8: APK no celular, medir FPS/temperatura nos 3 presets | PLANO_VISUAL V8 | médio | coordenador | precisa Marco (SDK/JDK) | 2026-10-17 | |
 | T-096 | V7: caminhão com cara de Dekotora (luzes de marcação, andon, murais trocáveis) | PLANO_VISUAL V7 | difícil | coordenador | fila | 2026-10-17 | |
 | T-095 | V6: cromo por matcap (dia/noite) | PLANO_VISUAL V6 | difícil | coordenador | fila | 2026-10-17 | |
-| T-094 | V5: sensação de velocidade (FOV, tremor, linhas, rastros, reflexo falso, faíscas) | PLANO_VISUAL V5 | difícil | coordenador | fila | 2026-10-17 | |
-| T-093 | V4: texturas CC0 com desgaste (asfalto, concreto, metal) | PLANO_VISUAL V4 | difícil | coordenador | fila | 2026-10-17 | |
+| T-094 | V5: sensação de velocidade (FOV, tremor, linhas, rastros, reflexo falso, faíscas) | PLANO_VISUAL V5 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
+| T-093 | V4: texturas CC0 com desgaste (asfalto, concreto, metal) | PLANO_VISUAL V4 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-092 | V3: estrada com cara de via expressa japonesa (marcações, delineadores, pórticos, túnel) | PLANO_VISUAL V3 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-091 | V2: sistema de hora do dia (TimeOfDay night/dusk/day por rota, céu por shader) | PLANO_VISUAL V2 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-090 | V1: 3 propostas de direção de arte com capturas (escolha do Marco) | PLANO_VISUAL V1 | médio | coordenador | precisa Marco (escolher A/B/C) | 2026-10-17 | 2026-10-17 |

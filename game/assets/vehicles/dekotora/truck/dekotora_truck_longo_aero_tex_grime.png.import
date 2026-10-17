@@ -3,22 +3,23 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7lm6autcqyk3"
-path="res://.godot/imported/dekotora_truck_longo_aero_tex_grime.png-e81cb3d47607ef2b7bf2acd5f2f94b1b.ctex"
+path.s3tc="res://.godot/imported/dekotora_truck_longo_aero_tex_grime.png-e81cb3d47607ef2b7bf2acd5f2f94b1b.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
-"md5": "82670dadddd6a07b264de11d69fd9e9c"
+"md5": "397bdeed60487e6b8299a862eb88fafd"
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_longo_aero_tex_grime.png"
-dest_files=["res://.godot/imported/dekotora_truck_longo_aero_tex_grime.png-e81cb3d47607ef2b7bf2acd5f2f94b1b.ctex"]
+dest_files=["res://.godot/imported/dekotora_truck_longo_aero_tex_grime.png-e81cb3d47607ef2b7bf2acd5f2f94b1b.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

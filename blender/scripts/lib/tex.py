@@ -51,10 +51,10 @@ def diamond_plate(name: str = "tex_diamond", n: int = 8, size: int = 256):
 
 def grime_panel(name: str = "tex_grime", w: int = 512, h: int = 256, seed: int = 7):
     """Sujeira discreta para chapa pintada (multiplica a cor): escurece a parte de baixo (poeira da estrada),
-    riscos de água escorrendo de cima e pontinhos de uso. Valores 0,82..1,0 (nunca preto)."""
+    riscos de água escorrendo de cima e pontinhos de uso. Valores 0,66..1,0 (nunca preto)."""
     rng = np.random.default_rng(seed)
     v = np.linspace(0, 1, h)[:, None]                       # 0 = embaixo, 1 = em cima
-    grime = 0.16 * np.clip(1 - v / 0.35, 0, 1) ** 1.5       # poeira na barra inferior
+    grime = 0.3 * np.clip(1 - v / 0.4, 0, 1) ** 1.4         # poeira na barra inferior (lama das rodas)
     streaks = np.zeros((h, w))
     for _ in range(26):                                     # riscos verticais
         x = rng.integers(0, w)
@@ -67,8 +67,44 @@ def grime_panel(name: str = "tex_grime", w: int = 512, h: int = 256, seed: int =
         streaks[y1:h - y0, x:x + wd] += ramp[:, None][: streaks[y1:h - y0, x:x + wd].shape[0]]
     speck = np.clip(rng.normal(0, 1, (h, w)), 1.6, 4) - 1.6   # arranhoes/pontinhos raros
     speck = (speck > 0.9) * 0.05
-    val = np.clip(1.0 - grime - streaks - speck, 0.78, 1.0)
+    val = np.clip(1.0 - grime - streaks - speck, 0.66, 1.0)
     return _image(name, np.repeat(val[..., None], 3, axis=2))
+
+
+def load_pixels(path: str, size: int) -> np.ndarray:
+    """Lê uma imagem (jpg/png) e devolve (size, size, 3) em sRGB 0..1, de cima para baixo, reduzida por média."""
+    img = bpy.data.images.load(path)
+    img.colorspace_settings.name = "Non-Color"            # lê os valores como estão no arquivo
+    w, h = img.size
+    arr = np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)[::-1, :, :3]
+    bpy.data.images.remove(img)
+    f = w // size
+    return arr[: size * f, : size * f].reshape(size, f, size, f, 3).mean(axis=(1, 3))
+
+
+def streaked_concrete(src: str, size: int = 512, seed: int = 5) -> np.ndarray:
+    """Concreto CC0 (src) com manchas de chuva escorrida: riscos escuros que começam no topo (linha 0) e somem
+    para baixo, mais uma faixa de poeira na base. Repete nas laterais. Devolve (size, size, 3) sRGB."""
+    rng = np.random.default_rng(seed)
+    base = load_pixels(src, size)
+    lum = base.mean(axis=2, keepdims=True)
+    base = lum + (base - lum) * 0.55                        # menos amarelado
+    base = base / max(float(base.mean()), 1e-3) * 0.55      # brilho medio padronizado
+    dark = np.zeros((size, size))
+    for _ in range(70):
+        x = int(rng.integers(0, size))
+        wd = int(rng.integers(2, 9))
+        length = rng.uniform(0.25, 0.95)
+        a = rng.uniform(0.08, 0.28)
+        n = int(size * length)
+        ramp = np.linspace(a, 0.0, n) ** 1.3
+        for k in range(wd):                                  # borda suave do risco
+            fall = 1.0 - abs(k - wd / 2) / (wd / 2 + 1)
+            dark[:n, (x + k) % size] += ramp * fall
+    v = np.linspace(0, 1, size)[:, None]
+    dark += 0.12 * np.clip((v - 0.8) / 0.2, 0, 1)           # poeira da pista na base
+    val = np.clip(1.0 - dark, 0.45, 1.0)
+    return np.clip(base * val[..., None], 0, 1)[::-1]     # save_png grava a linha 0 embaixo
 
 
 def concrete(name: str = "tex_concrete", size: int = 512, seed: int = 11):
