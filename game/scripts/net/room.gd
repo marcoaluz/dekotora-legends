@@ -77,7 +77,7 @@ func remove_member(peer: int) -> void:
 	elif sim != null and m.truck_idx >= 0:
 		# jogador saiu no meio da corrida: um bot assume o caminhao ate o fim
 		sim.trucks[m.truck_idx].is_bot = true
-		drivers[m.truck_idx] = BotDriver.new(BotDriver.Difficulty.NORMAL, 900 + peer, GRID_X[m.truck_idx % 4])
+		drivers[m.truck_idx] = BotDriver.new(BotDriver.Difficulty.NORMAL, 900 + peer, GRID_X[m.truck_idx % 4], false, true)
 		sim.set_command(m.truck_idx, Commands.new())
 
 
