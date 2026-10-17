@@ -21,6 +21,8 @@ var _autoplay: bool = false
 var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
 var _cargo_notice: Array[String] = []
+var _hud_layer: CanvasLayer             # HUD + botoes de toque (some na pausa para o menu nao ficar por cima deles)
+var _demo: RaceDemo                    # capturas/depuracao (--demo=, --shots=)
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
 const TIMEOUT_SCREEN_DELAY: float = 1.8
 var _shake: float = 0.0
@@ -66,6 +68,9 @@ func _ready() -> void:
 	else:
 		var track: Track = route.build_track() if route != null else Track.make_test_track()
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
+		var fake: Dictionary = RaceDemo.fake_contract(OS.get_cmdline_user_args(), route)
+		if not fake.is_empty():
+			gs.pending_contract = fake
 		sim = RaceSim.new(track, density)
 		sim.freight = route.freight if route != null else 25000
 		if not gs.pending_contract.is_empty():         # contrato do Mercado: o valor dele e o frete da corrida
@@ -122,12 +127,18 @@ func _ready() -> void:
 	layer.layer = 5
 	layer.scale = Vector2(2, 2)          # HUD e toque desenhados em 480x270
 	add_child(layer)
+	_hud_layer = layer
 	_hud = RaceHud.new()
 	_hud.bind(sim, player)
 	layer.add_child(_hud)
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_autoplay = "--autoplay" in args
 	_debug_events = "--debug-events" in args
+	_demo = RaceDemo.new(args)
+	if not online:
+		_demo.setup(sim)
+		for k in sim.trucks.size():
+			_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 	for a in args:
 		if a.begins_with("--start="):
 			var z0: float = float(a.substr(8))
@@ -302,7 +313,7 @@ func _build_pause_menu() -> void:
 	_pause_layer.add_child(root)
 	# tela de pausa SEM escurecer a corrida (ATB-1): titulo + 3 blocos com icone (continuar, revanche, desistir)
 	var col := VBoxContainer.new()
-	col.position = Vector2(150, 140)
+	col.position = Vector2(150, 110)
 	col.custom_minimum_size = Vector2(660, 0)
 	col.add_theme_constant_override("separation", 18)
 	root.add_child(col)
@@ -373,8 +384,11 @@ func _toggle_pause() -> void:
 		return
 	get_tree().paused = not get_tree().paused
 	_pause_layer.visible = get_tree().paused
+	_hud_layer.visible = not get_tree().paused
 	if _pause_layer.visible and _pause_first != null:
 		_pause_first.grab_focus()
+	if _pause_layer.visible and _demo.shot_dir != "":
+		get_tree().create_timer(0.8, true).timeout.connect(func() -> void: _demo.snap(get_viewport(), "pausa"))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -403,6 +417,8 @@ func _process(delta: float) -> void:
 		var cmd: Commands = input.poll()
 		if _autoplay:
 			cmd = Commands.make(0.0, 1.0, 0.0)
+		if _demo.active():
+			cmd = _demo.command(sim.time)
 		sim.set_command(player, cmd)
 		_steer_smooth = lerpf(_steer_smooth, cmd.steer, minf(8.0 * dt, 1.0))
 		_acc += dt
@@ -419,6 +435,7 @@ func _process(delta: float) -> void:
 	_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
+	_demo.update(get_viewport(), sim.trucks[player], dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
@@ -481,6 +498,7 @@ func _update_audio(dt: float) -> void:
 func _handle_events(events: Array[Dictionary]) -> void:
 	for e in events:
 		_audio.on_event(e, player)
+		_demo.on_event(e, player, sim.time)
 		if _debug_events:
 			print("EVENTO frame=%d %s" % [Engine.get_frames_drawn(), e])
 		match String(e["type"]):

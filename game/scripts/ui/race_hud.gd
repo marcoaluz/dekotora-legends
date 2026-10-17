@@ -89,8 +89,9 @@ func _draw() -> void:
 	if Settings.show_fps:
 		_lbl(Vector2(w * 0.5 - 20, 66), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
 	if countdown > 0.0:
-		_num(Vector2(0, size.y * 0.44), "%d" % int(ceil(countdown)), 72, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
-		_num(Vector2(0, size.y * 0.58), Tr.t("hud.lane_hint"), 11, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
+		var low: float = 0.58 if cargo_notice.is_empty() else 0.6
+		_num(Vector2(0, size.y * low), "%d" % int(ceil(countdown)), 56, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
+		_num(Vector2(0, size.y * 0.7), Tr.t("hud.lane_hint"), 11, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
 		_draw_cargo_notice(w)
 	elif banner_time > 0.0:
 		_num(Vector2(0, size.y * 0.36), banner, 26, PINK, HORIZONTAL_ALIGNMENT_CENTER, w)

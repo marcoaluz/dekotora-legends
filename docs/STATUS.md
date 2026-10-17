@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (84) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (122) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -70,6 +70,12 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   ferramenta `scenes/tools/chrome_compare.tscn`); V7 caminhão Dekotora (`blender/scripts/truck3d/deco.py`: fileiras de luzes, andons com kanji
   銀河丸/街道爆走, mural trocável em `game/assets/vehicles/dekotora/murals/mural_side.png` ou `user://mural_side.png`).
   Custo no modo médio: ~345 chamadas de desenho (antes ~330). **V8 (medir no celular) depende do APK.**
+- **Lote ATB-1 (2026-10-17, T-099..T-104, base: `docs/REFERENCIA_ART_TRUCK_BATTLE.md`)**: **controle só por faixas** (3 faixas + acostamento; 1º toque liga a seta, 2º toque no mesmo lado em até 1,5 s troca em ~0,7 s; `Lanes`, `TruckSim._lane_input`, botões ◀ ▶ grandes; bots e rede usam a mesma regra, o snapshot leva faixa/seta);
+  **prazo de entrega** (`RaceSim.deadline`, `RouteDef.deadline()`, contrato `deadline_s`) e **vitória = 1º E no prazo** (derrota por tempo esgotado ou por chegar depois do rival paga 0 ¥);
+  **perda de carga 0–40%** do prêmio por contato/batida e tipos de carga (frágil, pesada, perecível; `CargoDef.trait_kind`), aviso na contagem regressiva; **rival de verdade** (`BotDriver`: trava no trânsito, duelo lado a lado, espelha a seta, empurra, sem borracha);
+  **pausa** Continuar/Revanche/Desistir sem escurecer e barra de progresso com marcador do jogador e do rival. Números em `docs/BALANCEAMENTO.md`; capturas em `docs/capturas_atb1/`.
+  Depuração das capturas: `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --demo=close --shots=PASTA` (`--demo=lanes|close`, `--contract=ceramica`, `--paused`; ver `race_demo.gd`).
+  Pendências: erro antigo de malha no túnel da rota de Hakone (`tunnel_3d.gd:151`, `set_normal`: aparece no console, não trava); falta jogar para ajustar prazo, empurrão e a regra "derrota paga 0".
 - Opcional: contratar VPS (`server/README.md`), chave de assinatura Android (`docs/RELEASE_ANDROID.md`), conta Play Console / itch.io.
 
 ## Problemas conhecidos / ideias
