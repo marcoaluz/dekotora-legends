@@ -18,16 +18,20 @@ var _pool_mesh: PlaneMesh
 var _lamp_off: ArrayMesh
 
 
-func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
+func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null, tunnels: Array[Vector2] = []) -> void:
 	path = path_
 	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
+	var deck: float = RoadMesh.deck_height(kind)    # viaduto: o que fica alem da mureta esta la embaixo, no chao
 	var groups: Dictionary = {}     # nome do modelo -> Array[Transform3D]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
 	for o in path.track.objects:
 		var z: float = float(o["z"])
 		var xu: float = float(o["x"])
-		var base: Vector3 = path.world_point(z, xu)
+		if RoadMesh.in_tunnel(z, tunnels, 6.0):
+			continue                                  # dentro do tunel nao ha postes nem arvores
+		var outside: bool = absf(xu) * Track.ROAD_HALF_WIDTH_M > RoadMesh.BARRIER_IN
+		var base: Vector3 = path.world_point(z, xu, -deck if outside else 0.0)
 		var yaw: float = path.yaw_at(z)
 		var k: String = String(o["kind"])
 		var model: String = k
@@ -43,9 +47,11 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null)
 				var sc: float = rng.randf_range(0.8, 1.5)
 				b = Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(sc, sc * rng.randf_range(0.9, 1.3), sc))
 			"sign_green":
+				if deck > 0.0:
+					continue                          # no viaduto as placas ficam nos porticos
 				b = Basis(Vector3.UP, yaw + PI)       # o texto fica legivel para quem vem pela pista
 		_put(groups, model, Transform3D(b, base))
-	_extras(groups, kind, rng)
+	_extras(groups, kind, rng, deck, tunnels)
 	var pool_mat: StandardMaterial3D = _pool_material()
 	for key in groups:
 		var name: String = String(key).get_slice("#", 0)
@@ -75,14 +81,17 @@ func _put(groups: Dictionary, model: String, t: Transform3D) -> void:
 
 
 ## Vegetacao extra fora da pista (arbustos ao pe da mureta, pedras na praia/encosta).
-func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator) -> void:
+func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator, deck: float, tunnels: Array[Vector2]) -> void:
 	var z: float = 10.0
 	var hw: float = Track.ROAD_HALF_WIDTH_M
 	while z < path.track.length_m - 5.0:
 		var yaw: float = path.yaw_at(z)
 		var sc: float = rng.randf_range(0.6, 1.3)
 		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3.ONE * sc)
-		var left: Vector3 = path.world_point(z, -rng.randf_range(11.0, 16.0) / hw)
+		var left: Vector3 = path.world_point(z, -rng.randf_range(14.5, 19.0) / hw, -deck)
+		if RoadMesh.in_tunnel(z, tunnels, 6.0):
+			z += 20.0
+			continue
 		_put(groups, "bush" if kind != &"mountain" else "rock", Transform3D(b, left))
 		if kind == &"coast":                     # pedras na areia, perto do mar
 			var beach: Vector3 = path.world_point(z + 6.0, rng.randf_range(27.0, 36.0) / hw, -1.0)

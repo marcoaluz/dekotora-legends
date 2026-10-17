@@ -13,6 +13,7 @@ extends Resource
 @export var night: bool = true                 # musica e farois; derivado da hora do dia (dia = false)
 @export var time_of_day: StringName = &"night" # preset em data/time/ (night, dusk, day)
 @export var fame_required: int = 0
+@export var tunnels: Array[Vector2] = []        # (inicio m, comprimento m) so visual: Tunnel3D
 @export var places: PackedStringArray = []      # cidades do trecho (origem/destino dos contratos)
 
 

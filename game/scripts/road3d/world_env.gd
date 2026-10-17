@@ -83,10 +83,11 @@ void sky() {
 
 ## `indoor` = galpao da garagem: fundo escuro, sem neblina, luz de teto. Fora dele, usa o preset `tod`
 ## (sem preset = noite). `fuji` = silhueta do Monte Fuji no horizonte.
-static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, fuji: bool = false) -> void:
+## Devolve {"sun": DirectionalLight3D, "env": Environment} (o tunel apaga o sol quando o jogador entra).
+static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, fuji: bool = false) -> Dictionary:
 	if indoor:
 		_create_indoor(parent)
-		return
+		return {}
 	if tod == null:
 		tod = TimeOfDay.by_id(&"night")
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
@@ -143,6 +144,7 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	sun.directional_shadow_max_distance = 90.0
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # 2 cortes em vez de 4: metade das chamadas de sombra
 	parent.add_child(sun)
+	return {"sun": sun, "env": env}
 
 
 static func _create_indoor(parent: Node3D) -> void:

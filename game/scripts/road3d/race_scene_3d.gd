@@ -41,6 +41,7 @@ var _rival_idx: Array[int] = []
 var _cmd_acc: float = 0.0
 var _auto_driver: BotDriver
 var tod: TimeOfDay
+var _tunnel: Tunnel3D
 
 
 func _ready() -> void:
@@ -70,16 +71,23 @@ func _ready() -> void:
 	get_viewport().msaa_3d = Viewport.MSAA_2X if q >= 2 else Viewport.MSAA_DISABLED
 	tod = _resolve_time_of_day()
 	var scenery: StringName = route.scenery if route != null else &"city"
-	WorldEnv.create(self, false, tod, scenery == &"mountain")
+	var world: Dictionary = WorldEnv.create(self, false, tod, scenery == &"mountain")
+	var tunnels: Array[Vector2] = route.tunnels if route != null else ([] as Array[Vector2])
 	var road := RoadMesh.new()
 	add_child(road)
-	road.build(path, scenery, tod)
+	road.build(path, scenery, tod, tunnels)
+	var furniture := RoadFurniture.new()
+	add_child(furniture)
+	furniture.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray())
+	_tunnel = Tunnel3D.new()
+	add_child(_tunnel)
+	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
 	var city := CityBuilder.new()
 	add_child(city)
 	city.build(path, 21, scenery, tod)
 	var side := Roadside3D.new()
 	add_child(side)
-	side.build(path, scenery, tod)
+	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_traffic3d = Traffic3D.new()
@@ -384,6 +392,7 @@ func _process(delta: float) -> void:
 	_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
+	_tunnel.track_player(_player_z(), _trucks[player].global_position)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 	if _autoplay and not _fps_printed and Time.get_ticks_msec() > 6000:
@@ -414,6 +423,7 @@ func _process_online(dt: float) -> void:
 	_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
+	_tunnel.track_player(_player_z(), _trucks[player].global_position)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 

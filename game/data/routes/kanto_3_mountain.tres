@@ -8,6 +8,7 @@ id = &"kanto_3_mountain"
 time_of_day = &"day"
 night = false
 display_key = "route.kanto_3_mountain"
+tunnels = Array[Vector2]([Vector2(2080, 300)])
 places = PackedStringArray("Hakone", "Gotemba", "Fujinomiya", "Numazu", "Kofu")
 freight = 45000
 sections = Array[Dictionary]([{

@@ -88,11 +88,13 @@ const SIGN_COLORS: Array = [Color("#ff2e88"), Color("#21e6ff"), Color("#ffb347")
 
 var path: TrackPath
 var tod: TimeOfDay
+var _deck: float = 0.0
 
 
 func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
 	path = path_
 	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
+	_deck = RoadMesh.deck_height(kind)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
 	_add_ground(kind)
@@ -143,8 +145,9 @@ func _building(rng: RandomNumberGenerator, z: float, yaw: float, side: float, di
 	var wall: Color = Color.from_hsv(rng.randf_range(0.55, 0.75), rng.randf_range(0.15, 0.45), rng.randf_range(0.06, 0.16))
 	wall.a = rng.randf()                                             # estilo das janelas (shader)
 	var by := Basis(Vector3.UP, yaw)
-	blds.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), c + Vector3.UP * (h * 0.5 - 4.0)), wall])
-	var top: float = h - 4.0
+	var sink: float = 4.0 + _deck                                     # base enterrada (abaixo do chao/viaduto)
+	blds.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), c + Vector3.UP * (h * 0.5 - sink)), wall])
+	var top: float = h - sink
 	if rng.randf() < 0.4:                                            # recuo no topo
 		var h2: float = h * rng.randf_range(0.15, 0.35)
 		blds.append([Transform3D(by * Basis.from_scale(Vector3(w * 0.6, h2, d * 0.6)), c + Vector3.UP * (top + h2 * 0.5)), wall])
@@ -255,6 +258,6 @@ func _add_ground(kind: StringName) -> void:
 		m.albedo_color = tod.land_color
 		m.roughness = 0.9
 		mi.material_override = m
-	mi.position = Vector3(0, -1.2, -1400)
+	mi.position = Vector3(0, -1.2 - RoadMesh.deck_height(kind), -1400)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
