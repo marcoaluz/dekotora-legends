@@ -42,11 +42,17 @@ Loop: aceitar frete → correr a rota (bots ou amigos) → entregar → reparar 
 ### Controles
 | Ação | Android | PC teclado | PC controle |
 | --- | --- | --- | --- |
-| Virar | ◀ ▶ à esquerda ou inclinação | A/D ou ←/→ | Analógico esquerdo |
+| Trocar de faixa (toque 1 = seta, toque 2 = troca) | ◀ ▶ grandes à esquerda | A/D ou ←/→ | Analógico esquerdo ou direcional |
 | Acelerar | Botão grande à direita | W ou ↑ | Gatilho direito |
 | Frear | Botão menor à direita | S ou ↓ | Gatilho esquerdo |
 | Passing | Botão redondo | Espaço | A |
 | Pausa | Ícone | Esc | Start |
+
+**Controle por faixas (decisão ATB-1):** 3 faixas + acostamento. O 1º toque para um lado liga a seta (pisca no caminhão e no HUD);
+o 2º toque no mesmo lado em até ~1,5 s executa a troca (~0,7 s, com leve inclinação). Não existe volante livre nem botão de bater:
+trocar para uma faixa ocupada é a batida/empurrão. Nas curvas o caminhão segue a faixa sozinho.
+**Prazo e vitória:** o frete tem prazo que desce desde a largada; vence quem chega primeiro **e** dentro do prazo.
+Câmera só externa (primeira pessoa descartada).
 
 Câmbio automático no MVP. Freio-motor entra sozinho ao soltar o acelerador em alta rotação.
 
