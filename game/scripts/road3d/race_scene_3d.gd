@@ -246,7 +246,7 @@ func _on_net_end(result: Dictionary) -> void:
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
 func _spawn_field() -> void:
-	var xs: Array[float] = [0.25, -0.75, -0.25, 0.75]
+	var xs: Array[float] = Room.GRID_X
 	var rival: RivalDef = null
 	if route != null:
 		rival = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
@@ -284,7 +284,7 @@ func _spawn_field() -> void:
 			t.set_loadout(parts)
 			node.apply_loadout(defs)
 			node.set_paint_color(paint)
-			_bots.append(BotDriver.new(diff, 100 + i, xs[i]))
+			_bots.append(BotDriver.new(diff, 100 + i, xs[i], i == 1 and rival != null))
 		node.set_headlights(tod.headlights)
 		_trucks.append(node)
 		_prev.append(Vector2(t.z, t.x))

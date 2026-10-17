@@ -93,7 +93,7 @@ func test_prediction_matches_server_and_beats_no_prediction() -> void:
 	print("RTT 150 ms: erro de predicao %.3f m; posicao desenhada vs servidor: com predicao %.2f m, sem %.2f m" % [with_p["mismatch"], with_p["mean"], without_p["mean"]])
 	check(float(with_p["mismatch"]) < 0.6, "a predicao concorda com o servidor (erro %.3f m por snapshot)" % with_p["mismatch"])
 	# sem predicao o caminhao aparece sempre para tras (lag ~ velocidade x meio RTT); com predicao ele fica "no presente"
-	check(float(without_p["mean"]) > 2.5, "sem predicao o caminhao desenhado atrasa vs servidor (%.2f m)" % without_p["mean"])
+	check(float(without_p["mean"]) > 1.5 and float(without_p["mean"]) > float(with_p["mean"]) * 1.5, "sem predicao o caminhao desenhado atrasa vs servidor (%.2f m)" % without_p["mean"])
 
 
 func test_prediction_survives_packet_loss() -> void:

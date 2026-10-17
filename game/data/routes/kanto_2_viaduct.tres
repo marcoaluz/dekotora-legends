@@ -40,3 +40,4 @@ sections = Array[Dictionary]([{
 scenery = &"city"
 rival_id = &"rival_urban"
 fame_required = 20
+deadline_s = 130.0

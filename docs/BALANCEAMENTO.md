@@ -117,7 +117,7 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 
 ## Prazo de entrega e vitória (ATB-1, T-101)
 
-- Prazo = comprimento do trecho ÷ 27 m/s (≈ 97 km/h) × 1,2, arredondado (kanto_1 = 133 s, kanto_2 = 122 s, kanto_3 = 124 s). Um trecho pode fixar `deadline_s` no `.tres`; o contrato do Mercado leva o prazo em `deadline_s`.
+- Prazo = comprimento do trecho ÷ 27 m/s (≈ 97 km/h) × 1,2, arredondado (kanto_1 = 133 s). Um trecho pode fixar `deadline_s` no `.tres`: kanto_2 = 130 s e kanto_3 = 150 s (um bot DIFÍCIL leva ~112 s e ~129 s); o contrato do Mercado leva o prazo em `deadline_s`.
 - Vitória = chegar em 1º **e** dentro do prazo. Chegar depois do rival = derrota; prazo esgotado = derrota ("tempo esgotado").
 - Derrota paga **0 ¥** e **0 Fama** (suposição a revisar: ver QUADRO T-101). O dano às peças continua, e o contrato volta a ficar disponível.
 - Curvas (controle por faixas): acima da velocidade segura `sqrt(0,5 × aderência ÷ (|curva| × 7,9e-4))` o caminhão é empurrado para fora da faixa (curva 1,0 = 90 km/h; curva 0,6 = 117 km/h).
@@ -129,3 +129,10 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Penalidade de contato: encostar em outro caminhão ou carro = 0,4% do prêmio × fragilidade; batida = 0,4% × variação de velocidade (m/s) × fragilidade; teto 40%.
 - Tipo de carga (`CargoDef.trait_kind`): **frágil** (cerâmica 2,2 · eletrônicos 1,8: perde mais por batida), **pesada** (aço, madeira: tração × 0,9, além da massa), **perecível** (alimentos: prazo × 0,8), normal (peças industriais).
 - O Mercado de fretes mostra o tipo e o prazo; na contagem regressiva a corrida mostra o aviso da carga.
+
+## Rival de verdade (ATB-1, T-103)
+
+- Sem "borracha": a velocidade desejada do bot nunca depende de quem está na frente ou atrás (só de curva, trânsito e duelo). Teto = 72% / 86% / 97% da velocidade máxima (fácil / normal / difícil).
+- Trava no trânsito: preso atrás de um carro lento, espera 0,8 / 1,0 / 1,6 s (fácil / normal / difícil) antes de tentar sair; o difícil enxerga menos longe (7 m + 1,3 × velocidade) — rápido na reta, mas perde tempo no tráfego.
+- Duelo (rival da rota e bots normal/difícil): ao ficar a menos de 16 m do jogador abre um duelo de 5–9 s (chance por segundo 30% / 50% / 90%): emparelha a velocidade, anda na faixa vizinha e, a cada 1,6–3,2 s, mira a faixa do jogador por 1,4 s (o empurrão é a batida lateral normal). Espelha a seta do jogador: depois de 0,7 / 0,35 / 0,15 s vai para a faixa que ele quer, fechando-a.
+- Bots cancelam uma troca de faixa se aparecer alguém ao lado, exceto quando estão fechando o jogador de propósito.
