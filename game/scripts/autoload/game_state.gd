@@ -50,6 +50,8 @@ func new_profile() -> void:
 		"owned_mech": {"eng_i6_std": true, "turbo_none": true, "exh_std": true},   # motores/turbos/escapes/upgrades comprados
 		"systems": {"engine": 100.0, "steering": 100.0},
 		"paint": "#e9eef5",
+		"decals": [],                                  # adesivos: [{id, slot, x, y, size, color}]
+		"light_pattern": "steady",
 		"routes_done": {},                             # id -> {best_time, best_position}
 		"player_code": _make_player_code(),
 	}

@@ -276,6 +276,7 @@ func _spawn_field() -> void:
 			gs.configure_truck(t)
 			node.apply_loadout(gs.installed_part_defs())
 			node.set_paint_color(Color(String(gs.profile.get("paint", "#e9eef5"))))
+			node.apply_decals(gs.profile.get("decals", []) as Array)
 		else:
 			var defs: Array[PartDef] = []
 			var paint: Color = FIELD_COLORS[i]

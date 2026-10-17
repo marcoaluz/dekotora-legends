@@ -149,3 +149,10 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - As luzinhas de marcação do modelo e das peças (âmbar, amarelo, rosa, ciano) usam um material de shader (`LightPatterns`): **fixas**, **sequencial** (onda correndo pelo comprimento), **alternado** (dois grupos trocando) e **respirando**. Lanterna vermelha e farol branco ficam fixos. Escolha na garagem (aba Decoração > Luzes), gravada em `profile.light_pattern`; os rivais usam um padrão cada.
 - Acendem à noite e no fim de tarde (`tod.headlights`) e dentro dos túneis (`Tunnel3D.amount`); de dia ficam fracas (12%); a prévia de dia da garagem mostra 40%.
 - **Custo medido** (modo médio, rota 1, 75 FPS): 404–409 chamadas de desenho e ~255 mil triângulos, contra 410 e ~257 mil antes. Nenhum custo extra (um material por cor, sem luz real nem script por lâmpada).
+
+## Adesivos, pintura e calotas (ATB-2, T-110)
+
+- **Adesivos** (`DecalCatalog`, `DecalPlacer`): PNG branco/transparente pintado pela cor escolhida; 4 lugares (lateral esq., lateral dir., traseira, cabine = as duas portas); posição X/Y, tamanho e cor ajustáveis na garagem (Decoração > Adesivos). +6 destaque cada. O renderizador Compatibility (celular) não tem o nó Decal, então cada adesivo é um quad colado na superfície (no máx. 5 quads, uma superfície cada).
+- 6 provisórios em `game/assets/decals/` (kanji 爆走, kanji 魂, ondas, raio, estrela, sol; gerados por `python tools/gen_decals.py`). Arte própria: coloque o PNG em `game/assets/decals/` ou em `user://decals/` (guia em `LEIA-ME.md` na pasta).
+- **Calotas** (aba Decoração, slot Calotas): cromadas 8 (já existia), aço com luz ciano 10, cromadas com luz rosa 12 (Fama 10), douradas 16 (Fama 30).
+- Os adesivos e as luzes valem só no aparelho do jogador; no multiplayer os outros jogadores ainda não os veem (falta mandar `decals`/`light_pattern` no descritor da rede).

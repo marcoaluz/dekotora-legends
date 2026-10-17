@@ -22,6 +22,7 @@ var _chips: HBoxContainer
 var _tab_buttons: Dictionary = {}
 var _msg: Label
 var _day_btn: Button
+var _ui_layer: CanvasLayer
 var _preview_cache: Dictionary = {}
 
 
@@ -31,8 +32,11 @@ func _ready() -> void:
 	shop = GarageShop.new(gs, _preview, _flash)
 	stage = GarageStage.new()
 	add_child(stage)
+	shop.live_decals = func(list: Array) -> void: stage.truck.apply_decals(list)
+	shop.focus_view = func(view: String) -> void: stage.focus_view(view)
 	var layer := CanvasLayer.new()
 	add_child(layer)
+	_ui_layer = layer
 	var root := Control.new()
 	root.theme = UiTheme.make()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -141,10 +145,19 @@ func _apply_debug_args() -> void:
 		gs.profile["owned"]["rb_chrome"]["broken"] = true
 		gs.profile["systems"]["engine"] = 55.0
 	for a in args:
-		if a.begins_with("--lights="):
+		if a == "--decals":
+			gs.profile["decals"] = [
+				{"id": "kanji_bakusou", "slot": "side_l", "x": -0.5, "y": 0.0, "size": 0.5, "color": "#f5cc5a"},
+				{"id": "estrela", "slot": "side_r", "x": 0.3, "y": 0.0, "size": 0.45, "color": "#ff2e88"},
+				{"id": "raio", "slot": "rear", "x": 0.0, "y": 0.0, "size": 0.7, "color": "#21e6ff"},
+				{"id": "sol", "slot": "cab", "x": 0.0, "y": 0.1, "size": 0.5, "color": "#ffffff"}]
+			stage.refresh_truck()
+		elif a.begins_with("--lights="):
 			gs.profile["light_pattern"] = a.substr(9)
 			stage.refresh_truck()
 			stage.truck.set_light_pattern(a.substr(9))
+		elif a == "--hideui":
+			_ui_layer.visible = false
 		elif a == "--day":
 			stage.set_daytime(true)
 		elif a.begins_with("--view="):
@@ -202,6 +215,8 @@ func _refresh() -> void:
 			_build_model()
 		"parts":
 			shop.build_deco_header(_left)
+			shop.build_decals(_left)
+			_left.add_child(UiKit.heading(Tr.t("garage.parts").to_upper(), 18, UiTheme.PINK))
 			_build_slots()
 		"mech":
 			shop.build_mech(_left)

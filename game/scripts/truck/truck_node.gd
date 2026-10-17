@@ -36,6 +36,7 @@ var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 var _mural_mat: StandardMaterial3D
+var _decal_nodes: Array[Node3D] = []
 const LIGHTS_OFF_LEVEL: float = 0.12
 var _lamp_mats: Dictionary = {}              # nome do material de luz -> ShaderMaterial animado (um por caminhao)
 var _lights_level: float = 1.0
@@ -104,6 +105,17 @@ func _apply_light_materials(root: Node) -> void:
 				sm.set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
 				_lamp_mats[key] = sm
 			m.set_surface_override_material(s, _lamp_mats[key])
+
+
+## Adesivos (DecalPlacer): lista de {id, slot, x, y, size, color}. Troca tudo de uma vez.
+func apply_decals(decals: Array) -> void:
+	for n in _decal_nodes:
+		if is_instance_valid(n):
+			n.queue_free()
+	_decal_nodes.clear()
+	if model == null:
+		return
+	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)))
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).

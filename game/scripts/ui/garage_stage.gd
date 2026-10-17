@@ -140,6 +140,7 @@ func refresh_truck() -> void:
 	truck.apply_loadout(gs.installed_part_defs())
 	var col: Color = Color(String(gs.profile.get("paint", "#e9eef5")))
 	truck.set_paint_color(col)
+	truck.apply_decals(gs.profile.get("decals", []) as Array)
 	# pecas quebradas/amassadas do perfil
 	for d in gs.installed_part_defs():
 		var own: Dictionary = gs.profile["owned"][String(d.id)]

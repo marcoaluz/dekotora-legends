@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_hub"]
+
+[resource]
+script = ExtResource("1_hub")
+id = &"hub_gold"
+display_key = "part.hub_gold"
+slot = &"hubcaps"
+zones = PackedStringArray("wheels")
+weight_kg = 44.0
+durability = 70.0
+fame = 16
+price = 22000
+fame_required = 30
+accessory_id = "hubcap_decorative"
+variant = {
+"accent": "lamp_pink",
+"main": "paint_gold"
+}
