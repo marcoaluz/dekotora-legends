@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-113 | Ajuste pós-ATB-1: faixas do asfalto alinhadas com a simulação, caminhão centrado na faixa, troca de faixa mais pesada (jeito do original) | pedido do Marco | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-112 | ATB-2 item 6: largada e chegada com clima (corte de câmera lateral 1–2 s, banner, clarão na saída do túnel) | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-111 | ATB-2 item 5: rivais que recusam por fama e destaque mínimos, com fala curta | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-110 | ATB-2 item 4: adesivos/decals em PNG trocáveis (lados, traseira, cabine), 6 provisórios, pasta game/assets/decals/, rodas/calotas | lote ATB-2 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |

@@ -147,7 +147,7 @@ func _road_text(text: String, z: float, lane_x: float, size: int, stretch: float
 
 
 func _markings(L: float, tunnels: Array[Vector2]) -> void:
-	var lanes: Array[float] = [-0.75, -0.25, 0.25, 0.75]
+	var lanes: Array[float] = Lanes.ROAD
 	var prev_sharp: bool = false
 	var z: float = 0.0
 	while z < L:                                                          # antes de cada curva forte

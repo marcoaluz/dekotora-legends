@@ -8,9 +8,13 @@ const FIRST: int = 1                   # primeira faixa de rolagem
 const LAST: int = 3                    # ultima faixa de rolagem
 const SHOULDER_R: int = 4
 const CENTER: int = 2
-const X: Array[float] = [-1.1, -0.6, 0.0, 0.6, 1.1]
-const ROAD: Array[float] = [-0.6, 0.0, 0.6]   # so as faixas de rolagem (transito)
-const SPACING: float = 0.6
+## 3 faixas de 3,6 m (x = 0,5 -> 3,6 m do centro) e acostamento de 1,8 m de cada lado; o caminhao tem 2,5 m, entao
+## fica folgado DENTRO da faixa. Tem que bater com RoadMesh (LANE_W) e as linhas pintadas.
+const X: Array[float] = [-0.875, -0.5, 0.0, 0.5, 0.875]
+const ROAD: Array[float] = [-0.5, 0.0, 0.5]   # so as faixas de rolagem (transito)
+const SPACING: float = 0.5
+const ASPHALT_EDGE: float = 0.75              # borda das faixas (x)
+const OFFROAD_X: float = 0.8                  # alem disto o centro do caminhao ja esta no acostamento (lento)
 
 
 static func nearest(x: float) -> int:

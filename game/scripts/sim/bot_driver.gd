@@ -203,7 +203,7 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 		throttle = 0.3
 	else:
 		brake = clampf((speed - desired) * 0.25, 0.0, 1.0)
-	var off: bool = absf(me.x) > 1.0
+	var off: bool = absf(me.x) > 1.0               # saiu de verdade da pista (alem do acostamento)
 	if off and not _was_off:
 		out_of_road_count += 1
 	_was_off = off

@@ -54,7 +54,7 @@ func test_second_tap_same_side_changes_lane_in_about_0_7s() -> void:
 		sim.step()
 		steps += 1
 	var secs: float = float(steps + 3) * DT          # + os 3 passos que sobram do 2o toque
-	check(secs > 0.5 and secs < 1.2, "troca leva ~0,7 s (levou %.2f s)" % secs)
+	check(secs > 0.8 and secs < 1.6, "troca pesada leva ~1 s (levou %.2f s)" % secs)
 
 
 func test_second_tap_after_window_only_rearms_signal() -> void:
@@ -120,7 +120,7 @@ func test_standing_truck_does_not_slide() -> void:
 func test_changing_into_occupied_lane_pushes_and_hits() -> void:
 	var sim := _straight()
 	var a := sim.add_truck(0.0, 0.0)           # troca para a direita
-	var b := sim.add_truck(0.0, 0.6)           # ocupa a faixa da direita, ao lado
+	var b := sim.add_truck(0.0, 0.5)           # ocupa a faixa da direita, ao lado
 	sim.trucks[a].speed = 25.0
 	sim.trucks[b].speed = 25.0
 	sim.trucks[b].set_mass(6000.0)             # mais leve

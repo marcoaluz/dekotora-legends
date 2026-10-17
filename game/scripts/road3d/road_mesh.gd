@@ -26,6 +26,7 @@ const SEA_DROP: float = 1.6
 const DECK_CITY: float = 9.0                # altura do viaduto na cidade
 const SOUND_BLOCK_M: float = 300.0          # barreira de som em blocos alternados
 const LANE_W: float = 3.6
+const LANES: int = 3                        # 3 faixas de 3,6 m no meio (Lanes.X); o resto ate ROAD_HALF_WIDTH_M e acostamento
 ## Sub-faixas de uma faixa de rolamento (inicio em m, multiplicador de cor): trilhas de roda mais escuras.
 const LANE_BANDS: Array = [[0.0, 1.0], [0.5, 0.74], [1.15, 0.97], [2.45, 0.74], [3.1, 1.0]]
 
@@ -235,8 +236,9 @@ func _build_chunk(s0: int, s1: int) -> void:
 		if tunnel:
 			for side in [-1.0, 1.0]:
 				_barrier(sts["tbarrier"], i, j, BARRIER_IN, side, Color(0.62, 0.52, 0.4) * _lane_tint(i, 9))
-		for lane in 4:                                                      # asfalto: 4 faixas com trilhas de roda
-			var x0: float = -half + float(lane) * LANE_W
+		var asph: float = LANE_W * float(LANES) * 0.5                        # metade da largura das faixas (5,4 m)
+		for lane in LANES:                                                  # asfalto: 3 faixas com trilhas de roda
+			var x0: float = -asph + float(lane) * LANE_W
 			var tint: Color = _lane_tint(i, lane)
 			for b in LANE_BANDS.size():
 				var a0: float = float(LANE_BANDS[b][0])
@@ -244,17 +246,17 @@ func _build_chunk(s0: int, s1: int) -> void:
 				var m: float = float(LANE_BANDS[b][1])
 				_strip(rs, i, j, x0 + a0, x0 + a1, 0.0, 0.0, Color(tint.r * m, tint.g * m, tint.b * m))
 		var shoulder: Color = Color(0.86, 0.86, 0.88) * (_lane_tint(i, 9) if tunnel else Color.WHITE)
-		_strip(rs, i, j, -gw, -half, 0.0, 0.0, shoulder)                     # acostamento (sem zebra)
-		_strip(rs, i, j, half, gw, 0.0, 0.0, shoulder)
+		_strip(rs, i, j, -gw, -asph, 0.0, 0.0, shoulder)                     # acostamento (sem zebra)
+		_strip(rs, i, j, asph, gw, 0.0, 0.0, shoulder)
 		var sharp: bool = absf(path.track.curves[i]) >= RoadFurniture.SHARP_CURVE
-		for lane in [-0.5, 0.0, 0.5]:                                       # divisao de faixas
-			var c: float = lane * half
+		for lane in [-1.0, 1.0]:                                            # divisao de faixas (entre as 3)
+			var c: float = lane * LANE_W * 0.5
 			if sharp:
 				_strip(sts["yline"], i, j, c - 0.08, c + 0.08, 0.02, 0.02)  # amarela continua: nao mude de faixa
 			elif band:
 				_strip(sts["line"], i, j, c - 0.08, c + 0.08, 0.02, 0.02)
 		for side in [-1.0, 1.0]:                                            # linhas continuas de borda
-			var e: float = side * (half - 0.35)
+			var e: float = side * (asph - 0.25)
 			_strip(sts["line"], i, j, e - 0.1, e + 0.1, 0.02, 0.02)
 		_strip(sts["road"], i, j, -BARRIER_IN, -gw, 0.0, 0.0, Color(0.7, 0.7, 0.72))   # faixa ate a mureta
 		if not tunnel:

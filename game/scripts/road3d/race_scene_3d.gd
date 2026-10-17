@@ -571,7 +571,7 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = path.vehicle_transform(z, x, 12.0, -t.lateral_vel * 0.12, t.lean() * 0.07)
+		node.transform = path.vehicle_transform(z, x, 12.0, -t.lateral_vel * 0.1, t.lean() * 0.11)
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 	_traffic3d.refresh()

@@ -11,11 +11,11 @@ const OFFROAD_MAX_SPEED: float = 14.0   # m/s no acostamento
 const OFFROAD_DECEL: float = 8.0        # m/s^2 acima desse limite
 const CURVE_PUSH: float = 7.9e-4        # empurrao da curva: x/s por (m/s)^2 por unidade de curva
 const STEER_SPEED: float = 1.6          # x/s de autoridade maxima de direcao (limite de aderencia nas curvas)
-const STEER_RESPONSE: float = 6.0
+const STEER_RESPONSE: float = 3.2          # inercia lateral: quanto menor, mais pesado o caminhao para sair da faixa
 const LANE_SIGNAL_WINDOW: float = 1.5   # s: 2o toque no mesmo lado dentro desta janela executa a troca
-const LANE_CHANGE_TIME: float = 0.7     # s: duracao nominal da troca de faixa
-const LANE_GAIN: float = 3.4            # 1/s: quanto o x corre atras da faixa alvo
-const LANE_MAX_VEL: float = 1.3         # x/s: velocidade lateral maxima
+const LANE_CHANGE_TIME: float = 1.0     # s: duracao nominal da troca de faixa (pesado, jeito do original)
+const LANE_GAIN: float = 1.9            # 1/s: quanto o x corre atras da faixa alvo
+const LANE_MAX_VEL: float = 0.95        # x/s: velocidade lateral maxima
 const LANE_HOLD: float = 0.5            # aderencia lateral: define a velocidade segura nas curvas (curva 1,0 = 90 km/h)
 const OVERSPEED_PUSH: float = 4.0       # quanto a curva empurra para fora acima da velocidade segura
 const MASS_REF: float = 12000.0
@@ -171,7 +171,7 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	elif speed > EngineModel.MAX_SPEED * 0.7:
 		passing_charge = minf(passing_charge + PASSING_FILL_RATE * dt, 1.0)
 	# 2) acostamento: perde velocidade
-	offroad = absf(x) > 1.0
+	offroad = absf(x) > Lanes.OFFROAD_X
 	if offroad and speed > OFFROAD_MAX_SPEED:
 		speed = maxf(speed - OFFROAD_DECEL * dt, OFFROAD_MAX_SPEED)
 	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho. Na curva so escapa se entrar rapido demais.

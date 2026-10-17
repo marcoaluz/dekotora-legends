@@ -173,3 +173,8 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 
 - **Largada:** 1,6 s antes do "larga" a câmera corta para o lado (15 m, 5 m de altura, lado com menos caminhões) e fica até 0,3 s depois; banner "LARGOU!" (1,3 s). **Chegada:** corte lateral de 1,9 s, banner "CHEGADA! nº LUGAR", e a tela de resultado só aparece 2,6 s depois (1,8 s no tempo esgotado); o caminhão passa da linha freando sozinho e o resultado é fixado no instante da chegada (o que acontece depois não conta).
 - **Clarão na saída do túnel:** tela clareia (mais forte de dia, 80%; à noite, 40%) e some em 0,75 s (`Tunnel3D.exited`, `RaceCinema`).
+
+## Ajuste pós-ATB-1 (T-113): faixas e peso
+
+- **Faixas do asfalto = faixas da simulação:** 3 faixas de 3,6 m (centros em x = −0,5 · 0 · +0,5) e acostamento de 1,8 m de cada lado (x = ±0,875, lento: passou de |x| 0,8 já conta como fora). Antes o asfalto tinha 4 faixas e a linha do meio passava por baixo do caminhão. O caminhão (2,5 m) fica folgado dentro da faixa.
+- **Mais pesado:** troca de faixa ~1 s (era 0,7), inércia lateral maior (`STEER_RESPONSE` 3,2), velocidade lateral máxima 0,95 x/s, inclinação da cabine maior (~6°). Carga e peças pesadas já aumentam a inércia pela aderência (`grip`).

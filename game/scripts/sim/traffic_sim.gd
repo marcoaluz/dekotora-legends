@@ -6,7 +6,7 @@ extends RefCounted
 
 enum Density { LIGHT, NORMAL, HEAVY }
 
-const LANES: Array[float] = [-0.6, 0.0, 0.6]       # = Lanes.ROAD: as 3 faixas de rolagem
+const LANES: Array[float] = [-0.5, 0.0, 0.5]       # = Lanes.ROAD: as 3 faixas de rolagem
 const CAR_LEN: float = 4.5
 const CAR_WIDTH_X: float = 0.27          # 1,9 m em unidades de x
 const TRUCK_LEN: float = 12.0
