@@ -121,3 +121,11 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Vitória = chegar em 1º **e** dentro do prazo. Chegar depois do rival = derrota; prazo esgotado = derrota ("tempo esgotado").
 - Derrota paga **0 ¥** e **0 Fama** (suposição a revisar: ver QUADRO T-101). O dano às peças continua, e o contrato volta a ficar disponível.
 - Curvas (controle por faixas): acima da velocidade segura `sqrt(0,5 × aderência ÷ (|curva| × 7,9e-4))` o caminhão é empurrado para fora da faixa (curva 1,0 = 90 km/h; curva 0,6 = 117 km/h).
+
+## Perda de carga proporcional e tipos de carga (ATB-1, T-102)
+
+- `pagamento = frete × (1 − perda) + bônus de posição + bônus de Fama`, com `perda = 0,4 × (1 − integridade da carga)` (0 a 40%).
+- `integridade = saúde do sistema "carga" (sobra do dano das peças) − penalidade de contato ÷ 0,4`. **O dano das peças e do motor continua igual**; a perda de carga soma.
+- Penalidade de contato: encostar em outro caminhão ou carro = 0,4% do prêmio × fragilidade; batida = 0,4% × variação de velocidade (m/s) × fragilidade; teto 40%.
+- Tipo de carga (`CargoDef.trait_kind`): **frágil** (cerâmica 2,2 · eletrônicos 1,8: perde mais por batida), **pesada** (aço, madeira: tração × 0,9, além da massa), **perecível** (alimentos: prazo × 0,8), normal (peças industriais).
+- O Mercado de fretes mostra o tipo e o prazo; na contagem regressiva a corrida mostra o aviso da carga.

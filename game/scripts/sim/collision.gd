@@ -45,6 +45,9 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 	_contacts[key] = true
 	if started and _clock - float(_last_event.get(key, -99.0)) < EVENT_COOLDOWN:
 		started = false                   # mesmo par encostando de novo logo depois: so empurra, sem novo dano
+	if started:
+		a.cargo_touch()                   # qualquer encostao ja custa um pouco do premio
+		b.cargo_touch()
 	var ev: Dictionary = {}
 	if longitudinal:
 		var back: TruckSim = a if a.z < b.z else b       # o de tras bate com a frente
@@ -82,6 +85,8 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 
 
 func _event(a: TruckSim, b: TruckSim, ia: int, ib: int, zone_a: String, zone_b: String, dv: float) -> Dictionary:
+	a.cargo_hit(dv)
+	b.cargo_hit(dv)
 	_last_event["%d:%d" % [ia, ib]] = _clock
 	var dmg_a: float = DamageModel.impact_damage(dv, b.mass)
 	var dmg_b: float = DamageModel.impact_damage(dv, a.mass)
@@ -107,12 +112,15 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 			continue
 		var started: bool = not _contacts.has(key)
 		_contacts[key] = true
+		if started:
+			truck.cargo_touch()
 		var rear_hit: bool = (pen_z < pen_x or absf(c.x - truck.x) < WIDTH_ALIGNED) and truck.z < c.z
 		var dv: float = maxf(truck.speed - c.speed, 0.0) if rear_hit else absf(truck.lateral_vel) * M_X + 0.2 * absf(truck.speed - c.speed)
 		if started and dv > MIN_EVENT_DV:
 			var zone: String = "front" if rear_hit else ("right" if c.x > truck.x else "left")
 			var dmg: float = DamageModel.impact_damage(dv, car_mass)
 			var broken: Array[String] = DamageModel.apply_impact(truck, zone, dmg)
+			truck.cargo_hit(dv)
 			traffic.hits += 1
 			events.append({"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv,
 				"damage": dmg, "broken": broken})

@@ -20,6 +20,7 @@ var _fx: Fx3D
 var _autoplay: bool = false
 var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
+var _cargo_notice: Array[String] = []
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
 const TIMEOUT_SCREEN_DELAY: float = 1.8
 var _shake: float = 0.0
@@ -70,6 +71,7 @@ func _ready() -> void:
 		if not gs.pending_contract.is_empty():         # contrato do Mercado: o valor dele e o frete da corrida
 			sim.freight = int(gs.pending_contract["reward"])
 		sim.deadline = float(gs.pending_contract.get("deadline_s", 0.0))
+		_cargo_notice = _build_cargo_notice(gs.pending_contract)
 		if sim.deadline <= 0.0 and route != null:
 			sim.deadline = route.deadline()
 	path = TrackPath.new(sim.track)
@@ -568,9 +570,20 @@ func _scrape_sparks(t: TruckSim, dt: float) -> void:
 
 func _update_hud() -> void:
 	_hud.countdown = _countdown
+	_hud.cargo_notice = _cargo_notice
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])
 		_fx.set_smoke(k, _trucks[k], clampf((60.0 - eng) / 60.0, 0.0, 1.0))
+
+
+## Linhas do aviso de carga mostrado na contagem regressiva (contrato do Mercado).
+func _build_cargo_notice(c: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	if c.is_empty() or not c.has("cargo"):
+		return out
+	out.append("%s · %.1f t" % [Tr.t("cargo." + String(c["cargo"])), float(c["weight_t"])])
+	out.append(Tr.t("cargo.trait." + String(c.get("trait", "normal"))))
+	return out
 
 
 func _show_result() -> void:

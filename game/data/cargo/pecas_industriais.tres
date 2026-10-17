@@ -11,3 +11,4 @@ weight_min_t = 6.0
 weight_max_t = 14.0
 pay_mult = 1.0
 fragility = 1.0
+trait_kind = &"normal"

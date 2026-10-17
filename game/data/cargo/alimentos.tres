@@ -11,3 +11,4 @@ weight_min_t = 4.0
 weight_max_t = 10.0
 pay_mult = 1.15
 fragility = 1.2
+trait_kind = &"perishable"

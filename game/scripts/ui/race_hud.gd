@@ -19,6 +19,7 @@ var player: int = 0
 var countdown: float = 0.0
 var banner: String = ""
 var banner_time: float = 0.0
+var cargo_notice: Array[String] = []     # aviso da carga antes da largada (linhas)
 var _hf: Font
 var _bf: Font
 var _panel_sb: StyleBoxFlat
@@ -89,6 +90,7 @@ func _draw() -> void:
 	if countdown > 0.0:
 		_num(Vector2(0, size.y * 0.44), "%d" % int(ceil(countdown)), 72, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
 		_num(Vector2(0, size.y * 0.58), Tr.t("hud.lane_hint"), 11, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
+		_draw_cargo_notice(w)
 	elif banner_time > 0.0:
 		_num(Vector2(0, size.y * 0.36), banner, 26, PINK, HORIZONTAL_ALIGNMENT_CENTER, w)
 
@@ -119,6 +121,17 @@ func _draw_destination(t: TruckSim, w: float) -> void:
 		var f: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
 		var c: Color = PINK if k == player else Color(0.75, 0.82, 1.0, 0.9)
 		draw_rect(Rect2(bar.position.x + bar.size.x * f - 1.5, bar.position.y - 2, 3, 8), c)
+
+
+## Aviso da carga antes da largada: nome, peso e o que muda na direcao (fragil/pesada/pereciv.).
+func _draw_cargo_notice(w: float) -> void:
+	if cargo_notice.is_empty():
+		return
+	var h: float = 14.0 + 13.0 * cargo_notice.size()
+	var r := Rect2(w * 0.5 - 130, 66, 260, h)
+	_panel(r, GOLD)
+	for i in cargo_notice.size():
+		_num(Vector2(r.position.x, r.position.y + 15.0 + 13.0 * i), cargo_notice[i], 11 if i == 0 else 9, GOLD if i == 0 else Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, r.size.x)
 
 
 ## Tempo de viagem (sobe) e prazo de entrega (desce). O prazo fica vermelho e pisca nos ultimos 15 s.

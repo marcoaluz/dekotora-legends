@@ -11,3 +11,4 @@ weight_min_t = 10.0
 weight_max_t = 16.0
 pay_mult = 1.1
 fragility = 0.5
+trait_kind = &"heavy"

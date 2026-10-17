@@ -65,8 +65,8 @@ func _draw() -> void:
 	var rows: Array = [
 		["Tempo", "%d:%05.2f" % [int(t) / 60, fmod(t, 60.0)]],
 		["Prazo", "%d:%02d" % [int(float(_res.get("deadline", 0.0))) / 60, int(float(_res.get("deadline", 0.0))) % 60]],
-		["Integridade da carga", "%d%%" % roundi(float(_res["cargo"]) * 100.0)],
 		["Frete", "%d ¥" % int(_res["freight"])],
+		["Perda de carga (%d%%)" % roundi(float(_res.get("cargo_loss", 0.0)) * 100.0), "-%d ¥" % int(_res.get("cargo_loss_yen", 0))],
 		["Bonus de posicao", "+%d ¥" % int(_res["position_bonus"])],
 		["Ultrapassagens", "%d" % int(_res["overtakes"])],
 		["Fama (Kirameki)", "+%d" % int(_res["fame"])],

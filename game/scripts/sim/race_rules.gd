@@ -29,8 +29,13 @@ static func outcome(truck: TruckSim, position: int) -> String:
 	return "win" if position == 1 else "lose_rival"
 
 
+## Perda do premio por carga estragada: 0..40% (TruckSim.MAX_CARGO_LOSS) conforme a integridade.
+static func cargo_loss(cargo_integrity: float) -> float:
+	return TruckSim.MAX_CARGO_LOSS * (1.0 - clampf(cargo_integrity, 0.0, 1.0))
+
+
 static func payment(freight: int, cargo_integrity: float, position: int, fame: int) -> int:
-	var base: int = roundi(float(freight) * clampf(cargo_integrity, 0.0, 1.0))
+	var base: int = roundi(float(freight) * (1.0 - cargo_loss(cargo_integrity)))
 	return base + position_bonus(freight, position) + fame * FAME_TO_YEN
 
 
@@ -59,6 +64,9 @@ static func build_result(truck: TruckSim, position: int, freight: int, finish_ti
 		"deadline": deadline,
 		"time_left": maxf(deadline - shown_time, 0.0) if deadline > 0.0 else 0.0,
 		"cargo": truck.cargo_integrity(),
+		"cargo_loss": truck.cargo_loss(),
+		"cargo_loss_yen": roundi(float(freight) * truck.cargo_loss()),
+		"cargo_trait": truck.cargo_trait,
 		"freight": freight,
 		"position_bonus": position_bonus(freight, position) if won else 0,
 		"fame": fame,

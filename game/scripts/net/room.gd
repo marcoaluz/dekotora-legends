@@ -245,7 +245,7 @@ func damage_of(idx: int) -> Dictionary:
 	var parts: Array = []
 	for p in t.loadout:
 		parts.append([String(p["id"]), float(p["dur"]), bool(p["broken"])])
-	return {"idx": idx, "parts": parts, "systems": t.systems.duplicate(), "mass": t.mass}
+	return {"idx": idx, "parts": parts, "systems": t.systems.duplicate(), "mass": t.mass, "penalty": t.cargo_penalty}
 
 
 func _finish() -> void:

@@ -11,6 +11,7 @@ extends RefCounted
 const CAPACITY_T: Dictionary = {"leve": 6.0, "base": 12.0, "longo": 16.0}
 const PER_ROUTE: int = 2                     # contratos por trecho liberado
 const CARGO_DIR := "res://data/cargo/"
+const PERISHABLE_DEADLINE: float = 0.8       # perecivel: prazo 20% menor
 
 
 static func capacity_t(body: String) -> float:
@@ -59,7 +60,8 @@ static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, bo
 			out.append({
 				"id": "%s_%d_%d" % [r.id, seed_ % 100000, k], "route": String(r.id),
 				"origin": pl[a], "destination": pl[b], "cargo": String(cargo.id), "weight_t": w,
-				"reward": reward(r, cargo, w), "fragility": cargo.fragility, "deadline_s": r.deadline(),
+				"reward": reward(r, cargo, w), "fragility": cargo.fragility, "trait": String(cargo.trait_kind),
+				"deadline_s": roundf(r.deadline() * (PERISHABLE_DEADLINE if cargo.trait_kind == &"perishable" else 1.0)),
 			})
 	return out
 
@@ -68,4 +70,5 @@ static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, bo
 static func sim_fields(contract: Dictionary) -> Dictionary:
 	if contract.is_empty():
 		return {}
-	return {"cargo_kg": float(contract["weight_t"]) * 1000.0, "cargo_fragility": float(contract.get("fragility", 1.0))}
+	return {"cargo_kg": float(contract["weight_t"]) * 1000.0, "cargo_fragility": float(contract.get("fragility", 1.0)),
+		"cargo_trait": String(contract.get("trait", "normal"))}

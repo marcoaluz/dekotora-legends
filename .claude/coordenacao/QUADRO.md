@@ -7,7 +7,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | T-104 | ATB-1 item 5: pausa (Continuar · Revanche · Desistir, sem escurecer) e barra de progresso com marcador do jogador e do rival | lote ATB-1 | médio | coordenador | fila | 2026-10-17 | |
 | T-103 | ATB-1 item 4: rival de verdade (rápido na reta, trava no trânsito, anda colado, fecha a faixa, sem borracha) | lote ATB-1 | difícil | coordenador | fila | 2026-10-17 | |
-| T-102 | ATB-1 item 3: perda de carga proporcional 0–40% do prêmio e tipos de carga (frágil, pesada, perecível) | lote ATB-1 | difícil | coordenador | fila | 2026-10-17 | |
+| T-102 | ATB-1 item 3: perda de carga proporcional 0–40% do prêmio e tipos de carga (frágil, pesada, perecível) | lote ATB-1 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-101 | ATB-1 item 2: prazo de entrega e regra de vitória/derrota | lote ATB-1 | médio | coordenador | concluída (dúvida: derrota paga 0 ¥ e 0 Fama; risco de ficar sem dinheiro para reparar) | 2026-10-17 | 2026-10-17 |
 | T-100 | ATB-1 item 1: controle por faixas (sim, bots, rede, entrada, HUD, testes) | lote ATB-1 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-099 | ATB-1 item 0: decisões do Marco em DECISOES.md e GDD.md | lote ATB-1 | fácil | coordenador | concluída | 2026-10-17 | 2026-10-17 |

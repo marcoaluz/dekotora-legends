@@ -9,8 +9,8 @@ func _straight(len_m: float = 4000.0) -> Track:
 
 
 func test_payment_formula() -> void:
-	# frete 20000, carga 80%, 1o lugar (+50% do frete), fama 10 -> 16000 + 10000 + 500
-	check_eq(RaceRules.payment(20000, 0.8, 1, 10), 26500, "pagamento")
+	# frete 20000, carga 80% (perda 0,4 x 20% = 8% = 1600), 1o lugar (+50% do frete), fama 10 -> 18400 + 10000 + 500
+	check_eq(RaceRules.payment(20000, 0.8, 1, 10), 28900, "pagamento")
 	check_eq(RaceRules.payment(20000, 1.0, 4, 0), 20000, "4o sem bonus")
 	check_eq(RaceRules.position_bonus(30000, 2), 6000, "2o +20%")
 

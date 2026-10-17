@@ -101,7 +101,10 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 	info.add_theme_constant_override("separation", 0)
 	var title := HBoxContainer.new()
 	title.add_child(UiKit.heading("%s · %s t" % [Tr.t("cargo." + String(c["cargo"])), _num(float(c["weight_t"]))], 21, UiTheme.TEXT if reason == "" else UiTheme.TEXT_DIM))
-	if float(c.get("fragility", 1.0)) >= 1.5:
+	var trait_kind: String = String(c.get("trait", "normal"))
+	if trait_kind in ["fragile", "heavy", "perishable"]:
+		title.add_child(UiKit.heading("  " + Tr.t("market." + trait_kind), 15, UiTheme.WARN))
+	elif float(c.get("fragility", 1.0)) >= 1.5:
 		title.add_child(UiKit.heading("  " + Tr.t("market.fragile"), 15, UiTheme.WARN))
 	info.add_child(title)
 	info.add_child(UiTheme.label("%s  →  %s" % [String(c["origin"]), String(c["destination"])], 16, UiTheme.TEXT))
@@ -112,7 +115,8 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 	var val: Label = UiKit.heading(Tr.yen(int(c["reward"])), 24, UiTheme.GOLD)
 	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(val)
-	var km: Label = UiTheme.label("%.1f km" % route_km(r), 15, UiTheme.TEXT_DIM)
+	var dl: int = int(float(c.get("deadline_s", r.deadline())))
+	var km: Label = UiTheme.label("%.1f km  ·  %d:%02d" % [route_km(r), dl / 60, dl % 60], 15, UiTheme.TEXT_DIM)
 	km.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(km)
 	h.add_child(money)

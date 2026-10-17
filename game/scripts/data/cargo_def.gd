@@ -10,3 +10,5 @@ extends Resource
 @export var weight_max_t: float = 10.0
 @export var pay_mult: float = 1.0
 @export var fragility: float = 1.0
+## fragile = perde mais prêmio por batida · heavy = acelera menos · perishable = prazo 20% menor · normal
+@export var trait_kind: StringName = &"normal"

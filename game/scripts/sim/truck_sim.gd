@@ -26,6 +26,10 @@ const PASSING_FILL_RATE: float = 0.04   # por segundo, em velocidade alta (> 70%
 const PASSING_DRAIN_RATE: float = 0.35  # por segundo enquanto o botao esta apertado
 const DRAFT_BOOST: float = 0.2          # +20% de tracao com vacuo total
 const DRAFT_SPEED_BONUS: float = 2.0    # m/s acima da velocidade maxima com vacuo total
+const MAX_CARGO_LOSS: float = 0.4       # a carga estragada tira no maximo 40% do premio (ATB-1)
+const CARGO_HIT_LOSS: float = 0.004     # fracao do premio por m/s de impacto (x fragilidade)
+const CARGO_TOUCH_LOSS: float = 0.004   # encostar em alguem (sem dano) ja custa um pouco
+const HEAVY_ACCEL: float = 0.9          # carga pesada: a tracao rende 10% menos
 
 var z: float = 0.0
 var x: float = 0.0
@@ -56,6 +60,8 @@ var lane_change_time: float = 0.0       # s restantes da troca em andamento (inc
 var tap_prev: int = 0                   # direcao do comando anterior (detecta o toque)
 var lane_changes: int = 0               # trocas executadas (testes/estatistica)
 var side_hits: int = 0                  # batidas laterais (riscam murais)
+var cargo_trait: String = "normal"   # fragile | heavy | perishable | normal (muda a fisica/prazo)
+var cargo_penalty: float = 0.0          # perda de premio por contato/batida (fracao 0..MAX_CARGO_LOSS)
 var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (eletronicos/ceramica > 1)
 
 
@@ -73,8 +79,23 @@ func set_loadout(parts: Array[Dictionary]) -> void:
 	refresh_damage_effects()
 
 
+## Integridade da carga 0..1: o dano que passou das pecas (sistema "cargo") MAIS os contatos/batidas.
+## Perda do premio = MAX_CARGO_LOSS x (1 - integridade).
 func cargo_integrity() -> float:
-	return float(systems["cargo"]) / 100.0
+	return clampf(float(systems["cargo"]) / 100.0 - cargo_penalty / MAX_CARGO_LOSS, 0.0, 1.0)
+
+
+func cargo_loss() -> float:
+	return MAX_CARGO_LOSS * (1.0 - cargo_integrity())
+
+
+## Batida com variacao de velocidade `dv` (m/s): a carga sofre (mais se for fragil).
+func cargo_hit(dv: float) -> void:
+	cargo_penalty = minf(cargo_penalty + dv * CARGO_HIT_LOSS * cargo_fragility, MAX_CARGO_LOSS)
+
+
+func cargo_touch() -> void:
+	cargo_penalty = minf(cargo_penalty + CARGO_TOUCH_LOSS * cargo_fragility, MAX_CARGO_LOSS)
 
 
 ## Recalcula os efeitos mecanicos do dano (potencia do motor, puxao da direcao).
@@ -134,6 +155,8 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	var force: float = engine.step(dt, cmd.throttle, speed, draft * DRAFT_SPEED_BONUS)
 	if force > 0.0:
 		force *= 1.0 + DRAFT_BOOST * draft
+		if cargo_trait == "heavy":
+			force *= HEAVY_ACCEL
 	var resist: float = DRAG * speed * speed + ROLLING_RESISTANCE * mass * GRAVITY
 	if speed > 0.0:
 		force -= resist

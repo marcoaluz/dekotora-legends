@@ -183,6 +183,7 @@ func apply_damage(d: Dictionary) -> void:
 	for k in d["systems"]:
 		t.systems[k] = float(d["systems"][k])
 	t.mass = float(d["mass"])
+	t.cargo_penalty = float(d.get("penalty", 0.0))
 	t.refresh_damage_effects()
 
 
