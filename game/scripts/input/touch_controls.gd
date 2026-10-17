@@ -26,8 +26,8 @@ func _ready() -> void:
 func layout() -> void:
 	var s: float = Settings.touch_scale
 	_buttons = {
-		"left": {"center": Vector2(46, 228), "radius": 30.0 * s},
-		"right": {"center": Vector2(118, 228), "radius": 30.0 * s},
+		"left": {"center": Vector2(52, 220), "radius": 38.0 * s},
+		"right": {"center": Vector2(146, 220), "radius": 38.0 * s},
 		"throttle": {"center": Vector2(425, 215), "radius": 40.0 * s},
 		"brake": {"center": Vector2(350, 238), "radius": 26.0 * s},
 		"passing": {"center": Vector2(432, 135), "radius": 24.0 * s},

@@ -64,8 +64,7 @@ func _show(id: String) -> void:
 	match id:
 		"controls":
 			_slider(Tr.t("options.touch_size"), _s.touch_scale, 0.7, 1.5, 0.05, func(v: float) -> void: _s.touch_scale = v, true)
-			_toggle(Tr.t("options.tilt"), _s.use_tilt, func(on: bool) -> void: _s.use_tilt = on)
-			_toggle(Tr.t("options.tilt_invert"), _s.tilt_invert, func(on: bool) -> void: _s.tilt_invert = on)
+			_hint("Troca de faixa: toque uma vez no lado para ligar a seta, toque de novo para trocar.")
 		"graphics":
 			_choice("Qualidade gráfica", ["Baixa", "Média", "Alta"], _s.quality, func(i: int) -> void: _s.quality = i)
 			_hint("Baixa = mais FPS no celular; Alta = mais reflexos e luzes.")

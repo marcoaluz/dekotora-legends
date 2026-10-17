@@ -13,12 +13,17 @@ const M_X: float = Track.ROAD_HALF_WIDTH_M   # metros por unidade de x
 const WIDTH_ALIGNED: float = 0.1         # |dx| abaixo disso = alinhados: batida de frente/traseira
 const SEPARATION_PUSH: float = 2.0        # x/s empurrando os dois para longe enquanto sobrepostos
 
+const EVENT_COOLDOWN: float = 0.8         # s: encostar de novo no mesmo par nao repete dano antes disto
+
 var _contacts: Dictionary = {}            # "i:j" -> true enquanto encostados
+var _clock: float = 0.0
+var _last_event: Dictionary = {}          # "i:j" -> instante do ultimo dano
 
 
 ## Resolve todos os pares de caminhoes. Devolve a lista de eventos novos.
 func resolve_trucks(trucks: Array[TruckSim], dt: float) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
+	_clock += dt
 	for i in trucks.size():
 		for j in range(i + 1, trucks.size()):
 			var key: String = "%d:%d" % [i, j]
@@ -38,6 +43,8 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 	var longitudinal: bool = pen_z < pen_x or absf(dx) < WIDTH_ALIGNED
 	var started: bool = not _contacts.has(key)
 	_contacts[key] = true
+	if started and _clock - float(_last_event.get(key, -99.0)) < EVENT_COOLDOWN:
+		started = false                   # mesmo par encostando de novo logo depois: so empurra, sem novo dano
 	var ev: Dictionary = {}
 	if longitudinal:
 		var back: TruckSim = a if a.z < b.z else b       # o de tras bate com a frente
@@ -75,6 +82,7 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 
 
 func _event(a: TruckSim, b: TruckSim, ia: int, ib: int, zone_a: String, zone_b: String, dv: float) -> Dictionary:
+	_last_event["%d:%d" % [ia, ib]] = _clock
 	var dmg_a: float = DamageModel.impact_damage(dv, b.mass)
 	var dmg_b: float = DamageModel.impact_damage(dv, a.mass)
 	var broken_a: Array[String] = DamageModel.apply_impact(a, zone_a, dmg_a)

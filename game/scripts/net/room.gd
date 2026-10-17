@@ -4,7 +4,7 @@ extends RefCounted
 ## o servidor (server_main.gd) entrega comandos e le snapshots/eventos. Isso permite testar tudo
 ## sem abrir portas (tests/test_net_room.gd).
 
-const GRID_X: Array[float] = [0.25, -0.75, -0.25, 0.75]
+const GRID_X: Array[float] = [0.0, -0.6, 0.6, 0.0]   # faixas do grid (centro, esq., dir., centro)
 const GRID_GAP: float = 14.0
 const END_AFTER_FIRST_FINISH: float = 30.0     # s para os outros chegarem depois do primeiro humano
 

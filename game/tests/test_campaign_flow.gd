@@ -8,7 +8,7 @@ func _run_route(route_id: String) -> Dictionary:
 	var sim := RaceSim.new(route.build_track(), route.traffic)
 	sim.freight = route.freight
 	var drivers: Array[BotDriver] = []
-	var xs: Array[float] = [0.25, -0.75, -0.25, 0.75]
+	var xs: Array[float] = Room.GRID_X
 	for i in 4:
 		sim.add_truck(-float(i) * 14.0, xs[i])
 		var t: TruckSim = sim.trucks[i]

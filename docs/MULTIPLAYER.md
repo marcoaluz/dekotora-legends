@@ -43,6 +43,9 @@ quando muda.
 
 - **Predição**: o cliente roda a simulação do próprio caminhão com os próprios comandos, sem esperar o servidor.
   Quando chega um snapshot, ele corrige: volta ao estado do servidor e reaplica os comandos ainda não confirmados.
+- **Faixas (ATB-1)**: o comando `steer` é a direção SEGURADA (-1/0/+1); a simulação detecta o toque (borda 0 → lado).
+  Por isso o snapshot leva também faixa alvo, seta, tempo da seta, toque anterior e tempo de troca (5 bytes por caminhão),
+  senão a predição do cliente discordaria do servidor.
 - **Interpolação**: os outros caminhões são desenhados ~100 ms no passado, entre dois snapshots, para não tremer.
 - **Colisão**: o cliente pode mostrar a batida na hora (faísca, som), mas o **dano** só vale o que o servidor mandar.
 

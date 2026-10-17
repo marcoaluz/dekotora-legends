@@ -33,6 +33,7 @@ func add_truck(start_z: float = 0.0, start_x: float = 0.0) -> int:
 	var t := TruckSim.new()
 	t.z = start_z
 	t.x = start_x
+	t.lane = Lanes.nearest(start_x)
 	trucks.append(t)
 	commands.append(Commands.new())
 	return trucks.size() - 1

@@ -87,6 +87,7 @@ func _draw() -> void:
 		_lbl(Vector2(w * 0.5 - 20, 52), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
 	if countdown > 0.0:
 		_num(Vector2(0, size.y * 0.44), "%d" % int(ceil(countdown)), 72, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
+		_num(Vector2(0, size.y * 0.58), Tr.t("hud.lane_hint"), 11, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
 	elif banner_time > 0.0:
 		_num(Vector2(0, size.y * 0.36), banner, 26, PINK, HORIZONTAL_ALIGNMENT_CENTER, w)
 
@@ -160,10 +161,25 @@ func _draw_dash(t: TruckSim, w: float) -> void:
 		var a: float = a0 + span * i / 6.0
 		draw_line(c + Vector2.from_angle(a) * (rad - 6), c + Vector2.from_angle(a) * (rad - 3), Color(1, 1, 1, 0.4), 1.0)
 	_lbl(Vector2(c.x - 15, c.y + 3), "RPM", 7, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 30.0)
+	_draw_lane_signal(t, cx, r.position.y - 9.0)
 	if t.draft > 0.1:                                # chip de vacuo acima do painel
-		var dr := Rect2(cx - 24, r.position.y - 14, 48, 11)
+		var dr := Rect2(cx - 24, r.position.y - 27, 48, 11)
 		draw_style_box(_panel_sb, dr)
 		_lbl(Vector2(dr.position.x, dr.position.y + 8.5), Tr.t("hud.draft"), 7, CYAN, HORIZONTAL_ALIGNMENT_CENTER, dr.size.x)
+
+
+## Setas de faixa: a do lado escolhido pisca em ambar enquanto o 2o toque ainda vale; pontos mostram a faixa atual.
+func _draw_lane_signal(t: TruckSim, cx: float, y: float) -> void:
+	var blink: bool = int(Time.get_ticks_msec() / 160) % 2 == 0
+	for side in [-1, 1]:
+		var on: bool = t.signal_dir == side
+		var col: Color = Color("#ffa30d") if on and blink else (Color(1, 1, 1, 0.16) if not on else Color(1, 1, 1, 0.3))
+		var c := Vector2(cx + side * 50.0, y)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(side * 7.0, 0), c + Vector2(-side * 4.0, -6), c + Vector2(-side * 4.0, 6)]), col)
+	for i in 5:
+		var lc := Vector2(cx - 12.0 + i * 6.0, y)
+		var cur: bool = i == t.lane
+		draw_circle(lc, 2.2 if cur else 1.4, Color.WHITE if cur else Color(1, 1, 1, 0.3))
 
 
 ## Caminhao visto de cima, com as 4 zonas coloridas pelo dano + motor (M) e direcao (D).

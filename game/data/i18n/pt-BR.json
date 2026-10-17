@@ -48,6 +48,7 @@
  "hud.gear": "MARCHA",
  "hud.draft": "VÁCUO",
  "hud.overtake": "ULTRAPASSAGEM!",
+ "hud.lane_hint": "TOQUE: LIGA A SETA  ·  TOQUE DE NOVO: TROCA DE FAIXA",
  "hud.finish": "CHEGADA! %dº LUGAR",
  "garage.title": "GARAGEM",
  "garage.parts": "PEÇAS",

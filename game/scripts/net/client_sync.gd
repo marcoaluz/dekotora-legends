@@ -116,6 +116,7 @@ func _copy_state(tr: TruckSim, st: Dictionary) -> void:
 	tr.draft = float(st["draft"])
 	tr.offroad = bool(st["offroad"])
 	tr.passing_active = bool(st["passing"])
+	Snapshot._apply_lane(tr, st)
 	if bool(st["finished"]) and tr.finish_position == 0:
 		tr.finish_position = 1
 
@@ -156,6 +157,7 @@ func interpolate(now_ms: int, dt: float) -> void:
 		ts.offroad = bool(tb["offroad"])
 		ts.draft = float(tb["draft"])
 		ts.passing_charge = float(tb["passing_charge"])
+		Snapshot._apply_lane(ts, tb)
 		if bool(tb["finished"]) and ts.finish_position == 0:
 			ts.finish_position = 1
 	if sim.traffic != null:

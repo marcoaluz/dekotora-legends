@@ -36,6 +36,7 @@ var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 var _mural_mat: StandardMaterial3D
+var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 traseira-esq., 3 traseira-dir.
 
 
 func _ready() -> void:
@@ -49,6 +50,7 @@ func _ready() -> void:
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
+	_build_blinkers()
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
 		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
@@ -62,6 +64,37 @@ func _ready() -> void:
 	_headlight.shadow_enabled = false
 	_headlight.visible = int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1
 	add_child(_headlight)
+
+
+## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
+func _build_blinkers() -> void:
+	var front_z: float = -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0))
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(1.0, 0.62, 0.05)
+	mat.emission_enabled = true
+	mat.emission = Color(1.0, 0.55, 0.0)
+	mat.emission_energy_multiplier = 5.0
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var box := BoxMesh.new()
+	box.size = Vector3(0.34, 0.2, 0.14)
+	box.material = mat
+	for i in 4:
+		var m := MeshInstance3D.new()
+		m.mesh = box
+		var side: float = -1.0 if i % 2 == 0 else 1.0
+		m.position = Vector3(side * 1.22, 0.95 if i < 2 else 1.05, front_z if i < 2 else 0.12)
+		m.visible = false
+		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(m)
+		_blinkers.append(m)
+
+
+## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada), ~3 vezes por segundo.
+func set_signal(dir: int) -> void:
+	var on: bool = dir != 0 and int(Time.get_ticks_msec() / 160) % 2 == 0
+	for i in _blinkers.size():
+		var side: int = -1 if i % 2 == 0 else 1
+		_blinkers[i].visible = on and side == dir
 
 
 ## Gira as rodas e aplica a escala de velocidade; `dt` em segundos reais.
