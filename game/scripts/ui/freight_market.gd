@@ -109,6 +109,13 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 	info.add_child(title)
 	info.add_child(UiTheme.label("%s  →  %s" % [String(c["origin"]), String(c["destination"])], 16, UiTheme.TEXT))
 	info.add_child(UiTheme.label("%s  ·  %s" % [Tr.t("route." + String(c["route"])), Tr.t("scenery." + String(r.scenery))], 13, UiTheme.TEXT_DIM))
+	var refusal: Dictionary = _gs.rival_refusal(String(c["route"]))
+	if not bool(refusal.get("ok", true)):
+		var rl: Label = UiTheme.label("%s: “%s”" % [String(refusal["name"]), String(refusal["line"])], 14, UiTheme.WARN)
+		rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rl.custom_minimum_size = Vector2(420, 0)
+		info.add_child(rl)
+		info.add_child(UiTheme.label(Tr.t("market.rival_needs", [int(refusal["min_fame"]), int(refusal["min_destaque"]), _gs.fame(), _gs.destaque()]), 12, UiTheme.TEXT_DIM))
 	h.add_child(info)
 	var money := VBoxContainer.new()
 	money.add_theme_constant_override("separation", -2)

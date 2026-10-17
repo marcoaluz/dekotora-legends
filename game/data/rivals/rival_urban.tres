@@ -9,3 +9,6 @@ display_name = "Dragao de Aco"
 paint = Color(0.22745098, 0.4509804, 0.8392157, 1)
 part_ids = PackedStringArray("fb_chrome_steps", "roof_lights_row", "rb_basic")
 taunt_key = "rival.rival_urban.taunt"
+min_fame = 20
+min_destaque = 40
+refuse_key = "rival.rival_urban.refuse"

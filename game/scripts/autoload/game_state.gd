@@ -679,7 +679,23 @@ func capacity_t() -> float:
 func contract_block_reason(c: Dictionary) -> String:
 	if float(c["weight_t"]) > capacity_t():
 		return "BAÚ PEQUENO"
+	if not bool(rival_refusal(String(c.get("route", ""))).get("ok", true)):
+		return "RIVAL RECUSA"
 	return ""
+
+
+## O rival do trecho aceita o desafio? Exige Fama e destaque minimos. Devolve {ok, name, line, min_fame, min_destaque}.
+## `line` e a fala curta de recusa (vazia se aceitou).
+func rival_refusal(route_id: String) -> Dictionary:
+	var rd: RouteDef = load("res://data/routes/%s.tres" % route_id) as RouteDef if ResourceLoader.exists("res://data/routes/%s.tres" % route_id) else null
+	if rd == null or String(rd.rival_id) == "":
+		return {"ok": true}
+	var rv: RivalDef = load("res://data/rivals/%s.tres" % rd.rival_id) as RivalDef
+	if rv == null:
+		return {"ok": true}
+	var ok: bool = fame() >= rv.min_fame and destaque() >= rv.min_destaque
+	return {"ok": ok, "name": rv.display_name, "min_fame": rv.min_fame, "min_destaque": rv.min_destaque,
+		"line": "" if ok else Tr.t(rv.refuse_key) if rv.refuse_key != "" else "..."}
 
 
 ## Aceita o contrato: a proxima corrida usa o trecho, o valor e a carga dele.

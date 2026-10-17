@@ -122,6 +122,9 @@ func _continue() -> void:
 		_show_market()
 		return
 	var gs: Node = get_node("/root/GameState")
+	if not bool(gs.rival_refusal(String(r.id)).get("ok", true)):   # o rival recusa: o mercado mostra a fala e o que falta
+		_show_market()
+		return
 	gs.pending_route = r
 	for c in gs.contract_board():                 # usa o melhor contrato do trecho que cabe no bau
 		if String(c["route"]) == String(r.id) and gs.contract_block_reason(c) == "":

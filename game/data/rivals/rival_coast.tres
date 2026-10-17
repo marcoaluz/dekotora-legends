@@ -10,3 +10,6 @@ difficulty = 0
 paint = Color(1, 0.43529412, 0.69411767, 1)
 part_ids = PackedStringArray("fb_basic", "rb_basic")
 taunt_key = "rival.rival_coast.taunt"
+min_fame = 0
+min_destaque = 0
+refuse_key = "rival.rival_coast.refuse"

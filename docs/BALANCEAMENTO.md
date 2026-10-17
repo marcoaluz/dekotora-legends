@@ -156,3 +156,15 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - 6 provisórios em `game/assets/decals/` (kanji 爆走, kanji 魂, ondas, raio, estrela, sol; gerados por `python tools/gen_decals.py`). Arte própria: coloque o PNG em `game/assets/decals/` ou em `user://decals/` (guia em `LEIA-ME.md` na pasta).
 - **Calotas** (aba Decoração, slot Calotas): cromadas 8 (já existia), aço com luz ciano 10, cromadas com luz rosa 12 (Fama 10), douradas 16 (Fama 30).
 - Os adesivos e as luzes valem só no aparelho do jogador; no multiplayer os outros jogadores ainda não os veem (falta mandar `decals`/`light_pattern` no descritor da rede).
+
+## Rivais que recusam (ATB-2, T-111)
+
+| Rival | Trecho | Fama mínima | Destaque mínimo |
+| --- | --- | --- | --- |
+| Trovão Rosa (provisório) | kanto_1 | 0 | 0 |
+| Dragão de Aço (provisório) | kanto_2 | 20 | 40 |
+| Imperador da Estrada (chefe) | kanto_3 | 60 | 140 |
+| (montanha, sem trecho ainda) | — | 40 | 90 |
+
+- `GameState.rival_refusal(route_id)`; recusa = contrato do trecho bloqueado ("RIVAL RECUSA") no Mercado de fretes, que mostra a fala curta do rival e o que falta (Fama e destaque). O botão Continuar do menu abre o Mercado quando o próximo rival recusa.
+- Valores são propostas; ajustar jogando. Falas em `game/data/i18n/pt-BR.json` (`rival.<id>.refuse`).

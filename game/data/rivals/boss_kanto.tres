@@ -11,3 +11,6 @@ paint = Color(0.9607843, 0.8, 0.3529412, 1)
 part_ids = PackedStringArray("fb_gold_wing", "skirt_chrome", "rb_chrome", "roof_lights_crown", "andon_kanji")
 boss = true
 taunt_key = "rival.boss_kanto.taunt"
+min_fame = 60
+min_destaque = 140
+refuse_key = "rival.boss_kanto.refuse"

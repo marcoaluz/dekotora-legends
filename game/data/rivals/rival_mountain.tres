@@ -9,3 +9,6 @@ display_name = "Lua Cromada"
 paint = Color(0.24705882, 0.69803923, 0.43529412, 1)
 part_ids = PackedStringArray("fb_chrome_steps", "skirt_chrome", "rb_chrome")
 taunt_key = "rival.rival_mountain.taunt"
+min_fame = 40
+min_destaque = 90
+refuse_key = "rival.rival_mountain.refuse"
