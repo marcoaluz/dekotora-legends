@@ -31,3 +31,6 @@ builds/
 # Segredos (chaves de API) - NUNCA commitar
 .chaves.env
 *.env
+
+# Videos e quadros de referencia (analise de outros jogos) - nunca commitar
+referencias/
