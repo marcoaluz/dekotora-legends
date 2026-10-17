@@ -209,6 +209,9 @@
  "repair.steering": "Direção",
  "race.paused": "JOGO EM PAUSA",
  "race.resume": "CONTINUAR",
+ "race.rematch": "REVANCHE",
+ "race.giveup": "DESISTIR",
+ "hud.rival": "RIVAL",
  "race.exit": "SAIR PARA O MENU",
  "race.quit_game": "SAIR DO JOGO"
 }

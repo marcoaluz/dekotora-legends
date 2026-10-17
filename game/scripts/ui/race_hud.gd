@@ -19,6 +19,7 @@ var player: int = 0
 var countdown: float = 0.0
 var banner: String = ""
 var banner_time: float = 0.0
+var rival_idx: int = -1                  # indice do rival da rota (marcador dourado na barra de progresso)
 var cargo_notice: Array[String] = []     # aviso da carga antes da largada (linhas)
 var _hf: Font
 var _bf: Font
@@ -117,10 +118,22 @@ func _draw_destination(t: TruckSim, w: float) -> void:
 	draw_rect(bar, Color(1, 1, 1, 0.12))
 	var f_me: float = clampf(t.z / sim.finish_z, 0.0, 1.0)
 	draw_rect(Rect2(bar.position, Vector2(bar.size.x * f_me, bar.size.y)), Color(CYAN, 0.55))
-	for k in sim.trucks.size():                      # marcadores de todos (rosa = voce)
-		var f: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
-		var c: Color = PINK if k == player else Color(0.75, 0.82, 1.0, 0.9)
-		draw_rect(Rect2(bar.position.x + bar.size.x * f - 1.5, bar.position.y - 2, 3, 8), c)
+	for k in sim.trucks.size():                      # os outros ficam discretos; voce (rosa) e o rival (dourado) aparecem
+		if k == player or k == rival_idx:
+			continue
+		var fo: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
+		draw_rect(Rect2(bar.position.x + bar.size.x * fo - 1.0, bar.position.y - 1, 2, 6), Color(0.75, 0.82, 1.0, 0.55))
+	if rival_idx >= 0 and rival_idx < sim.trucks.size():
+		var fr: float = clampf(sim.trucks[rival_idx].z / sim.finish_z, 0.0, 1.0)
+		var rx: float = bar.position.x + bar.size.x * fr
+		draw_rect(Rect2(rx - 1.5, bar.position.y - 3, 3, 10), GOLD)
+		draw_colored_polygon(PackedVector2Array([Vector2(rx - 3, bar.position.y + 8), Vector2(rx + 3, bar.position.y + 8), Vector2(rx, bar.position.y + 4)]), GOLD)
+		var gap_m: float = sim.trucks[rival_idx].z - t.z
+		var gap_txt: String = "%s %s%d m" % [Tr.t("hud.rival"), "+" if gap_m >= 0.0 else "-", int(absf(gap_m))]
+		_lbl(Vector2(r.position.x, 17), gap_txt, 8, GOLD if gap_m >= 0.0 else OK_COL, HORIZONTAL_ALIGNMENT_CENTER, r.size.x)
+	var fm: float = f_me
+	draw_rect(Rect2(bar.position.x + bar.size.x * fm - 2.0, bar.position.y - 3, 4, 10), PINK)
+	draw_colored_polygon(PackedVector2Array([Vector2(bar.position.x + bar.size.x * fm - 3, bar.position.y - 5), Vector2(bar.position.x + bar.size.x * fm + 3, bar.position.y - 5), Vector2(bar.position.x + bar.size.x * fm, bar.position.y - 1)]), PINK)
 
 
 ## Aviso da carga antes da largada: nome, peso e o que muda na direcao (fragil/pesada/pereciv.).

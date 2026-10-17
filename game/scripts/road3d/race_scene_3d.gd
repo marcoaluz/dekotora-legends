@@ -300,11 +300,7 @@ func _build_pause_menu() -> void:
 	root.theme = UiTheme.make()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pause_layer.add_child(root)
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.6)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(dim)
-	# tela de pausa: titulo + 4 blocos com icone (continuar, opcoes, menu, sair do jogo)
+	# tela de pausa SEM escurecer a corrida (ATB-1): titulo + 3 blocos com icone (continuar, revanche, desistir)
 	var col := VBoxContainer.new()
 	col.position = Vector2(150, 140)
 	col.custom_minimum_size = Vector2(660, 0)
@@ -318,6 +314,8 @@ func _build_pause_menu() -> void:
 	col.add_child(ic)
 	var title: Label = UiKit.heading(Tr.t("race.paused"), 36)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	title.add_theme_constant_override("outline_size", 8)
 	col.add_child(title)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -325,11 +323,8 @@ func _build_pause_menu() -> void:
 	col.add_child(row)
 	var tiles: Array = [
 		[Tr.t("race.resume"), "play", _toggle_pause],
-		[Tr.t("menu.settings"), "settings", _pause_options],
-		[Tr.t("race.exit"), "house", func() -> void:
-			get_tree().paused = false
-			SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn")],
-		[Tr.t("race.quit_game"), "log-out", func() -> void: get_tree().quit()],
+		[Tr.t("race.rematch"), "rotate-ccw", _rematch],
+		[Tr.t("race.giveup"), "flag", _give_up],
 	]
 	_pause_first = null
 	for t in tiles:
@@ -345,7 +340,23 @@ func _build_pause_menu() -> void:
 		if _pause_first == null:
 			_pause_first = b
 			b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.22), UiTheme.PINK, 1, 10, 10))
+	var opt: Button = UiTheme.button(Tr.t("menu.settings"), Vector2(220, 40))
+	opt.pressed.connect(_pause_options)
+	opt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	col.add_child(opt)
 	_pause_root = root
+
+
+## Revanche: recomeca a mesma corrida (mesma rota e contrato); o dano so entra no perfil ao terminar, entao volta ao estado de antes.
+func _rematch() -> void:
+	get_tree().paused = false
+	SceneFader.go(get_tree(), "res://scenes/race/race3d.tscn")
+
+
+## Desistir: sai para o menu sem resultado (nada e pago e o contrato continua no quadro).
+func _give_up() -> void:
+	get_tree().paused = false
+	SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn")
 
 
 ## Opcoes durante a pausa (mesma tela do menu; volume e controles valem na hora).
@@ -570,6 +581,7 @@ func _scrape_sparks(t: TruckSim, dt: float) -> void:
 
 func _update_hud() -> void:
 	_hud.countdown = _countdown
+	_hud.rival_idx = _rival_idx[0] if not _rival_idx.is_empty() else -1
 	_hud.cargo_notice = _cargo_notice
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])
