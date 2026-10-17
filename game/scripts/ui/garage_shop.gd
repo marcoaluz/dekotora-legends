@@ -150,6 +150,25 @@ func build_deco_header(box: VBoxContainer) -> void:
 			gs.profile_changed.emit())
 		grid.add_child(b)
 	box.add_child(wl(Tr.t("garage.paint_hint"), 12, UiTheme.TEXT_DIM))
+	box.add_child(UiKit.heading(Tr.t("garage.lights").to_upper(), 18, UiTheme.PINK))
+	var cur_pat: String = String(gs.profile.get("light_pattern", "steady"))
+	var row := GridContainer.new()
+	row.columns = 2
+	row.add_theme_constant_override("h_separation", 6)
+	row.add_theme_constant_override("v_separation", 6)
+	box.add_child(row)
+	for id in LightPatterns.IDS:
+		var on: bool = id == cur_pat
+		var pb: Button = UiTheme.button(Tr.t(LightPatterns.label_key(id)) + ("  ✔" if on else ""), Vector2(0, 38))
+		pb.add_theme_font_size_override("font_size", 15)
+		pb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		pb.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.2) if on else Color(1, 1, 1, 0.04), UiTheme.PINK if on else Color(1, 1, 1, 0.12), 1, 8, 8))
+		pb.pressed.connect(func() -> void:
+			gs.profile["light_pattern"] = id
+			gs.save_profile()
+			AudioBus.play_ui("ui_select")
+			gs.profile_changed.emit())
+		row.add_child(pb)
 	box.add_child(UiKit.heading(Tr.t("garage.parts").to_upper(), 18, UiTheme.PINK))
 
 

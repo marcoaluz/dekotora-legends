@@ -143,3 +143,9 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Pintura: branco de fábrica 0 · grafite 3 · vermelho 6 · azul 6 · rosa 9 · jade 9 · dourado 14 (vermelho/azul exigem 10 de Fama; rosa/jade 30; dourado 60). Cor fora da lista = 4.
 - Adesivo: +6 cada, no máximo 4 (lateral esq., lateral dir., traseira, cabine). Tamanho e cor não mudam a nota.
 - Na corrida o destaque entra na Fama ganha (peça quebrada perde os pontos dela; pintura e adesivos ficam). O resultado mostra "Destaque do caminhão"; a loja mostra o total no topo e o efeito de cada compra (`Destaque +N`).
+
+## Luzes com padrões de pisca (ATB-2, T-109)
+
+- As luzinhas de marcação do modelo e das peças (âmbar, amarelo, rosa, ciano) usam um material de shader (`LightPatterns`): **fixas**, **sequencial** (onda correndo pelo comprimento), **alternado** (dois grupos trocando) e **respirando**. Lanterna vermelha e farol branco ficam fixos. Escolha na garagem (aba Decoração > Luzes), gravada em `profile.light_pattern`; os rivais usam um padrão cada.
+- Acendem à noite e no fim de tarde (`tod.headlights`) e dentro dos túneis (`Tunnel3D.amount`); de dia ficam fracas (12%); a prévia de dia da garagem mostra 40%.
+- **Custo medido** (modo médio, rota 1, 75 FPS): 404–409 chamadas de desenho e ~255 mil triângulos, contra 410 e ~257 mil antes. Nenhum custo extra (um material por cor, sem luz real nem script por lâmpada).

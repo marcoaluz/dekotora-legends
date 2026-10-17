@@ -21,6 +21,7 @@ var _autoplay: bool = false
 var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
 var _cargo_notice: Array[String] = []
+var _lights_state: bool = true
 var _hud_layer: CanvasLayer             # HUD + botoes de toque (some na pausa para o menu nao ficar por cima deles)
 var _demo: RaceDemo                    # capturas/depuracao (--demo=, --shots=)
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
@@ -297,6 +298,7 @@ func _spawn_field() -> void:
 			node.set_paint_color(paint)
 			_bots.append(BotDriver.new(diff, 100 + i, xs[i], i == 1 and rival != null))
 		node.set_headlights(tod.headlights)
+		node.set_light_pattern(String(gs.profile.get("light_pattern", "steady")) if i == 0 else LightPatterns.IDS[i % LightPatterns.IDS.size()])
 		_trucks.append(node)
 		_prev.append(Vector2(t.z, t.x))
 
@@ -598,12 +600,24 @@ func _scrape_sparks(t: TruckSim, dt: float) -> void:
 
 
 func _update_hud() -> void:
+	_update_truck_lights()
 	_hud.countdown = _countdown
 	_hud.rival_idx = _rival_idx[0] if not _rival_idx.is_empty() else -1
 	_hud.cargo_notice = _cargo_notice
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])
 		_fx.set_smoke(k, _trucks[k], clampf((60.0 - eng) / 60.0, 0.0, 1.0))
+
+
+## Luzinhas e farois: acesos de noite/fim de tarde e quando o jogador esta num tunel (de dia ficam fracos).
+func _update_truck_lights() -> void:
+	var on: bool = tod.headlights or _tunnel.amount > 0.3
+	if on == _lights_state:
+		return
+	_lights_state = on
+	for k in _trucks.size():
+		_trucks[k].set_lights_on(on)
+		_trucks[k].set_headlights(on)
 
 
 ## Linhas do aviso de carga mostrado na contagem regressiva (contrato do Mercado).

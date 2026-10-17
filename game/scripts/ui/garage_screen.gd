@@ -141,7 +141,11 @@ func _apply_debug_args() -> void:
 		gs.profile["owned"]["rb_chrome"]["broken"] = true
 		gs.profile["systems"]["engine"] = 55.0
 	for a in args:
-		if a == "--day":
+		if a.begins_with("--lights="):
+			gs.profile["light_pattern"] = a.substr(9)
+			stage.refresh_truck()
+			stage.truck.set_light_pattern(a.substr(9))
+		elif a == "--day":
 			stage.set_daytime(true)
 		elif a.begins_with("--view="):
 			stage.focus_view(a.substr(7))

@@ -36,6 +36,10 @@ var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 var _mural_mat: StandardMaterial3D
+const LIGHTS_OFF_LEVEL: float = 0.12
+var _lamp_mats: Dictionary = {}              # nome do material de luz -> ShaderMaterial animado (um por caminhao)
+var _lights_level: float = 1.0
+var _pattern: String = "steady"
 var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 traseira-esq., 3 traseira-dir.
 
 
@@ -50,6 +54,7 @@ func _ready() -> void:
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
+	_apply_light_materials(model)
 	_build_blinkers()
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
@@ -66,13 +71,39 @@ func _ready() -> void:
 	add_child(_headlight)
 
 
-## Luzinhas de marcacao (padroes de pisca: T-109). `bright` = visivel de dia; `day` = previa de dia.
-func set_lights_on(_on: bool, _day: bool = false) -> void:
-	pass
+## Luzinhas de marcacao (fileiras do bau, cabine, andon e das pecas): `on` = acesas (noite/tunel); apagadas
+## ficam so como vidro fosco. `day_preview` = garagem de dia (acesas, mas fracas).
+func set_lights_on(on: bool, day_preview: bool = false) -> void:
+	_lights_level = (0.4 if day_preview else 1.0) if on else LIGHTS_OFF_LEVEL
+	for m in _lamp_mats.values():
+		(m as ShaderMaterial).set_shader_parameter("level", _lights_level)
 
 
-func set_light_pattern(_pattern: String) -> void:
-	pass
+## Padrao de pisca: "steady" (fixas), "sequential" (onda correndo), "alternate" (grupos alternando) ou "breathing".
+func set_light_pattern(pattern: String) -> void:
+	_pattern = pattern if pattern in LightPatterns.IDS else "steady"
+	for m in _lamp_mats.values():
+		(m as ShaderMaterial).set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
+
+
+## Troca os materiais das luzinhas (lamp_amber/yellow/pink/cyan) de `root` pelo material animado do padrao.
+## Vermelho (lanterna) e branco (farol) ficam fixos. Chame de novo depois de montar pecas novas.
+func _apply_light_materials(root: Node) -> void:
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		var m: MeshInstance3D = mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		for s in m.mesh.get_surface_count():
+			var cur: Material = m.get_active_material(s)
+			if cur == null or not cur.resource_name.begins_with("lamp_") or not LightPatterns.ANIMATED.has(cur.resource_name):
+				continue
+			var key: String = cur.resource_name
+			if not _lamp_mats.has(key):
+				var sm: ShaderMaterial = LightPatterns.make_material(cur)
+				sm.set_shader_parameter("level", _lights_level)
+				sm.set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
+				_lamp_mats[key] = sm
+			m.set_surface_override_material(s, _lamp_mats[key])
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
@@ -193,6 +224,7 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
 				if chrome_mode != "":
 					ChromeMatcap.apply(n, chrome_mode)
+				_apply_light_materials(n)
 				list.append(n)
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"

@@ -15,6 +15,7 @@ const ARCH: Array = [[13.6, 0.0], [13.6, 5.0], [11.1, 7.4], [6.0, 8.0], [0.0, 8.
 
 var path: TrackPath
 var tunnels: Array[Vector2] = []
+var amount: float = 0.0                 # 0..1: quanto o jogador esta dentro de um tunel (acende as luzes do caminhao)
 var _sun: DirectionalLight3D
 var _env: Environment
 var _sun_base: float = 1.0
@@ -68,6 +69,7 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 ## Chamado a cada quadro com o z do jogador e a posicao do caminhao (apaga o sol, liga a luz que pisca).
 func track_player(z: float, truck_pos: Vector3) -> void:
 	if tunnels.is_empty():
+		amount = 0.0
 		return
 	var f: float = 0.0
 	for t in tunnels:
@@ -78,6 +80,7 @@ func track_player(z: float, truck_pos: Vector3) -> void:
 	if _env != null:
 		_env.ambient_light_energy = _amb_base * (1.0 - 0.85 * f)
 		_env.background_energy_multiplier = _bg_base * (1.0 - 0.7 * f)   # tira o reflexo azul do ceu no cromo e na pintura
+	amount = f
 	_omni.visible = f > 0.01
 	if _omni.visible:
 		var phase: float = fmod(z, LAMP_EVERY) / LAMP_EVERY
