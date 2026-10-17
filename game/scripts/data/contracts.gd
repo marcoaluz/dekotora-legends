@@ -59,7 +59,7 @@ static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, bo
 			out.append({
 				"id": "%s_%d_%d" % [r.id, seed_ % 100000, k], "route": String(r.id),
 				"origin": pl[a], "destination": pl[b], "cargo": String(cargo.id), "weight_t": w,
-				"reward": reward(r, cargo, w), "fragility": cargo.fragility,
+				"reward": reward(r, cargo, w), "fragility": cargo.fragility, "deadline_s": r.deadline(),
 			})
 	return out
 

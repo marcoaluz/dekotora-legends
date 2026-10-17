@@ -66,19 +66,30 @@ func test_race_runs_server_side_and_finishes_with_results() -> void:
 	r.advance(Protocol.COUNTDOWN_SECONDS + 0.01)
 	check_eq(r.state, Protocol.RoomState.RACING, "largou")
 	var steps: int = 0
+	var human_drivers: Dictionary = {}
+	for p in r.order:
+		human_drivers[p] = BotDriver.new(BotDriver.Difficulty.NORMAL, p, 0.0)
 	while r.state == Protocol.RoomState.RACING and steps < 30 * 300:
 		# os dois humanos "dirigem" mandando comandos de bot
 		for p in r.order:
 			var m: Room.Member = r.members[p]
-			var cmd: Commands = BotDriver.new(BotDriver.Difficulty.NORMAL, p, 0.25).command_for(r.sim, m.truck_idx, 1.0 / 30.0)
+			var cmd: Commands = (human_drivers[p] as BotDriver).command_for(r.sim, m.truck_idx, 1.0 / 30.0)
 			r.apply_command(p, steps, cmd.steer, cmd.throttle, cmd.brake, cmd.passing)
 		r.step_tick()
 		steps += 1
 	check_eq(r.state, Protocol.RoomState.FINISHED, "sala terminou")
 	check_eq(r.results.size(), 2, "resultado para cada humano")
+	var winners: int = 0
 	for p in r.results:
-		check(int(r.results[p]["pay"]) > 0, "pagamento calculado")
-		check(bool(r.results[p]["persist_damage"]), "dano real grava")
+		var res: Dictionary = r.results[p]
+		check(res.has("outcome"), "resultado traz o desfecho")
+		if String(res["outcome"]) == "win":
+			winners += 1
+			check(int(res["pay"]) > 0, "quem vence recebe pagamento")
+		else:
+			check_eq(int(res["pay"]), 0, "quem perde nao recebe")
+		check(bool(res["persist_damage"]), "dano real grava")
+	check(winners <= 1, "no maximo um vencedor entre os humanos")
 
 
 func test_race_only_damage_mode_does_not_persist() -> void:

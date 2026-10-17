@@ -48,6 +48,7 @@ var draft: float = 0.0                  # 0..1: efeito do vacuo (atras de outro 
 var overtakes: int = 0
 var finish_time: float = -1.0
 var finish_position: int = 0
+var timed_out: bool = false             # o prazo de entrega acabou antes de chegar
 var lane: int = Lanes.CENTER            # faixa alvo (0..4, ver Lanes)
 var signal_dir: int = 0                 # seta ligada: -1 esquerda, +1 direita, 0 apagada
 var signal_time: float = 0.0            # s restantes para dar o 2o toque

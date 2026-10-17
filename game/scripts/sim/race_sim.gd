@@ -12,6 +12,8 @@ var time: float = 0.0
 var tick: int = 0
 var finish_z: float = 0.0
 var freight: int = 20000
+var deadline: float = 0.0              # prazo de entrega (s) desde a largada; 0 = sem prazo
+var _deadline_fired: bool = false
 var finish_order: Array[int] = []      # indices na ordem de chegada
 var _prev_ahead: Dictionary = {}       # "i:j" -> true se i estava a frente de j (para contar ultrapassagens)
 const DRAFT_RANGE: float = 28.0
@@ -61,6 +63,7 @@ func step(dt: float = FIXED_DT) -> void:
 	_update_finish()
 	time += dt
 	tick += 1
+	_update_deadline()
 
 
 ## Vacuo: atras de outro caminhao/carro, na mesma linha, a menos de DRAFT_RANGE.
@@ -109,17 +112,39 @@ func _update_overtakes() -> void:
 				_prev_ahead[key] = false
 
 
+## Segundos que faltam para o prazo (cresce sem limite se nao ha prazo).
+func time_left() -> float:
+	return maxf(deadline - time, 0.0) if deadline > 0.0 else INF
+
+
+## Acabou o prazo: quem ainda nao chegou perde (evento "timeout" para a tela de tempo esgotado).
+func _update_deadline() -> void:
+	if deadline <= 0.0 or _deadline_fired or time < deadline:
+		return
+	_deadline_fired = true
+	for i in trucks.size():
+		if trucks[i].finish_position == 0:
+			trucks[i].timed_out = true
+			events.append({"type": "timeout", "truck": i, "time": time})
+
+
+func deadline_passed() -> bool:
+	return _deadline_fired
+
+
 func _update_finish() -> void:
 	for i in trucks.size():
-		if trucks[i].finish_position == 0 and trucks[i].z >= finish_z:
+		if trucks[i].finish_position == 0 and not trucks[i].timed_out and trucks[i].z >= finish_z:
 			finish_order.append(i)
 			trucks[i].finish_position = finish_order.size()
 			trucks[i].finish_time = time
 			events.append({"type": "finish", "truck": i, "position": finish_order.size(), "time": time})
 
 
-## A corrida acaba quando todos os humanos chegaram (ou, sem humanos, todos).
+## A corrida acaba quando todos os humanos chegaram (ou, sem humanos, todos) ou quando o prazo acaba.
 func is_over() -> bool:
+	if _deadline_fired:
+		return true
 	var humans: int = 0
 	for t in trucks:
 		if not t.is_bot:
@@ -134,7 +159,7 @@ func is_over() -> bool:
 func result_for(index: int) -> Dictionary:
 	var t: TruckSim = trucks[index]
 	var pos: int = t.finish_position if t.finish_position > 0 else trucks.size()
-	return RaceRules.build_result(t, pos, freight, t.finish_time)
+	return RaceRules.build_result(t, pos, freight, t.finish_time, deadline)
 
 
 func drain_events() -> Array[Dictionary]:

@@ -153,6 +153,7 @@ func _build_race(seed_: int) -> void:
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
 	sim = RaceSim.new(track, int(rules["traffic"]), seed_)
 	sim.freight = route.freight if route != null else 25000
+	sim.deadline = route.deadline() if route != null else 0.0
 	drivers.clear()
 	var slot: int = 0
 	for p in order:

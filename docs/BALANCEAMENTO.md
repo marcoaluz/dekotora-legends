@@ -114,3 +114,10 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Suposições novas (não estavam no GDD): 1 Fama = 50 ¥ de bônus; ultrapassagem = 2 Fama; vácuo = +20% tração e +2 m/s;
   Passing enche 4%/s acima de 70% da velocidade máxima e gasta 35%/s; Fama mínima para liberar peças: <15k ¥ livre,
   <30k = 20, <50k = 60, acima = 120.
+
+## Prazo de entrega e vitória (ATB-1, T-101)
+
+- Prazo = comprimento do trecho ÷ 27 m/s (≈ 97 km/h) × 1,2, arredondado (kanto_1 = 133 s, kanto_2 = 122 s, kanto_3 = 124 s). Um trecho pode fixar `deadline_s` no `.tres`; o contrato do Mercado leva o prazo em `deadline_s`.
+- Vitória = chegar em 1º **e** dentro do prazo. Chegar depois do rival = derrota; prazo esgotado = derrota ("tempo esgotado").
+- Derrota paga **0 ¥** e **0 Fama** (suposição a revisar: ver QUADRO T-101). O dano às peças continua, e o contrato volta a ficar disponível.
+- Curvas (controle por faixas): acima da velocidade segura `sqrt(0,5 × aderência ÷ (|curva| × 7,9e-4))` o caminhão é empurrado para fora da faixa (curva 1,0 = 90 km/h; curva 0,6 = 117 km/h).

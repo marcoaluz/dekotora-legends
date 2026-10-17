@@ -7,6 +7,7 @@ func _run_route(route_id: String) -> Dictionary:
 	var route: RouteDef = load("res://data/routes/%s.tres" % route_id) as RouteDef
 	var sim := RaceSim.new(route.build_track(), route.traffic)
 	sim.freight = route.freight
+	sim.deadline = route.deadline()
 	var drivers: Array[BotDriver] = []
 	var xs: Array[float] = Room.GRID_X
 	for i in 4:
@@ -17,7 +18,7 @@ func _run_route(route_id: String) -> Dictionary:
 		else:
 			t.is_bot = true
 			t.set_loadout([DamageModel.make_part("fb_basic", ["front"], 120.0, 80.0, 5)])
-		drivers.append(BotDriver.new(BotDriver.Difficulty.NORMAL, 50 + i, xs[i]))
+		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, xs[i]))
 	var steps: int = 0
 	while not sim.is_over() and steps < 30 * 400:
 		for i in 4:

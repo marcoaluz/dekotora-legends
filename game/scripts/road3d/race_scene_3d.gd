@@ -20,6 +20,8 @@ var _fx: Fx3D
 var _autoplay: bool = false
 var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
+var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
+const TIMEOUT_SCREEN_DELAY: float = 1.8
 var _shake: float = 0.0
 var _result_shown: bool = false
 var _fps_printed: bool = false
@@ -67,6 +69,9 @@ func _ready() -> void:
 		sim.freight = route.freight if route != null else 25000
 		if not gs.pending_contract.is_empty():         # contrato do Mercado: o valor dele e o frete da corrida
 			sim.freight = int(gs.pending_contract["reward"])
+		sim.deadline = float(gs.pending_contract.get("deadline_s", 0.0))
+		if sim.deadline <= 0.0 and route != null:
+			sim.deadline = route.deadline()
 	path = TrackPath.new(sim.track)
 	var q: int = int(Settings.quality)
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
@@ -408,8 +413,10 @@ func _process(delta: float) -> void:
 		_fps_printed = true
 		print("FPS_MEDIDO: ", Engine.get_frames_per_second(), "  draw_calls=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME), "  tris=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), "  mem_MB=", OS.get_static_memory_usage() / 1048576)
 	if sim.is_over() and not _result_shown:
-		_result_shown = true
-		_show_result()
+		_over_time += dt
+		if _over_time >= (TIMEOUT_SCREEN_DELAY if sim.trucks[player].timed_out else 0.0):
+			_result_shown = true
+			_show_result()
 
 
 func _process_online(dt: float) -> void:
@@ -470,6 +477,9 @@ func _handle_events(events: Array[Dictionary]) -> void:
 			"finish":
 				if int(e["truck"]) == player:
 					_hud.show_banner(Tr.t("hud.finish", [int(e["position"])]), 3.0)
+			"timeout":
+				if int(e["truck"]) == player:
+					_hud.show_banner(Tr.t("hud.timeout"), 3.0)
 			"truck":
 				var f: float = float(e["force"])
 				var ia: int = int(e["a"])

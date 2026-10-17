@@ -581,12 +581,15 @@ func apply_race_result(res: Dictionary, route_id: String, truck: TruckSim) -> vo
 	if route_id != "":
 		var rec: Dictionary = (profile["routes_done"] as Dictionary).get(route_id, {})
 		var t: float = float(res["time"])
-		if rec.is_empty() or t < float(rec.get("best_time", 1e9)):
+		var won: bool = String(res.get("outcome", "win")) == "win"
+		if won and (rec.is_empty() or t < float(rec.get("best_time", 1e9))):
 			rec["best_time"] = t
 		rec["best_position"] = mini(int(rec.get("best_position", 9)), int(res["position"]))
-		if int(res["position"]) == 1:
+		if won:
 			rec["won"] = true
 		(profile["routes_done"] as Dictionary)[route_id] = rec
+	if not pending_contract.is_empty() and String(res.get("outcome", "win")) != "win":
+		pending_contract = {}                     # derrota: o contrato continua no quadro para tentar de novo
 	if not pending_contract.is_empty():           # contrato concluido: historico + quadro novo
 		var c: Dictionary = pending_contract.duplicate()
 		c["paid"] = int(res["pay"])

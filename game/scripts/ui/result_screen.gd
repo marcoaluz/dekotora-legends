@@ -50,11 +50,21 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.02, 0.02, 0.07, 0.86))
 	draw_rect(Rect2(60, 14, 360, 210), Color(0.07, 0.06, 0.16, 0.95))
 	draw_rect(Rect2(60, 14, 360, 3), PINK)
-	_t(Vector2(60, 46), "%do LUGAR" % int(_res["position"]), 30, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 360.0)
+	var outcome: String = String(_res.get("outcome", "win"))
+	match outcome:
+		"win":
+			_t(Vector2(60, 46), "%do LUGAR" % int(_res["position"]), 30, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 360.0)
+		"lose_rival":
+			_t(Vector2(60, 40), "DERROTA", 24, Color("#d1303f"), HORIZONTAL_ALIGNMENT_CENTER, 360.0)
+			_t(Vector2(60, 54), "Voce chegou depois do rival (%do)" % int(_res["position"]), 10, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, 360.0)
+		_:
+			_t(Vector2(60, 40), "TEMPO ESGOTADO", 24, Color("#d1303f"), HORIZONTAL_ALIGNMENT_CENTER, 360.0)
+			_t(Vector2(60, 54), "A entrega nao chegou dentro do prazo", 10, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, 360.0)
 	var t: float = float(_res["time"])
 	var line_y: float = 70.0
 	var rows: Array = [
 		["Tempo", "%d:%05.2f" % [int(t) / 60, fmod(t, 60.0)]],
+		["Prazo", "%d:%02d" % [int(float(_res.get("deadline", 0.0))) / 60, int(float(_res.get("deadline", 0.0))) % 60]],
 		["Integridade da carga", "%d%%" % roundi(float(_res["cargo"]) * 100.0)],
 		["Frete", "%d ¥" % int(_res["freight"])],
 		["Bonus de posicao", "+%d ¥" % int(_res["position_bonus"])],

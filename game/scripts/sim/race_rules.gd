@@ -22,6 +22,13 @@ static func fame_gain(intact_fame: float, position: int, overtakes: int) -> int:
 	return roundi(intact_fame * FAME_FACTOR[_idx(position)] + float(overtakes) * FAME_PER_OVERTAKE)
 
 
+## Desfecho: "win" (1o E dentro do prazo), "lose_rival" (chegou depois do rival), "timeout" (acabou o prazo).
+static func outcome(truck: TruckSim, position: int) -> String:
+	if truck.timed_out or truck.finish_position == 0:
+		return "timeout"
+	return "win" if position == 1 else "lose_rival"
+
+
 static func payment(freight: int, cargo_integrity: float, position: int, fame: int) -> int:
 	var base: int = roundi(float(freight) * clampf(cargo_integrity, 0.0, 1.0))
 	return base + position_bonus(freight, position) + fame * FAME_TO_YEN
@@ -37,19 +44,25 @@ static func intact_fame(truck: TruckSim) -> float:
 
 
 ## Resultado completo de um caminhao ao terminar. `position` = 1..4.
-static func build_result(truck: TruckSim, position: int, freight: int, finish_time: float) -> Dictionary:
-	var fame: int = fame_gain(intact_fame(truck), position, truck.overtakes)
+static func build_result(truck: TruckSim, position: int, freight: int, finish_time: float, deadline: float = 0.0) -> Dictionary:
+	var out: String = outcome(truck, position)
+	var won: bool = out == "win"
+	var fame: int = fame_gain(intact_fame(truck), position, truck.overtakes) if won else 0
+	var shown_time: float = finish_time if finish_time >= 0.0 else deadline
 	var parts: Array[Dictionary] = []
 	for p in truck.loadout:
 		parts.append({"id": p["id"], "state": DamageModel.part_state(p), "dur": p["dur"], "max": p["max"]})
 	return {
 		"position": position,
-		"time": finish_time,
+		"time": shown_time,
+		"outcome": out,
+		"deadline": deadline,
+		"time_left": maxf(deadline - shown_time, 0.0) if deadline > 0.0 else 0.0,
 		"cargo": truck.cargo_integrity(),
 		"freight": freight,
-		"position_bonus": position_bonus(freight, position),
+		"position_bonus": position_bonus(freight, position) if won else 0,
 		"fame": fame,
-		"pay": payment(freight, truck.cargo_integrity(), position, fame),
+		"pay": payment(freight, truck.cargo_integrity(), position, fame) if won else 0,
 		"overtakes": truck.overtakes,
 		"parts": parts,
 		"systems": truck.systems.duplicate(),

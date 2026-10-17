@@ -82,9 +82,10 @@ func _draw() -> void:
 	_draw_position(t)
 	_draw_destination(t, w)
 	_draw_cargo(t, w)
+	_draw_timer(w)
 	_draw_dash(t, w)
 	if Settings.show_fps:
-		_lbl(Vector2(w * 0.5 - 20, 52), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
+		_lbl(Vector2(w * 0.5 - 20, 66), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
 	if countdown > 0.0:
 		_num(Vector2(0, size.y * 0.44), "%d" % int(ceil(countdown)), 72, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)
 		_num(Vector2(0, size.y * 0.58), Tr.t("hud.lane_hint"), 11, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
@@ -118,6 +119,31 @@ func _draw_destination(t: TruckSim, w: float) -> void:
 		var f: float = clampf(sim.trucks[k].z / sim.finish_z, 0.0, 1.0)
 		var c: Color = PINK if k == player else Color(0.75, 0.82, 1.0, 0.9)
 		draw_rect(Rect2(bar.position.x + bar.size.x * f - 1.5, bar.position.y - 2, 3, 8), c)
+
+
+## Tempo de viagem (sobe) e prazo de entrega (desce). O prazo fica vermelho e pisca nos ultimos 15 s.
+func _draw_timer(w: float) -> void:
+	if sim.deadline <= 0.0:
+		return
+	var r := Rect2(w * 0.5 - 104, 40, 208, 18)
+	_panel(r)
+	var run: float = minf(sim.time, sim.deadline)
+	var left: float = sim.time_left()
+	_lbl(Vector2(r.position.x + 8, 52), Tr.t("hud.time"), 8)
+	_num(Vector2(r.position.x + 40, 53), _clock(run), 11, Color.WHITE)
+	var urgent: bool = left < 15.0
+	var col: Color = Color.WHITE
+	if urgent:
+		col = BAD_COL if int(Time.get_ticks_msec() / 250) % 2 == 0 else Color.WHITE
+	elif left < 30.0:
+		col = WARN_COL
+	_lbl(Vector2(r.position.x + 108, 52), Tr.t("hud.deadline"), 8)
+	_num(Vector2(r.position.x + 140, 53), _clock(left), 11, col)
+
+
+static func _clock(seconds: float) -> String:
+	var s: int = int(ceil(seconds))
+	return "%d:%02d" % [s / 60, s % 60]
 
 
 func _draw_cargo(t: TruckSim, w: float) -> void:

@@ -15,6 +15,24 @@ extends Resource
 @export var fame_required: int = 0
 @export var tunnels: Array[Vector2] = []        # (inicio m, comprimento m) so visual: Tunnel3D
 @export var places: PackedStringArray = []      # cidades do trecho (origem/destino dos contratos)
+@export var deadline_s: float = 0.0             # prazo de entrega (s); 0 = calculado pelo comprimento do trecho
+
+const DEADLINE_REF_SPEED: float = 27.0           # m/s (~97 km/h) de referencia para o prazo
+const DEADLINE_SLACK: float = 1.2                # folga sobre o tempo de referencia
+
+
+func length_m() -> float:
+	var total: float = 0.0
+	for s in sections:
+		total += float(s["length"])
+	return total
+
+
+## Prazo de entrega em segundos: vence quem chega primeiro E dentro deste tempo (docs/DECISOES.md, ATB-1).
+func deadline() -> float:
+	if deadline_s > 0.0:
+		return deadline_s
+	return roundf(length_m() / DEADLINE_REF_SPEED * DEADLINE_SLACK)
 
 
 func build_track(seed_: int = 7) -> Track:
