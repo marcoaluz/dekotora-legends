@@ -98,6 +98,71 @@ def textured(name: str, image, metallic: float = 0.8, roughness: float = 0.4, ti
     return m
 
 
+def textured_full(name: str, color_img, orm_img=None, normal_img=None, metallic: float = 0.0,
+                  roughness: float = 0.5, tint: str | None = None, coat: float = 0.0, coat_rough: float = 0.05,
+                  normal_strength: float = 1.0):
+    """Material PBR completo para o glTF: cor (x tint), ORM (G = rugosidade, B = metálico) e mapa de normais.
+    Os nós seguem o padrão que o exportador glTF reconhece (Separate Color -> Roughness/Metallic,
+    Normal Map -> Normal); no Godot vira StandardMaterial3D com as mesmas texturas."""
+    m = textured(name, color_img, metallic, roughness, tint, coat, coat_rough)
+    nt = m.node_tree
+    b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    if orm_img is not None:
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = orm_img
+        sep = nt.nodes.new("ShaderNodeSeparateColor")
+        nt.links.new(t.outputs["Color"], sep.inputs[0])
+        nt.links.new(sep.outputs[1], b.inputs["Roughness"])
+        nt.links.new(sep.outputs[2], b.inputs["Metallic"])
+    if normal_img is not None:
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = normal_img
+        nm = nt.nodes.new("ShaderNodeNormalMap")
+        nm.inputs["Strength"].default_value = normal_strength
+        nt.links.new(t.outputs["Color"], nm.inputs["Color"])
+        nt.links.new(nm.outputs["Normal"], b.inputs["Normal"])
+    return m
+
+
+def truck_set(m: dict) -> dict:
+    """Materiais exclusivos do caminhão (T-106), acrescentados ao conjunto padrão. Nomes estáveis: o jogo
+    procura "paint_white" no nome da malha para tingir e "chrome"/"paint_gold" para o cromo por matcap."""
+    from . import tex_truck as T
+    for k in ("paint_white_panel", "diamond"):                  # troca as versões simples (mesmo nome no .glb)
+        old = m.get(k)
+        if old is not None:
+            for node in old.node_tree.nodes:
+                if node.type == "TEX_IMAGE" and node.image is not None and node.image.users <= 1:
+                    bpy.data.images.remove(node.image)
+            bpy.data.materials.remove(old)
+    col, orm, nrm = T.paint_maps()
+    m["paint_white_panel"] = textured_full("paint_white_panel", tex._image("tex_paint_dirt", col),
+                                           tex._image("tex_paint_orm", orm, srgb=False), tex._image("tex_paint_nrm", nrm, srgb=False),
+                                           tint="#d6dce6", coat=0.8, coat_rough=0.04, normal_strength=1.0)
+    col, orm = T.plastic_maps()
+    m["plastic_trim"] = textured_full("plastic_trim", tex._image("tex_plastic_dust", col), tex._image("tex_plastic_orm", orm, srgb=False))
+    col, orm = T.glass_wind_maps()
+    m["glass_wind"] = textured_full("glass_wind", tex._image("tex_glass_wind", col), tex._image("tex_glass_wind_orm", orm, srgb=False),
+                                    coat=1.0, coat_rough=0.02)
+    m["glass_lens"] = pbr("glass_lens", "#2b313c", metallic=0.85, roughness=0.12)
+    col, nrm = T.honeycomb()
+    m["grille_honeycomb"] = textured_full("grille_honeycomb", tex._image("tex_honeycomb", col), None,
+                                          tex._image("tex_honeycomb_nrm", nrm, srgb=False), metallic=0.5, roughness=0.45)
+    col, nrm = T.slots()
+    m["vent_slots"] = textured_full("vent_slots", tex._image("tex_vent_slots", col), None,
+                                    tex._image("tex_vent_slots_nrm", nrm, srgb=False), metallic=0.2, roughness=0.55)
+    col, nrm = T.diamond_maps()
+    m["diamond"] = textured_full("diamond", tex._image("tex_diamond_plate", col), None, tex._image("tex_diamond_nrm", nrm, srgb=False),
+                                 metallic=0.75, roughness=0.42)
+    return m
+
+
+def tire_material(profile, R: float):
+    from . import tex_truck as T
+    col, orm = T.tire_maps(profile, R)
+    return textured_full("rubber_tire", tex._image("tex_tire", col), tex._image("tex_tire_orm", orm, srgb=False))
+
+
 def standard_set() -> dict:
     """Conjunto padrão usado por caminhão e acessórios (nomes estáveis para o Godot)."""
     return {

@@ -8,6 +8,7 @@
 
 Nada aqui ocupa os pontos de montagem das peças compráveis (saias, guarnições, painéis, ornamentos).
 """
+import math
 import os
 
 import numpy as np
@@ -54,10 +55,18 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
         add(M.box(f"mk_rear_h_{k}", (LAMP, 0.03, LAMP), (x, -0.11, 3.02), m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
     # --- frente da cabine: fileira de luzes logo abaixo do para-brisa ("sobrancelha")
     if cab_front:
-        yf, wz0 = cab_front
+        yf, wz0 = cab_front[:2]
+        surf = cab_front[2] if len(cab_front) > 2 else None       # (x, z) -> (ponto, normal) na casca curva
         for k in range(13):
             x = -1.02 + k * 0.17
-            add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, wz0 - 0.12), lamps[k % 2], bevel=0.0, seg=1))
+            z = wz0 - 0.15
+            if surf is None:
+                add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, z), lamps[k % 2], bevel=0.0, seg=1))
+                continue
+            p, n = surf(x, z)
+            p = p + n * 0.012
+            add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), tuple(p), lamps[k % 2], bevel=0.0, seg=1,
+                      rot=(0, 0, -math.degrees(math.atan2(n.x, n.y)))))
     # --- andons
     z0 = max(BODY_TOP + 0.08, cab_top + 0.04)                     # a frente aparece por cima de qualquer cabine
     _andon(m, add, "andon_f", body_l - 0.25, z0, FRONT_ANDON, front=True)

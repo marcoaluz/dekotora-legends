@@ -23,7 +23,7 @@ from truck3d.cab import STYLES  # noqa: E402
 from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB_Y0, CAB_Y1,  # noqa: E402,F401
                           CAB_Z0, FRONT_AXLE_Y, MOUNTS, REAR_AXLES_Y, WHEEL_R)
 from truck3d.variants import LENGTH_DELTA, VARIANTS, apply_variant
-from truck3d.wheels import make_wheel  # noqa: E402
+from truck3d.wheels import make_wheel, tire_profile  # noqa: E402
 
 
 def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = "padrao"):
@@ -41,7 +41,7 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
     spec = VARIANTS[variant]
     build_chassis(m, add, spec["rear_axles"], spec["tanks"])
     build_body(m, add)
-    build_cab(m, add, cab)
+    sh = build_cab(m, add, cab)
     for sx in (-1, 1):
         side = "L" if sx < 0 else "R"
         for y in spec["rear_axles"]:
@@ -61,7 +61,14 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
                 w = mw @ v.co
                 if w.y > body_l + 0.3 and w.z > cab_z:
                     cab_z = w.z
-        build_deco(m, add, body_l, cab_z, (CAB_Y1 + VARIANTS[variant]["delta"], STYLES[cab]["wz0"]))
+        dy = VARIANTS[variant]["delta"]
+
+        def surf(x, z):                                # ponto/normal na casca curva (luzes da "sobrancelha")
+            q = sh.q_from_x(x, z)
+            p = sh.ev(q, z)
+            p.y += dy
+            return p, sh.normal(q, z)
+        build_deco(m, add, body_l, cab_z, (CAB_Y1 + dy, STYLES[cab]["wz0"], surf))
     return parts, wheels, empties
 
 
@@ -77,10 +84,16 @@ def main():
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     scene.reset_scene()
-    m = pbr.standard_set()
+    m = pbr.truck_set(pbr.standard_set())
+    m["rubber_tire"] = pbr.tire_material(tire_profile(WHEEL_R, 0.3), WHEEL_R)
     parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab)
     for o in parts:                                  # texturas precisam de UV que cubra cada face
-        if o.active_material and o.active_material.name in ("mesh_perf", "mesh_perf_vent", "mesh_perf_grille", "diamond", "paint_white_panel"):
+        name = o.active_material.name if o.active_material else ""
+        if name in ("paint_white_panel", "plastic_trim"):
+            M.uv_height(o)                           # sujeira por altura (lib/tex_truck.py)
+        elif name == "diamond":
+            M.uv_world(o, 0.45)
+        elif name in ("mesh_perf", "mesh_perf_vent", "mesh_perf_grille") and not o.get("has_uv"):
             M.uv_planar(o)
     all_meshes = parts + [w for ws in wheels for w in ws]
     M.smooth(all_meshes, 35.0)
@@ -123,7 +136,12 @@ def main():
                          views={"34": (35, 14, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "rear": (180, 8, 22.0 + d, (0, 6.0 + d / 2, 1.6)),
                                 "side": (90, 4, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "front": (0, 10, 22.0 + d, (0, 6.0 + d / 2, 1.6)),
                                 "cab34": (38, 10, 9.0, (0, 10.0 + d, 1.8)), "cabside": (90, 3, 9.0, (0, 10.0 + d, 1.8)),
-                                "wheel": (55, 6, 3.2, (1.0, 10.2 + d, 0.5)), "grille": (15, 8, 3.5, (0, 11.5 + d, 1.1))})
+                                "wheel": (55, 6, 3.2, (1.0, 10.2 + d, 0.5)), "grille": (15, 8, 3.5, (0, 11.5 + d, 1.1)),
+                                "cabfront": (8, 6, 7.5, (0, 11.0 + d, 1.9)), "cabrear34": (140, 14, 9.0, (0, 9.5 + d, 2.0)),
+                                "door": (75, 4, 4.2, (1.2, 10.0 + d, 1.8))})
+    pre = os.path.join(pdir, f"truck_{tag}" + ("_night" if args.night else ""))
+    preview.contact_sheet([f"{pre}_{v}.png" for v in ("cabfront", "cab34", "cabside", "34", "front", "side", "cabrear34", "door", "grille")],
+                          f"{pre}_sheet.png", cols=3)
     print("OK build_truck_3d ->", glb)
 
 

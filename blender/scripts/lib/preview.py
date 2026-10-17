@@ -57,6 +57,34 @@ def _light(name, kind, loc, energy, color=(1, 1, 1), size=3.0):
     return ob
 
 
+def contact_sheet(paths, out: str, cols: int = 3, gap: int = 6) -> None:
+    """Junta PNGs do mesmo tamanho numa folha de contato (grade, fundo escuro) para revisão de uma vez."""
+    import numpy as np
+    imgs = []
+    for p in paths:
+        im = bpy.data.images.load(p)
+        im.colorspace_settings.name = "Non-Color"
+        w, h = im.size
+        imgs.append(np.array(im.pixels[:], dtype=np.float32).reshape(h, w, 4)[::-1])   # linha 0 = topo
+        bpy.data.images.remove(im)
+    h, w = imgs[0].shape[:2]
+    rows = (len(imgs) + cols - 1) // cols
+    sheet = np.zeros((rows * h + (rows + 1) * gap, cols * w + (cols + 1) * gap, 4), np.float32)
+    sheet[..., :3] = 0.05
+    sheet[..., 3] = 1.0
+    for i, a in enumerate(imgs):
+        r, c = divmod(i, cols)
+        y, x = gap + r * (h + gap), gap + c * (w + gap)
+        sheet[y:y + h, x:x + w] = a
+    sheet = sheet[::-1]
+    img = bpy.data.images.new(os.path.basename(out), sheet.shape[1], sheet.shape[0], alpha=False)
+    img.colorspace_settings.name = "Non-Color"
+    img.pixels.foreach_set(sheet.ravel())
+    img.filepath_raw = out
+    img.file_format = "PNG"
+    img.save()
+
+
 def render_views(prefix: str, objs, size=(960, 540), center=(0.0, 6.0, 1.6), views=None, dist=22.0, lens=60.0, night=False):
     """Renderiza vistas (nome -> (azimute°, elevação°)) em <prefix>_<nome>.png."""
     sc = bpy.context.scene

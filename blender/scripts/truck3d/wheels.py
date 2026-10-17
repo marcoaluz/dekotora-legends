@@ -43,7 +43,7 @@ def rim_profile(R: float, k_t: float):
 def make_wheel(name, loc, m, rim=True, radius=0.52, width=0.3, seg=48):
     """Devolve lista de objetos; o primeiro (pneu) tem a origem no centro da roda."""
     side = 1 if loc[0] >= 0 else -1
-    tire = A.lathe(name + "_tire", tire_profile(radius, width), loc, m["rubber"], axis="X", seg=seg,
+    tire = A.lathe(name + "_tire", tire_profile(radius, width), loc, m.get("rubber_tire", m["rubber"]), axis="X", seg=seg,
                     disp=tread_disp(radius, width))
     parts = [tire]
     k = radius / 0.5

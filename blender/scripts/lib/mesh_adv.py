@@ -67,17 +67,22 @@ def lathe(name, profile, loc, mat=None, axis="X", seg=32, sweep=360.0, collectio
         grid.append(row)
     m = len(profile)
     cols = seg if full else seg
+    uvl = bm.loops.layers.uv.new("UVMap")          # u = volta (0..1), v = ponto do perfil ((i+0.5)/m; repete)
     for i in range(m):
         i2 = (i + 1) % m
         for s in range(cols):
             s2 = (s + 1) % steps if full else s + 1
             quad = [grid[i][s], grid[i][s2], grid[i2][s2], grid[i2][s]]
-            uniq = []
-            for v in quad:
+            uvq = [(s / seg, (i + 0.5) / m), ((s + 1) / seg, (i + 0.5) / m), ((s + 1) / seg, (i + 1.5) / m), (s / seg, (i + 1.5) / m)]
+            uniq, uvs = [], []
+            for v, c in zip(quad, uvq):
                 if v not in uniq:
                     uniq.append(v)
+                    uvs.append(c)
             if len(uniq) >= 3:
-                bm.faces.new(uniq)
+                f = bm.faces.new(uniq)
+                for lp, c in zip(f.loops, uvs):
+                    lp[uvl].uv = c
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     ob = _link(name, bm, mat, collection)
     ob.location = loc

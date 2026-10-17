@@ -317,6 +317,28 @@ def uv_planar(o) -> None:
             uvl.data[li].uv = (u, v)
 
 
+def uv_height(o, tile_u: float = 4.0, tile_v: float = 5.0, roof_v: float = 0.92) -> None:
+    """UV "por altura" (texturas de `tex_truck`): v = altura do mundo / tile_v (a sujeira fica embaixo, os
+    escorridos descem de cima), u = metros na horizontal / tile_u. Faces viradas para cima/baixo usam só a faixa
+    limpa do topo da textura (v >= roof_v), normalizada por face. Usa a matriz do objeto (antes de juntar)."""
+    me = o.data
+    uvl = me.uv_layers.active or me.uv_layers.new(name="UVMap")
+    mw = o.matrix_world
+    rot = mw.to_3x3()
+    for poly in me.polygons:
+        n = rot @ poly.normal
+        cos = [mw @ me.vertices[me.loops[li].vertex_index].co for li in poly.loop_indices]
+        if abs(n.z) > 0.7:
+            ys = [c.y for c in cos]
+            lo, hi = min(ys), max(ys)
+            for li, c in zip(poly.loop_indices, cos):
+                uvl.data[li].uv = (c.x / tile_u, roof_v + 0.07 * (c.y - lo) / max(hi - lo, 1e-6))
+            continue
+        side = abs(n.x) > abs(n.y)
+        for li, c in zip(poly.loop_indices, cos):
+            uvl.data[li].uv = ((c.y if side else c.x) / tile_u, max(0.0, min(c.z / tile_v, roof_v - 0.005)))
+
+
 def uv_world(o, tile: float = 4.0) -> None:
     """UV em metros (repete a textura a cada `tile` m): projeta cada face nos 2 eixos perpendiculares à
     sua normal dominante. Para pisos/paredes grandes com textura repetível. Aplique transformações antes."""
