@@ -5,6 +5,13 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-112 | ATB-2 item 6: largada e chegada com clima (corte de câmera lateral 1–2 s, banner, clarão na saída do túnel) | lote ATB-2 | médio | coordenador | fila | 2026-10-17 | |
+| T-111 | ATB-2 item 5: rivais que recusam por fama e destaque mínimos, com fala curta | lote ATB-2 | médio | coordenador | fila | 2026-10-17 | |
+| T-110 | ATB-2 item 4: adesivos/decals em PNG trocáveis (lados, traseira, cabine), 6 provisórios, pasta game/assets/decals/, rodas/calotas | lote ATB-2 | difícil | coordenador | fila | 2026-10-17 | |
+| T-109 | ATB-2 item 3: luzes de verdade com padrões de pisca (sequencial, alternado, respirando), noite e túneis, custo no modo médio | lote ATB-2 | difícil | coordenador | fila | 2026-10-17 | |
+| T-108 | ATB-2 item 2: loja em duas abas (Decoração e Mecânica) e prévia dia/noite na garagem | lote ATB-2 | médio | coordenador | fila | 2026-10-17 | |
+| T-107 | ATB-2 item 1: nota de destaque (peças, pintura, mural, adesivo) ao vivo na loja e no resultado | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
+| T-106 | Cabine do caminhão mais realista (portas, painéis, vidros, para-lama, detalhes) e texturas melhores da pintura/metal/borracha, via scripts Blender de linha de comando (sem MCP) | pedido do Marco | difícil | especialista | em andamento | 2026-10-17 | |
 | T-104 | ATB-1 item 5: pausa (Continuar · Revanche · Desistir, sem escurecer) e barra de progresso com marcador do jogador e do rival | lote ATB-1 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-103 | ATB-1 item 4: rival de verdade (rápido na reta, trava no trânsito, anda colado, fecha a faixa, sem borracha) | lote ATB-1 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-102 | ATB-1 item 3: perda de carga proporcional 0–40% do prêmio e tipos de carga (frágil, pesada, perecível) | lote ATB-1 | difícil | coordenador | concluída | 2026-10-17 | 2026-10-17 |

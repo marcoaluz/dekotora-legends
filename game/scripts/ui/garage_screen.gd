@@ -162,6 +162,7 @@ func _refresh() -> void:
 	_clear(_chips)
 	_chips.add_child(UiKit.chip("coins", Tr.yen(gs.money()), UiTheme.GOLD))
 	_chips.add_child(UiKit.chip("star", "%s %d" % [Tr.t("hud.fame"), gs.fame()]))
+	_chips.add_child(UiKit.chip("trophy", "%s %d" % [Tr.t("garage.destaque"), gs.destaque()], UiTheme.PINK))
 	for k in _tab_buttons:
 		var on: bool = k == _tab
 		var b: Button = _tab_buttons[k]

@@ -41,7 +41,7 @@ static func payment(freight: int, cargo_integrity: float, position: int, fame: i
 
 ## Fama das pecas ainda inteiras (nao quebradas) de um caminhao.
 static func intact_fame(truck: TruckSim) -> float:
-	var total: float = 0.0
+	var total: float = float(truck.style_points)
 	for p in truck.loadout:
 		if not bool(p["broken"]):
 			total += float(p["fame"])
@@ -67,6 +67,7 @@ static func build_result(truck: TruckSim, position: int, freight: int, finish_ti
 		"cargo_loss": truck.cargo_loss(),
 		"cargo_loss_yen": roundi(float(freight) * truck.cargo_loss()),
 		"cargo_trait": truck.cargo_trait,
+		"destaque": roundi(intact_fame(truck)),
 		"freight": freight,
 		"position_bonus": position_bonus(freight, position) if won else 0,
 		"fame": fame,

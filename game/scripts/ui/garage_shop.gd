@@ -34,7 +34,8 @@ static func card(highlight: Color = Color(1, 1, 1, 0.1)) -> Array:
 func delta_text(after: Dictionary, before: Dictionary) -> String:
 	var dm: int = roundi(float(after["mass"]) - float(before["mass"]))
 	var dz: float = float(after["zero100"]) - float(before["zero100"])
-	return "%+d kg   %s %+.1f s" % [dm, Tr.t("garage.effect"), dz]
+	var dd: int = int(after["rating"]) - int(before["rating"])
+	return "%+d kg   %s %+.1f s   %s %+d" % [dm, Tr.t("garage.effect"), dz, Tr.t("garage.destaque"), dd]
 
 
 static func small_button(text: String, w: float = 0.0) -> Button:
@@ -51,7 +52,8 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 	var title: String = Tr.t("part." + String(d.id)) + ("  ✔" if installed else "")
 	v.add_child(wl(title, 18, UiTheme.GOLD if installed else UiTheme.TEXT))
 	var dur: String = "—" if d.durability <= 0.0 else str(int(d.durability))
-	v.add_child(wl("%s %d kg · %s %s · Fama %d" % [Tr.t("garage.weight"), int(d.weight_kg), Tr.t("garage.durability"), dur, d.fame], 14, UiTheme.TEXT_DIM))
+	v.add_child(wl("%s %d kg · %s %s · %s +%d" % [Tr.t("garage.weight"), int(d.weight_kg), Tr.t("garage.durability"), dur, Tr.t("garage.destaque"), d.fame], 14, UiTheme.TEXT_DIM))
+	v.add_child(wl("%s: %s" % [Tr.t("garage.protects"), _zones_text(d)], 13, UiTheme.TEXT_DIM))
 	if not installed:
 		v.add_child(wl(delta_text(preview.call({"install": String(d.id)}), base), 14, UiTheme.CYAN))
 	var row := HBoxContainer.new()
@@ -79,6 +81,16 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 		bs.pressed.connect(func() -> void: gs.sell(String(d.id)))
 		row.add_child(bs)
 	return cv[0]
+
+
+## Zonas que a peca protege (ela absorve o impacto antes do motor/direcao/carga).
+func _zones_text(d: PartDef) -> String:
+	if d.durability <= 0.0 or d.zones.is_empty():
+		return Tr.t("garage.no_protection")
+	var names: PackedStringArray = []
+	for z in d.zones:
+		names.append(Tr.t("zone." + String(z)))
+	return ", ".join(names)
 
 
 func build_slot_detail(box: VBoxContainer, slot: String) -> void:
@@ -114,7 +126,7 @@ func build_mech(box: VBoxContainer) -> void:
 				"turbo":
 					detail = "+%d%% torque · atraso %.1f s" % [roundi(float(def.get("torque_gain")) * 100.0), float(def.get("lag_s"))]
 				"exhaust":
-					detail = "+%d%% torque · +%d Fama" % [roundi(float(def.get("torque_bonus")) * 100.0), int(def.get("fame"))]
+					detail = "+%d%% torque · destaque +%d" % [roundi(float(def.get("torque_bonus")) * 100.0), int(def.get("fame"))]
 				"upgrade":
 					detail = "efeito %+d%%" % roundi(float(def.get("value")) * 100.0)
 			v.add_child(wl(detail, 13, UiTheme.TEXT_DIM))

@@ -383,6 +383,10 @@ func preview(changes: Dictionary) -> Dictionary:
 			profile[k] = changes[k]
 	if changes.has("jake_brake"):
 		profile["jake_brake"] = changes["jake_brake"]
+	if changes.has("paint"):
+		profile["paint"] = changes["paint"]
+	if changes.has("decals"):
+		profile["decals"] = changes["decals"]
 	var out: Dictionary = {"mass": total_mass(), "zero100": estimate_zero_to_100(), "rating": total_fame_rating()}
 	profile = backup
 	return out
@@ -396,7 +400,7 @@ func truck_descriptor() -> Dictionary:
 		parts.append({"id": String(d.id), "dur": float(own["dur"]), "broken": bool(own["broken"])})
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
-		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"),
+		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
 	}.merged(Contracts.sim_fields(pending_contract))
 
@@ -405,9 +409,19 @@ func configure_truck(t: TruckSim) -> void:
 	TruckConfig.apply(t, truck_descriptor())
 
 
-## Fama total das pecas instaladas e inteiras + bonus do escape.
+## Pontos de destaque da pintura e dos adesivos (StyleCatalog).
+func style_points() -> int:
+	return StyleCatalog.paint_points(String(profile.get("paint", "#e9eef5"))) + StyleCatalog.decal_points(profile.get("decals", []) as Array)
+
+
+## Nota de DESTAQUE: pecas instaladas e inteiras (inclui murais e calotas) + escape + pintura + adesivos.
+func destaque() -> int:
+	return total_fame_rating()
+
+
+## (nome antigo) mesma coisa que destaque().
 func total_fame_rating() -> int:
-	var f: int = 0
+	var f: int = style_points()
 	for d in installed_part_defs():
 		var own: Dictionary = profile["owned"][String(d.id)]
 		if not bool(own["broken"]):

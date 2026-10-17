@@ -69,6 +69,7 @@ func _draw() -> void:
 		["Perda de carga (%d%%)" % roundi(float(_res.get("cargo_loss", 0.0)) * 100.0), "-%d ¥" % int(_res.get("cargo_loss_yen", 0))],
 		["Bonus de posicao", "+%d ¥" % int(_res["position_bonus"])],
 		["Ultrapassagens", "%d" % int(_res["overtakes"])],
+		["Destaque do caminhao", "%d" % int(_res.get("destaque", 0))],
 		["Fama (Kirameki)", "+%d" % int(_res["fame"])],
 	]
 	for r in rows:

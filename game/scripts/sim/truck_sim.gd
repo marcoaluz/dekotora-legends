@@ -60,6 +60,7 @@ var lane_change_time: float = 0.0       # s restantes da troca em andamento (inc
 var tap_prev: int = 0                   # direcao do comando anterior (detecta o toque)
 var lane_changes: int = 0               # trocas executadas (testes/estatistica)
 var side_hits: int = 0                  # batidas laterais (riscam murais)
+var style_points: int = 0              # destaque da pintura e dos adesivos (somado ao das pecas)
 var cargo_trait: String = "normal"   # fragile | heavy | perishable | normal (muda a fisica/prazo)
 var cargo_penalty: float = 0.0          # perda de premio por contato/batida (fracao 0..MAX_CARGO_LOSS)
 var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (eletronicos/ceramica > 1)

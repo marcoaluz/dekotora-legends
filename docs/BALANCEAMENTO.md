@@ -136,3 +136,10 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Trava no trânsito: preso atrás de um carro lento, espera 0,8 / 1,0 / 1,6 s (fácil / normal / difícil) antes de tentar sair; o difícil enxerga menos longe (7 m + 1,3 × velocidade) — rápido na reta, mas perde tempo no tráfego.
 - Duelo (rival da rota e bots normal/difícil): ao ficar a menos de 16 m do jogador abre um duelo de 5–9 s (chance por segundo 30% / 50% / 90%): emparelha a velocidade, anda na faixa vizinha e, a cada 1,6–3,2 s, mira a faixa do jogador por 1,4 s (o empurrão é a batida lateral normal). Espelha a seta do jogador: depois de 0,7 / 0,35 / 0,15 s vai para a faixa que ele quer, fechando-a.
 - Bots cancelam uma troca de faixa se aparecer alguém ao lado, exceto quando estão fechando o jogador de propósito.
+
+## Nota de destaque (ATB-2, T-107)
+
+- **Destaque** = Fama das peças instaladas e inteiras (inclui murais, calotas, andon; mural riscado perde proporcionalmente) + escape + pintura + adesivos. `GameState.destaque()`; o antigo `total_fame_rating()` é o mesmo número.
+- Pintura: branco de fábrica 0 · grafite 3 · vermelho 6 · azul 6 · rosa 9 · jade 9 · dourado 14 (vermelho/azul exigem 10 de Fama; rosa/jade 30; dourado 60). Cor fora da lista = 4.
+- Adesivo: +6 cada, no máximo 4 (lateral esq., lateral dir., traseira, cabine). Tamanho e cor não mudam a nota.
+- Na corrida o destaque entra na Fama ganha (peça quebrada perde os pontos dela; pintura e adesivos ficam). O resultado mostra "Destaque do caminhão"; a loja mostra o total no topo e o efeito de cada compra (`Destaque +N`).
