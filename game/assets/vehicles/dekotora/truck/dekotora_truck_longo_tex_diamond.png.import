@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://4325m6gfqfjx"
-path="res://.godot/imported/dekotora_truck_longo_tex_diamond.png-1ff51e968ae7f0229e2e488bc1d56416.ctex"
+path.s3tc="res://.godot/imported/dekotora_truck_longo_tex_diamond.png-1ff51e968ae7f0229e2e488bc1d56416.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "31d9612df917e12e00ead8268b73e4f9"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_longo_tex_diamond.png"
-dest_files=["res://.godot/imported/dekotora_truck_longo_tex_diamond.png-1ff51e968ae7f0229e2e488bc1d56416.ctex"]
+dest_files=["res://.godot/imported/dekotora_truck_longo_tex_diamond.png-1ff51e968ae7f0229e2e488bc1d56416.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
