@@ -22,6 +22,9 @@ var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
 var _cargo_notice: Array[String] = []
 var _lights_state: bool = true
+var _cinema := RaceCinema.new()         # cortes de camera da largada/chegada e clarao do tunel
+var _final_result: Dictionary = {}     # resultado fixado no instante em que a corrida acaba
+const END_SCREEN_DELAY: float = 2.6    # tempo do corte e do banner de chegada antes da tela de resultado
 var _hud_layer: CanvasLayer             # HUD + botoes de toque (some na pausa para o menu nao ficar por cima deles)
 var _demo: RaceDemo                    # capturas/depuracao (--demo=, --shots=)
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
@@ -55,6 +58,7 @@ var _scrape_t: float = 0.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS     # recebe o botao de pausa mesmo pausado
 	gs = get_node("/root/GameState")
+	RaceDemo.decorate_profile(gs, OS.get_cmdline_user_args())
 	route = gs.pending_route
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--route="):
@@ -97,6 +101,9 @@ func _ready() -> void:
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
+	_tunnel.exited.connect(func() -> void:
+		_cinema.tunnel_flash(tod.day_amount)
+		_demo.queue_shot("saida_tunel", 0.12))
 	var city := CityBuilder.new()
 	add_child(city)
 	city.build(path, 21, scenery, tod)
@@ -129,6 +136,7 @@ func _ready() -> void:
 	layer.scale = Vector2(2, 2)          # HUD e toque desenhados em 480x270
 	add_child(layer)
 	_hud_layer = layer
+	_cinema.build(self)
 	_hud = RaceHud.new()
 	_hud.bind(sim, player)
 	layer.add_child(_hud)
@@ -411,17 +419,25 @@ func _process(delta: float) -> void:
 			_fps_n = 0
 	var dt: float = minf(delta, 0.1)
 	if _countdown > 0.0:
+		var before: float = _countdown
 		_countdown -= dt
+		if before > RaceCinema.START_CUT_BEFORE and _countdown <= RaceCinema.START_CUT_BEFORE:
+			_cinema.start_cut("start", RaceCinema.START_CUT_S, _cut_side())      # corte lateral na largada
+		if before > 0.0 and _countdown <= 0.0:
+			_hud.show_banner(Tr.t("hud.go"), 1.3)
+	_cinema.update_flash(dt)
 	if online:
 		_process_online(dt)
 		return
-	var racing: bool = _countdown <= 0.0 and not sim.is_over()
+	var racing: bool = _countdown <= 0.0 and (not sim.is_over() or _over_time < _end_delay())
 	if racing:
 		var cmd: Commands = input.poll()
 		if _autoplay:
 			cmd = Commands.make(0.0, 1.0, 0.0)
 		if _demo.active():
 			cmd = _demo.command(sim.time)
+		if sim.is_over():
+			cmd = Commands.make(0.0, 0.0, 0.35)          # passou da linha: deixa o caminhao frear sozinho
 		sim.set_command(player, cmd)
 		_steer_smooth = lerpf(_steer_smooth, cmd.steer, minf(8.0 * dt, 1.0))
 		_acc += dt
@@ -446,8 +462,10 @@ func _process(delta: float) -> void:
 		_fps_printed = true
 		print("FPS_MEDIDO: ", Engine.get_frames_per_second(), "  draw_calls=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME), "  tris=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), "  mem_MB=", OS.get_static_memory_usage() / 1048576)
 	if sim.is_over() and not _result_shown:
+		if _final_result.is_empty():
+			_final_result = sim.result_for(player)          # fixa o resultado: o que acontece depois da linha nao conta
 		_over_time += dt
-		if _over_time >= (TIMEOUT_SCREEN_DELAY if sim.trucks[player].timed_out else 0.0):
+		if _over_time >= _end_delay():
 			_result_shown = true
 			_show_result()
 
@@ -511,6 +529,7 @@ func _handle_events(events: Array[Dictionary]) -> void:
 			"finish":
 				if int(e["truck"]) == player:
 					_hud.show_banner(Tr.t("hud.finish", [int(e["position"])]), 3.0)
+					_cinema.start_cut("finish", RaceCinema.FINISH_CUT_S, _cut_side())      # corte lateral na chegada
 			"timeout":
 				if int(e["truck"]) == player:
 					_hud.show_banner(Tr.t("hud.timeout"), 3.0)
@@ -573,6 +592,9 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
+	if _cinema.apply_cut(dt, _cam, _trucks[player]):
+		_speed_fx.update(t.speed, dt)
+		return
 	var z: float = _player_z()
 	var ex: Array = _speed_fx.camera_extra(t.speed, sim.track.curve_at(z + 30.0), dt)   # atraso na curva + tremor
 	var c: Array[Vector3] = _cam_target(z + t.speed * 0.02, _player_x())
@@ -631,8 +653,23 @@ func _build_cargo_notice(c: Dictionary) -> Array[String]:
 	return out
 
 
+## Lado da camera do corte: o lado com menos caminhoes perto (+1 = direita do jogador, -1 = esquerda).
+func _cut_side() -> float:
+	var me: TruckSim = sim.trucks[player]
+	var bias: float = 0.0
+	for k in sim.trucks.size():
+		if k != player and absf(sim.trucks[k].z - me.z) < 40.0:
+			bias += signf(sim.trucks[k].x - me.x)
+	return -1.0 if bias > 0.0 else 1.0
+
+
+## Quanto espera (corte de chegada + banner) antes da tela de resultado.
+func _end_delay() -> float:
+	return TIMEOUT_SCREEN_DELAY if sim.trucks[player].timed_out else END_SCREEN_DELAY
+
+
 func _show_result() -> void:
-	var res: Dictionary = sim.result_for(player)
+	var res: Dictionary = _final_result if not _final_result.is_empty() else sim.result_for(player)
 	print("RESULTADO: ", res)
 	_audio.finish_race(int(res["position"]) == 1)
 	gs.apply_race_result(res, String(route.id) if route != null else "", sim.trucks[player])

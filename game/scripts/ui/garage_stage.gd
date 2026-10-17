@@ -105,7 +105,9 @@ func set_daytime(on: bool) -> void:
 	day = on
 	if _env != null:
 		_env.background_color = Color("#bcd5ee") if on else Color("#07080d")
-		_env.ambient_light_energy = 1.2 if on else 0.45
+		_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if on else Environment.AMBIENT_SOURCE_SKY
+		_env.ambient_light_color = Color(0.85, 0.9, 1.0)
+		_env.ambient_light_energy = 1.0 if on else 0.45
 	if _key != null:
 		_key.light_energy = 8.5 if on else 5.0
 		_key.light_color = Color(1.0, 0.98, 0.9) if on else Color(1.0, 0.97, 0.92)
@@ -164,6 +166,11 @@ func focus_view(view: String) -> void:
 func set_layout(right_panel_open: bool) -> void:
 	_shift_goal = 0.0 if right_panel_open else 0.2
 	_zoom_goal = 1.5 if right_panel_open else 1.15
+
+
+## Aproximacao fixa da camera (1.0 = normal; menor = mais perto). Usada nas capturas de depuracao.
+func set_zoom(z: float) -> void:
+	_zoom_goal = clampf(z, 0.2, 3.0)
 
 
 ## Enquadramento de vitrine da tela inicial: 3/4 frontal baixo, caminhao deslocado para a direita

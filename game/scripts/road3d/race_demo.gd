@@ -46,6 +46,29 @@ static func fake_contract(args: PackedStringArray, route: RouteDef) -> Dictionar
 	return {}
 
 
+## `--decorated`: perfil de demonstracao (caminhao cheio de pecas, pintura, adesivos e luzes) gravado em
+## user://demo_profile.json, nunca no perfil real. Chamar antes de montar a corrida.
+static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
+	if not ("--decorated" in args):
+		return
+	gs.save_path = "user://demo_profile.json"
+	gs.new_profile()
+	gs.profile["money"] = 900000
+	gs.profile["fame"] = 500
+	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning",
+			"hub_gold", "grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "rear_lamp_cluster"]:
+		var d: PartDef = gs.part(id)
+		if d != null and gs.buy(d):
+			gs.install(id)
+	gs.profile["paint"] = "#ff2e88"
+	gs.profile["light_pattern"] = "sequential"
+	gs.profile["decals"] = [
+		{"id": "kanji_bakusou", "slot": "side_l", "x": -0.55, "y": 0.0, "size": 0.45, "color": "#f5cc5a"},
+		{"id": "estrela", "slot": "side_r", "x": -0.55, "y": 0.0, "size": 0.4, "color": "#21e6ff"},
+		{"id": "raio", "slot": "rear", "x": 0.0, "y": 0.0, "size": 0.7, "color": "#21e6ff"},
+		{"id": "sol", "slot": "cab", "x": 0.0, "y": 0.1, "size": 0.5, "color": "#ffffff"}]
+
+
 func active() -> bool:
 	return mode != ""
 
@@ -69,6 +92,9 @@ func command(race_time: float) -> Commands:
 
 
 func on_event(e: Dictionary, player: int, race_time: float) -> void:
+	if shot_dir != "" and String(e["type"]) == "finish" and int(e["truck"]) == player:
+		_queue.append([_clock + 0.9, "chegada"])
+		return
 	if shot_dir == "" or String(e["type"]) != "truck":
 		return
 	if int(e["a"]) != player and int(e["b"]) != player:
@@ -102,6 +128,12 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 		else:
 			keep.append(q)
 	_queue = keep
+
+
+## Agenda uma captura daqui a `delay` s (tempo real).
+func queue_shot(name: String, delay: float) -> void:
+	if shot_dir != "":
+		_queue.append([_clock + delay, name])
 
 
 ## Captura avulsa (ex.: tela de pausa).

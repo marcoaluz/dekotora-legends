@@ -15,6 +15,8 @@ const ARCH: Array = [[13.6, 0.0], [13.6, 5.0], [11.1, 7.4], [6.0, 8.0], [0.0, 8.
 
 var path: TrackPath
 var tunnels: Array[Vector2] = []
+var _prev_amount: float = 0.0
+signal exited                          # o jogador saiu de um tunel (clarao na camera)
 var amount: float = 0.0                 # 0..1: quanto o jogador esta dentro de um tunel (acende as luzes do caminhao)
 var _sun: DirectionalLight3D
 var _env: Environment
@@ -80,6 +82,9 @@ func track_player(z: float, truck_pos: Vector3) -> void:
 	if _env != null:
 		_env.ambient_light_energy = _amb_base * (1.0 - 0.85 * f)
 		_env.background_energy_multiplier = _bg_base * (1.0 - 0.7 * f)   # tira o reflexo azul do ceu no cromo e na pintura
+	if _prev_amount > 0.5 and f <= 0.5 and f < _prev_amount:
+		exited.emit()
+	_prev_amount = f
 	amount = f
 	_omni.visible = f > 0.01
 	if _omni.visible:

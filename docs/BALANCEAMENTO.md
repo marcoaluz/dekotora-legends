@@ -168,3 +168,8 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 
 - `GameState.rival_refusal(route_id)`; recusa = contrato do trecho bloqueado ("RIVAL RECUSA") no Mercado de fretes, que mostra a fala curta do rival e o que falta (Fama e destaque). O botão Continuar do menu abre o Mercado quando o próximo rival recusa.
 - Valores são propostas; ajustar jogando. Falas em `game/data/i18n/pt-BR.json` (`rival.<id>.refuse`).
+
+## Largada e chegada com clima (ATB-2, T-112)
+
+- **Largada:** 1,6 s antes do "larga" a câmera corta para o lado (15 m, 5 m de altura, lado com menos caminhões) e fica até 0,3 s depois; banner "LARGOU!" (1,3 s). **Chegada:** corte lateral de 1,9 s, banner "CHEGADA! nº LUGAR", e a tela de resultado só aparece 2,6 s depois (1,8 s no tempo esgotado); o caminhão passa da linha freando sozinho e o resultado é fixado no instante da chegada (o que acontece depois não conta).
+- **Clarão na saída do túnel:** tela clareia (mais forte de dia, 80%; à noite, 40%) e some em 0,75 s (`Tunnel3D.exited`, `RaceCinema`).

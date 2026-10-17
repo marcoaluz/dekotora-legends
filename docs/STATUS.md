@@ -86,3 +86,12 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 - Sem login: o código de jogador é a "senha". Servidor aceita perfil do cliente se `rev` for maior (confiança entre amigos).
 - Mural riscado só conta batidas laterais; sem textura de risco.
 - Teste de rede ainda não foi feito com celular real (só localhost com atraso simulado).
+
+## Lote ATB-2 (2026-10-17, T-107..T-112): alma Dekotora
+
+- **Destaque** (`GameState.destaque()`): peças + escape + pintura (7 cores, `StyleCatalog`) + adesivos; na loja, no topo da garagem, na corrida (Fama) e no resultado.
+- **Garagem:** abas MODELO · DECORAÇÃO (destaque, peso, proteção por zona, pintura, luzes, adesivos, peças/calotas) · MECÂNICA · REPARO; botão ☾ NOITE / ☀ DIA (prévia com luz e cromo próprios).
+- **Luzes** (`LightPatterns`, shader): fixas · sequencial · alternado · respirando; acendem à noite e nos túneis. **Adesivos** (`DecalCatalog`/`DecalPlacer`): 6 provisórios em `game/assets/decals/` (arte própria: ver `LEIA-ME.md` ali ou `user://decals/`).
+- **Rivais recusam** por Fama/destaque (`GameState.rival_refusal`), com fala no Mercado de fretes. **Largada/chegada** com corte lateral, banners e clarão na saída do túnel (`RaceCinema`).
+- Capturas em `docs/capturas_atb2/`. Depuração: garagem `-- --demo --decals --lights=sequential --tab=parts --view=rear [--day] [--hideui] --shot=ARQUIVO.png`; corrida `-- --route=kanto_2_viaduct --time=night --decorated --start=300 --demo=lanes --shots=PASTA`. **Os modos de depuração (`--demo`, `--decorated`) gravam em `user://demo_profile.json`, nunca no perfil real** (antes de 2026-10-17 o `--demo` da garagem regravava `profile.json`).
+- Pendências: adesivos e padrão de luz só aparecem no aparelho do dono (multiplayer não envia); valores de destaque/Fama dos rivais são propostas; as luzinhas densas são as do modelo (não foram adicionadas fileiras novas).

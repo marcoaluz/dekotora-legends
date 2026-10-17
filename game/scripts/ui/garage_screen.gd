@@ -125,16 +125,19 @@ func _build_bottom(root: Control) -> void:
 	root.add_child(_msg)
 
 
-## Argumentos de depuracao: --demo (monta um caminhao cheio de pecas), --tab=model|parts|mech|repair, --slot=<slot>, --damage
+## Argumentos de depuracao: --demo (monta um caminhao cheio de pecas; --noparts = sem pecas; --cab=<estilo>), --tab=model|parts|mech|repair, --slot=<slot>, --damage
 func _apply_debug_args() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	if "--demo" in args:
+		gs.save_path = "user://demo_profile.json"        # a depuracao NUNCA grava por cima do perfil real do jogador
 		gs.new_profile()
 		gs.profile["money"] = 900000
 		gs.profile["fame"] = 500
 		for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning", "hub_chrome",
 				"grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "fender_extension", "side_ornament_wave", "rear_lamp_cluster", "mudflap_designed"]:
 			var d: PartDef = gs.part(id)
+			if "--noparts" in args:                    # so o caminhao de fabrica (capturas da cabine)
+				break
 			if d != null and gs.buy(d):
 				gs.install(id)
 	if "--damage" in args:
@@ -162,9 +165,14 @@ func _apply_debug_args() -> void:
 			stage.set_daytime(true)
 		elif a.begins_with("--view="):
 			stage.focus_view(a.substr(7))
-		elif a.begins_with("--shot="):          # captura de tela depois de 3 s e fecha (depuracao)
+		elif a.begins_with("--cab=") and "--demo" in args:    # so com --demo (perfil de teste, nunca o real)
+			stage.set_cab(a.substr(6))
+		elif a.begins_with("--zoom="):                      # aproxima a camera (capturas de detalhe)
+			var z: float = float(a.substr(7))
+			get_tree().create_timer(1.0).timeout.connect(func() -> void: stage.set_zoom(z))   # depois do layout
+		elif a.begins_with("--shot="):          # captura de tela depois de 6 s (camera assentada) e fecha (depuracao)
 			var path: String = a.substr(7)
-			get_tree().create_timer(3.0).timeout.connect(func() -> void: _take_shot(path))
+			get_tree().create_timer(6.0).timeout.connect(func() -> void: _take_shot(path))
 		elif a.begins_with("--tab="):
 			_tab = a.substr(6)
 		elif a.begins_with("--slot="):

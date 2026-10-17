@@ -48,6 +48,7 @@
  "hud.gear": "MARCHA",
  "hud.draft": "VÁCUO",
  "hud.overtake": "ULTRAPASSAGEM!",
+ "hud.go": "LARGOU!",
  "market.heavy": "PESADA",
  "market.perishable": "PERECÍVEL",
  "cargo.trait.fragile": "FRÁGIL: cada batida custa mais do prêmio",
