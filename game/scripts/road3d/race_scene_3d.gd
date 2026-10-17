@@ -180,6 +180,7 @@ func _spawn_field_online() -> void:
 	for entry in grid:
 		var i: int = int(entry["idx"])
 		var node := TruckNode.new()
+		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		add_child(node)
 		var defs: Array[PartDef] = []
 		for p in entry["loadout"]["parts"]:
@@ -250,6 +251,7 @@ func _spawn_field() -> void:
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
 		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "alta"][i % 3]
+		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		add_child(node)
 		if i == 0:
 			gs.configure_truck(t)

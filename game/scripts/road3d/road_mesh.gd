@@ -85,7 +85,7 @@ func _make_materials() -> void:
 	if road.albedo_texture == null:                                         # reserva: textura procedural
 		road.albedo_texture = _tex("asphalt_albedo.png")
 		road.roughness_texture = _tex("asphalt_rough.png")
-	road.albedo_color = Color(1.3, 1.3, 1.34).lerp(Color(1.1, 1.08, 1.05), tod.day_amount) if road.albedo_texture else Color("#2c2c33")
+	road.albedo_color = Color(1.3, 1.3, 1.34).lerp(Color(0.85, 0.84, 0.82), tod.day_amount) if road.albedo_texture else Color("#2c2c33")
 	road.uv1_scale = Vector3(0.7, 0.7, 1.0)                                  # uma repeticao a cada ~5,7 m
 	road.roughness = tod.road_roughness       # noite: asfalto umido (reflete mais)
 	road.metallic_specular = 0.6

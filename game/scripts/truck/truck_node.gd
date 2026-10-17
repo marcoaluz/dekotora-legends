@@ -19,6 +19,8 @@ const WHEEL_RADIUS: float = 0.52
 var body_kind: String = "base"
 ## Cabine: "padrao", "classica", "aero" ou "alta". Definir antes de add_child.
 var cab_kind: String = "padrao"
+## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
+var chrome_mode: String = "night"
 
 var model: Node3D
 var _wheels: Array[Node3D] = []
@@ -39,6 +41,8 @@ func _ready() -> void:
 		return
 	model = scene.instantiate() as Node3D
 	add_child(model)
+	if chrome_mode != "":
+		ChromeMatcap.apply(model, chrome_mode)
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
 		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
@@ -113,6 +117,8 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 			var n: Node3D = catalog.attach(model, d.accessory_id, side)
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
+				if chrome_mode != "":
+					ChromeMatcap.apply(n, chrome_mode)
 				list.append(n)
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
