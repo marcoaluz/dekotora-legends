@@ -409,6 +409,21 @@ func configure_truck(t: TruckSim) -> void:
 	TruckConfig.apply(t, truck_descriptor())
 
 
+## Protecao por zona das pecas instaladas: {zona: [durabilidade atual, durabilidade maxima]}.
+func zone_protection() -> Dictionary:
+	var out: Dictionary = {"front": [0.0, 0.0], "rear": [0.0, 0.0], "left": [0.0, 0.0], "right": [0.0, 0.0]}
+	for d in installed_part_defs():
+		if d.durability <= 0.0:
+			continue
+		var own: Dictionary = profile["owned"][String(d.id)]
+		var cur: float = 0.0 if bool(own["broken"]) else float(own["dur"])
+		for z in d.zones:
+			if out.has(String(z)):
+				out[String(z)][0] += cur
+				out[String(z)][1] += d.durability
+	return out
+
+
 ## Pontos de destaque da pintura e dos adesivos (StyleCatalog).
 func style_points() -> int:
 	return StyleCatalog.paint_points(String(profile.get("paint", "#e9eef5"))) + StyleCatalog.decal_points(profile.get("decals", []) as Array)

@@ -21,6 +21,11 @@ const SLOT_FOCUS: Dictionary = {
 }
 
 var truck: TruckNode
+var day: bool = false                # previa de dia (luz clara) ou noite (luzes do caminhao em destaque)
+var _env: Environment
+var _key: SpotLight3D
+var _rim: OmniLight3D
+var _fill: OmniLight3D
 var cam: Camera3D
 var auto_rotate: bool = true
 var _az: float = 35.0
@@ -40,6 +45,9 @@ func _ready() -> void:
 	var hall: PackedScene = load(HALL_PATH) as PackedScene if ResourceLoader.exists(HALL_PATH) else null
 	if hall != null:                                  # galpao industrial (blender/scripts/build_garage_env.py)
 		add_child(hall.instantiate())
+	for n in get_children():
+		if n is WorldEnvironment:
+			_env = (n as WorldEnvironment).environment
 	_studio_lights()
 	_spawn_truck()
 	cam = Camera3D.new()
@@ -63,18 +71,21 @@ func _studio_lights() -> void:
 	key.light_color = Color(1.0, 0.97, 0.92)
 	key.shadow_enabled = q >= 1
 	add_child(key)
+	_key = key
 	var rim := OmniLight3D.new()
 	rim.position = Vector3(-6, 5, -16)
 	rim.omni_range = 16.0
 	rim.light_energy = 2.2
 	rim.light_color = UiTheme.PINK
 	add_child(rim)
+	_rim = rim
 	var fill := OmniLight3D.new()
 	fill.position = Vector3(-9, 4, 3)
 	fill.omni_range = 18.0
 	fill.light_energy = 1.0
 	fill.light_color = Color("#9fd8ff")
 	add_child(fill)
+	_fill = fill
 
 
 func _spawn_truck() -> void:
@@ -82,7 +93,27 @@ func _spawn_truck() -> void:
 	var prof: Dictionary = get_node("/root/GameState").profile
 	truck.body_kind = String(prof.get("body", "base"))
 	truck.cab_kind = String(prof.get("cab", "padrao"))
+	truck.chrome_mode = "day" if day else "night"
 	add_child(truck)
+	truck.set_lights_on(true, day)
+	truck.set_light_pattern(String(prof.get("light_pattern", "steady")))
+
+
+## Previa dia/noite: luz do galpao, cromo (matcap dia/noite) e luzes do caminhao. De dia as luzinhas ficam
+## acesas mas fracas; a noite brilham com o padrao escolhido.
+func set_daytime(on: bool) -> void:
+	day = on
+	if _env != null:
+		_env.background_color = Color("#bcd5ee") if on else Color("#07080d")
+		_env.ambient_light_energy = 1.2 if on else 0.45
+	if _key != null:
+		_key.light_energy = 8.5 if on else 5.0
+		_key.light_color = Color(1.0, 0.98, 0.9) if on else Color(1.0, 0.97, 0.92)
+	if _rim != null:
+		_rim.light_energy = 0.8 if on else 2.2
+	if _fill != null:
+		_fill.light_energy = 1.8 if on else 1.0
+	_respawn()
 
 
 ## Troca a carroceria do caminhao mostrado (recria o no e reaplica pecas e tinta).

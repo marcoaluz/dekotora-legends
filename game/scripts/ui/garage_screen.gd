@@ -4,7 +4,7 @@ extends Node3D
 ## Direita = ficha tecnica real (GarageInfoPanel) ou as pecas do encaixe escolhido.
 ## Embaixo = VOLTAR e botoes de vista (frente, lado, traseira, teto, rodas, girar).
 
-const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.parts", "wrench"],
+const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.deco", "paintbrush"],
 		["mech", "garage.mechanics", "cog"], ["repair", "garage.repair", "hammer"]]
 const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "view.rear"],
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
@@ -21,6 +21,7 @@ var _right: VBoxContainer
 var _chips: HBoxContainer
 var _tab_buttons: Dictionary = {}
 var _msg: Label
+var _day_btn: Button
 var _preview_cache: Dictionary = {}
 
 
@@ -41,8 +42,8 @@ func _ready() -> void:
 	root.add_child(title)
 	_chips = HBoxContainer.new()
 	_chips.alignment = BoxContainer.ALIGNMENT_END
-	_chips.position = Vector2(560, 12)
-	_chips.size = Vector2(384, 40)
+	_chips.position = Vector2(400, 12)
+	_chips.size = Vector2(544, 40)
 	root.add_child(_chips)
 	_left = _column(root, Vector2(16, 62), true)
 	_right = _column(root, Vector2(644, 62), false)
@@ -107,6 +108,14 @@ func _build_bottom(root: Control) -> void:
 		var id: String = String(vw[0])
 		b.pressed.connect(func() -> void: stage.focus_view(id))
 		h.add_child(b)
+	var dn: Button = UiTheme.button(Tr.t("garage.preview_night"), Vector2(0, 30))
+	dn.add_theme_font_size_override("font_size", 14)
+	dn.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.2), UiTheme.PINK, 1, 6, 8))
+	_day_btn = dn
+	dn.pressed.connect(func() -> void:
+		stage.set_daytime(not stage.day)
+		_refresh())
+	h.add_child(dn)
 	_msg = UiKit.heading("", 18, UiTheme.CYAN, false)
 	_msg.position = Vector2(330, 446)
 	root.add_child(_msg)
@@ -132,12 +141,26 @@ func _apply_debug_args() -> void:
 		gs.profile["owned"]["rb_chrome"]["broken"] = true
 		gs.profile["systems"]["engine"] = 55.0
 	for a in args:
-		if a.begins_with("--tab="):
+		if a == "--day":
+			stage.set_daytime(true)
+		elif a.begins_with("--view="):
+			stage.focus_view(a.substr(7))
+		elif a.begins_with("--shot="):          # captura de tela depois de 3 s e fecha (depuracao)
+			var path: String = a.substr(7)
+			get_tree().create_timer(3.0).timeout.connect(func() -> void: _take_shot(path))
+		elif a.begins_with("--tab="):
 			_tab = a.substr(6)
 		elif a.begins_with("--slot="):
 			_tab = "parts"
 			_slot = a.substr(7)
 			stage.focus_slot(_slot)
+
+
+func _take_shot(path: String) -> void:
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png(path)
+	print("CAPTURA: ", path)
+	get_tree().quit()
 
 
 func _set_tab(t: String) -> void:
@@ -155,6 +178,8 @@ func _clear(c: Control) -> void:
 
 func _refresh() -> void:
 	_preview_cache.clear()
+	if _day_btn != null:
+		_day_btn.text = Tr.t("garage.preview_day") if stage.day else Tr.t("garage.preview_night")
 	stage.refresh_truck()
 	stage.set_layout(true)
 	_clear(_left)
@@ -172,6 +197,7 @@ func _refresh() -> void:
 		"model":
 			_build_model()
 		"parts":
+			shop.build_deco_header(_left)
 			_build_slots()
 		"mech":
 			shop.build_mech(_left)

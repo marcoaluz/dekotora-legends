@@ -66,6 +66,15 @@ func _ready() -> void:
 	add_child(_headlight)
 
 
+## Luzinhas de marcacao (padroes de pisca: T-109). `bright` = visivel de dia; `day` = previa de dia.
+func set_lights_on(_on: bool, _day: bool = false) -> void:
+	pass
+
+
+func set_light_pattern(_pattern: String) -> void:
+	pass
+
+
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
 func _build_blinkers() -> void:
 	var front_z: float = -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0))

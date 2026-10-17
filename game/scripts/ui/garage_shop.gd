@@ -105,6 +105,54 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		box.add_child(rm)
 
 
+# ---------------------------------------------------------------- decoracao (cabecalho e pintura)
+
+## Topo da aba DECORACAO: destaque total, peso e protecao por zona, e a escolha de pintura (cada cor soma destaque).
+func build_deco_header(box: VBoxContainer) -> void:
+	var pv: Dictionary = preview.call({})
+	var cv: Array = card(UiTheme.PINK)
+	var v: VBoxContainer = cv[1]
+	v.add_child(UiKit.heading("%s %d" % [Tr.t("garage.destaque").to_upper(), gs.destaque()], 24, UiTheme.GOLD))
+	v.add_child(wl("%s %d kg" % [Tr.t("garage.mass"), roundi(float(pv["mass"]))], 14, UiTheme.TEXT_DIM))
+	var prot: Dictionary = gs.zone_protection()
+	var parts: PackedStringArray = []
+	for z in ["front", "rear", "left", "right"]:
+		parts.append("%s %d" % [Tr.t("zone." + z), roundi(float(prot[z][0]))])
+	v.add_child(wl("%s: %s" % [Tr.t("garage.protection"), " · ".join(parts)], 13, UiTheme.CYAN))
+	box.add_child(cv[0])
+	box.add_child(UiKit.heading(Tr.t("garage.paint").to_upper(), 18, UiTheme.PINK))
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	box.add_child(grid)
+	var cur_hex: String = String(gs.profile.get("paint", "#e9eef5")).to_lower()
+	for p in StyleCatalog.PAINTS:
+		var hex: String = String(p["hex"])
+		var locked: bool = gs.fame() < int(p["fame_required"])
+		var sel: bool = hex.to_lower() == cur_hex
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(62, 52)
+		b.text = "+%d" % int(p["points"]) if not locked else "F%d" % int(p["fame_required"])
+		b.tooltip_text = "%s · %s +%d" % [Tr.t("paint." + String(p["id"])), Tr.t("garage.destaque"), int(p["points"])]
+		b.add_theme_font_size_override("font_size", 15)
+		var col: Color = Color(hex)
+		if locked:
+			col = col.darkened(0.7)
+		b.add_theme_stylebox_override("normal", UiTheme.box(col, UiTheme.GOLD if sel else Color(1, 1, 1, 0.25), 3 if sel else 1, 8, 4))
+		b.add_theme_stylebox_override("hover", UiTheme.box(col.lightened(0.15), UiTheme.PINK, 2, 8, 4))
+		b.add_theme_color_override("font_color", Color.BLACK if col.get_luminance() > 0.5 else Color.WHITE)
+		b.disabled = locked
+		b.pressed.connect(func() -> void:
+			gs.profile["paint"] = hex
+			gs.save_profile()
+			AudioBus.play_ui("ui_select")
+			gs.profile_changed.emit())
+		grid.add_child(b)
+	box.add_child(wl(Tr.t("garage.paint_hint"), 12, UiTheme.TEXT_DIM))
+	box.add_child(UiKit.heading(Tr.t("garage.parts").to_upper(), 18, UiTheme.PINK))
+
+
 # ---------------------------------------------------------------- mecanica
 
 func build_mech(box: VBoxContainer) -> void:
