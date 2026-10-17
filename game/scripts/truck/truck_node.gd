@@ -22,6 +22,7 @@ var cab_kind: String = "padrao"
 
 var model: Node3D
 var _wheels: Array[Node3D] = []
+var _wheel_rest: Array[Basis] = []
 var _headlight: SpotLight3D
 var _tail_glow: OmniLight3D
 var _spin: float = 0.0
@@ -40,6 +41,7 @@ func _ready() -> void:
 	add_child(model)
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		_wheels.append(n as Node3D)
+		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
 	_headlight = SpotLight3D.new()
 	_headlight.position = Vector3(0, 1.2, -11.6 - float(LENGTH_DELTA.get(body_kind, 0.0)))
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
@@ -55,12 +57,15 @@ func _ready() -> void:
 ## Gira as rodas e aplica a escala de velocidade; `dt` em segundos reais.
 func animate(speed: float, dt: float, steer: float = 0.0) -> void:
 	_spin += speed / WHEEL_RADIUS * dt
-	for w in _wheels:
+	_spin = fmod(_spin, TAU)                 # evita perder precisao em corridas longas
+	for i in _wheels.size():
+		var w: Node3D = _wheels[i]
 		var r: Basis = Basis(Vector3.RIGHT, -_spin)
 		var base_yaw: float = 0.0
 		if String(w.name).begins_with("wheel_f"):
 			base_yaw = -steer * 0.35
-		w.transform.basis = Basis(Vector3.UP, base_yaw) * r
+		# ordem: rotacao original do modelo -> giro no eixo X -> esterçamento no eixo vertical
+		w.transform.basis = Basis(Vector3.UP, base_yaw) * r * _wheel_rest[i]
 
 
 func set_headlights(on: bool) -> void:

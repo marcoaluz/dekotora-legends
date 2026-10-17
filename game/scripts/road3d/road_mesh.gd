@@ -18,8 +18,8 @@ const COAST_GRASS: float = 14.0             # litoral: grama do lado do mar ante
 const COAST_SAND: float = 16.0              # largura da praia (desce ate o mar)
 const SEA_DROP: float = 1.6
 
-const COL_RUMBLE_A := Color("#ff2e88")
-const COL_RUMBLE_B := Color("#e8edf5")
+const COL_RUMBLE_A := Color("#c9ccd2")   # PROTOTIPO: sem zebra de autodromo
+const COL_RUMBLE_B := Color("#c9ccd2")
 const TEX_DIR := "res://assets/textures/"
 
 var path: TrackPath
@@ -50,7 +50,7 @@ func _make_materials() -> void:
 	road.albedo_texture = _tex("asphalt_albedo.png")
 	road.albedo_color = Color(1.25, 1.25, 1.3) if road.albedo_texture else Color("#2c2c33")
 	road.roughness_texture = _tex("asphalt_rough.png")
-	road.roughness = 1.0
+	road.roughness = 0.55                       # PROTOTIPO: asfalto umido
 	road.metallic_specular = 0.6
 	road.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	_mats["road"] = road

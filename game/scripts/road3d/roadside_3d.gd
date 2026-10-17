@@ -29,6 +29,7 @@ func build(path_: TrackPath, kind: StringName = &"city") -> void:
 			"lamp_post":
 				if xu < 0.0:
 					b = Basis(Vector3.UP, yaw + PI)   # o braco aponta para a pista
+				_pool(path.world_point(z, xu * 0.6, 0.06), yaw)   # PROTOTIPO: poca de luz de sodio no asfalto
 			"tree":
 				model = _tree_model(kind, rng)
 				var sc: float = rng.randf_range(0.8, 1.5)
@@ -87,3 +88,30 @@ func _add_multi(mesh: ArrayMesh, xforms: Array) -> void:
 	mi.multimesh = mm
 	mi.visibility_range_end = 450.0
 	add_child(mi)
+
+
+var _pool_mat: StandardMaterial3D
+## PROTOTIPO: "poca" de luz pintada no chao (quad aditivo com gradiente radial); barato no celular.
+func _pool(pos: Vector3, yaw: float) -> void:
+	if _pool_mat == null:
+		var g := Gradient.new()
+		g.set_color(0, Color(1.0, 0.62, 0.25, 0.75))
+		g.set_color(1, Color(1.0, 0.5, 0.15, 0.0))
+		var t := GradientTexture2D.new()
+		t.gradient = g
+		t.fill = GradientTexture2D.FILL_RADIAL
+		t.fill_from = Vector2(0.5, 0.5)
+		t.fill_to = Vector2(1.0, 0.5)
+		_pool_mat = StandardMaterial3D.new()
+		_pool_mat.albedo_texture = t
+		_pool_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_pool_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_pool_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	var q := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(16, 22)
+	q.mesh = pm
+	q.material_override = _pool_mat
+	q.position = pos
+	q.rotation.y = yaw
+	add_child(q)
