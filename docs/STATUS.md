@@ -75,6 +75,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   memória quando há vários modelos na corrida); (2) PNGs antigos extraídos que os .glb novos não usam mais (`*_tex_grime.png`,
   `*_tex_diamond.png`, `*_tex_perforated.png`, `*_tex_perf_grille.png`) continuam na pasta (não apaguei sem o Marco); (3) sem interior
   (bancos/painel) atrás do vidro escuro; (4) flocos metálicos e reflexo real no vidro dependem de luz do jogo, não da textura.
+- **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **Plano visual (`docs/PLANO_VISUAL.md`, análise do Marco em `docs/dekotora_analise_visual/`) — V0 a V7 FEITOS (2026-10-17)**:
   V0 rodas giram no eixo certo; V1 três identidades em `docs/DIRECAO_ARTE.md` (**Marco escolhe A, B ou C**); V2 hora do dia por rota
   (`TimeOfDay`, `data/time/night|dusk|day.tres`, céu por shader com estrelas/lua/sol/nuvens/Fuji; `--time=day` para testar);

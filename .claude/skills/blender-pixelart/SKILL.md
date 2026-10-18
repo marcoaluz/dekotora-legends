@@ -39,6 +39,8 @@ Leia também `docs/PIPELINE_ARTE_BLENDER.md` (o "o quê"). Esta skill é o "como
 | Caminhão pequeno demais no ângulo reto | `fit_camera` usa o pior caso (curva forte) | Use ângulos menores (±12°/±6°) ou quadro mais largo (ex.: 128×72); decida olhando a folha |
 | Imagem de cabeça para baixo | Blender guarda pixels de baixo para cima | `render_rgba`/`save_png` já invertem |
 | Avisos "EGL Error" no terminal | Contexto gráfico sem tela | Inofensivos se o PNG foi salvo |
+| Caminho relativo em `scene.render.filepath` no Blender em background vai parar na raiz do disco (`C:\blender\...`) | Caminho relativo | Use sempre caminho absoluto |
+| Câmera com `to_track_quat('Z', 'Y')`: a imagem sai girada 90° | Eixo de track errado para câmera | `to_track_quat('-Z', 'Y')` é o certo para câmera |
 
 ## Regras do pipeline
 
