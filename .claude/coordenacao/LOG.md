@@ -100,3 +100,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: inventário dos modelos (docs/INVENTARIO_MODELOS.md; Tunnel.obj/van.abc só medidos, sem copiar); placas japonesas fictícias em caminhões e tráfego; sinalização japonesa (limites, losangos, chevrons, km, 出口, placa do túnel, 止まれ no pedágio).
 - Validação: 179 testes, 0 falhas; modo médio nas 3 rotas: +3 chamadas de desenho, FPS igual (75), textura +0,9 MB.
 - Decisão pendente: Marco mandar link/licença de Tunnel.obj e van.abc; aprovar limites, 止まれ no pedágio e nomes de túnel.
+
+## 2026-10-18 15:30 · T-133 · especialista · CONCLUÍDA
+- Feito: pneus já giravam (13 modelos, jogador/rivais/tráfego); calotas e rodas da loja ficavam nos pontos fixos MOUNT_WHEEL_FRONT_FACE (só frente). Agora `TruckWheels` prende a peça de roda em todas as rodas externas como filha do pneu (gira e estérça junto), giro por raio de cada roda (Canter 0,45/0,43; JAC 0,55; americana 0,53), garagem gira devagar só na vista RODAS. Sem regerar .glb.
+- Arquivos: game/scripts/truck/truck_wheels.gd (novo), truck_node.gd, ui/garage_stage.gd, ui/garage_screen.gd (--shot-pair), road3d/race_demo.gd (--burst), tests/test_wheels_spin.gd, tools_dev/measure_wheels.gd, docs STATUS/DECISOES/ACESSORIOS, docs/direcao_arte/rodas_girando_*.png.
+- Validação: 184 testes, 0 falhas (179 + 5 novos); capturas de 2 quadros seguidos na corrida e na garagem conferidas; corrida decorada sem vsync: ~249 FPS antes, ~247 depois (ruído), +~10 chamadas, +~2 mil triângulos (peças de roda sem sombra e até 60 m).
+- Decisão pendente: nenhuma (confirmar com o Marco se quer as peças visíveis além de 60 m e a velocidade do giro na garagem).
