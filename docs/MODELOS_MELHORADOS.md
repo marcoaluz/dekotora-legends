@@ -11,6 +11,23 @@ Data: 2026-10-18. Pedido do Marco: "pegar para criar novos carros de NPC, cabine
 A pasta é pesada (~700 MB) e **não deve ir para o Git** (adicionar ao `.gitignore`, como `docs/Novos modelos/`).
 Medidas feitas no Blender 5.2.2 e lendo os `.glb` diretamente. Prévias em `docs/direcao_arte/modelos_melhorados/`.
 
+## Status (atualizado 2026-10-18, T-124)
+
+O Marco confirmou que **todos os modelos baixados são Royalty Free** (2026-10-18). Viraram tráfego (créditos em `game/assets/LICENCAS.md`):
+
+| Modelo | Arquivo no jogo | Tipo no tráfego | Triângulos (origem → jogo) | Observação |
+| --- | --- | --- | --- | --- |
+| Van 01 (foad3d) | `car_van01.glb` | carro | 505 mil → 6,1 mil | T-121, `build_traffic_van01.py` |
+| Opel Ascona | `car_ascona.glb` | carro | 98 mil → 5,0 mil | cores lisas pela textura original, grade lisa (emblema some), rodas nossas, teto de vinil escuro |
+| Ford Falcon GT | `car_falcon.glb` | carro | 94 mil → 5,0 mil | idem |
+| SUV do mini pack 5 | `car_suv.glb` | carro | 13 mil (um SUV) → 4,7 mil | rodas dele reduzidas |
+| Fumi SC | `car_fumi.glb` | **esportivo** (raro, 29–34 m/s) | 82 mil → 5,6 mil | sem interior, motor, volante, emblema e letreiro |
+| Ônibus Jetset | `car_bus.glb` | **ônibus** (13,3 m, 13–17 m/s, 12 t) | 143 mil → 8,8 mil | sem assentos, painel, escadas |
+
+Todos: 2 materiais (`paint_white` + atlas de cores lisas), rodas `wheel_f`/`wheel_r` com pivô no eixo, 4 superfícies por carro
+(os 4 carros antigos têm 6–7). Gerar de novo: `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all`
+(lê daqui, ~14 s, determinístico). JAC 1045 virou o Canter e a cabine curta (T-125). Kenworth, Camry NYPD e bonde continuam fora.
+
 ## Resumo
 
 | Modelo | O que é | Triângulos | Peças separadas | Licença no arquivo | Uso possível |

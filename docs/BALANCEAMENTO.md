@@ -194,4 +194,22 @@ que vai para o servidor no multiplayer).
 - Pontos fracos: só pega fretes de até 4 t (paga menos), é empurrado mais longe nas batidas laterais (o empurrão é
   proporcional à massa do OUTRO) e o motor rende 55% do torque (com V8 + turbo continua abaixo do caminhão grande no topo).
 - Hitbox de 7 m: passa por brechas no trânsito e não encosta em quem está a 8 m. O vácuo conta a partir do nariz (z + 7 m).
-- Os bots continuam com 12 m (o trânsito, `TrafficSim.TRUCK_LEN`, também). Ajustar jogando.
+- Os bots continuam com 12 m. O trânsito enxerga o comprimento real de cada caminhão (`TruckSim.length`, T-124). Ajustar jogando.
+
+## Tipos de veículo do trânsito (T-124)
+
+Proposta para testar (`TrafficSim.KIND_*`). O tipo de cada veículo é fixo pelo índice (servidor e clientes concordam sem rede).
+
+| Tipo | Quantos | Comprimento | Largura | Velocidade | Massa | Modelos |
+| --- | --- | --- | --- | --- | --- | --- |
+| Carro | o resto | 4,5 m | 1,9 m | 15–26 m/s (54–94 km/h) | 1.500 kg | hatch, sedã, van, kei, van01, Ascona, Falcon, SUV |
+| **Ônibus** | 1 a cada 11 (o 6º, o 17º): 1 no leve/normal, 2 no pesado | **13,3 m** | 2,5 m | **13–17 m/s** (47–61 km/h) | **12.000 kg** | ônibus Jetset |
+| **Esportivo** | 1 a cada 9 (o 5º, o 14º): 1 no leve, 2 no normal/pesado | 4,5 m | 2,0 m | **29–34 m/s** (104–122 km/h) | 1.400 kg | Fumi SC |
+
+- **Fila e ultrapassagem:** quem alcança um mais lento (carro, ônibus ou caminhão) na mesma linha tenta a faixa da esquerda,
+  depois a da direita (livre = 20,5 m entre carrocerias e nenhum caminhão ao lado); sem faixa livre, freia (7 m/s²) e segue
+  atrás com 8 m de folga. Volta à velocidade de cruzeiro a 3 m/s². Antes os carros atravessavam uns aos outros.
+- **Batida:** o empurrão e o dano usam a massa do tipo: bater na traseira do ônibus segura mais o caminhão e dói mais
+  (`DamageModel.impact_damage(dv, 12000)`). O hitbox usa o comprimento e a largura do tipo.
+- O esportivo é mais rápido que todo o trânsito, mas mais lento que o caminhão no limite (38,9 m/s): ele passa o jogador
+  que estiver devagar e é alcançado por quem estiver no talo.

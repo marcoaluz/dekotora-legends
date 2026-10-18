@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-16**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-18**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -90,6 +90,15 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   câmera da corrida chega mais perto do Canter. Corrida (modo médio, litoral) ~75 FPS, ~340 chamadas (base ~380). Capturas em
   `docs/capturas_t125/`; depuração da garagem: `-- --demo --body=canter [--cab=curta]`.
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
+- **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
+  Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).
+  Scripts: `blender/scripts/build_traffic_van01.py` e `build_traffic_cars.py -- --model all` (+ `lib/traffic_kit.py`,
+  `traffic_classify.py`, `traffic_preview.py`; lêem `docs/Novos modelos/` e `docs/Modelos Melhorados/`, fora do Git). Cada carro:
+  2 materiais (`paint_white` + atlas de cores lisas), rodas `wheel_f`/`wheel_r` que giram, 4,7–6,1 mil triângulos (ônibus 8,8 mil).
+  Simulação: `TrafficSim.Kind` (tamanho, velocidade, massa por tipo; fila/ultrapassagem atrás de quem é mais lento), hitbox por tipo
+  em `Collision.resolve_traffic`; `Traffic3D.MODELS_BY_KIND`. Medido (kanto_2, 14 veículos, qualidade média): superfícies do
+  trânsito 96 → 65, ~420 chamadas de desenho (antes ~440), triângulos ~208 → ~232 mil, 75 FPS nos dois. Comparar:
+  `-- --traffic-classic` (só os 4 antigos). Capturas: `docs/capturas_t124/`. Testes: `test_traffic_models.gd`, `test_traffic_kinds.gd`.
 - **Plano visual (`docs/PLANO_VISUAL.md`, análise do Marco em `docs/dekotora_analise_visual/`) — V0 a V7 FEITOS (2026-10-17)**:
   V0 rodas giram no eixo certo; V1 três identidades em `docs/DIRECAO_ARTE.md` (**Marco escolhe A, B ou C**); V2 hora do dia por rota
   (`TimeOfDay`, `data/time/night|dusk|day.tres`, céu por shader com estrelas/lua/sol/nuvens/Fuji; `--time=day` para testar);
