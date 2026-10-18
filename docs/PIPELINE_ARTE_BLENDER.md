@@ -26,6 +26,8 @@ blender -b -P blender/scripts/render_truck.py -- --truck base --parts all
 | `export.py` | Salva PNG + JSON (tamanho, âncora, offset) e a folha de contato |
 | `damage.py` | Gera os estados amassado (deforma vértices com ruído determinístico) e quebrado (remove/desloca partes) |
 | `palette.py` | Lê `blender/palettes/dekotora.json` |
+| `tex_truck.py` | Texturas procedurais (numpy) do caminhão: pintura, plástico, para-brisa, colmeia, fendas, chapa xadrez, pneu |
+| `pbr.truck_set` | Materiais exclusivos do caminhão (função `truck_set` em `pbr.py`), acrescentados ao conjunto padrão |
 
 ## Convenções do modelo
 

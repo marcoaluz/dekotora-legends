@@ -79,3 +79,12 @@ Leia também `docs/PIPELINE_ARTE_BLENDER.md` (o "o quê"). Esta skill é o "como
 Para *inspecionar* uma cena aberta (não para o pipeline, que é sempre por script), existe o servidor MCP oficial
 do Blender Lab (exige Blender 5.1+) e o comunitário "MCP for Blender". Só sugira instalar se o Marco pedir ou se
 um problema visual não puder ser entendido pelos renders.
+
+## Caminhão 3D (T-106)
+
+- Placas que seguem a casca da cabine usam `truck3d/cab_surface.py` (função `patch()`). Toda placa precisa de uma
+  linha nas dobras da casca; isso já é automático pelo atributo `kinks` da casca.
+- Texturas por altura usam `mesh3d.uv_height` (u e v em metros, sujeira sempre embaixo, chuva descendo de cima).
+- A folha de conferência sai em `previews/truck_<tag>_sheet.png` (com `--night`, `truck_<tag>_night_sheet.png`).
+  O build sem `--no-preview` gera sozinho.
+- Para medir triângulos e MB de textura: `python tools/glb_stats.py <arquivos .glb>` (só biblioteca padrão do Python).
