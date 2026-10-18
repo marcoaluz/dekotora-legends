@@ -1,7 +1,8 @@
 class_name DebugShot
 extends RefCounted
 ## Capturas de depuracao de qualquer tela (T-138): `-- --shot=C:/pasta/x.png [--shot-delay=3]` salva a imagem
-## da janela depois do atraso e fecha o jogo. Use com `--resolution 960x540` ou `--resolution 2400x1080`.
+## da janela depois do atraso e fecha o jogo. Use com `--resolution 960x540` ou `--resolution 1200x540` (= layout
+## de 2400x1080 / 20:9; a janela nao passa do tamanho do monitor).
 ## Sem `--shot=` nao faz nada (custo zero no jogo normal).
 
 

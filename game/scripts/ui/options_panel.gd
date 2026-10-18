@@ -6,6 +6,7 @@ extends PanelContainer
 
 signal back_pressed
 signal profile_changed
+signal menu_bg_changed
 
 const CATEGORIES: Array = [["controls", "options.cat_controls", "gamepad-2"], ["graphics", "options.cat_graphics", "monitor"],
 		["audio", "options.cat_audio", "volume-2"], ["account", "options.cat_account", "circle-user"]]
@@ -80,6 +81,12 @@ func _show(id: String) -> void:
 			_toggle(Tr.t("options.fx_trails"), _s.fx_trails, func(on: bool) -> void: _s.fx_trails = on)
 			_toggle(Tr.t("options.fx_rain"), _s.fx_rain, func(on: bool) -> void: _s.fx_rain = on)
 			_hint(Tr.t("options.fx_hint"))
+			var bgs: Array[String] = MenuBackdrop.KINDS
+			_choice(Tr.t("options.menu_bg"), bgs.map(func(k: String) -> String: return Tr.t("options.menu_bg_" + k)), maxi(bgs.find(String(_s.menu_bg)), 0),
+					func(i: int) -> void:
+						_s.menu_bg = bgs[i]
+						menu_bg_changed.emit())
+			_hint(Tr.t("options.menu_bg_hint"))
 		"audio":
 			_slider(Tr.t("options.music"), _s.music_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.music_volume = v, true)
 			_slider(Tr.t("options.sfx"), _s.sfx_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.sfx_volume = v, true)

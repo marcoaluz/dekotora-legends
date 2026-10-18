@@ -213,4 +213,15 @@ func _show_options() -> void:
 	op.profile_changed.connect(func() -> void:
 		stage.refresh_truck()
 		_show_main())
+	op.menu_bg_changed.connect(_swap_backdrop)
 	_panel.add_child(op)
+
+
+## Opcoes > Graficos > Fundo da tela inicial: troca o cenario 3D na hora (o painel de opcoes continua aberto).
+func _swap_backdrop() -> void:
+	var old: MenuBackdrop = stage
+	stage = MenuBackdrop.create(String(get_node("/root/Settings").menu_bg))
+	add_child(stage)
+	move_child(stage, old.get_index())
+	old.queue_free()
+	stage.focus_default()

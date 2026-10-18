@@ -384,7 +384,7 @@
  "result.time": "Tempo",
  "result.deadline": "Prazo",
  "result.freight": "Frete",
- "result.cargo_row": "Perda de carga (%d%%)",
+ "result.cargo_row": "Perda de carga",
  "result.position_bonus": "Bônus de posição",
  "result.overtakes_row": "Ultrapassagens",
  "result.destaque": "Destaque do caminhão",

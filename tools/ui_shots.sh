@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Capturas de todas as telas (T-138) em uma resolucao. Abre uma janela por tela (o modo headless nao desenha).
 # Uso (na raiz do projeto): bash tools/ui_shots.sh 960x540 PASTA [tela...]
+# 2400x1080 (20:9): use 1200x540. A janela nao passa do tamanho do monitor, e com stretch canvas_items
+# (base 960x540, aspect expand) o layout de 1200x540 e identico ao de 2400x1080 (so muda a nitidez).
 # Telas: menu market options newcareer garage garage_parts garage_mech garage_repair garage_wheel lobby pause result result_lose result_timeout
 GODOT="${GODOT:-/d/DEV/Godot/Godot_v4.7.2-stable_win64.exe}"
 RES="${1:-960x540}"

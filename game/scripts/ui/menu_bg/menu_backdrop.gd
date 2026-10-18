@@ -1,12 +1,14 @@
 class_name MenuBackdrop
 extends Node3D
-## Fundo 3D da tela inicial (T-138): o caminhao do jogador numa cena leve. Opcoes (escolha do Marco pendente):
-##   a  = posto de estrada a noite com neon (MenuBgRestStop) — padrao provisorio
+## Fundo 3D da tela inicial (T-138): o caminhao do jogador numa cena leve. Duas opcoes nas Opcoes > Graficos:
+##   a  = posto de estrada a noite com neon (MenuBgRestStop) — padrao
 ##   b  = rodovia a noite, caminhao passando em camera lenta (MenuBgHighway)
-##   hall = galpao da garagem (o fundo antigo, MenuBgHall)
-## Escolha por argumento: `-- --menu-bg=a|b|hall`. A base cuida do caminhao e da camera orbital suave.
+##   hall = galpao da garagem (o fundo antigo, MenuBgHall; so por argumento, para comparar)
+## Escolha: Settings.menu_bg, ou o argumento `-- --menu-bg=a|b|hall` (manda). A base cuida do caminhao e da camera.
 
 const DEFAULT_KIND: String = "a"
+## Fundos que aparecem nas Opcoes (texto em options.menu_bg_<kind>).
+const KINDS: Array[String] = ["a", "b"]
 
 var truck: TruckNode
 var cam: Camera3D
@@ -18,8 +20,10 @@ var _t: float = 0.0
 
 
 ## Cria o fundo pedido por `--menu-bg=` (ou o padrao).
-static func create() -> MenuBackdrop:
-	var kind: String = DEFAULT_KIND
+static func create(kind: String = "") -> MenuBackdrop:
+	if kind == "":
+		var s: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("Settings")
+		kind = String(s.menu_bg) if s != null else DEFAULT_KIND
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--menu-bg="):
 			kind = a.substr(10)

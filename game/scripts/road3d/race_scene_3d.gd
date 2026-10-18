@@ -184,9 +184,13 @@ func _ready() -> void:
 		_print_surface_budget()
 	if "--paused" in args:                       # depuracao: abre ja na tela de pausa (capturas)
 		_toggle_pause.call_deferred()
+	if _demo.mode.begins_with("result"):         # --demo=result|result_lose|result_timeout: so a tela (nao grava no perfil)
+		_result_shown = true
+		_open_result.call_deferred(ResultScreen.demo_result(_demo.mode), "res://scenes/menu/main_menu.tscn")
 	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
+	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
 
 
 ## Hora do dia: a da rota, ou --time=night|dusk|day (depuracao/capturas).
@@ -275,14 +279,7 @@ func _on_net_end(result: Dictionary) -> void:
 	_result_shown = true
 	Net.pending_setup = {}
 	_audio.finish_race(int(result["position"]) == 1)
-	var layer := CanvasLayer.new()
-	layer.layer = 20
-	layer.scale = Vector2(2, 2)
-	add_child(layer)
-	var screen := ResultScreen.new()
-	layer.add_child(screen)
-	screen.show_result(result)
-	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/lobby/lobby.tscn"))
+	_open_result(result, "res://scenes/lobby/lobby.tscn")
 
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
@@ -672,14 +669,18 @@ func _show_result() -> void:
 	print("RESULTADO: ", res)
 	_audio.finish_race(int(res["position"]) == 1)
 	gs.apply_race_result(res, String(route.id) if route != null else "", sim.trucks[player])
+	_open_result(res, "res://scenes/menu/main_menu.tscn")
+
+
+## Tela de resultado numa camada propria SEM escala (layout por containers, T-138). `next_scene` = para onde o CONTINUAR leva.
+func _open_result(res: Dictionary, next_scene: String) -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 20
-	layer.scale = Vector2(2, 2)
 	add_child(layer)
 	var screen := ResultScreen.new()
 	layer.add_child(screen)
 	screen.show_result(res)
-	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
+	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), next_scene))
 
 
 ## Depuracao (--fps-log): quantas superficies (≈ chamadas de desenho) cada parte da cena tem.
