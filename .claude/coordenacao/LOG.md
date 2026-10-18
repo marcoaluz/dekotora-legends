@@ -112,3 +112,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: game/scripts/sim/{curve_grip,truck_sim,traffic_sim}.gd, road3d/{track_path,race_scene_3d,traffic_3d,race_demo}.gd, ui/race_hud.gd, audio/race_audio.gd, data/i18n/pt-BR.json, tests/test_lane_following.gd, tests/test_sim_basic.gd (comentário), tools_dev/{measure_lane_following,check_glb_orientation}.gd, docs STATUS/DECISOES/BALANCEAMENTO/GDD/ROADMAP, docs/direcao_arte/faixa_curva_*.png
 - Validação: medição antes (9,88 m viaduto, 7,94 m montanha, 52% corpo > 2°) reproduz o Marco; depois 0,36 / 0,25 / 0,19 m e 0% > 2° (máx 0,16°); 192 testes 0 falhas (após merge da main); net_test PASSOU (Ana estoura o prazo nos dois casos, antes e depois: já existia); capturas olhadas.
 - Decisão pendente: com V8 + turbo duplo (ou 16 t) acelerando sem soltar, entra a +47% na curva 1,0 do viaduto e escapa (regra dos +30%, com aviso). Manter ou subir o limite/atrito? Aviso: a main tem um gitlink `.claude/worktrees/agent-ab772c8029a7a1802` versionado (veio da main, não desta tarefa).
+
+## 2026-10-18 · T-138 · especialista · CONCLUÍDA
+- Feito: telas por containers presas às bordas (aspect expand), resultado novo com frases claras, fundo do menu A/B nas Opções, garagem com câmera mais perto, cromo de estúdio e botão VER EM MOVIMENTO, ~115 chaves pt-BR que faltavam, teste de textos.
+- Validação: 196 testes, 0 falhas na main após o merge; capturas 960x540 e 1200x540 em docs/capturas_t138/.
+- Decisão pendente: fundo padrão do menu (A posto / B rodovia) e se a câmera da garagem está perto o bastante.
