@@ -34,3 +34,6 @@ builds/
 
 # Videos e quadros de referencia (analise de outros jogos) - nunca commitar
 referencias/
+
+# Modelos 3D de terceiros em avaliacao (1,1 GB, licenca desconhecida): nunca commitar
+docs/Novos modelos/
