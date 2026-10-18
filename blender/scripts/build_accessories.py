@@ -141,7 +141,7 @@ def write_catalog(out: str, entries: list) -> None:
         "version": 1,
         "units": "metros",
         "godot_forward": "-Z",
-        "truck": {"id": "dekotora_truck_base", "model": "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb",
+        "truck": {"id": "dekotora_truck_base", "model": "res://assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb",
                   "mount_points_godot_xyz": mounts},
         "categories": {"front": "Frente", "lighting": "Teto e iluminação", "sides": "Laterais e rodas", "rear": "Traseira e decoração"},
         "accessories": items,

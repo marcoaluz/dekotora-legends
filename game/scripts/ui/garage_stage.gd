@@ -93,7 +93,7 @@ func _spawn_truck() -> void:
 	truck = TruckNode.new()
 	var prof: Dictionary = get_node("/root/GameState").profile
 	truck.body_kind = String(prof.get("body", "base"))
-	truck.cab_kind = String(prof.get("cab", "padrao"))
+	truck.cab_kind = CabCatalog.normalize(prof.get("cab", ""))
 	truck.chrome_mode = "day" if day else "night"
 	add_child(truck)
 	truck.set_lights_on(true, day)
@@ -127,7 +127,7 @@ func set_body(kind: String) -> void:
 
 ## Troca a cabine do caminhao mostrado.
 func set_cab(kind: String) -> void:
-	get_node("/root/GameState").profile["cab"] = kind
+	get_node("/root/GameState").profile["cab"] = CabCatalog.normalize(kind)
 	_respawn()
 
 

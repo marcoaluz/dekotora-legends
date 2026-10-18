@@ -4,6 +4,9 @@ extends Node3D
 ## Debug: -- --autoplay  --start=600  --touch  --shot (sem HUD de toque)
 
 const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#3a73d6"), Color("#3fb26f")]
+## Cabine dos bots por posicao no grid (o 0 e o jogador). Antes da T-129: classica, aero, curta, chata;
+## as cabines por codigo viraram a nova mais parecida (aero -> jac).
+const RIVAL_CABS: Array[String] = ["chata", "jac", "curta", "chata"]
 
 var sim: RaceSim
 var path: TrackPath
@@ -209,6 +212,7 @@ func _spawn_field_online() -> void:
 		var node := TruckNode.new()
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		node.body_kind = String(entry["loadout"].get("body", "base"))      # o Canter tem outro tamanho na simulacao
+		node.cab_kind = CabCatalog.normalize(entry["loadout"].get("cab", ""))   # descritor antigo/sem cabine -> padrao
 		add_child(node)
 		var defs: Array[PartDef] = []
 		for p in entry["loadout"]["parts"]:
@@ -278,7 +282,7 @@ func _spawn_field() -> void:
 		t.is_bot = i != 0
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
-		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "curta", "chata"][i % 4]
+		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		add_child(node)
 		if i == 0:

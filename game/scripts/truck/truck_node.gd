@@ -4,17 +4,20 @@ extends Node3D
 ## lanternas. A origem do no e a TRASEIRA do bau no chao; a frente aponta para -Z (convencao Godot).
 ## Pecas (acessorios) entram nos nos MOUNT_* do modelo.
 
-const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb"
+## Caminhao padrao (bau medio + cabine padrao CabCatalog.DEFAULT): visualizador de acessorios e testes.
+const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb"
 const MODEL_PATHS: Dictionary = {
 	"base": MODEL_PATH,
-	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve.glb",
-	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo.glb",
+	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve_chata.glb",
+	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo_chata.glb",
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
-## Cabines que existem em .glb (a "padrao" nao tem sufixo no nome do arquivo).
-const CABS: Array[String] = ["padrao", "classica", "aero", "alta", "chata", "curta"]
+## Cabines que existem em .glb (T-129: so de modelos de arquivo; ids antigos caem em CabCatalog.normalize).
+const CABS: Array[String] = CabCatalog.IDS
+## Quanto a frente de cada cabine passa da frente padrao (CAB_Y1 = 11,5 m): JAC grande e bico longo americano.
+const CAB_FRONT_DELTA: Dictionary = {"jac": 0.17, "americana": 0.09}
 ## Modelos com cabine fixa (nao combinam com as outras cabines).
 const FIXED_CAB: Dictionary = {"canter": "canter"}
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
@@ -25,10 +28,11 @@ const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
 const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
 const MURAL_USER := "user://mural_side.png"
-## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
+## Modelo: "base" (bau medio), "leve" (bau curto), "longo", "canter" ou "carreta" (guardada). Definir antes de add_child.
 var body_kind: String = "base"
-## Cabine: "padrao", "classica", "aero", "alta", "chata" (cara chata, T-119) ou "curta" (JAC, T-125). Definir antes de add_child.
-var cab_kind: String = "padrao"
+## Cabine: um id de CabCatalog.IDS ("chata", "jac", "curta", "americana"); ids antigos viram o mais parecido.
+## Definir antes de add_child.
+var cab_kind: String = CabCatalog.DEFAULT
 ## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
 var chrome_mode: String = "night"
 
@@ -51,6 +55,7 @@ var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 tr
 
 
 func _ready() -> void:
+	cab_kind = CabCatalog.normalize(cab_kind)
 	var path: String = model_path(body_kind, cab_kind)
 	var scene: PackedScene = load(path) as PackedScene
 	if scene == null:
@@ -69,7 +74,7 @@ func _ready() -> void:
 		_wheels.append(n as Node3D)
 		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
 	_headlight = SpotLight3D.new()
-	_headlight.position = Vector3(0, 1.2, -11.6 - float(LENGTH_DELTA.get(body_kind, 0.0)))
+	_headlight.position = Vector3(0, 1.2, -11.6 - front_delta())
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
 	_headlight.spot_range = 70.0
 	_headlight.spot_angle = 32.0
@@ -123,12 +128,12 @@ func apply_decals(decals: Array) -> void:
 	_decal_nodes.clear()
 	if model == null:
 		return
-	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)), shown_cab())
+	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - front_delta(), shown_cab())
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
 func _build_blinkers() -> void:
-	var front_z: float = -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0))
+	var front_z: float = -11.5 - front_delta()
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(1.0, 0.62, 0.05)
 	mat.emission_enabled = true
@@ -220,13 +225,15 @@ func _apply_mural() -> void:
 ## os 20 modelos; um .glb futuro que ja traga o ponto tem prioridade.
 static func extra_mounts(body: String, cab: String) -> Dictionary:
 	var d: float = float(LENGTH_DELTA.get(body, 0.0))
-	var stack: Vector3 = Vector3(1.3, 8.3 + d, 0.9)           # escapamentos de fabrica (padrao, classica, aero, alta, chata)
+	var stack: Vector3 = Vector3(1.3, 8.3 + d, 0.9)           # escapamentos de fabrica (chata, americana)
 	var sc: float = 1.0
 	if body == "canter":
 		stack = Vector3(1.25, 5.09, 0.75)                    # entre a cabine curta e o bau do Canter
 		sc = 0.88
 	elif cab == "curta":
 		stack = Vector3(1.4, 9.47 + d, 0.9)                  # canto de tras da cabine curta (o bau cresceu ate ali)
+	elif cab == "jac":
+		stack = Vector3(1.3, 9.15 + d, 0.9)                  # atras da cabine JAC grande (escapamentos de fabrica)
 	return {"MOUNT_STACK_R": [stack, sc], "MOUNT_STACK_L": [Vector3(-stack.x, stack.y, stack.z), sc]}
 
 
@@ -246,16 +253,26 @@ static func add_extra_mounts(root: Node3D, body: String, cab: String) -> void:
 
 ## Cabine que aparece de verdade (o Canter so tem a dele, qualquer que seja a escolha do perfil).
 func shown_cab() -> String:
-	return String(FIXED_CAB.get(body_kind, cab_kind))
+	return String(FIXED_CAB.get(body_kind, CabCatalog.normalize(cab_kind)))
 
 
-## Caminho do .glb para a combinacao carroceria + cabine (a cabine "padrao" nao tem sufixo).
+## Quanto a frente deste caminhao passa da do caminhao padrao (m): comprimento do bau + bico da cabine.
+func front_delta() -> float:
+	var d: float = float(LENGTH_DELTA.get(body_kind, 0.0))
+	if not FIXED_CAB.has(body_kind):
+		d += float(CAB_FRONT_DELTA.get(CabCatalog.normalize(cab_kind), 0.0))
+	return d
+
+
+## Caminho do .glb para a combinacao carroceria + cabine (`dekotora_truck_<bau>_<cabine>.glb`; o Canter e a
+## carreta tem cabine fixa). Cabine antiga ou desconhecida vira a nova mais parecida (CabCatalog.normalize).
 static func model_path(body: String, cab: String) -> String:
-	if FIXED_CAB.has(body):
+	if FIXED_CAB.has(body) or body == "carreta":
 		return String(MODEL_PATHS[body])
-	if cab == "padrao" or not ResourceLoader.exists(MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]):
+	var path: String = MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, CabCatalog.normalize(cab)]
+	if not ResourceLoader.exists(path):
 		return String(MODEL_PATHS.get(body, MODEL_PATH))
-	return MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]
+	return path
 
 
 ## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao.

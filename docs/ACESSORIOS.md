@@ -8,7 +8,7 @@ no Blender, exportados em `.glb` (materiais PBR embutidos) para o Godot 4.7.
 | O quê | Caminho (dentro de `game/`) |
 | --- | --- |
 | Modelos `.glb` | `assets/vehicles/dekotora/accessories/<front\|lighting\|sides\|rear>/<id>.glb` |
-| Caminhão base `.glb` (com pontos `MOUNT_*`) | `assets/vehicles/dekotora/truck/dekotora_truck_base.glb` |
+| Caminhão base `.glb` (com pontos `MOUNT_*`) | `assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb` (baú médio + cabine padrão; T-129) |
 | Fontes `.blend` editáveis | `assets/vehicles/dekotora/source_blend/` (tem `.gdignore`: o Godot não importa) |
 | Prévias (imagens) | `assets/vehicles/dekotora/previews/` (`<id>_34.png` e `assembled_<categoria>_*.png`) |
 | Catálogo | `assets/vehicles/dekotora/catalog.json` |

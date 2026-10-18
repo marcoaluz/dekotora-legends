@@ -2,11 +2,10 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://df83fegwoq67t"
-path.s3tc="res://.godot/imported/dekotora_truck_carreta_tex_tire_orm.png-37c08e5efde3f382074638c00f6090bd.s3tc.ctex"
+uid="uid://b60ci1amwvnlh"
+path="res://.godot/imported/dekotora_truck_carreta_tex_tire_orm.png-37c08e5efde3f382074638c00f6090bd.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "c899ad9e784553c5c31ce7816461690f"
@@ -15,11 +14,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_carreta_tex_tire_orm.png"
-dest_files=["res://.godot/imported/dekotora_truck_carreta_tex_tire_orm.png-37c08e5efde3f382074638c00f6090bd.s3tc.ctex"]
+dest_files=["res://.godot/imported/dekotora_truck_carreta_tex_tire_orm.png-37c08e5efde3f382074638c00f6090bd.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -41,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

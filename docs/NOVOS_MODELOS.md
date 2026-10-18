@@ -92,6 +92,8 @@ Repare que ela é ~0,5 m mais baixa e ~1 m mais curta que a cabine do jogo.*
 
 ## 4. Encaixe no jogo
 
+> **T-129:** as cabines por código (`truck3d/cab.py` e módulos) foram retiradas; as referências a `cab.py`/`cab_surface` abaixo são históricas.
+
 ### Cabine CF500 como 5ª cabine (`--cab cf500`)
 
 É o que mais tem a cara do pedido ("tem até cabine"): o formato **cara chata** é o mesmo dos caminhões japoneses que viram Dekotora.

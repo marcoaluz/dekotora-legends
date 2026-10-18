@@ -4,7 +4,7 @@ extends TestCase
 
 const IDS: Array[String] = ["kw_exhaust_stacks", "kw_fuel_tank", "kw_steps", "kw_visor", "kw_bumper", "kw_grille",
 		"fumi_wing", "fumi_sport_rims", "jac_steel_rims", "jac_toolbox"]
-const TRUCKS: Array = [["base", "padrao"], ["leve", "chata"], ["longo", "curta"], ["canter", "padrao"]]
+const TRUCKS: Array = [["base", "americana"], ["leve", "chata"], ["longo", "curta"], ["base", "jac"], ["canter", "chata"]]
 
 
 func test_part_data_and_texts() -> void:

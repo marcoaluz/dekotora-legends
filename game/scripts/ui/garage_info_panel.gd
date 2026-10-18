@@ -6,7 +6,7 @@ extends RefCounted
 
 static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Callable) -> void:
 	var body: String = String(gs.profile.get("body", "base"))
-	var cab: String = String(gs.profile.get("cab", "padrao"))
+	var cab: String = CabCatalog.normalize(gs.profile.get("cab", ""))
 	box.add_child(UiTheme.label(Tr.t("garage.spec_title"), 14, UiTheme.TEXT_DIM))
 	box.add_child(UiKit.heading(Tr.t("body." + body).to_upper(), 26))
 	if TruckNode.FIXED_CAB.has(body):

@@ -273,7 +273,7 @@ func _build_model() -> void:
 		_left.add_child(note)
 		return
 	for k in CABS:
-		_choice_card("cab", String(k), "padrao", func() -> void: stage.set_cab(String(k)))
+		_choice_card("cab", String(k), CabCatalog.DEFAULT, func() -> void: stage.set_cab(String(k)))
 
 
 ## Cartao selecionavel (estilo da lista de veiculos da referencia): nome + descricao; o atual fica com borda rosa.

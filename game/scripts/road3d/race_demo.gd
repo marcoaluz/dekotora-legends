@@ -64,7 +64,7 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 	gs.profile["light_pattern"] = "sequential"
 	for a in args:                                   # --cab=chata / --body=leve / --parts=...: so no perfil demo
 		if a.begins_with("--cab="):
-			gs.profile["cab"] = a.substr(6)
+			gs.profile["cab"] = CabCatalog.normalize(a.substr(6))
 		elif a.begins_with("--body="):
 			gs.profile["body"] = a.substr(7)
 		elif a.begins_with("--parts="):                  # --parts=kw_bumper,fumi_wing: pecas a mais (medir custo, T-126)

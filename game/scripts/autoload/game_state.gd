@@ -52,6 +52,7 @@ func new_profile() -> void:
 		"paint": "#e9eef5",
 		"decals": [],                                  # adesivos: [{id, slot, x, y, size, color}]
 		"light_pattern": "steady",
+		"cab": CabCatalog.DEFAULT,                     # cabine do caminhao grande (CabCatalog.IDS)
 		"routes_done": {},                             # id -> {best_time, best_position}
 		"player_code": _make_player_code(),
 	}
@@ -79,9 +80,22 @@ func load_profile() -> void:
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 		if parsed is Dictionary and int(parsed.get("version", 0)) == SAVE_VERSION:
 			profile = parsed
+			migrate_profile()
 			profile_changed.emit()
 			return
 	new_profile()
+
+
+## Ajusta um perfil salvo por uma versao anterior do jogo (sem mudar `rev`): a cabine guardada pode ser uma das
+## 4 feitas por codigo retiradas na T-129 (padrao, classica, aero, alta) -> a nova mais parecida (CabCatalog).
+## Devolve true se mudou algo. Chamado ao carregar o perfil e quando o servidor adota o perfil de um cliente.
+func migrate_profile() -> bool:
+	var old: Variant = profile.get("cab", null)
+	var cab: String = CabCatalog.normalize(old)
+	if old is String and String(old) == cab:
+		return false
+	profile["cab"] = cab
+	return true
 
 
 ## Escrita atomica: grava num arquivo temporario e renomeia (nao corrompe se o app fechar no meio).
@@ -403,7 +417,7 @@ func truck_descriptor() -> Dictionary:
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
-		"body": String(profile.get("body", "base")),
+		"body": String(profile.get("body", "base")), "cab": CabCatalog.normalize(profile.get("cab", "")),
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
 	}.merged(Contracts.sim_fields(pending_contract))
 

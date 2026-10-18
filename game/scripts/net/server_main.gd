@@ -138,6 +138,8 @@ func _sanitize_loadout(player_code: String, requested: Dictionary) -> Dictionary
 	var desc: Dictionary = gs.truck_descriptor()
 	if requested.has("paint") and String(requested["paint"]).begins_with("#") and String(requested["paint"]).length() == 7:
 		desc["paint"] = String(requested["paint"])
+	if requested.has("cab"):                       # cabine e so visual: aceita a do cliente (id antigo vira o novo)
+		desc["cab"] = CabCatalog.normalize(requested["cab"])
 	return desc
 
 

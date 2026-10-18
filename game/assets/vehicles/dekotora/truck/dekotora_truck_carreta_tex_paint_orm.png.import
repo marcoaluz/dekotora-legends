@@ -2,11 +2,10 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7fecdoejmlrv"
-path.s3tc="res://.godot/imported/dekotora_truck_carreta_tex_paint_orm.png-d2d90af7c9f9bb8fd973601b7f187525.s3tc.ctex"
+uid="uid://beceb0ub6yjx2"
+path="res://.godot/imported/dekotora_truck_carreta_tex_paint_orm.png-d2d90af7c9f9bb8fd973601b7f187525.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
 "md5": "9c7bd92166eaa10d398bbc3f22631a0c"
@@ -15,11 +14,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vehicles/dekotora/truck/dekotora_truck_carreta_tex_paint_orm.png"
-dest_files=["res://.godot/imported/dekotora_truck_carreta_tex_paint_orm.png-d2d90af7c9f9bb8fd973601b7f187525.s3tc.ctex"]
+dest_files=["res://.godot/imported/dekotora_truck_carreta_tex_paint_orm.png-d2d90af7c9f9bb8fd973601b7f187525.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -41,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

@@ -56,6 +56,7 @@ func sync_from_client(code: String, client_profile: Dictionary) -> Node:
 	if _looks_valid(client_profile) and int(client_profile.get("rev", 0)) > int(gs.profile.get("rev", 0)):
 		client_profile["player_code"] = code
 		gs.profile = client_profile
+		gs.migrate_profile()                     # cliente antigo pode mandar uma cabine retirada (T-129)
 		gs.save_profile()
 	return gs
 
