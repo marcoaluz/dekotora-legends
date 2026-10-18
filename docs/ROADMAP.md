@@ -44,6 +44,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-126] 10 peças de personalização de terceiros (Kenworth W990, Fumi SC, JAC 1045), concluída em 2026-10-18, commit 674b053
 - [x] [T-129] Cabines só de arquivo: jac (JAC grande) e americana (Kenworth) novas, 4 cabines por código retiradas, migração de perfis (concluída em 2026-10-18)
 - [x] [T-133] Rodas girando: peças de roda presas ao pneu, todas as rodas, garagem gira na vista RODAS (concluída em 2026-10-18, referência `docs/direcao_arte/rodas_girando_*.png`)
+- [x] [T-132] Caminhão segue a faixa nas curvas: atrito acima da velocidade segura, deslizada de até 0,5 m, escape só acima de +30% com aviso, giro do corpo só na troca de faixa (≤ 3°, eixo traseiro); bots, servidor, predição e trânsito com a mesma regra (concluída em 2026-10-18, `tests/test_lane_following.gd`, `docs/direcao_arte/faixa_curva_*.png`)
 
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins

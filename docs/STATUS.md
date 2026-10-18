@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (179) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (192) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -63,7 +63,22 @@ continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi i
    `docs/INVENTARIO_MODELOS.md`). Seguir o padrão da T-124: `blender/scripts/build_traffic_cars.py -- --model ...`,
    3 a 6 mil triângulos, `paint_white` trocável, rodas `wheel_f*`/`wheel_r*`, entrar em `traffic_3d.gd` (`MODELS_BY_KIND`),
    placas (T-130), crédito do autor se houver, teste e medida de FPS.
-2. **T-132, BUG: o caminhão anda "de lado" no asfalto.** O certo é ele seguir a pista de frente, alinhado com a direção da
+2. **T-132 RESOLVIDA (2026-10-18): o caminhão segue a faixa nas curvas.** Causa: acima da velocidade segura a curva
+   empurrava o caminhão para fora (até 4× o excesso, sem limite) e o controle de faixa puxava de volta no máximo; o corpo
+   era girado por `lateral_vel` (até 5,4°, apontando para dentro enquanto ele escorregava para fora = "de lado").
+   Medido acelerando sem tocar (antes → depois): viaduto 9,9 m → 0,36 m de desvio; montanha 7,9 m → 0,25 m; litoral
+   2,8 m → 0,19 m; corpo torto > 2° em 33%/52%/9% do tempo → 0% (máximo 0,16°). Agora (`sim/curve_grip.gd`, usado por
+   `TruckSim`, portanto bots, servidor e predição do cliente): até +30% da velocidade segura o pneu raspa (perde
+   velocidade, canta, desliza no máximo 0,5 m); acima de +30% perde a faixa de verdade, com aviso "CURVA! ALIVIE" ~2 s
+   antes (HUD + vibração) e "DERRAPANDO!" ao escapar. O giro do corpo vem só da troca de faixa (≤ 3°, suave,
+   `TruckSim.body_yaw`) em torno do eixo traseiro; a direção do corpo é a corda do eixo traseiro ao dianteiro sobre a
+   linha da faixa (`TrackPath.vehicle_transform`), igual para o trânsito (`TrafficSim.body_yaw`). Nenhum `.glb` está
+   girado (`tools_dev/check_glb_orientation.gd`: 24 modelos, erro 0,00°). Teste `tests/test_lane_following.gd`
+   (8 testes); medidor `tools_dev/measure_lane_following.gd`; capturas `docs/direcao_arte/faixa_curva_*.png`
+   (`-- --route=kanto_3_mountain --time=day --cam=top|high|side --nohud --autoplay --start=300 --start-speed=21
+   --snap-every=2 --shots=PASTA`; troca de faixa: `--demo=lanes`). **Atenção:** com V8 + turbo duplo (ou 16 t de carga)
+   acelerando sem soltar, o caminhão chega a +47% na curva 1,0 do viaduto e escapa (é a regra dos +30%; o aviso vem antes).
+   (Original) **T-132, BUG: o caminhão anda "de lado" no asfalto.** O certo é ele seguir a pista de frente, alinhado com a direção da
    estrada (curvas incluídas), e inclinar/guinar só um pouco ao trocar de faixa. Onde olhar: `race_scene_3d.gd:591`
    (`path.vehicle_transform(z, x, t.length, -t.lateral_vel * 0.1, t.lean() * 0.11)`: o guinar vem de `lateral_vel` e o
    sinal/escala podem estar errados), `TrackPath.vehicle_transform` (a direção usa a tangente da pista no ponto do eixo
@@ -90,7 +105,7 @@ continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi i
    da garagem; (d) rodas das peças (`wheels`, `hub_*`) montadas como filhos fora de `wheel_*`. Corrigir e criar teste
    (a rotação dos nós `wheel_*` muda com a velocidade, para cada modelo e cabine; rodas de peça acompanham).
 
-Ordem sugerida: T-132 e T-133 primeiro (afetam todo o jogo), depois T-131.
+Ordem sugerida: T-131 (T-132 e T-133 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
