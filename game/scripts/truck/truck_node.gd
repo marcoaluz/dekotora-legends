@@ -44,11 +44,10 @@ var _plate_ids: Array[int] = []
 var _plates_queued: bool = false
 
 var model: Node3D
-var _wheels: Array[Node3D] = []
-var _wheel_rest: Array[Basis] = []
+## Rodas (giro por raio de cada roda, esterçamento, pecas de roda presas no pneu; T-133).
+var wheels: TruckWheels = TruckWheels.new()
 var _headlight: SpotLight3D
 var _tail_glow: OmniLight3D
-var _spin: float = 0.0
 var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
@@ -77,9 +76,7 @@ func _ready() -> void:
 	TruckTextures.apply(model)               # texturas grandes compartilhadas (o .glb so traz miniaturas)
 	_apply_light_materials(model)
 	_build_blinkers()
-	for n in model.find_children("wheel_*", "Node3D", true, false):
-		_wheels.append(n as Node3D)
-		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
+	wheels.setup(model, float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)))
 	_headlight = SpotLight3D.new()
 	_headlight.position = Vector3(0, 1.2, -11.6 - front_delta())
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
@@ -193,18 +190,10 @@ func set_signal(dir: int) -> void:
 		_blinkers[i].visible = on and side == dir
 
 
-## Gira as rodas e aplica a escala de velocidade; `dt` em segundos reais.
+## Gira as rodas (cada uma por velocidade / raio dela) e estérça as dianteiras; as calotas e rodas da loja
+## sao filhas das rodas e acompanham. `speed` em m/s, `dt` em segundos reais, `steer` em -1..1.
 func animate(speed: float, dt: float, steer: float = 0.0) -> void:
-	_spin += speed / float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)) * dt
-	_spin = fmod(_spin, TAU)                 # evita perder precisao em corridas longas
-	for i in _wheels.size():
-		var w: Node3D = _wheels[i]
-		var r: Basis = Basis(Vector3.RIGHT, -_spin)
-		var base_yaw: float = 0.0
-		if String(w.name).begins_with("wheel_f"):
-			base_yaw = -steer * 0.35
-		# ordem: rotacao original do modelo -> giro no eixo X -> esterçamento no eixo vertical
-		w.transform.basis = Basis(Vector3.UP, base_yaw) * r * _wheel_rest[i]
+	wheels.animate(speed, dt, steer)
 
 
 func set_headlights(on: bool) -> void:
@@ -322,8 +311,13 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 		if entry.is_empty():
 			continue
 		var list: Array = []
-		for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
-			var n: Node3D = catalog.attach(model, d.accessory_id, side)
+		var made: Array[Node3D] = []
+		if TruckWheels.is_wheel_part(entry):            # calota/roda da loja: em TODAS as rodas externas, presa no pneu
+			made = wheels.attach_part(catalog, d.accessory_id)
+		else:
+			for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
+				made.append(catalog.attach(model, d.accessory_id, side))
+		for n in made:
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
 				if chrome_mode != "":
@@ -346,7 +340,8 @@ func set_part_state(part_id: String, state: String) -> void:
 		node.visible = state != "broken"
 		if state == "dent":
 			catalog.swap_material(node, "chrome", "steel")
-			node.rotation.x = 0.06
+			if not node.has_meta("wheel_part"):          # peca de roda gira com o pneu: sem inclinar o encaixe
+				node.rotation.x = 0.06
 
 
 ## Sincroniza todos os acessorios com o dano da simulacao (lista de pecas de TruckSim.loadout).

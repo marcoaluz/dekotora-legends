@@ -193,6 +193,11 @@ func _take_shot(path: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(path)
 	print("CAPTURA: ", path)
+	if "--shot-pair" in OS.get_cmdline_user_args():     # T-133: mais um quadro seguido (rodas girando na vista da roda)
+		await RenderingServer.frame_post_draw
+		var p2: String = path.get_basename() + "_2.png"
+		get_viewport().get_texture().get_image().save_png(p2)
+		print("CAPTURA: ", p2)
 	get_tree().quit()
 
 

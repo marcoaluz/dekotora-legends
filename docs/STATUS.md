@@ -70,7 +70,19 @@ continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi i
    traseiro/dianteiro? caminhões longos de 7 a 12 m podem estar usando a tangente de um ponto só), o ajuste de peso da T-113
    (`STEER_RESPONSE`, `LANE_GAIN`, `LANE_MAX_VEL`) e o `Lanes`. Também vale conferir se algum `.glb` novo (Canter, cabines
    `jac`/`americana`/`chata`) está girado em Z. Validar com captura de cima/lado em reta, curva e troca de faixa.
-3. **T-133, BUG: as rodas estão estáticas (não giram).** `TruckNode.animate()` gira os nós `wheel_*`
+3. **T-133 RESOLVIDA (2026-10-18): rodas girando de verdade.** Causa: o pneu (`wheel_*`) já girava em todos os 13 modelos
+   (jogador, rivais e tráfego), mas calotas e rodas da loja eram montadas nos pontos fixos `MOUNT_WHEEL_FRONT_FACE_*`
+   (irmãos do pneu, não filhos) e só no eixo da frente. Agora `TruckWheels` (`game/scripts/truck/truck_wheels.gd`, usado
+   pelo `TruckNode`) põe a peça de roda escolhida como **filha de cada roda externa** (frente, todos os eixos de trás, a de
+   fora do rodado duplo, lado esquerdo espelhado), copiando o encaixe dos pontos FACE; ela gira e estérça junto com o pneu.
+   Cada roda gira por velocidade / **raio dela** medido na malha (chata/curta 0,50, americana 0,53, JAC 0,55 na frente;
+   0,52 atrás; Canter 0,45/0,43). Garagem: na vista RODAS (ou ao escolher calotas) as rodas giram devagar (1 m/s), nas
+   outras vistas nada roda. Custo: peças de roda sem sombra e só até 60 m → corrida decorada ~+10 chamadas, FPS igual
+   (~248 sem vsync, antes e depois). Teste `tests/test_wheels_spin.gd` (5 testes); medidor `tools_dev/measure_wheels.gd`;
+   capturas `docs/direcao_arte/rodas_girando_*.png` (corrida: `-- --decorated --demo=reta --shots=PASTA --burst=5
+   --cam=5.0,-9,1.3,5.0,0,0.7`; garagem: `-- --demo --noparts --parts=fumi_sport_rims --body=canter --hideui --view=wheel
+   --zoom=0.4 --shot=ARQ.png --shot-pair`). Texto original da tarefa abaixo.
+   (Original) **T-133, BUG: as rodas estão estáticas (não giram).** `TruckNode.animate()` gira os nós `wheel_*`
    (`game/scripts/truck/truck_node.gd:195`), então conferir: (a) se `find_children("wheel_*")` (linha ~80) acha as rodas dos
    `.glb` novos e regerados (Canter, `_jac`, `_americana`, `_curta`, `_chata`; o especialista da T-126 já avisou que as
    calotas/rodas de peça não giram); (b) se `animate()` está sendo chamado para o caminhão do jogador, rivais e tráfego
