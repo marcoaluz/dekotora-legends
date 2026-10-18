@@ -29,6 +29,7 @@ func test_reaches_top_speed_but_not_beyond() -> void:
 	check(v > 35.0 and v <= EngineModel.MAX_SPEED + 0.01, "velocidade maxima ~38.9 m/s, foi %.1f" % v)
 
 
+## T-132: so escapa MUITO acima da segura (+30%); 36 m/s na curva 1,0 = +43%. Ate +30% so raspa (test_lane_following).
 func test_curve_too_fast_pushes_out_of_lane() -> void:
 	var t := Track.new()
 	t.add_section(3000.0, 1.0, 0.0, 0.0)
