@@ -260,6 +260,7 @@
  "engine.eng_i6_std": "6 cilindros padrão",
  "engine.eng_i6_tuned": "6 cilindros preparado",
  "engine.eng_v8": "V8",
+ "engine.canter_note": "4 cilindros (Canter)",
  "turbo.turbo_none": "Sem turbo",
  "turbo.turbo_single": "Turbo simples",
  "turbo.turbo_twin": "Turbo duplo",

@@ -40,6 +40,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P45] Save local e campanha de Kanto (3 trechos + chefe)
 - [x] [P46] Bots, tráfego e cenário de Kanto no Blender
 - [x] [T-121/T-124] Carros de tráfego com modelos de terceiros (Royalty Free): Van 01, Ascona, Falcon, SUV, Fumi SC e ônibus (ver `docs/MODELOS_MELHORADOS.md`, seção Status)
+- [x] [T-125] Caminhão Canter e cabine curta a partir do JAC 1045 (concluída em 2026-10-18, commit 1637c2c)
+- [x] [T-126] 10 peças de personalização de terceiros (Kenworth W990, Fumi SC, JAC 1045), concluída em 2026-10-18, commit 674b053
 
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins

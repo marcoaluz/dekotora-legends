@@ -23,7 +23,8 @@ static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Ca
 	if gain > 0.0:
 		torque += "  (+%d%%)" % roundi(gain * 100.0)
 	box.add_child(UiKit.stat_row("zap", Tr.t("garage.torque"), torque))
-	box.add_child(UiKit.stat_row("cog", Tr.t("garage.engine"), Tr.t("engine." + String(gs.profile["engine"]))))
+	var engine_name: String = Tr.t("engine.canter_note") if TruckNode.FIXED_CAB.has(body) else Tr.t("engine." + String(gs.profile["engine"]))
+	box.add_child(UiKit.stat_row("cog", Tr.t("garage.engine"), engine_name))
 	box.add_child(UiKit.stat_row("gauge", Tr.t("garage.redline"), "%s rpm" % _thousands(roundi(eng.redline_rpm) if eng else 0)))
 	box.add_child(UiKit.stat_row("package", Tr.t("garage.capacity"), "%d t" % roundi(Contracts.capacity_t(body))))
 	box.add_child(UiKit.stat_row("weight", Tr.t("garage.mass"), "%s kg" % _thousands(roundi(float(pv["mass"])))))
