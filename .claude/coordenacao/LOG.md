@@ -78,3 +78,15 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/lib/shared_tex.py, build_truck_3d.py, game/scripts/truck/{truck_textures,truck_node}.gd, ui/accessory_viewer.gd, road3d/race_scene_3d.gd, 13 .glb + miniaturas + textures/, docs STATUS/DECISOES
 - Validação: .glb 51,2 → 33,0 MB; PNG de textura 18,5 → 1,5 MB (+0,36 MB de miniaturas); .pck Windows de teste 97,5 → 54,0 MB; corrida modo médio: textura 53,1 → 43,1 MB, vídeo 87,2 → 77,2 MB, ~490 chamadas e ~75 FPS iguais; garagem padrao/aero antes x depois com diferença média de pixel 0,0006–0,0008; corrida com rival ok; 141 testes 0 falhas; corrida, garagem, accessory_viewer, chrome_compare e servidor headless abrem (avisos de saída na garagem vêm da música, já existiam).
 - Decisão pendente: nenhuma. (LOG.md não commitado: tem linhas de outra tarefa sem commit.)
+
+## 2026-10-18 02:30 · T-121+T-124 · especialista · CONCLUÍDA
+- Feito: 6 veículos novos no trânsito (van01, Ascona, Falcon, SUV, Fumi esportivo, ônibus) a partir dos modelos de terceiros; tipos na simulação (tamanho/velocidade/massa, fila e ultrapassagem, hitbox por tipo).
+- Arquivos: blender/scripts/build_traffic_{cars,van01}.py, lib/traffic_{kit,classify,preview}.py, game/assets/vehicles/traffic/car_*, sim/traffic_sim.gd, road3d/traffic_3d.gd, tests/test_traffic_{models,kinds}.gd, LICENCAS.md, docs, docs/capturas_t124/
+- Validação: 161 testes, 0 falhas; net_test passou; build determinístico; modo médio: chamadas ~440→~420, tri ~208→~232 mil, 75 FPS igual.
+- Decisão pendente: Marco aprovar velocidades/massa/frequência de ônibus e esportivo. Aviso: o commit 1637c2c (T-125) levou linhas da T-124 e só compila junto com 1998131.
+
+## 2026-10-18 03:30 · T-125+T-126 · especialista · CONCLUÍDA
+- Feito: caminhão base Canter (malha do JAC 1045, baú nosso) e cabine curta; BodyDef por modelo (massa, capacidade 4 t, hitbox 7 m, agilidade, torque); 10 peças novas (Kenworth, Fumi, JAC) com 2 encaixes novos.
+- Arquivos: blender/scripts/truck3d/{jac_*,canter}.py, lib/extract.py, accessories/thirdparty.py, game/data/bodies/*.tres, tests/test_canter.gd, test_parts_thirdparty.gd, docs/capturas_t125, capturas_t126
+- Validação: 165 testes, 0 falhas; modo médio 75 FPS; Canter ~340 chamadas (base ~380); 8 peças novas: +10 mil tri, mesmas chamadas.
+- Decisão pendente: Marco ajustar números do Canter, preços e destaques das peças; dar números próprios ao baú leve e longo.
