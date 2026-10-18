@@ -4,6 +4,9 @@ extends RefCounted
 ##   --demo=lanes   o jogador toca a seta/troca sozinho (direita, direita, esquerda, esquerda...)
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
+##   --cam=top|high|side camera de depuracao presa ao jogador: de cima (30 m), bem alta (75 m) ou de lado (T-132)
+##   --nohud        esconde o HUD e os botoes (capturas limpas)
+##   --shot-every=S tambem salva uma captura a cada S segundos de corrida (t_<segundos>.png)
 ## Exemplo: godot --path game res://scenes/race/race3d.tscn -- --demo=close --shots=C:/tmp/capt
 
 var mode: String = ""
@@ -14,6 +17,9 @@ var _clock: float = 0.0
 var _last_lane_changes: int = 0
 var _last_close: float = -99.0
 var _count: Dictionary = {}
+var cam_mode: String = ""
+var _shot_every: float = 0.0
+var _next_periodic: float = 0.0
 
 
 func _init(args: PackedStringArray) -> void:
@@ -22,6 +28,11 @@ func _init(args: PackedStringArray) -> void:
 			mode = a.substr(7)
 		elif a.begins_with("--shots="):
 			shot_dir = a.substr(8)
+		elif a.begins_with("--cam="):
+			cam_mode = a.substr(6)
+		elif a.begins_with("--shot-every="):
+			_shot_every = float(a.substr(13))
+			_next_periodic = _shot_every
 	if mode == "lanes":
 		_taps = [[1.0, 1], [1.5, 1], [5.0, -1], [5.5, -1], [9.0, 1], [9.5, 1]]
 	elif mode == "close":
@@ -116,11 +127,28 @@ func on_event(e: Dictionary, player: int, race_time: float) -> void:
 	_queue.append([_clock + 0.5, "fechamento_b"])
 
 
+## Camera de depuracao (--cam=top|side) olhando o caminhao em (z, x) de comprimento `length`.
+func place_camera(cam: Camera3D, path: TrackPath, z: float, x: float, length: float) -> void:
+	var mid: float = z + length * 0.5
+	var target: Vector3 = path.world_point(mid, x, 1.0)
+	if cam_mode == "top" or cam_mode == "high":
+		var ahead: float = 0.0 if cam_mode == "top" else 30.0
+		target = path.world_point(mid + ahead, x, 1.0)
+		cam.global_position = path.world_point(mid + ahead, x, 30.0 if cam_mode == "top" else 75.0)
+		cam.look_at(target, path.forward_at(mid + ahead))     # frente da pista para cima na imagem
+	else:
+		cam.global_position = path.world_point(mid - 4.0, x - 2.6, 11.0)
+		cam.look_at(target, Vector3.UP)
+
+
 ## Chame todo quadro (depois de avancar a simulacao).
-func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
+func update(viewport: Viewport, player_truck: TruckSim, dt: float, race_time: float = 0.0) -> void:
 	_clock += dt
 	if shot_dir == "":
 		return
+	if _shot_every > 0.0 and race_time >= _next_periodic:
+		_next_periodic += _shot_every
+		_save(viewport, "t_%04.1f" % race_time)
 	if _clock > 1.5 and not _count.has("largada"):
 		_save(viewport, "largada")                # contagem regressiva: mostra o aviso da carga
 	if player_truck.lane_changes != _last_lane_changes:

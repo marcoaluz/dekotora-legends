@@ -1,7 +1,7 @@
 extends Node3D
 ## Corrida em 3D (plano B): liga a simulacao (a mesma do plano A) a uma apresentacao 3D com
 ## estrada em malha, caminhoes .glb PBR, transito, cidade e camera atras do jogador.
-## Debug: -- --autoplay  --start=600  --touch  --shot (sem HUD de toque)
+## Debug: -- --autoplay  --start=600 [--start-speed=20]  --touch  --shot (sem HUD de toque)
 
 const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#3a73d6"), Color("#3fb26f")]
 
@@ -150,12 +150,18 @@ func _ready() -> void:
 		_demo.setup(sim)
 		for k in sim.trucks.size():
 			_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
+	var v0: float = 30.0
+	for a in args:
+		if a.begins_with("--start-speed="):            # depuracao: velocidade inicial com --start (m/s)
+			v0 = float(a.substr(14))
+	if "--nohud" in args:
+		layer.visible = false
 	for a in args:
 		if a.begins_with("--start="):
 			var z0: float = float(a.substr(8))
 			for k in sim.trucks.size():
 				sim.trucks[k].z = z0 - float(k) * 14.0
-				sim.trucks[k].speed = 30.0
+				sim.trucks[k].speed = v0
 				_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 			_countdown = 0.0
 	if DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false):
@@ -458,7 +464,7 @@ func _process(delta: float) -> void:
 	_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
-	_demo.update(get_viewport(), sim.trucks[player], dt)
+	_demo.update(get_viewport(), sim.trucks[player], dt, sim.time)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
@@ -597,6 +603,9 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
+	if _demo.cam_mode != "":                     # depuracao (--cam=top|side): camera presa ao jogador
+		_demo.place_camera(_cam, path, _player_z(), _player_x(), t.length)
+		return
 	if _cinema.apply_cut(dt, _cam, _trucks[player]):
 		_speed_fx.update(t.speed, dt)
 		return
