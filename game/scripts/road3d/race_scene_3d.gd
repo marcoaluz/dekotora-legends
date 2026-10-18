@@ -30,6 +30,8 @@ var _demo: RaceDemo                    # capturas/depuracao (--demo=, --shots=)
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
 const TIMEOUT_SCREEN_DELAY: float = 1.8
 var _shake: float = 0.0
+var _was_escaping: bool = false         # curva rapida demais (T-132): vibra uma vez ao escapar
+var _was_warn_full: bool = false
 var _result_shown: bool = false
 var _fps_printed: bool = false
 var _debug_events: bool = false
@@ -573,7 +575,7 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = path.vehicle_transform(z, x, t.length, -t.lateral_vel * 0.1, t.lean() * 0.11)
+		node.transform = path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11)
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 	_traffic3d.refresh()
@@ -630,9 +632,21 @@ func _update_hud() -> void:
 	_hud.countdown = _countdown
 	_hud.rival_idx = _rival_idx[0] if not _rival_idx.is_empty() else -1
 	_hud.cargo_notice = _cargo_notice
+	_curve_feedback(sim.trucks[player])
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])
 		_fx.set_smoke(k, _trucks[k], clampf((60.0 - eng) / 60.0, 0.0, 1.0))
+
+
+## Curva rapida demais (T-132): vibra ao chegar no limite e ao escapar e treme a camera; o aviso escrito e do RaceHud.
+func _curve_feedback(t: TruckSim) -> void:
+	var warn_full: bool = _countdown <= 0.0 and t.curve_warning(sim.track) >= 1.0
+	if (t.escaping and not _was_escaping) or (warn_full and not _was_warn_full):
+		Input.vibrate_handheld(220 if t.escaping else 70)
+	if t.escaping:
+		_shake = maxf(_shake, 0.25)
+	_was_escaping = t.escaping
+	_was_warn_full = warn_full
 
 
 ## Luzinhas e farois: acesos de noite/fim de tarde e quando o jogador esta num tunel (de dia ficam fracos).

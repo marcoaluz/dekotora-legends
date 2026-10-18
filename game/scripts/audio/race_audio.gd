@@ -52,8 +52,8 @@ func update(dt: float, t: TruckSim, countdown: float) -> void:
 		get_node("/root/AudioBus").play_sfx("gear_shift_%d" % (_shift_idx + 1), -6.0)
 		_last_gear = t.gear
 	_set_loop("wind_speed_loop", clampf(t.speed / 38.9, 0.0, 1.0) * 0.55, -8.0)
-	var slip: float = clampf(absf(t.lateral_vel) * t.speed / 45.0, 0.0, 1.0)
-	_set_loop("tire_screech_loop", maxf(slip - 0.35, 0.0) * 1.4, -6.0)
+	# pneu cantando: so quando passa da velocidade segura da curva (TruckSim.skid); escapando, no maximo
+	_set_loop("tire_screech_loop", 1.0 if t.escaping else t.skid * 0.85, -6.0)
 	_set_loop("tire_gravel_loop", (clampf(t.speed / 20.0, 0.0, 1.0) * 0.8) if t.offroad else 0.0, -4.0)
 	var cargo_loss: float = 1.0 - t.cargo_integrity()
 	_set_loop("cargo_rattle_loop", clampf(cargo_loss * 1.4, 0.0, 0.8) * clampf(t.speed / 20.0, 0.0, 1.0), -10.0)

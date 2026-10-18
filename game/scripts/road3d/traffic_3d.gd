@@ -92,7 +92,7 @@ func car_transforms() -> Array[Transform3D]:
 func refresh() -> void:
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
-		_nodes[i].transform = path.vehicle_transform(c.z, c.x, c.length)
+		_nodes[i].transform = path.vehicle_transform(c.z, c.x, c.length, TrafficSim.body_yaw(c))
 		var ws: Array = _wheels[i]
 		for k in ws.size():
 			var w: Node3D = ws[k]
