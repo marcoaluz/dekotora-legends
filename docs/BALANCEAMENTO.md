@@ -213,3 +213,20 @@ Proposta para testar (`TrafficSim.KIND_*`). O tipo de cada veículo é fixo pelo
   (`DamageModel.impact_damage(dv, 12000)`). O hitbox usa o comprimento e a largura do tipo.
 - O esportivo é mais rápido que todo o trânsito, mas mais lento que o caminhão no limite (38,9 m/s): ele passa o jogador
   que estiver devagar e é alcançado por quem estiver no talo.
+
+## Peças tiradas de modelos de terceiros (T-126)
+
+Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 30 mil = 20, < 50 mil = 60).
+
+| ID | Encaixe | Zona | Peso (kg) | Durab. | Destaque | Preço (¥) | Fama nec. |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `kw_exhaust_stacks` | Escapamentos altos | Esq./Dir. | 90 | 60 | 18 | 26.000 | 20 |
+| `kw_fuel_tank` | Caixa lateral | Esq./Dir. | 140 | 120 | 14 | 22.000 | 20 |
+| `kw_steps` | Degraus | Esq./Dir. | 60 | 80 | 10 | 14.000 | 0 |
+| `kw_visor` | Quebra-sol | Frente | 70 | 60 | 16 | 24.000 | 20 |
+| `kw_bumper` | Para-choque frontal | Frente | 300 | 200 | 18 | 38.000 | 60 |
+| `kw_grille` | Grade frontal | Frente | 60 | 50 | 14 | 20.000 | 20 |
+| `fumi_wing` | Aerofólio | Teto | 35 | 30 | 12 | 18.000 | 20 |
+| `fumi_sport_rims` | Calotas | Rodas | 30 | 50 | 14 | 20.000 | 20 |
+| `jac_steel_rims` | Calotas | Rodas | 50 | 80 | 9 | 9.000 | 0 |
+| `jac_toolbox` | Caixa lateral | Esq./Dir. | 80 | 100 | 6 | 8.000 | 0 |

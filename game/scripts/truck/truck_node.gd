@@ -58,6 +58,7 @@ func _ready() -> void:
 		return
 	model = scene.instantiate() as Node3D
 	add_child(model)
+	add_extra_mounts(model, body_kind, cab_kind)
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
@@ -212,6 +213,35 @@ func _apply_mural() -> void:
 					_mural_mat.albedo_texture = tex
 					_mural_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 				m.set_surface_override_material(s, _mural_mat)
+
+
+## Pontos de montagem que os .glb ainda nao tem (T-126: escapamentos altos atras da cabine). Posicao no Blender
+## (x, y, z; y = da traseira do bau para a frente) e escala da peca. Criados em tempo de execucao para nao regerar
+## os 20 modelos; um .glb futuro que ja traga o ponto tem prioridade.
+static func extra_mounts(body: String, cab: String) -> Dictionary:
+	var d: float = float(LENGTH_DELTA.get(body, 0.0))
+	var stack: Vector3 = Vector3(1.3, 8.3 + d, 0.9)           # escapamentos de fabrica (padrao, classica, aero, alta, chata)
+	var sc: float = 1.0
+	if body == "canter":
+		stack = Vector3(1.25, 5.09, 0.75)                    # entre a cabine curta e o bau do Canter
+		sc = 0.88
+	elif cab == "curta":
+		stack = Vector3(1.4, 9.47 + d, 0.9)                  # canto de tras da cabine curta (o bau cresceu ate ali)
+	return {"MOUNT_STACK_R": [stack, sc], "MOUNT_STACK_L": [Vector3(-stack.x, stack.y, stack.z), sc]}
+
+
+static func add_extra_mounts(root: Node3D, body: String, cab: String) -> void:
+	var host: Node = root.get_child(0) if root.get_child_count() == 1 else root    # o no raiz do .glb (DekotoraTruckBase)
+	var em: Dictionary = extra_mounts(body, cab)
+	for n in em:
+		if root.find_child(String(n), true, false) != null:
+			continue
+		var p: Vector3 = em[n][0]
+		var e := Node3D.new()
+		e.name = String(n)
+		e.position = Vector3(p.x, p.z, -p.y)
+		e.scale = Vector3.ONE * float(em[n][1])
+		host.add_child(e)
 
 
 ## Cabine que aparece de verdade (o Canter so tem a dele, qualquer que seja a escolha do perfil).

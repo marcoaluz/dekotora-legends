@@ -100,3 +100,32 @@ catalog.swap_material(node, "chrome", "paint_gold")  # variante sem duplicar geo
   usada, então não há licenças a registrar (a fonte Noto Sans JP é OFL e fica em `assets/fonts/`).
 - Referências: o prompt sugere estudar fotos da categoria Dekotora no Wikimedia Commons; **não** foram baixadas imagens
   (sem acesso interativo). Os desenhos são originais, inspirados nas características gerais do estilo.
+
+## Peças tiradas de modelos de terceiros (T-126, 2026-10-18)
+
+10 peças a mais, copiadas de pedaços dos modelos de `docs/Modelos Melhorados/` (fora do Git; Royalty Free, créditos em
+`game/assets/LICENCAS.md`): `blender/scripts/accessories/thirdparty.py` escolhe as **ilhas** de malha por caixas
+(`blender/scripts/lib/extract.py`), troca os materiais pelos nossos, apaga letreiros/emblemas (ilhas pequenas ou caixas de
+exclusão), reduz por ilha (peças simples ficam inteiras) e leva para a convenção dos acessórios. Gerar:
+`blender -b --factory-startup -P blender/scripts/build_accessories.py -- --thirdparty`.
+
+| id | Peça | Encaixe (slot) | Ponto | Triângulos | Origem |
+| --- | --- | --- | --- | --- | --- |
+| `kw_exhaust_stacks` | Escapamentos altos cromados (com protetor) | `exhaust_stacks` (novo) | `MOUNT_STACK_R/L` | 2.989 | Kenworth W990 |
+| `kw_fuel_tank` | Tanque cromado americano | `side_box` | `MOUNT_SIDE_BOX_R/L` | 2.193 | Kenworth W990 |
+| `kw_steps` | Degraus cromados | `steps` | `MOUNT_STEP_R/L` | 1.592 | Kenworth W990 |
+| `kw_visor` | Para-sol cromado com 3 lanternas | `visor` | `MOUNT_VISOR` | 2.556 | Kenworth W990 |
+| `kw_bumper` | Para-choque americano | `front_bumper` | `MOUNT_FRONT_BUMPER` | 2.398 | Kenworth W990 |
+| `kw_grille` | Grade cromada americana (sem o emblema) | `grille` | `MOUNT_FRONT_GRILLE` | 3.591 | Kenworth W990 |
+| `fumi_wing` | Aerofólio de teto | `roof_wing` (novo) | `MOUNT_ROOF` | 1.232 | Fumi SC |
+| `fumi_sport_rims` | Rodas esportivas douradas (5 raios) | `hubcaps` | `MOUNT_WHEEL_FRONT_FACE_R/L` | 3.246 | Fumi SC |
+| `jac_steel_rims` | Rodas de aço cromadas | `hubcaps` | `MOUNT_WHEEL_FRONT_FACE_R/L` | 3.300 | JAC 1045 |
+| `jac_toolbox` | Caixa de ferramentas | `side_box` | `MOUNT_SIDE_BOX_R/L` | 204 | JAC 1045 |
+
+- `MOUNT_STACK_R/L` (atrás da cabine) ainda não existe nos .glb: o `TruckNode.add_extra_mounts()` cria o ponto ao montar o
+  caminhão (padrão/clássica/aero/alta/chata: onde ficam os escapamentos de fábrica; cabine curta: canto de trás da cabine;
+  Canter: entre a cabine e o baú, escala 0,88). Quem carregar o .glb sem o TruckNode chama a mesma função.
+- Rodas/calotas não giram (como a `hubcap_decorative`): ficam presas no ponto da face da roda.
+- Não entraram (de propósito): tomada de ar do capô do Fumi (pequena demais para a cabine e sem lugar num cab-over),
+  escapamento esportivo traseiro (briga com o para-choque traseiro), retrovisores (todas as cabines já têm), bull bar e
+  faróis auxiliares (o Kenworth não tem).

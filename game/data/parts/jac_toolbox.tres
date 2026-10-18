@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_p3p"]
+
+[resource]
+script = ExtResource("1_p3p")
+id = &"jac_toolbox"
+display_key = "part.jac_toolbox"
+slot = &"side_box"
+zones = PackedStringArray("left", "right")
+weight_kg = 80.0
+durability = 100.0
+fame = 6
+price = 8000
+fame_required = 0
+accessory_id = "jac_toolbox"

@@ -169,6 +169,12 @@ func _apply_debug_args() -> void:
 			stage.set_cab(a.substr(6))
 		elif a.begins_with("--body=") and "--demo" in args:   # --body=canter (T-125)
 			stage.set_body(a.substr(7))
+		elif a.begins_with("--parts=") and "--demo" in args:  # --parts=kw_bumper,fumi_wing (T-126): compra e instala
+			for pid in a.substr(8).split(","):
+				var pd: PartDef = gs.part(pid)
+				if pd != null and (gs.owns(pid) or gs.buy(pd)):
+					gs.install(pid)
+			stage.refresh_truck()
 		elif a.begins_with("--zoom="):                      # aproxima a camera (capturas de detalhe)
 			var z: float = float(a.substr(7))
 			get_tree().create_timer(1.0).timeout.connect(func() -> void: stage.set_zoom(z))   # depois do layout

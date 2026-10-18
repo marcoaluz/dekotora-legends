@@ -89,6 +89,11 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   `TruckSim.length` substitui o `Collision.LEN` fixo na colisão/vácuo/bots; garagem lista o Canter (cabine fixa) e a cabine curta;
   câmera da corrida chega mais perto do Canter. Corrida (modo médio, litoral) ~75 FPS, ~340 chamadas (base ~380). Capturas em
   `docs/capturas_t125/`; depuração da garagem: `-- --demo --body=canter [--cab=curta]`.
+- **T-126 (2026-10-18): 10 peças novas tiradas dos modelos de terceiros** (Kenworth W990, Fumi SC, JAC 1045; lista e custo em
+  `docs/ACESSORIOS.md`, números em `docs/BALANCEAMENTO.md`, créditos em `game/assets/LICENCAS.md`). Código: `blender/scripts/lib/extract.py`
+  (ilhas por caixa, redução por ilha, corte), `accessories/thirdparty.py` (`build_accessories.py -- --thirdparty`). Encaixes novos
+  `exhaust_stacks` e `roof_wing`; ponto `MOUNT_STACK_R/L` criado pelo `TruckNode.add_extra_mounts`. Capturas `docs/capturas_t126/`;
+  depuração: garagem `-- --demo --noparts --parts=kw_bumper,fumi_wing [--body=canter] [--cab=curta]`, corrida `-- --decorated --parts=...`.
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).

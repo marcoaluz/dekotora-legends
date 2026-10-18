@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_p3p"]
+
+[resource]
+script = ExtResource("1_p3p")
+id = &"kw_bumper"
+display_key = "part.kw_bumper"
+slot = &"front_bumper"
+zones = PackedStringArray("front")
+weight_kg = 300.0
+durability = 200.0
+fame = 18
+price = 38000
+fame_required = 60
+accessory_id = "kw_bumper"

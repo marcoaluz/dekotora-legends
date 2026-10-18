@@ -91,7 +91,7 @@ def build_one(acc: dict, out: str, previews: bool = True) -> dict:
     blend_rel = f"source_blend/accessories/{acc['category']}/{acc['id']}.blend"
     os.makedirs(os.path.dirname(os.path.join(out, blend_rel)), exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, blend_rel))
-    mount = T3.MOUNTS[acc["mount"]]
+    mount = T3.MOUNTS.get(acc["mount"]) or ACC.thirdparty.EXTRA_MOUNTS[acc["mount"]]
     problems = check_keepout(mn, mx, mount, mirrored=mount[0] < 0)
     if tris > MAX_TRIS[acc["category"]]:
         problems.append(f"orçamento de triângulos excedido: {tris}")
@@ -119,7 +119,7 @@ def build_one(acc: dict, out: str, previews: bool = True) -> dict:
         "customizable": acc.get("customizable"),
         "source_blend": "res://assets/vehicles/dekotora/" + blend_rel,
         "preview": ("res://assets/vehicles/dekotora/" + prev_rel) if prev_rel else "",
-        "license": "original (gerado por script; sem texturas externas)",
+        "license": acc.get("license", "original (gerado por script; sem texturas externas)"),
         "fit_warnings": problems,
     }
     log(f"{acc['id']:26s} tris={tris:5d} dims=({size.x:.2f},{size.z:.2f},{size.y:.2f}) {'AVISO: ' + '; '.join(problems) if problems else 'ok'}")
@@ -182,6 +182,7 @@ def main():
     ap.add_argument("--category", default="")
     ap.add_argument("--prototypes", action="store_true")
     ap.add_argument("--all", action="store_true")
+    ap.add_argument("--thirdparty", action="store_true", help="so as pecas tiradas de modelos de terceiros (T-126)")
     ap.add_argument("--assembled", action="store_true")
     ap.add_argument("--no-preview", action="store_true")
     args = ap.parse_args(argv)
@@ -192,6 +193,8 @@ def main():
         return
     if args.prototypes:
         todo = [ACC.BY_ID[i] for i in PROTOTYPES]
+    elif args.thirdparty:
+        todo = [ACC.BY_ID[i] for i in ACC.THIRDPARTY]
     elif args.only:
         todo = [ACC.BY_ID[i] for i in args.only.split(",")]
     elif args.category:

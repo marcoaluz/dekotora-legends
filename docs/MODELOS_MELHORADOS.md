@@ -5,6 +5,8 @@
 > `canter.py`; gerar: `build_truck_3d.py -- --variant canter` e `-- --variant base|leve|longo --cab curta`). Medido: 37,6 mil
 > triângulos do JAC (cabine + chassi) -> 18,3 mil; Canter inteiro 48 mil; cabine curta 11,8 mil (modelos `*_curta` 49–73 mil).
 > Escala usada: 0,74 (Canter, 6,9 m) e 0,84 (cabine curta: eixo dianteiro cai exatamente no nosso). Capturas em `docs/capturas_t125/`.
+> **T-126:** 10 peças de personalização saíram do Kenworth (escapamentos, tanque, degraus, para-sol, para-choque, grade), do Fumi SC
+> (aerofólio, rodas) e do JAC (rodas, caixa de ferramentas): `blender/scripts/accessories/thirdparty.py`, lista em `docs/ACESSORIOS.md`.
 
 Data: 2026-10-18. Pedido do Marco: "pegar para criar novos carros de NPC, cabine e caminhão dentro do jogo; analisa cada arquivo".
 **Só análise e prévias. Nada foi convertido nem entrou no jogo ainda**, porque a licença precisa da sua confirmação (seção 3).

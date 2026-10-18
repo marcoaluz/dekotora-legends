@@ -1500,6 +1500,343 @@
       "preview": "res://assets/vehicles/dekotora/previews/panel_japanese_theme_34.png",
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": []
+    },
+    {
+      "id": "kw_exhaust_stacks",
+      "name": "Escapamentos altos cromados",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/kw_exhaust_stacks.glb",
+      "mount_point": "MOUNT_STACK_R",
+      "mount_point_left": "MOUNT_STACK_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.372,
+        "y": 3.233,
+        "z": 0.294
+      },
+      "triangles": 2989,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/kw_exhaust_stacks.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_exhaust_stacks_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "kw_fuel_tank",
+      "name": "Tanque cromado americano",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/kw_fuel_tank.glb",
+      "mount_point": "MOUNT_SIDE_BOX_R",
+      "mount_point_left": "MOUNT_SIDE_BOX_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.881,
+        "y": 0.648,
+        "z": 1.631
+      },
+      "triangles": 2193,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/kw_fuel_tank.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_fuel_tank_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "kw_steps",
+      "name": "Degraus cromados",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/kw_steps.glb",
+      "mount_point": "MOUNT_STEP_R",
+      "mount_point_left": "MOUNT_STEP_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.252,
+        "y": 0.459,
+        "z": 0.852
+      },
+      "triangles": 1592,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/kw_steps.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_steps_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "kw_visor",
+      "name": "Para-sol cromado com lanternas",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/kw_visor.glb",
+      "mount_point": "MOUNT_VISOR",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.835,
+        "y": 0.225,
+        "z": 0.622
+      },
+      "triangles": 2556,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/kw_visor.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_visor_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "kw_bumper",
+      "name": "Para-choque americano",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/kw_bumper.glb",
+      "mount_point": "MOUNT_FRONT_BUMPER",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.458,
+        "y": 0.495,
+        "z": 0.104
+      },
+      "triangles": 2398,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/kw_bumper.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_bumper_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "kw_grille",
+      "name": "Grade cromada americana",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front/kw_grille.glb",
+      "mount_point": "MOUNT_FRONT_GRILLE",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.282,
+        "y": 1.298,
+        "z": 0.238
+      },
+      "triangles": 3591,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/front/kw_grille.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/kw_grille_34.png",
+      "license": "Kenworth W990 Truck (Sketchfab, Henry S), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "fumi_wing",
+      "name": "Aerofólio de teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/fumi_wing.glb",
+      "mount_point": "MOUNT_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.261,
+        "y": 0.302,
+        "z": 0.728
+      },
+      "triangles": 1232,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "paint_white"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_white",
+          "chrome",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/fumi_wing.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/fumi_wing_34.png",
+      "license": "2025 Fumi SC (Sketchfab, T3STAR), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "fumi_sport_rims",
+      "name": "Rodas esportivas",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/fumi_sport_rims.glb",
+      "mount_point": "MOUNT_WHEEL_FRONT_FACE_R",
+      "mount_point_left": "MOUNT_WHEEL_FRONT_FACE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.064,
+        "y": 0.708,
+        "z": 0.708
+      },
+      "triangles": 3246,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "paint_gold"
+      ],
+      "materials_available": {
+        "main": [
+          "paint_gold",
+          "chrome",
+          "plastic"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/fumi_sport_rims.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/fumi_sport_rims_34.png",
+      "license": "2025 Fumi SC (Sketchfab, T3STAR), Royalty Free/Sketchfab Standard; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "jac_steel_rims",
+      "name": "Rodas de aço cromadas",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/jac_steel_rims.glb",
+      "mount_point": "MOUNT_WHEEL_FRONT_FACE_R",
+      "mount_point_left": "MOUNT_WHEEL_FRONT_FACE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.112,
+        "y": 0.717,
+        "z": 0.766
+      },
+      "triangles": 3300,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/jac_steel_rims.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/jac_steel_rims_34.png",
+      "license": "JAC 1045 Truck (CGTrader), Royalty Free; reduzida, sem marca",
+      "fit_warnings": []
+    },
+    {
+      "id": "jac_toolbox",
+      "name": "Caixa de ferramentas",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/jac_toolbox.glb",
+      "mount_point": "MOUNT_SIDE_BOX_R",
+      "mount_point_left": "MOUNT_SIDE_BOX_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.572,
+        "y": 0.426,
+        "z": 1.088
+      },
+      "triangles": 204,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/jac_toolbox.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/jac_toolbox_34.png",
+      "license": "JAC 1045 Truck (CGTrader), Royalty Free; reduzida, sem marca",
+      "fit_warnings": []
     }
   ]
 }

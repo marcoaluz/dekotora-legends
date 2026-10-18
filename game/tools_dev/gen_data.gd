@@ -41,6 +41,17 @@ const PARTS: Array = [
 	["rear_plate_custom", "plate", ["rear"], 10, 15, 5, 3000, "rear_plate_custom", {}],
 	["mudflap_designed", "mudflaps", ["rear"], 25, 25, 6, 4500, "mudflap_designed", {}],
 	["rear_ornament_metal", "rear_ornament", ["rear"], 80, 60, 20, 24000, "rear_ornament_metal", {}],
+	# --- T-126: tiradas dos modelos de terceiros (Kenworth W990, Fumi SC, JAC 1045; valores PROPOSTOS)
+	["kw_exhaust_stacks", "exhaust_stacks", ["left", "right"], 90, 60, 18, 26000, "kw_exhaust_stacks", {}],
+	["kw_fuel_tank", "side_box", ["left", "right"], 140, 120, 14, 22000, "kw_fuel_tank", {}],
+	["kw_steps", "steps", ["left", "right"], 60, 80, 10, 14000, "kw_steps", {}],
+	["kw_visor", "visor", ["front"], 70, 60, 16, 24000, "kw_visor", {}],
+	["kw_bumper", "front_bumper", ["front"], 300, 200, 18, 38000, "kw_bumper", {}],
+	["kw_grille", "grille", ["front"], 60, 50, 14, 20000, "kw_grille", {}],
+	["fumi_wing", "roof_wing", ["roof"], 35, 30, 12, 18000, "fumi_wing", {}],
+	["fumi_sport_rims", "hubcaps", ["wheels"], 30, 50, 14, 20000, "fumi_sport_rims", {}],
+	["jac_steel_rims", "hubcaps", ["wheels"], 50, 80, 9, 9000, "jac_steel_rims", {}],
+	["jac_toolbox", "side_box", ["left", "right"], 80, 100, 6, 8000, "jac_toolbox", {}],
 ]
 
 # id, peso extra, torque, rpm de corte, preco

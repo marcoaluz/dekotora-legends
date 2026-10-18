@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_p3p"]
+
+[resource]
+script = ExtResource("1_p3p")
+id = &"kw_exhaust_stacks"
+display_key = "part.kw_exhaust_stacks"
+slot = &"exhaust_stacks"
+zones = PackedStringArray("left", "right")
+weight_kg = 90.0
+durability = 60.0
+fame = 18
+price = 26000
+fame_required = 20
+accessory_id = "kw_exhaust_stacks"

@@ -1,4 +1,4 @@
-"""Biblioteca de acessórios Dekotora 3D (32 peças em 4 categorias).
+"""Biblioteca de acessórios Dekotora 3D (32 peças nossas em 4 categorias + 10 de modelos de terceiros, `thirdparty`).
 
 Cada módulo (front, lighting, sides, rear) expõe `ACCESSORIES`: lista de dicts
     id        identificador estável (snake_case), vira o nome do arquivo .glb
@@ -10,8 +10,9 @@ Cada módulo (front, lighting, sides, rear) expõe `ACCESSORIES`: lista de dicts
     materials variantes de material permitidas por "slot" (catalog.json)
 Convenção do modelo: +Y = frente do caminhão, +X = direita, +Z = cima, metros.
 """
-from . import front, lighting, rear, sides  # noqa: F401
+from . import front, lighting, rear, sides, thirdparty  # noqa: F401
 
-ALL = front.ACCESSORIES + lighting.ACCESSORIES + sides.ACCESSORIES + rear.ACCESSORIES
+ALL = front.ACCESSORIES + lighting.ACCESSORIES + sides.ACCESSORIES + rear.ACCESSORIES + thirdparty.ACCESSORIES
+THIRDPARTY = [a["id"] for a in thirdparty.ACCESSORIES]          # T-126: tiradas de modelos de terceiros
 BY_ID = {a["id"]: a for a in ALL}
 CATEGORIES = ("front", "lighting", "sides", "rear")
