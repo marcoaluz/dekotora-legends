@@ -48,3 +48,21 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - O quadro é sorteado com semente salva no perfil: muda ao concluir um frete e ao tocar ATUALIZAR (sem custo).
   "Continuar" pega o contrato de maior valor do próximo trecho que caiba no baú.
 - Suposições a revisar com o Marco: pesos, multiplicadores e se ATUALIZAR deve custar algo.
+
+## 2026-10-18 — Placas de veículo e sinalização japonesa (T-130; Marco: "coloquei modelos de placa e sinalização, verificar e aplicar")
+
+- Inventário em `docs/INVENTARIO_MODELOS.md`: nenhum modelo trazia placa de trânsito ou letreiro aproveitável; as placas de carro
+  que existiam eram **fotos de placas reais** (Austrália no Fumi, Nova York no Camry) e não foram usadas. `Downloads\Tunnel.obj` e
+  `Downloads\van.abc` (licença desconhecida, caminhos de outro PC) ficaram **fora do projeto** até o Marco mandar o link/licença.
+- Placas **fictícias** feitas por código: atlas de 64 placas (`PlateCatalog`, 4 estilos reais: branca particular, amarela kei, verde
+  comercial, preta kei comercial), cidades reais de Kanto/Tokai com números inventados. Caminhões = placa verde comercial 40 x 20 cm;
+  carros = 33 x 16,5 cm; ônibus = verde grande; carros pequenos (hatch, kei) = amarela (1 em 5 preta).
+- Todas as placas da corrida num **MultiMesh único** (1 chamada de desenho); a sinalização inteira em **2 chamadas** (faces com atlas +
+  postes/costas). Materiais **sem luz por pixel** (claridade pela hora do dia), para não pagar passada extra de farol no Compatibility.
+- Sinalização à **esquerda** (mão inglesa), em cima da mureta: limite 80 (litoral), 60 (cidade e montanha), 60/50 antes das curvas fortes;
+  losango amarelo de curva/túnel/queda de pedras, chevrons por fora das curvas fortes (|curva| ≥ 0,9), painéis de km a cada 1,3 km,
+  出口 perto do fim, placa com nome e "延長 300m" na boca do túnel (nomes inventados: 臨海トンネル, 仙石原トンネル) e 止まれ pintado
+  no **acostamento** do pedágio (as faixas da corrida seguem livres). Losango de aviso no padrão japonês (não triângulo).
+- Gancho barato para a placa do jogador: `profile.plate_cell` (célula do atlas) e `TruckNode.plate_cell`; ainda sem tela para escolher.
+- Suposições a revisar com o Marco: limites por rota, densidade de placas, "止まれ" no pedágio, nomes dos túneis.
+

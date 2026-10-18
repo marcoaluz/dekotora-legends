@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (171) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (179) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -54,6 +54,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 ## PENDENTE — precisa do Marco
 
+- **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo); olhar
+  `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.
 - Instalar **Android SDK + JDK 17** e gerar/testar o APK no celular (P02, P22, P65, P70, P72). Sem isso o Android não foi testado.
 - **Olhar** as imagens (previews em `game/assets/vehicles/dekotora/previews/`, capturas em `docs/store/`) e **aprovar o visual** / escolher plano A ou B.
 - **Ouvir** os áudios e pedir regeração dos ruins: `python tools/gen_audio.py --only nome --force` (lista: `python tools/gen_audio.py --list`).
@@ -103,6 +105,15 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   Jogo: `CabCatalog` (`scripts/data/cab_catalog.gd`: ids, padrão, `normalize`/`LEGACY`), `GameState.migrate_profile()` (perfil local e do
   servidor), descritor de rede com `"cab"` (antes a corrida online mostrava sempre a cabine padrão), `TruckNode.CAB_FRONT_DELTA` (frente da jac e
   da americana). Teste `tests/test_cabs_t129.gd`. Capturas em `docs/capturas_t129/`.
+- **T-130 (2026-10-18): inventário dos modelos + placas de veículo + sinalização japonesa.** Inventário em `docs/INVENTARIO_MODELOS.md`
+  (Tunnel.obj = túnel de 2 faixas com semáforos de faixa; van.abc = caminhão aberto de 3 eixos, não uma van; os dois **sem licença,
+  fora do projeto**). Placas: `scripts/vehicle/` (`PlateCatalog` textos e atlas, `LicensePlates` MultiMesh que segue os veículos,
+  `PlateSpot`/`TruckPlateSpots` acham a lataria por raios em TriangleMesh de uma cópia da malha), `Traffic3D.PLATE_Y` (altura por modelo).
+  Sinalização: `road3d/road_signs.gd` (`RoadSigns`), `road3d/sign_atlas.gd` (mapa do atlas), `road3d/atlas_quads.gd` (quads com atlas).
+  Atlas gerados por `godot --path game -s res://tools_dev/make_sign_atlases.gd` (precisa de janela). Medido (modo médio, `--fps-log`,
+  6 amostras de 5 s): litoral 280 → 283 chamadas, viaduto 295 → 298, Hakone 286 → 289; triângulos +0,2 a +2,6 mil; textura +0,9 MB
+  (atlas comprimidos com mipmaps); FPS igual (75). Capturas em `docs/capturas_t130/`. Depuração nova da corrida: `--snap-every=S`
+  (com `--shots=`) e `--cam=DZ,LAT,H,LDZ,LLAT,LH` (câmera fixa relativa ao jogador); `--fps-log` imprime `SINALIZACAO:`.
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).

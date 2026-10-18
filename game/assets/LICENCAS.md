@@ -21,4 +21,6 @@
 | Esportivo de trânsito "Fumi" (sem interior, motor e emblemas; reduzido 82 mil → 5,6 mil, cores lisas) | `assets/vehicles/traffic/car_fumi*` | "2025 Fumi SC", Sketchfab, autor T3STAR (sketchfab.com/mememan43) | Sketchfab Standard; uso confirmado pelo Marco em 2026-10-18 (Royalty Free) |
 | Ônibus de trânsito (carroceria Jetset sem assentos, painel e escadas; reduzido 143 mil → 8,8 mil, cores lisas) | `assets/vehicles/traffic/car_bus*` | "BUS JETSET" (.fbx; o arquivo não traz autor nem licença) | Royalty Free, informado pelo Marco em 2026-10-18 |
 
+| Atlas de placas de veículo e de sinalização (T-130): desenhos nossos + texto na fonte Noto Sans JP (OFL, linha acima) | `assets/textures/plates_atlas.png`, `assets/textures/road_signs_atlas.png` | Gerados por `game/tools_dev/make_sign_atlases.gd`; números de placa e nomes de túnel inventados | Nosso (sem material de terceiros além da fonte) |
+
 Os demais modelos, texturas e sons são gerados pelo projeto (scripts em `blender/scripts/` e `tools/`) ou pelo Marco.

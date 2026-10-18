@@ -102,6 +102,9 @@ func _ready() -> void:
 	var furniture := RoadFurniture.new()
 	add_child(furniture)
 	furniture.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray())
+	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
+	add_child(signs)
+	signs.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray(), String(route.id) if route != null else "")
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])

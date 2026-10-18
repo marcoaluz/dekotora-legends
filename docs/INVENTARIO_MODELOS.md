@@ -85,7 +85,10 @@ Nenhum dos dois foi copiado para o projeto. Foram só abertos no Blender em segu
 - **Sinalização de pista:** limite de velocidade (círculo vermelho), aviso de curva e de túnel (losango amarelo), setas
   chevron vermelhas e brancas nas curvas fortes, placa "出口 EXIT", painéis de distância em km, placa com nome e comprimento
   na boca de cada túnel e "止まれ" + placa de pare antes do pedágio.
-- Detalhes técnicos, números medidos e capturas: `docs/STATUS.md` (T-130) e `docs/capturas_t130/`.
+- Custo medido (modo médio, 3 rotas): **+3 chamadas de desenho** (1 para todas as placas, 2 para toda a sinalização), +0,2 a
+  +2,6 mil triângulos, +0,9 MB de textura, FPS igual (75 no PC).
+- Fotos: `docs/capturas_t130/` (placas de perto na garagem, dia e noite; cada rota de dia/entardecer e de noite).
+- Detalhes técnicos: `docs/STATUS.md` (T-130) e `docs/DECISOES.md`.
 
 ## 5. Pendências para o Marco
 
