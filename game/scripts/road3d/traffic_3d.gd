@@ -14,6 +14,13 @@ const MODELS_BY_KIND: Array = [
 	["car_fumi"],
 ]
 const DIR := "res://assets/vehicles/traffic/"
+## Placas (T-130): altura (m) do centro da placa [frente, tras] por modelo (perfil de tools_dev/measure_plates.gd);
+## a distancia ate a lataria sai de raios (PlateSpot). Estilo: kei amarela/preta, onibus verde, o resto branca.
+const PLATE_Y: Dictionary = {
+	"car_hatch": [0.45, 0.65], "car_sedan": [0.45, 0.6], "car_van": [0.45, 0.6], "car_kei_truck": [0.45, 0.62],
+	"car_van01": [0.42, 0.55], "car_ascona": [0.48, 0.55], "car_falcon": [0.5, 0.62], "car_suv": [0.55, 0.62],
+	"car_bus": [0.48, 0.75], "car_fumi": [0.32, 0.57]}
+const KEI_MODELS: Array[String] = ["car_hatch", "car_kei_truck"]
 const BODY_COLORS: Array[Color] = [
 	Color("#2a5cc0"), Color("#c8202f"), Color("#2c9a5a"), Color("#d29a2e"), Color("#aeb8c8"), Color("#8a3fd0")]
 
@@ -39,11 +46,12 @@ static func model_for(kind: int, i: int, color_id: int) -> String:
 	return String(list[(i + color_id) % list.size()])
 
 
-func setup(path_: TrackPath, traffic_: TrafficSim) -> void:
+func setup(path_: TrackPath, traffic_: TrafficSim, plates: LicensePlates = null) -> void:
 	path = path_
 	traffic = traffic_
 	var scenes: Dictionary = {}          # nome do modelo -> PackedScene (so os usados nesta corrida)
 	var classic: bool = "--traffic-classic" in OS.get_cmdline_user_args()
+	var spots: Dictionary = {}           # modelo -> [transform da placa da frente, de tras]
 	var paints: Array[StandardMaterial3D] = []
 	for c in BODY_COLORS:
 		var mat := StandardMaterial3D.new()
@@ -76,6 +84,30 @@ func setup(path_: TrackPath, traffic_: TrafficSim) -> void:
 		_wheel_rest.append(rest)
 		add_child(n)
 		_nodes.append(n)
+		if plates != null:
+			if not spots.has(model):
+				spots[model] = plate_spots(model, n)
+			var cell: int = plates.pick(plate_style(model, i), i * 7919 + car.color_id)
+			plates.add_plate(n, spots[model][0], cell)
+			plates.add_plate(n, spots[model][1], cell)
+
+
+## Estilo da placa (PlateCatalog.Style) do carro `i` deste modelo.
+static func plate_style(model: String, i: int) -> int:
+	if model == "car_bus":
+		return PlateCatalog.Style.GREEN
+	if model in KEI_MODELS:
+		return PlateCatalog.Style.BLACK if i % 5 == 0 else PlateCatalog.Style.YELLOW
+	return PlateCatalog.Style.WHITE
+
+
+## Transforms locais das placas [frente, tras] para o modelo instanciado em `n` (frente = -Z, traseira em z = 0).
+static func plate_spots(model: String, n: Node3D) -> Array:
+	var ys: Array = PLATE_Y.get(model, [0.45, 0.6])
+	var size: Vector2 = LicensePlates.SIZE_TRUCK if model == "car_bus" else LicensePlates.SIZE_CAR
+	var tms: Array = PlateSpot.triangle_meshes(n, minf(ys[0], ys[1]) - 0.2, maxf(ys[0], ys[1]) + 0.2)
+	return [PlateSpot.plate_transform(tms, float(ys[0]), size, true, -4.0),
+		PlateSpot.plate_transform(tms, float(ys[1]), size, false, 0.0)]
 
 
 func car_count() -> int:

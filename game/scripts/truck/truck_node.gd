@@ -36,6 +36,13 @@ var cab_kind: String = CabCatalog.DEFAULT
 ## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
 var chrome_mode: String = "night"
 
+## Placas de veiculo (T-130): camada da cena (corrida, uma chamada de desenho para todos); null = cria a sua.
+var plates: LicensePlates
+## Celula do atlas de placas (PlateCatalog); -1 = a camada escolhe. Gancho para a placa do jogador. Antes de add_child.
+var plate_cell: int = -1
+var _plate_ids: Array[int] = []
+var _plates_queued: bool = false
+
 var model: Node3D
 var _wheels: Array[Node3D] = []
 var _wheel_rest: Array[Basis] = []
@@ -83,6 +90,30 @@ func _ready() -> void:
 	_headlight.shadow_enabled = false
 	_headlight.visible = int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1
 	add_child(_headlight)
+	_queue_plates()
+
+
+func _queue_plates() -> void:
+	if not _plates_queued:
+		_plates_queued = true
+		_place_plates.call_deferred()            # uma vez por quadro (depois do queue_free das pecas antigas)
+
+
+## Placa da frente e de tras (PlateCatalog, estilo comercial verde); refeita quando as pecas mudam.
+func _place_plates() -> void:
+	_plates_queued = false
+	if model == null or not is_inside_tree():
+		return
+	if plates == null:
+		plates = LicensePlates.new()
+		add_child(plates)
+	var s: Array = TruckPlateSpots.spots(self, model, shown_cab())
+	if _plate_ids.is_empty():
+		var cell: int = plate_cell if plate_cell >= 0 else plates.pick(PlateCatalog.Style.GREEN, 0)
+		plate_cell = cell
+		_plate_ids = [plates.add_plate(self, s[0], cell), plates.add_plate(self, s[1], cell)]
+	plates.set_plate(_plate_ids[0], s[0], true)
+	plates.set_plate(_plate_ids[1], s[1], bool(s[2]))
 
 
 ## Luzinhas de marcacao (fileiras do bau, cabine, andon e das pecas): `on` = acesas (noite/tunel); apagadas
@@ -301,6 +332,7 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 				list.append(n)
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
+	_queue_plates()
 
 
 ## Estado visual de uma peca: "ok", "dent" (opaca/amassada) ou "broken" (some do caminhao).

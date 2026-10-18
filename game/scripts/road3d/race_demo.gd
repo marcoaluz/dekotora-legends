@@ -4,6 +4,8 @@ extends RefCounted
 ##   --demo=lanes   o jogador toca a seta/troca sozinho (direita, direita, esquerda, esquerda...)
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
+##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
+##   --snap-every=S com --shots: tambem uma captura a cada S segundos (t01, t02...; placas e sinalizacao, T-130)
 ## Exemplo: godot --path game res://scenes/race/race3d.tscn -- --demo=close --shots=C:/tmp/capt
 
 var mode: String = ""
@@ -14,6 +16,9 @@ var _clock: float = 0.0
 var _last_lane_changes: int = 0
 var _last_close: float = -99.0
 var _count: Dictionary = {}
+var _cam: PackedFloat32Array = []
+var _snap_every: float = 0.0
+var _next_snap: float = 0.0
 
 
 func _init(args: PackedStringArray) -> void:
@@ -22,6 +27,12 @@ func _init(args: PackedStringArray) -> void:
 			mode = a.substr(7)
 		elif a.begins_with("--shots="):
 			shot_dir = a.substr(8)
+		elif a.begins_with("--cam="):
+			for v in a.substr(6).split(","):
+				_cam.append(float(v))
+		elif a.begins_with("--snap-every="):
+			_snap_every = float(a.substr(13))
+			_next_snap = _snap_every
 	if mode == "lanes":
 		_taps = [[1.0, 1], [1.5, 1], [5.0, -1], [5.5, -1], [9.0, 1], [9.5, 1]]
 	elif mode == "close":
@@ -79,6 +90,16 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 		{"id": "sol", "slot": "cab", "x": 0.0, "y": 0.1, "size": 0.5, "color": "#ffffff"}]
 
 
+## Camera de depuracao (--cam=...): devolve true se assumiu a camera neste quadro.
+func camera(cam: Camera3D, path: TrackPath, z: float) -> bool:
+	if _cam.size() < 6:
+		return false
+	var w: float = Track.ROAD_HALF_WIDTH_M
+	cam.global_position = path.world_point(z + _cam[0], _cam[1] / w, _cam[2])
+	cam.look_at(path.world_point(z + _cam[3], _cam[4] / w, _cam[5]), Vector3.UP)
+	return true
+
+
 func active() -> bool:
 	return mode != ""
 
@@ -121,6 +142,9 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 	_clock += dt
 	if shot_dir == "":
 		return
+	if _snap_every > 0.0 and _clock >= _next_snap:
+		_save(viewport, "t%02d" % roundi(_next_snap / _snap_every))
+		_next_snap += _snap_every
 	if _clock > 1.5 and not _count.has("largada"):
 		_save(viewport, "largada")                # contagem regressiva: mostra o aviso da carga
 	if player_truck.lane_changes != _last_lane_changes:
