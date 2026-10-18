@@ -3,7 +3,7 @@ extends RefCounted
 ## Cromo por matcap (V6): o Compatibility nao tem reflexo de tela e o ceu noturno e quase preto, entao o
 ## cromo "real" ficava escuro. Aqui o cromo le uma esfera pintada com o ambiente (textures/matcap_chrome_*.png,
 ## gerada por blender/scripts/build_matcaps.py) pela normal vista da camera: sempre brilha, custa uma textura.
-## Modos: "night" (postes de sodio, neon) e "day" (ceu azul, sol). Troca os materiais "chrome" e "paint_gold".
+## Modos: "night" (postes de sodio, neon), "day" (ceu azul, sol) e "studio" (garagem, neutro). Troca os materiais "chrome" e "paint_gold".
 ## Soma ao cromo PBR (nunca fica mais escuro que antes).
 
 const SHADER := """
@@ -22,6 +22,8 @@ void fragment() {
 }
 """
 const TARGETS: Dictionary = {"chrome": Color(1, 1, 1), "paint_gold": Color("#f6c453")}
+## Forca do ambiente pintado por modo. "studio" = garagem (T-138): cinza neutro com softbox, sem o azul da noite.
+const STRENGTH: Dictionary = {"night": 2.2, "day": 0.45, "studio": 0.95}
 
 static var _cache: Dictionary = {}
 
@@ -37,7 +39,7 @@ static func material(mode: String, target: String) -> ShaderMaterial:
 	m.resource_name = target                       # mantem o nome: swap_material("chrome", "steel") continua valendo
 	m.set_shader_parameter("matcap", load("res://assets/textures/matcap_chrome_%s.png" % mode))
 	m.set_shader_parameter("tint", TARGETS.get(target, Color.WHITE))
-	m.set_shader_parameter("strength", 2.2 if mode == "night" else 0.45)
+	m.set_shader_parameter("strength", float(STRENGTH.get(mode, 0.45)))
 	_cache[key] = m
 	return m
 

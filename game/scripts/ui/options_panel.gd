@@ -1,12 +1,15 @@
 class_name OptionsPanel
 extends PanelContainer
 ## Tela de opcoes: categorias a esquerda, conteudo rolavel a direita e botao VOLTAR sempre visivel.
-## Cabe em qualquer tela (960x540 base): nada fica fora da janela, o conteudo rola.
+## Presa aos 4 cantos com margem (960x540 e celular 20:9): nada fica fora da janela, o conteudo rola.
+## Textos via Tr.t (game/data/i18n/pt-BR.json).
 
 signal back_pressed
 signal profile_changed
+signal menu_bg_changed
 
-const CATEGORIES: Array = [["controls", "Controles"], ["graphics", "Gráficos"], ["audio", "Áudio"], ["account", "Conta"]]
+const CATEGORIES: Array = [["controls", "options.cat_controls", "gamepad-2"], ["graphics", "options.cat_graphics", "monitor"],
+		["audio", "options.cat_audio", "volume-2"], ["account", "options.cat_account", "circle-user"]]
 
 var _s: Node
 var _gs: Node
@@ -18,25 +21,26 @@ func _ready() -> void:
 	_s = get_node("/root/Settings")
 	_gs = get_node("/root/GameState")
 	theme = UiTheme.make()
+	add_theme_stylebox_override("panel", UiTheme.box(Color(0.05, 0.06, 0.11, 0.9), Color(1, 1, 1, 0.1), 1, 12, 18))
 	set_anchors_preset(Control.PRESET_FULL_RECT)
-	offset_left = 40.0
-	offset_top = 28.0
-	offset_right = -40.0
-	offset_bottom = -28.0
+	offset_left = 36.0
+	offset_top = 24.0
+	offset_right = -36.0
+	offset_bottom = -24.0
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 12)
 	add_child(root)
-	root.add_child(UiTheme.label(Tr.t("options.title"), 34, UiTheme.PINK))
+	root.add_child(UiKit.screen_title(Tr.t("options.title"), "settings"))
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 18)
 	root.add_child(body)
 	var side := VBoxContainer.new()
-	side.custom_minimum_size = Vector2(190, 0)
+	side.custom_minimum_size = Vector2(200, 0)
 	body.add_child(side)
 	for c in CATEGORIES:
-		var b: Button = UiTheme.menu_button(String(c[1]), Vector2(190, 48))
-		b.add_theme_font_size_override("font_size", 20)
+		var b: Button = UiKit.nav_button(Tr.t(String(c[1])), String(c[2]), Vector2(200, 46))
+		b.add_theme_font_size_override("font_size", 19)
 		var id: String = String(c[0])
 		b.pressed.connect(func() -> void: _show(id))
 		side.add_child(b)
@@ -50,10 +54,17 @@ func _ready() -> void:
 	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_content.add_theme_constant_override("separation", 14)
 	scroll.add_child(_content)
-	var back: Button = UiTheme.button(Tr.t("menu.back"), Vector2(220, 48))
+	var foot := HBoxContainer.new()
+	var back: Button = UiKit.back_button()
 	back.pressed.connect(func() -> void: back_pressed.emit())
-	root.add_child(back)
-	_show("controls")
+	foot.add_child(back)
+	root.add_child(foot)
+	var first: String = "controls"
+	for a in OS.get_cmdline_user_args():             # depuracao/capturas: --options-tab=graphics|audio|account
+		if a.begins_with("--options-tab=") and _tabs.has(a.substr(14)):
+			first = a.substr(14)
+	_show(first)
+	(_tabs[first] as Button).grab_focus.call_deferred()
 
 
 func _show(id: String) -> void:
@@ -64,11 +75,17 @@ func _show(id: String) -> void:
 	match id:
 		"controls":
 			_slider(Tr.t("options.touch_size"), _s.touch_scale, 0.7, 1.5, 0.05, func(v: float) -> void: _s.touch_scale = v, true)
-			_hint("Troca de faixa: toque uma vez no lado para ligar a seta, toque de novo para trocar.")
+			_hint(Tr.t("options.lane_hint"))
 		"graphics":
-			_choice("Qualidade gráfica", ["Baixa", "Média", "Alta"], _s.quality, func(i: int) -> void: _s.quality = i)
-			_hint("Baixa = mais FPS no celular; Alta = mais reflexos e luzes.")
-			_toggle("Mostrar FPS na corrida", _s.show_fps, func(on: bool) -> void: _s.show_fps = on)
+			var bgs: Array[String] = MenuBackdrop.KINDS
+			_choice(Tr.t("options.menu_bg"), bgs.map(func(k: String) -> String: return Tr.t("options.menu_bg_" + k)), maxi(bgs.find(String(_s.menu_bg)), 0),
+					func(i: int) -> void:
+						_s.menu_bg = bgs[i]
+						menu_bg_changed.emit())
+			_hint(Tr.t("options.menu_bg_hint"))
+			_choice(Tr.t("options.quality"), [Tr.t("options.quality_low"), Tr.t("options.quality_mid"), Tr.t("options.quality_high")], _s.quality, func(i: int) -> void: _s.quality = i)
+			_hint(Tr.t("options.quality_hint"))
+			_toggle(Tr.t("options.show_fps"), _s.show_fps, func(on: bool) -> void: _s.show_fps = on)
 			_toggle(Tr.t("options.fx_speed"), _s.fx_speed, func(on: bool) -> void: _s.fx_speed = on)
 			_toggle(Tr.t("options.fx_reflections"), _s.fx_reflections, func(on: bool) -> void: _s.fx_reflections = on)
 			_toggle(Tr.t("options.fx_trails"), _s.fx_trails, func(on: bool) -> void: _s.fx_trails = on)
@@ -124,6 +141,7 @@ func _toggle(text: String, on: bool, apply: Callable) -> void:
 	cb.button_pressed = on
 	cb.add_theme_font_size_override("font_size", 20)
 	cb.custom_minimum_size = Vector2(0, 46)
+	cb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	cb.toggled.connect(func(v: bool) -> void:
 		apply.call(v)
 		_s.save_settings())
@@ -146,14 +164,14 @@ func _choice(text: String, names: Array, selected: int, apply: Callable) -> void
 
 
 func _account() -> void:
-	_hint("Código do jogador: use o mesmo código em outro aparelho para ter a mesma garagem.")
+	_hint(Tr.t("options.code_hint"))
 	var row := HBoxContainer.new()
 	var edit := LineEdit.new()
 	edit.text = String(_gs.profile["player_code"])
 	edit.max_length = 12
 	edit.custom_minimum_size = Vector2(220, 46)
 	row.add_child(edit)
-	var use: Button = UiTheme.button("USAR CÓDIGO", Vector2(170, 46))
+	var use: Button = UiTheme.button(Tr.t("options.use_code"), Vector2(170, 46))
 	use.pressed.connect(func() -> void:
 		var code: String = edit.text.strip_edges().to_upper()
 		if code.length() >= 6 and code != String(_gs.profile["player_code"]):
@@ -167,7 +185,7 @@ func _account() -> void:
 	reset.pressed.connect(func() -> void:
 		if not armed[0]:
 			armed[0] = true
-			reset.text = "TOQUE DE NOVO PARA CONFIRMAR"
+			reset.text = Tr.t("options.reset_confirm")
 			return
 		_gs.new_profile()
 		profile_changed.emit())

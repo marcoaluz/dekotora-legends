@@ -136,11 +136,11 @@ func is_empty() -> bool:
 ## Host pede o inicio (ou todos prontos). Cria a simulacao e comeca a contagem.
 func try_start(peer: int, seed_: int) -> String:
 	if peer != host_peer:
-		return "so o anfitriao inicia"
+		return "só o anfitrião inicia"
 	if state != Protocol.RoomState.LOBBY:
-		return "ja iniciada"
+		return "já iniciada"
 	if not all_ready():
-		return "nem todos estao prontos"
+		return "nem todos estão prontos"
 	_build_race(seed_)
 	state = Protocol.RoomState.COUNTDOWN
 	countdown = Protocol.COUNTDOWN_SECONDS
@@ -163,7 +163,7 @@ func _build_race(seed_: int) -> void:
 		TruckConfig.apply(sim.trucks[idx], m.loadout)
 		slot += 1
 	var bots: int = mini(int(rules["bots"]), Protocol.MAX_PLAYERS - order.size())
-	var names: Array[String] = ["Trovao Rosa", "Dragao de Aco", "Lua Cromada"]
+	var names: Array[String] = ["Trovão Rosa", "Dragão de Aço", "Lua Cromada"]
 	for b in bots:
 		var idx2: int = sim.add_truck(-float(slot) * GRID_GAP, GRID_X[slot % 4])
 		var t: TruckSim = sim.trucks[idx2]

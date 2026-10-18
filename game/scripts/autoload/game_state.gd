@@ -199,11 +199,11 @@ func add_owned(d: PartDef) -> void:
 
 func can_buy(d: PartDef) -> String:
 	if owns(String(d.id)):
-		return "ja possui"
+		return Tr.t("reason.owned")
 	if fame() < d.fame_required:
-		return "precisa de %d Fama" % d.fame_required
+		return Tr.t("reason.needs_fame", [d.fame_required])
 	if money() < d.price:
-		return "dinheiro insuficiente"
+		return Tr.t("reason.no_money")
 	return ""
 
 
@@ -344,11 +344,11 @@ func mech_installed(id: String) -> bool:
 func can_buy_mech(id: String) -> String:
 	var d: Resource = mech_def(id)
 	if d == null:
-		return "indisponivel"
+		return Tr.t("reason.unavailable")
 	if owns_mech(id):
-		return "ja possui"
+		return Tr.t("reason.owned")
 	if money() < int(d.get("price")):
-		return "dinheiro insuficiente"
+		return Tr.t("reason.no_money")
 	return ""
 
 
@@ -693,9 +693,9 @@ func capacity_t() -> float:
 ## Motivo para nao poder aceitar ("" = pode).
 func contract_block_reason(c: Dictionary) -> String:
 	if float(c["weight_t"]) > capacity_t():
-		return "BAÚ PEQUENO"
+		return Tr.t("reason.small_box")
 	if not bool(rival_refusal(String(c.get("route", ""))).get("ok", true)):
-		return "RIVAL RECUSA"
+		return Tr.t("reason.rival_refuses")
 	return ""
 
 

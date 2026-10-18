@@ -184,9 +184,13 @@ func _ready() -> void:
 		_print_surface_budget()
 	if "--paused" in args:                       # depuracao: abre ja na tela de pausa (capturas)
 		_toggle_pause.call_deferred()
+	if _demo.mode.begins_with("result"):         # --demo=result|result_lose|result_timeout: so a tela (nao grava no perfil)
+		_result_shown = true
+		_open_result.call_deferred(ResultScreen.demo_result(_demo.mode), "res://scenes/menu/main_menu.tscn")
 	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
+	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
 
 
 ## Hora do dia: a da rota, ou --time=night|dusk|day (depuracao/capturas).
@@ -275,14 +279,7 @@ func _on_net_end(result: Dictionary) -> void:
 	_result_shown = true
 	Net.pending_setup = {}
 	_audio.finish_race(int(result["position"]) == 1)
-	var layer := CanvasLayer.new()
-	layer.layer = 20
-	layer.scale = Vector2(2, 2)
-	add_child(layer)
-	var screen := ResultScreen.new()
-	layer.add_child(screen)
-	screen.show_result(result)
-	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/lobby/lobby.tscn"))
+	_open_result(result, "res://scenes/lobby/lobby.tscn")
 
 
 ## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
@@ -342,55 +339,14 @@ func _build_pause_menu() -> void:
 	_pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	_pause_layer.visible = false
 	add_child(_pause_layer)
-	var root := Control.new()
-	root.theme = UiTheme.make()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_pause_layer.add_child(root)
-	# tela de pausa SEM escurecer a corrida (ATB-1): titulo + 3 blocos com icone (continuar, revanche, desistir)
-	var col := VBoxContainer.new()
-	col.position = Vector2(150, 110)
-	col.custom_minimum_size = Vector2(660, 0)
-	col.add_theme_constant_override("separation", 18)
-	root.add_child(col)
-	var ic := TextureRect.new()
-	ic.texture = UiKit.icon("pause")
-	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	ic.custom_minimum_size = Vector2(0, 40)
-	col.add_child(ic)
-	var title: Label = UiKit.heading(Tr.t("race.paused"), 36)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
-	title.add_theme_constant_override("outline_size", 8)
-	col.add_child(title)
-	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 12)
-	col.add_child(row)
-	var tiles: Array = [
-		[Tr.t("race.resume"), "play", _toggle_pause],
-		[Tr.t("race.rematch"), "rotate-ccw", _rematch],
-		[Tr.t("race.giveup"), "flag", _give_up],
-	]
-	_pause_first = null
-	for t in tiles:
-		var b: Button = UiTheme.button(String(t[0]), Vector2(150, 120))
-		b.icon = UiKit.icon(String(t[1]))
-		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.add_theme_constant_override("icon_max_width", 40)
-		b.add_theme_font_size_override("font_size", 17)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.pressed.connect(t[2])
-		row.add_child(b)
-		if _pause_first == null:
-			_pause_first = b
-			b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.22), UiTheme.PINK, 1, 10, 10))
-	var opt: Button = UiTheme.button(Tr.t("menu.settings"), Vector2(220, 40))
-	opt.pressed.connect(_pause_options)
-	opt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	col.add_child(opt)
-	_pause_root = root
+	var menu := PauseMenu.new()                  # pausa SEM escurecer a corrida (ATB-1), centralizada (T-138)
+	_pause_layer.add_child(menu)
+	menu.resume_pressed.connect(_toggle_pause)
+	menu.rematch_pressed.connect(_rematch)
+	menu.giveup_pressed.connect(_give_up)
+	menu.options_pressed.connect(_pause_options)
+	_pause_first = menu.first_button
+	_pause_root = menu
 
 
 ## Revanche: recomeca a mesma corrida (mesma rota e contrato); o dano so entra no perfil ao terminar, entao volta ao estado de antes.
@@ -713,14 +669,19 @@ func _show_result() -> void:
 	print("RESULTADO: ", res)
 	_audio.finish_race(int(res["position"]) == 1)
 	gs.apply_race_result(res, String(route.id) if route != null else "", sim.trucks[player])
+	_open_result(res, "res://scenes/menu/main_menu.tscn")
+
+
+## Tela de resultado numa camada propria SEM escala (layout por containers, T-138). `next_scene` = para onde o CONTINUAR leva.
+func _open_result(res: Dictionary, next_scene: String) -> void:
+	_hud_layer.visible = false                   # HUD e toque somem: a tela de resultado fica limpa
 	var layer := CanvasLayer.new()
 	layer.layer = 20
-	layer.scale = Vector2(2, 2)
 	add_child(layer)
 	var screen := ResultScreen.new()
 	layer.add_child(screen)
 	screen.show_result(res)
-	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
+	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), next_scene))
 
 
 ## Depuracao (--fps-log): quantas superficies (≈ chamadas de desenho) cada parte da cena tem.

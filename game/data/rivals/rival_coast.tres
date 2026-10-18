@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_p25pa")
 id = &"rival_coast"
-display_name = "Trovao Rosa"
+display_name = "Trovão Rosa"
 difficulty = 0
 paint = Color(1, 0.43529412, 0.69411767, 1)
 part_ids = PackedStringArray("fb_basic", "rb_basic")

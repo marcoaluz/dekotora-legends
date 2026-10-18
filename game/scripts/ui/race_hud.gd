@@ -43,6 +43,9 @@ func show_banner(text: String, seconds: float = 1.6) -> void:
 
 
 func _process(delta: float) -> void:
+	var want: Vector2 = get_viewport_rect().size / 2.0   # T-138: tela comprida = HUD mais largo (cantos nas bordas)
+	if size != want:
+		size = want
 	banner_time = maxf(banner_time - delta, 0.0)
 	queue_redraw()
 
@@ -114,7 +117,7 @@ func _draw_destination(t: TruckSim, w: float) -> void:
 	_panel(r)
 	var remaining: float = maxf(sim.finish_z - t.z, 0.0)
 	_lbl(Vector2(r.position.x + 8, 17), Tr.t("hud.destination"), 8)
-	_num(Vector2(r.position.x, 17), "%.1f km" % (remaining / 1000.0), 11, Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT, r.size.x - 8)
+	_num(Vector2(r.position.x, 17), ("%.1f km" % (remaining / 1000.0)).replace(".", ","), 11, Color.WHITE, HORIZONTAL_ALIGNMENT_RIGHT, r.size.x - 8)
 	var bar := Rect2(r.position.x + 8, 23, r.size.x - 16, 4)
 	draw_rect(bar, Color(1, 1, 1, 0.12))
 	var f_me: float = clampf(t.z / sim.finish_z, 0.0, 1.0)

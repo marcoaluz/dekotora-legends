@@ -148,11 +148,11 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 
 
 static func _create_indoor(parent: Node3D) -> void:
-	var sky_mat := ProceduralSkyMaterial.new()          # so para reflexos no cromo
-	sky_mat.sky_top_color = Color("#101a3a")
-	sky_mat.sky_horizon_color = Color("#b8706a")
-	sky_mat.ground_horizon_color = Color("#8a6a78")
-	sky_mat.ground_bottom_color = Color("#1c1c2c")
+	var sky_mat := ProceduralSkyMaterial.new()          # so para reflexos no cromo: cinza neutro de estudio (T-138, sem azul)
+	sky_mat.sky_top_color = Color("#2a2a2c")
+	sky_mat.sky_horizon_color = Color("#8c847e")
+	sky_mat.ground_horizon_color = Color("#6e6866")
+	sky_mat.ground_bottom_color = Color("#1e1e20")
 	sky_mat.sky_curve = 0.18
 	sky_mat.sky_energy_multiplier = 1.3
 	var sky := Sky.new()
@@ -178,7 +178,7 @@ static func _create_indoor(parent: Node3D) -> void:
 	we.environment = env
 	parent.add_child(we)
 	var top := DirectionalLight3D.new()                 # luz difusa vinda do teto (paineis de LED)
-	top.light_color = Color("#e6ecff")
+	top.light_color = Color("#fff8f0")                  # branco neutro (antes #e6ecff, azulado)
 	top.light_energy = 0.55
 	top.rotation_degrees = Vector3(-72, 20, 0)
 	top.shadow_enabled = q >= 1

@@ -69,3 +69,28 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - Gancho barato para a placa do jogador: `profile.plate_cell` (célula do atlas) e `TruckNode.plate_cell`; ainda sem tela para escolher.
 - Suposições a revisar com o Marco: limites por rota, densidade de placas, "止まれ" no pedágio, nomes dos túneis.
 
+
+## 2026-10-18 — Telas com acabamento final (T-138, E1)
+
+- **Telas presas às bordas**: `window/stretch/aspect = "expand"` (antes "keep", que punha faixas pretas nas laterais em celular
+  20:9). A base continua 960x540; numa tela 2400x1080 o jogo enxerga 1200x540 e o espaço a mais vai para os lados. Menu,
+  garagem, lobby, opções, pausa e resultado agora são montados com containers (margem + colunas), sem posições fixas em pixels.
+  HUD da corrida e botões de toque acompanham a largura (botões da direita presos na borda direita).
+- **Fundo do menu em 2 opções** (`MenuBackdrop`): **A = posto de estrada à noite com neon (padrão)** e B = rodovia à noite.
+  O Marco troca em Opções > Gráficos > "Fundo da tela inicial" (`Settings.menu_bg`, troca na hora). O galpão antigo fica só por
+  argumento (`--menu-bg=hall`) para comparar. Escolha do padrão é provisória: o Marco decide olhando `docs/capturas_t138/`.
+- **Garagem**: câmera mais perto (caminhão ~60% da largura), cromo **neutro de estúdio** (`matcap_chrome_studio.png`, cinza com
+  softbox, sem o azul da noite) e luz de preenchimento branca quente (antes ciano). A prévia de dia usa o cromo "day".
+- **Rodas na garagem**: ficam paradas até o jogador tocar **VER EM MOVIMENTO** (barra de vistas), tocar numa roda ou instalar
+  uma roda/calota nova. Trocar de vista desliga o giro. (Antes giravam sozinhas só na vista RODAS, T-133.)
+- **Resultado**: tela nova por containers, centralizada. Título por desfecho (**"1º LUGAR"**, **"DERROTA"**, **"TEMPO ESGOTADO"**)
+  e frases simples (`ResultText`): por que ganhou/perdeu, quanto da carga estragou e por quê (batidas, encostadas, dano no baú),
+  peças quebradas/amassadas e a Fama. Na derrota e no tempo esgotado diz que o frete não é pago. A simulação passou a contar
+  `cargo_hits`/`cargo_touches` (só contadores, sem mudar a física).
+- **Textos**: todos os textos fixos das telas viraram chaves em `pt-BR.json` (lobby, opções, garagem, motivos de bloqueio);
+  `tests/test_i18n_keys.gd` garante que toda chave usada existe e não está vazia. Nomes dos rivais ganharam acento
+  (Trovão Rosa, Dragão de Aço).
+- **Capturas**: `bash tools/ui_shots.sh 960x540 PASTA` (todas as telas). Para 2400x1080 use `1200x540`: a janela não passa do
+  tamanho do monitor e, com essa configuração de stretch, o layout é idêntico (só muda a nitidez).
+  `docs/capturas_t138/antes_960x540` (commit dc7c539) e `depois_960x540` / `depois_1200x540`. Não há "antes" em 20:9: o jogo
+  antigo desenhava sempre 960x540 e o resto da tela do celular ficava com faixas pretas nas laterais.

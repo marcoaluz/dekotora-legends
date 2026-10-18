@@ -18,19 +18,24 @@ var _font: Font
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
-	size = Vector2(480, 270)
 	_font = UiTheme.heading_font(true)
+	get_viewport().size_changed.connect(layout)
 	layout()
 
 
+## Layout em unidades de 480 de altura 270 (o CanvasLayer pai escala 2x). A largura acompanha a tela
+## (celular comprido = mais largo): os botoes da direita ficam presos na borda direita (T-138).
 func layout() -> void:
+	size = get_viewport_rect().size / 2.0 if is_inside_tree() else Vector2(480, 270)
 	var s: float = Settings.touch_scale
+	var w: float = size.x
+	var h: float = size.y
 	_buttons = {
-		"left": {"center": Vector2(52, 220), "radius": 38.0 * s},
-		"right": {"center": Vector2(146, 220), "radius": 38.0 * s},
-		"throttle": {"center": Vector2(425, 215), "radius": 40.0 * s},
-		"brake": {"center": Vector2(350, 238), "radius": 26.0 * s},
-		"passing": {"center": Vector2(432, 135), "radius": 24.0 * s},
+		"left": {"center": Vector2(52, h - 50), "radius": 38.0 * s},
+		"right": {"center": Vector2(146, h - 50), "radius": 38.0 * s},
+		"throttle": {"center": Vector2(w - 55, h - 55), "radius": 40.0 * s},
+		"brake": {"center": Vector2(w - 130, h - 32), "radius": 26.0 * s},
+		"passing": {"center": Vector2(w - 48, h - 135), "radius": 24.0 * s},
 	}
 	queue_redraw()
 

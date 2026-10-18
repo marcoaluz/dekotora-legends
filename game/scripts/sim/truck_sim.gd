@@ -69,6 +69,8 @@ var style_points: int = 0              # destaque da pintura e dos adesivos (som
 var cargo_trait: String = "normal"   # fragile | heavy | perishable | normal (muda a fisica/prazo)
 var cargo_penalty: float = 0.0          # perda de premio por contato/batida (fracao 0..MAX_CARGO_LOSS)
 var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (eletronicos/ceramica > 1)
+var cargo_hits: int = 0                 # batidas que sacudiram a carga (tela de resultado explica a perda, T-138)
+var cargo_touches: int = 0              # encostadas sem dano (tambem custam um pouco)
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
@@ -98,10 +100,12 @@ func cargo_loss() -> float:
 ## Batida com variacao de velocidade `dv` (m/s): a carga sofre (mais se for fragil).
 func cargo_hit(dv: float) -> void:
 	cargo_penalty = minf(cargo_penalty + dv * CARGO_HIT_LOSS * cargo_fragility, MAX_CARGO_LOSS)
+	cargo_hits += 1
 
 
 func cargo_touch() -> void:
 	cargo_penalty = minf(cargo_penalty + CARGO_TOUCH_LOSS * cargo_fragility, MAX_CARGO_LOSS)
+	cargo_touches += 1
 
 
 ## Recalcula os efeitos mecanicos do dano (potencia do motor, puxao da direcao).

@@ -123,7 +123,7 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(val)
 	var dl: int = int(float(c.get("deadline_s", r.deadline())))
-	var km: Label = UiTheme.label("%.1f km  ·  %d:%02d" % [route_km(r), dl / 60, dl % 60], 15, UiTheme.TEXT_DIM)
+	var km: Label = UiTheme.label("%s km  ·  %d:%02d" % [_km(r), dl / 60, dl % 60], 15, UiTheme.TEXT_DIM)
 	km.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(km)
 	h.add_child(money)
@@ -143,6 +143,11 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 ## 9.5 -> "9,5"; 12.0 -> "12".
 static func _num(v: float) -> String:
 	return (str(int(v)) if is_equal_approx(v, round(v)) else "%.1f" % v).replace(".", ",")
+
+
+## Distancia em km com virgula (pt-BR): 3.04 -> "3,0".
+static func _km(r: RouteDef) -> String:
+	return ("%.1f" % route_km(r)).replace(".", ",")
 
 
 ## Rotas ordenadas pelo valor do frete (a ordem da progressao).
@@ -196,7 +201,7 @@ func _row(list: VBoxContainer, r: RouteDef) -> Button:
 	var val: Label = UiKit.heading(Tr.yen(r.freight), 24, UiTheme.GOLD)
 	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(val)
-	var km: Label = UiTheme.label("%.1f km" % route_km(r), 15, UiTheme.TEXT_DIM)
+	var km: Label = UiTheme.label("%s km" % _km(r), 15, UiTheme.TEXT_DIM)
 	km.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	money.add_child(km)
 	h.add_child(money)

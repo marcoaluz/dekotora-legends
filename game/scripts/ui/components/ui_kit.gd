@@ -64,6 +64,8 @@ static func screen_title(text: String, icon_name: String) -> HBoxContainer:
 	h.add_theme_constant_override("separation", 12)
 	h.add_child(_icon_rect(icon_name, 30, UiTheme.PINK))
 	var l: Label = heading(text.to_upper(), 30)
+	l.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.07, 0.85))   # legivel sobre o caminhao branco (T-138)
+	l.add_theme_constant_override("outline_size", 6)
 	h.add_child(l)
 	return h
 
@@ -144,6 +146,55 @@ static func glass_panel(alpha: float = 0.86) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", UiTheme.box(Color(0.05, 0.06, 0.11, alpha), Color(1, 1, 1, 0.1), 1, 12, 16))
 	return p
+
+
+## Raiz de tela (T-138): margem em volta de tudo, presa aos 4 cantos (acompanha 16:9 e celular 20:9).
+## Nao bloqueia o mouse (o palco 3D atras continua recebendo arraste/toque onde nao ha painel).
+static func screen_margin(h: int = 24, v: int = 16) -> MarginContainer:
+	var m := MarginContainer.new()
+	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	m.add_theme_constant_override("margin_left", h)
+	m.add_theme_constant_override("margin_right", h)
+	m.add_theme_constant_override("margin_top", v)
+	m.add_theme_constant_override("margin_bottom", v)
+	return m
+
+
+## Espaco que estica (empurra os vizinhos para as pontas de um HBox/VBox).
+static func spacer(vertical: bool = false) -> Control:
+	var c := Control.new()
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if vertical:
+		c.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	else:
+		c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return c
+
+
+## Miniatura de uma peca (render 3/4 da biblioteca, previews/<acessorio>_34.png) numa moldura arredondada;
+## sem render, usa o icone do encaixe. `tint` pinta a moldura (estado da peca).
+static func part_thumb(d: PartDef, size: Vector2 = Vector2(52, 39), tint: Color = Color(1, 1, 1, 0.18)) -> PanelContainer:
+	var frame := PanelContainer.new()
+	var sb: StyleBoxFlat = UiTheme.box(Color(0.12, 0.12, 0.14, 1.0), tint, 1, 6, 0)
+	sb.content_margin_left = 1
+	sb.content_margin_right = 1
+	sb.content_margin_top = 1
+	sb.content_margin_bottom = 1
+	frame.add_theme_stylebox_override("panel", sb)
+	var tr := TextureRect.new()
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	tr.custom_minimum_size = size
+	var path: String = "res://assets/vehicles/dekotora/previews/%s_34.png" % (d.accessory_id if d != null else "")
+	if d != null and d.accessory_id != "" and ResourceLoader.exists(path):
+		tr.texture = load(path) as Texture2D
+	else:
+		tr.texture = icon("wrench")
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr.modulate = UiTheme.TEXT_DIM
+	frame.add_child(tr)
+	return frame
 
 
 ## Separador fino.

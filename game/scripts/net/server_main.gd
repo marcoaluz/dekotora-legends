@@ -34,11 +34,11 @@ func log_msg(text: String) -> void:
 
 func on_hello(peer: int, version: int, player_code: String, name: String, profile_json: String) -> void:
 	if version != Protocol.VERSION:
-		net().rpc_id(peer, "s_error", "versao incompativel (servidor %d, cliente %d)" % [Protocol.VERSION, version])
+		net().rpc_id(peer, "s_error", "versão incompatível (servidor %d, cliente %d)" % [Protocol.VERSION, version])
 		return
 	var code: String = store.clean_code(player_code)
 	if code == "":
-		net().rpc_id(peer, "s_error", "codigo de jogador invalido")
+		net().rpc_id(peer, "s_error", "código de jogador inválido")
 		return
 	var client_profile: Dictionary = {}
 	var parsed: Variant = JSON.parse_string(profile_json) if profile_json != "" else null
@@ -102,7 +102,7 @@ func on_join_room(peer: int, code: String, loadout: Dictionary) -> void:
 		return
 	code = code.to_upper().strip_edges()
 	if not rooms.has(code):
-		net().rpc_id(peer, "s_error", "sala %s nao existe" % code)
+		net().rpc_id(peer, "s_error", "sala %s não existe" % code)
 		return
 	_leave_current(peer)
 	var room: Room = rooms[code]
@@ -199,7 +199,7 @@ func on_action(peer: int, action: String, arg: String) -> void:
 	var gs: Node = store.get_profile(code)
 	var ok: bool = gs.apply_action(action, arg)
 	if not ok:
-		net().rpc_id(peer, "s_error", "acao recusada: %s %s" % [action, arg])
+		net().rpc_id(peer, "s_error", "ação recusada: %s %s" % [action, arg])
 	net().rpc_id(peer, "s_profile", JSON.stringify(gs.profile))
 
 
