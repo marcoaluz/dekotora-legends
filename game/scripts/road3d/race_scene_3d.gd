@@ -110,6 +110,9 @@ func _ready() -> void:
 	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
 	add_child(signs)
 	signs.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray(), String(route.id) if route != null else "")
+	var events3d := TrackEvents3D.new()           # T-139: acidente, obras, estreitamento (mesma lista da simulacao)
+	add_child(events3d)
+	events3d.build(path, tod)
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
@@ -155,6 +158,12 @@ func _ready() -> void:
 	_hud = RaceHud.new()
 	_hud.bind(sim, player)
 	layer.add_child(_hud)
+	var event_hud := EventHud.new()                 # T-139: avisos de acidente / obras / estreitamento
+	event_hud.bind(sim, player)
+	layer.add_child(event_hud)
+	event_hud.alert_shown.connect(func(_kind: int) -> void:
+		_audio.event_alert()
+		Input.vibrate_handheld(60))
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_autoplay = "--autoplay" in args
 	_debug_events = "--debug-events" in args
@@ -534,6 +543,7 @@ func _player_x() -> float:
 func _update_audio(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	_audio.update(dt, t, _countdown)
+	_audio.update_events(sim.track.events, t.z + t.length * 0.5)
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)

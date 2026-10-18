@@ -210,6 +210,17 @@ func _lane_tint(i: int, lane: int) -> Color:
 	return col
 
 
+## Estreitamento (T-139): a divisao do lado `side` (-1 esquerda, +1 direita) some onde a faixa de fora acaba.
+func _lane_ends(z: float, side: float) -> bool:
+	var evs: TrackEvents = path.track.events
+	if evs == null or evs.is_empty():
+		return false
+	for ev in evs.list:
+		if ev.kind == TrackEvents.Kind.NARROW and float(ev.side()) == side and z >= ev.z - 2.0 and z <= ev.reopen_end():
+			return true
+	return false
+
+
 func _hash(n: int) -> float:
 	return fmod(absf(sin(float(n) * 12.9898) * 43758.5453), 1.0)
 
@@ -251,6 +262,8 @@ func _build_chunk(s0: int, s1: int) -> void:
 		var sharp: bool = absf(path.track.curves[i]) >= RoadFurniture.SHARP_CURVE
 		for lane in [-1.0, 1.0]:                                            # divisao de faixas (entre as 3)
 			var c: float = lane * LANE_W * 0.5
+			if _lane_ends(z, lane):
+				continue                                                    # T-139: a faixa acaba (EventProps pinta a linha nova)
 			if sharp:
 				_strip(sts["yline"], i, j, c - 0.08, c + 0.08, 0.02, 0.02)  # amarela continua: nao mude de faixa
 			elif band:

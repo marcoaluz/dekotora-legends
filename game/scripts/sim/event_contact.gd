@@ -8,7 +8,8 @@ extends RefCounted
 ##  - vehicles / barricades (full closure): hard. The nose reaching the block is a crash against a STOPPED
 ##    vehicle (DamageModel with OBSTACLE_MASS, like hitting traffic): the truck cannot pass, drops to
 ##    BLOCKED_SPEED, its target lane becomes the nearest open one and it slides out sideways.
-##    Pushed into the block from the side: pushed back out with a side hit.
+##    Pushed into the block from the side: pushed back out with a side hit. A truck whose lane is OPEN and that only
+##    overlaps the edge (curve slide, a push) grazes: pushed back into its lane, cargo touch, no crash.
 ##  - lane end (narrowing): a wall that moves in with the taper; the truck scrapes along it (speed + cargo touch)
 ##    and, once the centre of its lane is gone, its target lane becomes the open neighbour: it MUST merge
 ##    (whoever is beside it disputes the gap through the normal truck collision).
@@ -24,6 +25,7 @@ const WALL_DECEL: float = 3.0           # m/s^2 while scraping the lane end
 const SCRAPE_EVERY: float = 0.8         # s between cargo touches while scraping
 const SIDE_MIN_DV: float = 1.5          # m/s: lateral speed that counts as a side hit
 const WALL_PUSH: float = 2.0            # x/s: how fast the lane end pushes a vehicle in (no teleport at the taper start)
+const GRAZE_X: float = 0.12            # x (0,86 m): a truck in an OPEN lane overlapping less than this only grazes the block
 const PLATE_EVERY: float = 0.5          # s between cargo shakes on the works steel plates above the limit
 const PLATE_CARGO: float = 0.25         # cargo_hit(dv) factor per shake (dv = m/s above limit + tolerance)
 
@@ -84,7 +86,9 @@ static func truck(evs: TrackEvents, t: TruckSim, dt: float) -> Dictionary:
 		if nose > full and t.z < ev.end_z():
 			var ivb: Vector2 = evs.interval(ev, full + 0.5)
 			if t.x + half > ivb.x and t.x - half < ivb.y:
-				var c: Dictionary = _block(evs, ev, ivb, t, nose - full, half)
+				var lane_open: bool = Lanes.X[t.lane] < ivb.x or Lanes.X[t.lane] > ivb.y
+				var graze: bool = lane_open and minf(t.x + half, ivb.y) - maxf(t.x - half, ivb.x) < GRAZE_X
+				var c: Dictionary = _graze(ivb, t, half) if graze else _block(evs, ev, ivb, t, nose - full, half)
 				if not c.is_empty():
 					c["event"] = k
 					out = c
@@ -118,6 +122,18 @@ static func _block(evs: TrackEvents, ev: TrackEvents.Event, iv: Vector2, t: Truc
 	if dv > SIDE_MIN_DV:
 		return {"kind": "obstacle", "zone": zone, "dv": dv}
 	return {"kind": "scrape", "zone": zone, "dv": 0.0}
+
+
+## Open-lane truck touching the edge of the block: back into its lane, a scrape (cargo touch), no damage.
+static func _graze(iv: Vector2, t: TruckSim, half: float) -> Dictionary:
+	var exit_left: bool = iv.y >= TrackEvents.OUTER or (iv.x > -TrackEvents.OUTER and t.x < (iv.x + iv.y) * 0.5)
+	t.x = (iv.x - half) if exit_left else (iv.y + half)
+	if t.lateral_vel * (1.0 if exit_left else -1.0) > 0.0:
+		t.lateral_vel = 0.0
+	if t.scrape_t > 0.0:
+		return {}
+	t.scrape_t = SCRAPE_EVERY
+	return {"kind": "scrape", "zone": "right" if exit_left else "left", "dv": 0.0}
 
 
 ## Tightest inner bound of the narrowing over the truck body (rear, middle, nose). INF/-INF if open.

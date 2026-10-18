@@ -32,7 +32,7 @@ const RANDOM_SHARP: float = 1.25          # no random event in the tightest curv
 const WORKS_LIMIT_KMH: float = 60.0       # posted limit beside the works
 const LIMIT_TOL_KMH: float = 5.0          # above limit + tolerance the plates shake the cargo
 # deadline allowance (s) per event, measured with tools_dev/measure_event_times.gd (mean loss of the HARD bots)
-const ALLOWANCE_S: Array[float] = [3.0, 4.0, 3.0]   # accident (1 lane), works, narrow
+const ALLOWANCE_S: Array[float] = [3.0, 7.0, 3.0]   # accident (1 lane), works (with the 60 km/h limit), narrow
 const ALLOWANCE_TWO_LANES_S: float = 8.0           # accident or works closing 2 lanes
 
 
@@ -63,6 +63,10 @@ class Event:
 		if lo == Lanes.FIRST and hi < Lanes.LAST:
 			return -1
 		return 0
+
+	## Extra deadline (s) this event gives (TrackEvents.time_allowance).
+	func allowance() -> float:
+		return ALLOWANCE_TWO_LANES_S if hi > lo else ALLOWANCE_S[kind]
 
 	func closes(lane: int) -> bool:
 		return lane >= lo and lane <= hi
@@ -220,7 +224,7 @@ func limit_ahead(rear_z: float, nose_z: float, look: float, decel: float, limit:
 func time_allowance() -> float:
 	var s: float = 0.0
 	for ev in list:
-		s += ALLOWANCE_TWO_LANES_S if ev.hi > ev.lo else ALLOWANCE_S[ev.kind]
+		s += ev.allowance()
 	return s
 
 

@@ -177,6 +177,24 @@ func test_deadline_stretches_with_events_same_on_server_and_client() -> void:
 	check_near(sync.sim.deadline, room.sim.deadline, 0.001, "cliente tem o mesmo prazo")
 
 
+func test_open_lane_truck_only_grazes_the_block_edge() -> void:
+	var sim := _sim_with({"kind": "works", "z": 300.0, "length": 170.0, "lanes": [1]})
+	var i: int = sim.add_truck(330.0, -0.09)                  # faixa do meio, escorregou 0,65 m para a esquerda (curva)
+	var t: TruckSim = sim.trucks[i]
+	t.lane = Lanes.CENTER
+	t.speed = 22.0
+	var evs: Array[Dictionary] = []
+	for n in int(4.0 / DT):
+		t.x = minf(t.x, -0.09) if t.z < 362.0 else t.x       # mantem a escorregada ate a barreira
+		sim.set_command(i, Commands.make(0.0, 0.6, 0.0))
+		sim.step()
+		evs.append_array(sim.drain_events())
+	check_eq(_count(evs, "event_obstacle"), 0, "faixa aberta encostando na beirada: sem batida")
+	check(_count(evs, "event_scrape") >= 1, "raspou na barreira (%d)" % _count(evs, "event_scrape"))
+	check(t.speed > 15.0 and t.z > 380.0, "seguiu viagem (v=%.1f z=%.0f)" % [t.speed, t.z])
+	check(t.x - TruckSim.WIDTH_X * 0.5 >= -0.25 - 0.02, "empurrado de volta para a faixa aberta (x=%.2f)" % t.x)
+
+
 # ---------------------------------------------------------------- bots e transito
 func _race_with_bots(ev: Dictionary, density: int, seconds: float = 150.0) -> Dictionary:
 	var sim := _sim_with(ev, density, 3200.0)
