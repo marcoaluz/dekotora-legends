@@ -54,7 +54,7 @@ func step(dt: float = FIXED_DT) -> void:
 		for t in trucks:
 			lead = maxf(lead, t.z)
 			rear = minf(rear, t.z)
-		traffic.step(dt, lead, rear)
+		traffic.step(dt, lead, rear, trucks)
 		for i in trucks.size():
 			events.append_array(collision.resolve_traffic(trucks[i], i, traffic))
 	events.append_array(collision.resolve_trucks(trucks, dt))
@@ -71,7 +71,7 @@ func _update_draft_and_passing(dt: float) -> void:
 	for i in trucks.size():
 		var me: TruckSim = trucks[i]
 		var target: float = 0.0
-		var nose: float = me.z + Collision.LEN
+		var nose: float = me.z + me.length
 		if me.speed > 25.0:
 			for j in trucks.size():
 				if j == i:

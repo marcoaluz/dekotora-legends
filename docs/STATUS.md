@@ -80,6 +80,15 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   FPS igual. Garagem antes/depois praticamente idêntica (diferença média de pixel 0,0008). O mural continua embutido (o TruckNode troca).
   Pendências: (3) sem interior (bancos/painel) atrás do vidro escuro; (4) flocos metálicos e reflexo real no vidro dependem de luz do
   jogo, não da textura. (Os PNGs antigos foram apagados na T-117.)
+- **T-125 (2026-10-18): caminhão base Canter + 6ª cabine "curta"** a partir do JAC 1045 (Royalty Free; emblema apagado; créditos em
+  `game/assets/LICENCAS.md`). Código: `blender/scripts/truck3d/jac_src.py` (importa o .blend de `docs/Modelos Melhorados/`, que fica fora
+  do Git), `jac_parts.py` (material/teto de triângulos por peça, pelo nome), `jac_cab.py` (cabine + montagens), `canter.py` (baú 2,3 x 5 m,
+  rodas, decoração); `body.py`/`deco.py` aceitam medidas de baú (`BoxDims`). Modelos: `dekotora_truck_canter.glb` (48 mil tri) e
+  `dekotora_truck_{base,leve,longo}_curta.glb` (61/49/73 mil; o baú cresce 1,22 m para a frente). No jogo: `BodyDef` (`data/bodies/`)
+  dá massa, capacidade, comprimento na pista, agilidade e torque por modelo (Canter 3,5 t, 4 t de carga, 7 m, torque ×0,55);
+  `TruckSim.length` substitui o `Collision.LEN` fixo na colisão/vácuo/bots; garagem lista o Canter (cabine fixa) e a cabine curta;
+  câmera da corrida chega mais perto do Canter. Corrida (modo médio, litoral) ~75 FPS, ~340 chamadas (base ~380). Capturas em
+  `docs/capturas_t125/`; depuração da garagem: `-- --demo --body=canter [--cab=curta]`.
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **Plano visual (`docs/PLANO_VISUAL.md`, análise do Marco em `docs/dekotora_analise_visual/`) — V0 a V7 FEITOS (2026-10-17)**:
   V0 rodas giram no eixo certo; V1 três identidades em `docs/DIRECAO_ARTE.md` (**Marco escolhe A, B ou C**); V2 hora do dia por rota

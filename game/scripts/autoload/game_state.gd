@@ -403,6 +403,7 @@ func truck_descriptor() -> Dictionary:
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
+		"body": String(profile.get("body", "base")),
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
 	}.merged(Contracts.sim_fields(pending_contract))
 

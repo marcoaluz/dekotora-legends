@@ -1,5 +1,11 @@
 # Modelos de `docs/Modelos Melhorados/`: análise (T-123)
 
+> **Atualização (T-125, 2026-10-18):** o Marco confirmou que todos os modelos desta pasta são Royalty Free. O **JAC 1045 já
+> virou o caminhão base Canter e a cabine curta** (`blender/scripts/truck3d/jac_src.py`, `jac_parts.py`, `jac_cab.py`,
+> `canter.py`; gerar: `build_truck_3d.py -- --variant canter` e `-- --variant base|leve|longo --cab curta`). Medido: 37,6 mil
+> triângulos do JAC (cabine + chassi) -> 18,3 mil; Canter inteiro 48 mil; cabine curta 11,8 mil (modelos `*_curta` 49–73 mil).
+> Escala usada: 0,74 (Canter, 6,9 m) e 0,84 (cabine curta: eixo dianteiro cai exatamente no nosso). Capturas em `docs/capturas_t125/`.
+
 Data: 2026-10-18. Pedido do Marco: "pegar para criar novos carros de NPC, cabine e caminhão dentro do jogo; analisa cada arquivo".
 **Só análise e prévias. Nada foi convertido nem entrou no jogo ainda**, porque a licença precisa da sua confirmação (seção 3).
 A pasta é pesada (~700 MB) e **não deve ir para o Git** (adicionar ao `.gitignore`, como `docs/Novos modelos/`).

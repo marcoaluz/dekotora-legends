@@ -1,7 +1,7 @@
 class_name GarageInfoPanel
 extends RefCounted
 ## Ficha tecnica da garagem: SO dados reais do jogo (GameState + EngineDef/TurboDef/ExhaustDef).
-## Capacidade de carga vem de Contracts.CAPACITY_T (por bau). Potencia e tanque NAO existem nos dados e nao sao inventados (aviso no rodape).
+## Capacidade de carga vem de BodyDef (data/bodies/, via Contracts.capacity_t); torque x BodyDef.torque_mult. Potencia e tanque NAO existem nos dados e nao sao inventados (aviso no rodape).
 
 
 static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Callable) -> void:
@@ -9,13 +9,17 @@ static func build(box: VBoxContainer, gs: Node, pv: Dictionary, on_customize: Ca
 	var cab: String = String(gs.profile.get("cab", "padrao"))
 	box.add_child(UiTheme.label(Tr.t("garage.spec_title"), 14, UiTheme.TEXT_DIM))
 	box.add_child(UiKit.heading(Tr.t("body." + body).to_upper(), 26))
+	if TruckNode.FIXED_CAB.has(body):
+		cab = "curta"
 	box.add_child(UiTheme.label("%s %s" % [Tr.t("garage.cab"), Tr.t("cab." + cab)], 16, UiTheme.CYAN))
 	box.add_child(UiKit.divider())
 	var eng: EngineDef = gs.mech_def(String(gs.profile["engine"])) as EngineDef
 	var turbo: TurboDef = gs.mech_def(String(gs.profile["turbo"])) as TurboDef
 	var exh: ExhaustDef = gs.mech_def(String(gs.profile["exhaust"])) as ExhaustDef
 	var gain: float = (turbo.torque_gain if turbo else 0.0) + (exh.torque_bonus if exh else 0.0)
-	var torque: String = "%s N·m" % _thousands(roundi(eng.max_torque_nm)) if eng else "—"
+	var bdef: BodyDef = BodyDef.find(body)
+	var tq_mult: float = bdef.torque_mult if bdef != null else 1.0      # Canter: motor menor
+	var torque: String = "%s N·m" % _thousands(roundi(eng.max_torque_nm * tq_mult)) if eng else "—"
 	if gain > 0.0:
 		torque += "  (+%d%%)" % roundi(gain * 100.0)
 	box.add_child(UiKit.stat_row("zap", Tr.t("garage.torque"), torque))

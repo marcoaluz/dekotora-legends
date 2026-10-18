@@ -9,5 +9,6 @@
 | Ícones Lucide v0.400.0 (recoloridos para branco, 48 px) | `assets/ui/icons/*.svg` | lucide.dev (pacote `lucide-static`) | ISC |
 | Cabine "cara chata" (malha reduzida e refeita do International CF500; marca apagada) | `assets/vehicles/dekotora/truck/*_chata.glb` | CGTrader, autor dany-sanchez | Royalty Free (no AI), confirmado pelo Marco em 2026-10-18 |
 | Van 01 (reduzida, sem marca) | `assets/vehicles/traffic/car_van01*` | CGTrader, autor foad3d | Royalty Free, confirmado pelo Marco em 2026-10-18 |
+| Caminhão Canter e cabine curta (cabine, chassi, motor, suspensão, tanque e lanternas reduzidos e re-texturizados do JAC 1045; emblema "JAC" apagado; baú, rodas e decoração são nossos) | `assets/vehicles/dekotora/truck/dekotora_truck_canter.glb`, `*_curta.glb` | "JAC 1045 Truck", CGTrader (o arquivo não traz o nome do autor; exportado do Luxion KeyShot) | Royalty Free, confirmado pelo Marco em 2026-10-18 |
 
 Os demais modelos, texturas e sons são gerados pelo projeto (scripts em `blender/scripts/` e `tools/`) ou pelo Marco.

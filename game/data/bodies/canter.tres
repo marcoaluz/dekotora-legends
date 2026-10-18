@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/body_def.gd" id="1_bd"]
+
+[resource]
+script = ExtResource("1_bd")
+id = &"canter"
+base_mass_kg = 3500.0
+capacity_t = 4.0
+default_cargo_kg = 2000.0
+length_m = 7.0
+agility = 1.1
+torque_mult = 0.55
+fixed_cab = "curta"

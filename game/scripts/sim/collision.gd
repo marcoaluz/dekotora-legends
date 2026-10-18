@@ -3,7 +3,7 @@ extends RefCounted
 ## Contato entre caminhoes e entre caminhao e transito. Decide zona atingida, impulso (empurrao
 ## proporcional ao peso) e dano. So numeros: nenhum no, nenhum som. Os efeitos saem como eventos.
 ##
-## Geometria: cada caminhao ocupa z .. z+LEN (z = traseira) e |x - x0| < WIDTH_X/2 (unidades de x).
+## Geometria: cada caminhao ocupa z .. z+length (z = traseira; LEN = 12 m do caminhao padrao, o Canter tem 7 m) e |x - x0| < WIDTH_X/2 (unidades de x).
 ## Se a penetracao longitudinal e menor que a lateral, e batida de frente/traseira; senao e lateral.
 
 const LEN: float = 12.0
@@ -36,7 +36,7 @@ func resolve_trucks(trucks: Array[TruckSim], dt: float) -> Array[Dictionary]:
 func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -> Dictionary:
 	var dx: float = b.x - a.x
 	var pen_x: float = (TruckSim.WIDTH_X - absf(dx)) * M_X
-	var pen_z: float = minf(a.z + LEN, b.z + LEN) - maxf(a.z, b.z)
+	var pen_z: float = minf(a.z + a.length, b.z + b.length) - maxf(a.z, b.z)
 	if pen_x <= 0.0 or pen_z <= 0.0:
 		_contacts.erase(key)
 		return {}
@@ -96,17 +96,17 @@ func _event(a: TruckSim, b: TruckSim, ia: int, ib: int, zone_a: String, zone_b: 
 		"damage_a": dmg_a, "damage_b": dmg_b, "broken_a": broken_a, "broken_b": broken_b}
 
 
-## Caminhao contra carro do transito. Carro: 1500 kg. O carro e empurrado/acelerado e some do
+## Caminhao contra carro do transito. Massa, comprimento e largura vem do tipo do veiculo (TrafficSim.Kind). O carro e empurrado/acelerado e some do
 ## caminho; o caminhao leva dano na frente (ou na lateral).
 func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
-	var car_mass: float = 1500.0
-	var half: float = (TruckSim.WIDTH_X + TrafficSim.CAR_WIDTH_X) * 0.5
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
+		var car_mass: float = c.mass                                   # onibus 12 t, carro 1,5 t (TrafficSim.KIND_MASS)
+		var half: float = (TruckSim.WIDTH_X + c.width_x) * 0.5
 		var key: String = "t%d:c%d" % [truck_id, i]
 		var pen_x: float = (half - absf(c.x - truck.x)) * M_X
-		var pen_z: float = minf(truck.z + LEN, c.z + TrafficSim.CAR_LEN) - maxf(truck.z, c.z)
+		var pen_z: float = minf(truck.z + truck.length, c.z + c.length) - maxf(truck.z, c.z)
 		if pen_x <= 0.0 or pen_z <= 0.0:
 			_contacts.erase(key)
 			continue

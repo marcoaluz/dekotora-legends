@@ -34,6 +34,7 @@ var turbo_lag: float = 0.0             # s
 var exhaust_bonus: float = 0.0         # 0.03 = +3%
 var has_jake: bool = false
 var power_factor: float = 1.0          # 1.0 saudavel; dano reduz (TruckSim.refresh_damage_effects)
+var body_torque: float = 1.0           # modelo do caminhao (BodyDef.torque_mult): o Canter tem motor menor
 
 var rpm: float = IDLE_RPM
 var gear: int = 1
@@ -110,7 +111,7 @@ func step(dt: float, throttle: float, speed: float, speed_bonus: float = 0.0) ->
 	var limiter: float = clampf((MAX_SPEED + speed_bonus - speed) / 3.0, 0.0, 1.0)
 	var rpm_limit: float = clampf((redline_rpm * 1.08 - rpm) / (redline_rpm * 0.08), 0.0, 1.0)
 	if throttle > 0.0 and shifting <= 0.0:
-		var tq: float = max_torque * torque_fraction(rpm) * (1.0 + exhaust_bonus) * (1.0 + turbo_gain * boost) * power_factor
+		var tq: float = max_torque * torque_fraction(rpm) * (1.0 + exhaust_bonus) * (1.0 + turbo_gain * boost) * power_factor * body_torque
 		var f_drive: float = tq * _ratio_total() * DRIVE_EFFICIENCY / WHEEL_RADIUS * throttle * limiter * rpm_limit
 		return minf(f_drive, TRACTION_LIMIT)
 	if throttle <= 0.0 and rpm > JAKE_MIN_RPM and speed > 1.0:

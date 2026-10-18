@@ -178,3 +178,20 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 
 - **Faixas do asfalto = faixas da simulação:** 3 faixas de 3,6 m (centros em x = −0,5 · 0 · +0,5) e acostamento de 1,8 m de cada lado (x = ±0,875, lento: passou de |x| 0,8 já conta como fora). Antes o asfalto tinha 4 faixas e a linha do meio passava por baixo do caminhão. O caminhão (2,5 m) fica folgado dentro da faixa.
 - **Mais pesado:** troca de faixa ~1 s (era 0,7), inércia lateral maior (`STEER_RESPONSE` 3,2), velocidade lateral máxima 0,95 x/s, inclinação da cabine maior (~6°). Carga e peças pesadas já aumentam a inércia pela aderência (`grip`).
+
+## Modelo do caminhão: Canter (T-125)
+
+Cada modelo tem um `BodyDef` (`game/data/bodies/<id>.tres`), lido por `TruckConfig.apply` (campo `body` do descritor,
+que vai para o servidor no multiplayer).
+
+| Modelo | Massa vazia | Carga sem contrato | Capacidade | Na pista (hitbox) | Agilidade | Torque |
+| --- | --- | --- | --- | --- | --- | --- |
+| Baú leve / médio / longo | 8.000 kg | 4.000 kg | 6 / 12 / 16 t | 12 m (`Collision.LEN`) | 1,0 | ×1,0 |
+| **Canter** | 3.500 kg | 2.000 kg | **4 t** | **7 m** | 1,1 | ×0,55 (motor menor) |
+
+- Medido (testes, para-choques básicos): 0–100 km/h **19,3 s** (padrão 22,6 s); troca de faixa ~0,7 s (padrão ~1,0 s);
+  curva 1,0 segura a **101 km/h** (padrão 90): a aderência sobe com a massa menor (`grip`).
+- Pontos fracos: só pega fretes de até 4 t (paga menos), é empurrado mais longe nas batidas laterais (o empurrão é
+  proporcional à massa do OUTRO) e o motor rende 55% do torque (com V8 + turbo continua abaixo do caminhão grande no topo).
+- Hitbox de 7 m: passa por brechas no trânsito e não encosta em quem está a 8 m. O vácuo conta a partir do nariz (z + 7 m).
+- Os bots continuam com 12 m (o trânsito, `TrafficSim.TRUCK_LEN`, também). Ajustar jogando.

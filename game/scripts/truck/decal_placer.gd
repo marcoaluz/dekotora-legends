@@ -75,7 +75,9 @@ const CAB_HALF_W: float = 1.2                 # meia largura da cabine (m)
 const CAB_Y: float = 1.55                     # altura do centro da porta (m)
 ## Lugar do adesivo "cab" por cabine: [meia largura, distancia da frente ate o centro, altura do centro, folga em y].
 ## A chata (T-119) tem a lateral em 1,153 m e o painel livre e o do dormitorio (entre a faixa rosa e a janela).
-const CAB_SPOT: Dictionary = {"padrao": [CAB_HALF_W, 2.1, CAB_Y, 0.35], "chata": [1.157, 2.4, 1.76, 0.15]}
+## A curta (JAC, T-125) tem a porta curta: o adesivo fica na chapa embaixo da janela; o Canter e a mesma em escala 0,88.
+const CAB_SPOT: Dictionary = {"padrao": [CAB_HALF_W, 2.1, CAB_Y, 0.35], "chata": [1.157, 2.4, 1.76, 0.15],
+		"curta": [1.2, 0.95, 1.08, 0.12], "canter": [1.06, 0.84, 0.95, 0.1]}
 
 
 static func _quad(parent: Node3D, tex: Texture2D, color: Color, size: Vector2, pos: Vector3, yaw_deg: float) -> Node3D:

@@ -8,7 +8,7 @@ const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.d
 		["mech", "garage.mechanics", "cog"], ["repair", "garage.repair", "hammer"]]
 const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "view.rear"],
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
-const BODIES: Array = ["leve", "base", "longo"]
+const BODIES: Array = ["canter", "leve", "base", "longo"]
 const CABS: Array = TruckNode.CABS
 
 var stage: GarageStage
@@ -125,7 +125,7 @@ func _build_bottom(root: Control) -> void:
 	root.add_child(_msg)
 
 
-## Argumentos de depuracao: --demo (monta um caminhao cheio de pecas; --noparts = sem pecas; --cab=<estilo>), --tab=model|parts|mech|repair, --slot=<slot>, --damage
+## Argumentos de depuracao: --demo (monta um caminhao cheio de pecas; --noparts = sem pecas; --cab=<estilo>; --body=<modelo>), --tab=model|parts|mech|repair, --slot=<slot>, --damage
 func _apply_debug_args() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	if "--demo" in args:
@@ -167,6 +167,8 @@ func _apply_debug_args() -> void:
 			stage.focus_view(a.substr(7))
 		elif a.begins_with("--cab=") and "--demo" in args:    # so com --demo (perfil de teste, nunca o real)
 			stage.set_cab(a.substr(6))
+		elif a.begins_with("--body=") and "--demo" in args:   # --body=canter (T-125)
+			stage.set_body(a.substr(7))
 		elif a.begins_with("--zoom="):                      # aproxima a camera (capturas de detalhe)
 			var z: float = float(a.substr(7))
 			get_tree().create_timer(1.0).timeout.connect(func() -> void: stage.set_zoom(z))   # depois do layout
@@ -257,6 +259,13 @@ func _build_model() -> void:
 	for k in BODIES:
 		_choice_card("body", String(k), "base", func() -> void: stage.set_body(String(k)))
 	_left.add_child(UiKit.heading(Tr.t("garage.cab").to_upper(), 18, UiTheme.PINK))
+	var body: String = String(gs.profile.get("body", "base"))
+	if TruckNode.FIXED_CAB.has(body):              # o Canter so tem a cabine dele (a escolha do perfil fica guardada)
+		var note: Label = UiTheme.label(Tr.t("garage.cab_fixed"), 15, UiTheme.TEXT_DIM)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note.custom_minimum_size = Vector2(220, 0)
+		_left.add_child(note)
+		return
 	for k in CABS:
 		_choice_card("cab", String(k), "padrao", func() -> void: stage.set_cab(String(k)))
 

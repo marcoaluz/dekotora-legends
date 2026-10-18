@@ -16,6 +16,7 @@ import numpy as np
 from lib import mesh3d as M
 from lib import pbr, tex
 
+from .body import STD, BoxDims
 from .dims import BODY_TOP, BODY_W
 
 W2 = BODY_W / 2
@@ -31,9 +32,14 @@ def mural_material():
     return pbr.textured("mural", img, 0.15, 0.35, coat=0.6, coat_rough=0.05)
 
 
-def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None):
+def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None, box: BoxDims = STD):
     """`body_l` = comprimento final do baú (traseira em Y=0); `cab_top` = altura do teto da cabine;
-    `cab_front` = (Y da frente da cabine, altura da base do para-brisa)."""
+    `cab_front` = (Y da frente da cabine, altura da base do para-brisa); `box` = largura/piso/teto do baú
+    (o Canter, T-125, tem um baú menor; as alturas acompanham a mesma fração da parede)."""
+    W2 = box.w / 2
+    BODY_TOP = box.top
+    kz = box.kz
+    kx = box.w / BODY_W
     lamps = (m["lamp_amber"], m["lamp_yellow"])
     # --- laterais: fileira de cima (alternando âmbar/amarelo) e de baixo (âmbar), sob os trilhos cromados
     for sx in (-1, 1):
@@ -41,24 +47,25 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
         n = int((body_l - 0.3) / 0.32)
         for i in range(n + 1):
             y = 0.15 + i * (body_l - 0.3) / n
-            add(M.box(f"mk_top_{sx}_{i}", (0.03, LAMP, LAMP), (x, y, 3.0), lamps[i % 2], bevel=0.0, seg=1))
+            add(M.box(f"mk_top_{sx}_{i}", (0.03, LAMP, LAMP), (x, y, kz(3.0)), lamps[i % 2], bevel=0.0, seg=1))
             if i % 2 == 0:
-                add(M.box(f"mk_low_{sx}_{i}", (0.03, LAMP, LAMP), (x, y, 1.21), m["lamp_amber"], bevel=0.0, seg=1))
+                add(M.box(f"mk_low_{sx}_{i}", (0.03, LAMP, LAMP), (x, y, kz(1.21)), m["lamp_amber"], bevel=0.0, seg=1))
     # --- traseira: moldura de luzes (colunas nos cantos e linha no alto), vermelho/âmbar alternados
     for sx in (-1, 1):
         for k in range(7):
-            z = 1.35 + k * 0.27
+            z = kz(1.35 + k * 0.27)
             add(M.box(f"mk_rear_v_{sx}_{k}", (LAMP, 0.03, LAMP), (sx * (W2 - 0.12), -0.11, z),
                       m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
     for k in range(9):
-        x = -1.0 + k * 0.25
-        add(M.box(f"mk_rear_h_{k}", (LAMP, 0.03, LAMP), (x, -0.11, 3.02), m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
+        x = (-1.0 + k * 0.25) * kx
+        add(M.box(f"mk_rear_h_{k}", (LAMP, 0.03, LAMP), (x, -0.11, kz(3.02)), m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
     # --- frente da cabine: fileira de luzes logo abaixo do para-brisa ("sobrancelha")
     if cab_front:
         yf, wz0 = cab_front[:2]
         surf = cab_front[2] if len(cab_front) > 2 else None       # (x, z) -> (ponto, normal) na casca curva
+        cab_k = cab_front[3] if len(cab_front) > 3 else 1.0       # cabine mais estreita (Canter): fileira menor
         for k in range(13):
-            x = -1.02 + k * 0.17
+            x = (-1.02 + k * 0.17) * cab_k
             z = wz0 - 0.15
             if surf is None:
                 add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, z), lamps[k % 2], bevel=0.0, seg=1))
@@ -69,15 +76,16 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
                       rot=(0, 0, -math.degrees(math.atan2(n.x, n.y)))))
     # --- andons
     z0 = max(BODY_TOP + 0.08, cab_top + 0.04)                     # a frente aparece por cima de qualquer cabine
-    _andon(m, add, "andon_f", body_l - 0.25, z0, FRONT_ANDON, front=True)
+    _andon(m, add, "andon_f", body_l - 0.25, z0, FRONT_ANDON, front=True, w=2.05 * kx)
     if z0 > BODY_TOP + 0.1:
         for sx in (-1, 1):                                          # pés do andon alto
-            add(M.box(f"andon_f_leg_{sx}", (0.06, 0.06, z0 - BODY_TOP), (sx * 0.9, body_l - 0.25, (z0 + BODY_TOP) / 2), m["chrome"], bevel=0.0, seg=1))
-    _andon(m, add, "andon_r", 0.12, BODY_TOP + 0.06, REAR_ANDON, front=False)
+            add(M.box(f"andon_f_leg_{sx}", (0.06, 0.06, z0 - BODY_TOP), (sx * 0.9 * kx, body_l - 0.25, (z0 + BODY_TOP) / 2), m["chrome"], bevel=0.0, seg=1))
+    _andon(m, add, "andon_r", 0.12, BODY_TOP + 0.06, REAR_ANDON, front=False, w=2.05 * kx)
     # --- murais
     mat = mural or mural_material()
     for sx in (-1, 1):
-        o = M.box(f"mural_{sx}", (0.01, body_l - 0.7, 1.62), (sx * (W2 + 0.014), body_l / 2, 2.175), mat, bevel=0.0, seg=1)
+        zm0, zm1 = kz(1.365), kz(2.985)                            # 1,62 m de altura no baú padrão
+        o = M.box(f"mural_{sx}", (0.01, body_l - 0.7, zm1 - zm0), (sx * (W2 + 0.014), body_l / 2, (zm0 + zm1) / 2), mat, bevel=0.0, seg=1)
         M.uv_planar(o)
         if sx < 0:                                                  # lado esquerdo: espelha para ler igual
             uvl = o.data.uv_layers.active
@@ -86,9 +94,9 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
         add(o)
 
 
-def _andon(m, add, name, y, z0, text, front: bool):
+def _andon(m, add, name, y, z0, text, front: bool, w: float = 2.05):
     """Caixa cromada com painel vermelho aceso e kanji âmbar; `front` = lê de frente (senão, de trás)."""
-    w, h = 2.05, 0.5
+    h = 0.5
     face = 1 if front else -1
     zc = z0 + h / 2
     add(M.box(name + "_frame", (w + 0.1, 0.12, h + 0.1), (0, y, zc), m["chrome"], bevel=0.02, seg=1))

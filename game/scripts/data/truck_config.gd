@@ -7,7 +7,8 @@ extends RefCounted
 ## descritor = {
 ##   "parts": [{"id": "fb_basic", "dur": 80.0, "broken": false}, ...],   # da mais externa para a interna
 ##   "engine": "eng_i6_std", "turbo": "turbo_none", "exhaust": "exh_std", "jake": false,
-##   "systems": {"engine": 100.0, "steering": 100.0}
+##   "systems": {"engine": 100.0, "steering": 100.0},
+##   "body": "base"      # BodyDef (data/bodies/): massa vazia, comprimento, agilidade, torque; sem = caminhao padrao
 ## }
 
 const OUTER_ORDER: Array[String] = ["front_bumper", "rear_bumper", "side_skirts", "fenders", "front_lip", "grille", "visor"]
@@ -45,7 +46,13 @@ static func apply(t: TruckSim, desc: Dictionary) -> void:
 	var tur: TurboDef = load("res://data/engines/%s.tres" % desc.get("turbo", "turbo_none")) as TurboDef
 	var exh: ExhaustDef = load("res://data/engines/%s.tres" % desc.get("exhaust", "exh_std")) as ExhaustDef
 	t.engine.configure(eng, tur, exh, bool(desc.get("jake", false)))
-	t.set_mass(weight + (eng.weight_kg if eng != null else 0.0), float(desc.get("cargo_kg", TruckSim.DEFAULT_CARGO)))
+	var body: BodyDef = BodyDef.find(String(desc.get("body", "base")))
+	t.base_mass = body.base_mass_kg if body != null else TruckSim.BASE_MASS
+	t.length = body.length_m if body != null else Collision.LEN
+	t.agility = body.agility if body != null else 1.0
+	t.engine.body_torque = body.torque_mult if body != null else 1.0
+	var default_cargo: float = body.default_cargo_kg if body != null else TruckSim.DEFAULT_CARGO
+	t.set_mass(weight + (eng.weight_kg if eng != null else 0.0), float(desc.get("cargo_kg", default_cargo)))
 	t.cargo_fragility = float(desc.get("cargo_fragility", 1.0))
 	t.style_points = int(desc.get("style_points", 0))
 	t.cargo_trait = String(desc.get("cargo_trait", "normal"))

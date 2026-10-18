@@ -21,6 +21,7 @@ from truck3d.chassis import build_chassis  # noqa: E402
 from truck3d.deco import build_deco  # noqa: E402
 from truck3d.cab import STYLES  # noqa: E402
 from truck3d.cab_chata import build_cab_chata  # noqa: E402
+from truck3d import canter as canter_mod, jac_cab, jac_src  # noqa: E402
 from mathutils import Vector  # noqa: E402
 from truck3d.dims import (BODY_L, BODY_TOP, BODY_W, BODY_Z0, CAB_TOP, CAB_W, CAB_Y0, CAB_Y1,  # noqa: E402,F401
                           CAB_Z0, FRONT_AXLE_Y, MOUNTS, REAR_AXLES_Y, WHEEL_R)
@@ -28,11 +29,47 @@ from truck3d.variants import LENGTH_DELTA, VARIANTS, apply_variant
 from truck3d.wheels import make_wheel, tire_profile  # noqa: E402
 
 
+def build_canter(m: dict, jac_src_path=None):
+    """Caminhão base Canter (T-125): cabine/chassi do JAC 1045 + baú e rodas nossos. Devolve como build_truck."""
+    parts = []
+
+    def add(o):
+        parts.append(o)
+        return o
+    info = canter_mod.build_canter(m, add, jac_src_path)
+    empties = []
+    for n, (p, sc) in sorted(info.mounts.items()):
+        e = M.empty(n, p)
+        e.scale = (sc, sc, sc)                     # peças do caminhão grande encolhem junto (cabine 2,1 m)
+        empties.append(e)
+    return parts, info.wheels, empties
+
+
+def _extend_box(parts, body_names, front, ext):
+    """Cabine curta (T-125): o baú cresce para a frente até perto das costas da cabine (mesmo comprimento total)."""
+    for o in parts:
+        if o.name not in body_names or o.name.startswith("underglow"):     # neon do chassi fica onde está
+            continue
+        M.apply_transforms([o])
+        ys = [v.co.y for v in o.data.vertices]
+        lo, hi = min(ys), max(ys)
+        if hi - lo > 2.6:
+            for v in o.data.vertices:
+                if v.co.y > front - 0.5:
+                    v.co.y += ext
+        elif (lo + hi) / 2 > front - 0.5:
+            for v in o.data.vertices:
+                v.co.y += ext
+        o.data.update()
+
+
 def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = "padrao", cab_src=None):
     """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set)."""
     if paint_name != "paint_white":
         m = dict(m)
         m["paint_white"] = m[paint_name]
+    if variant == "canter":
+        return build_canter(m, cab_src)
     parts = []
     wheels = []
 
@@ -42,8 +79,19 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
 
     spec = VARIANTS[variant]
     build_chassis(m, add, spec["rear_axles"], spec["tanks"])
+    n0 = len(parts)
     build_body(m, add)
+    body_names = {o.name for o in parts[n0:]}
     chata = build_cab_chata(m, add, cab_src) if cab == "chata" else None      # 5ª cabine: malha importada (T-119)
+    curta = jac_cab.build_jac(m, add, jac_src.CURTA, ("cab",), cab_src) if cab == "curta" else None   # 6ª (T-125)
+    if curta:                                       # sem escapamentos atrás da cabine (o baú ocupa o lugar)
+        for o in [o for o in parts if o.name.startswith("stack_")]:
+            parts.remove(o)
+            bpy.data.objects.remove(o, do_unlink=True)
+        for o in parts:
+            if o.name == "cab_back_gap":
+                body_names.add(o.name)
+        chata = curta
     sh = None if chata else build_cab(m, add, cab)
     for sx in (-1, 1):
         side = "L" if sx < 0 else "R"
@@ -55,8 +103,17 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
     mounts.update(chata.mounts if chata else cab_mounts(cab))     # teto/para-brisa/frente mudam com a cabine
     empties = [M.empty(n, p) for n, p in mounts.items()]
     apply_variant(variant, m, parts, wheels, empties)
+    ext = 0.0
+    if curta:
+        front = BODY_L + VARIANTS[variant]["delta"]
+        ext = round(curta.y_back + VARIANTS[variant]["delta"] - canter_mod.GAP - front, 2)
+        _extend_box(parts, body_names, front, ext)
+        bpy.context.view_layer.update()            # matrix_world volta a valer depois de aplicar as transformações
+        for e in empties:
+            if e.name == "MOUNT_BODY_ROOF":
+                e.location.y = (front + ext) / 2
     if variant != "carreta":                        # decoracao Dekotora (V7): luzes, andons, murais
-        body_l = BODY_L + VARIANTS[variant]["delta"]
+        body_l = BODY_L + VARIANTS[variant]["delta"] + ext
         cab_z = chata.top if chata else STYLES[cab]["top"]       # altura real da cabine (com defletor de teto, se houver)
         for o in parts:
             mw = o.matrix_world
@@ -75,6 +132,8 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
             p.y += dy
             return p, sh.normal(q, z)
         build_deco(m, add, body_l, cab_z, (CAB_Y1 + dy, chata.wz0 if chata else STYLES[cab]["wz0"], surf))
+    if curta:
+        print(f"cabine curta: bau esticado {ext:+.2f} m ate y={body_l:.2f}; cabine {curta.tris} triangulos")
     return parts, wheels, empties
 
 
@@ -83,11 +142,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="game/assets/vehicles/dekotora")
     ap.add_argument("--paint", default="paint_white")
-    ap.add_argument("--cab", default="padrao", choices=list(CAB_STYLES) + ["chata"], help="padrao | classica | aero | alta | chata")
-    ap.add_argument("--cab-src", default=None, help="STL da cabine chata (padrao: docs/Novos modelos/Cabine/CF_500_complete.stl)")
+    ap.add_argument("--cab", default="padrao", choices=list(CAB_STYLES) + ["chata", "curta"], help="padrao | classica | aero | alta | chata | curta")
+    ap.add_argument("--cab-src", default=None, help="malha de terceiros: STL da chata (docs/Novos modelos/Cabine/CF_500_complete.stl) "
+                    "ou .blend do JAC 1045 para curta/canter (docs/Modelos Melhorados/JAC+1045+Truck.blend)")
     ap.add_argument("--no-preview", action="store_true")
     ap.add_argument("--night", action="store_true", help="previas de revisao a noite (luzes acesas)")
-    ap.add_argument("--variant", default="base", choices=list(VARIANTS), help="base | leve | longo | carreta")
+    ap.add_argument("--variant", default="base", choices=list(VARIANTS) + ["canter"], help="base | leve | longo | carreta | canter (cabine do JAC)")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
     scene.reset_scene()
@@ -125,7 +185,7 @@ def main():
         o.parent = root
     final = [root] + merged + wheel_objs + empties
     print(f"triangulos: {tris}  objetos: {len(final)}  materiais: {len(bpy.data.materials)}")
-    tag = args.variant if args.cab == "padrao" else f"{args.variant}_{args.cab}"
+    tag = args.variant if args.cab == "padrao" or args.variant == "canter" else f"{args.variant}_{args.cab}"
     glb = os.path.join(out, "truck", f"dekotora_truck_{tag}.glb")
     mural_png = os.path.join(out, "murals", "mural_side.png")      # arte trocavel do mural (nunca sobrescreve)
     if not os.path.exists(mural_png):
@@ -141,7 +201,7 @@ def main():
     if args.no_preview:
         print("OK build_truck_3d ->", glb)
         return
-    d = LENGTH_DELTA[args.variant]
+    d = canter_mod.LENGTH - 11.5 if args.variant == "canter" else LENGTH_DELTA[args.variant]
     pdir = os.path.join(out, "previews")
     preview.render_views(os.path.join(pdir, f"truck_{tag}" + ("_night" if args.night else "")), merged + wheel_objs, size=(960, 540), night=args.night,
                          views={"34": (35, 14, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "rear": (180, 8, 22.0 + d, (0, 6.0 + d / 2, 1.6)),

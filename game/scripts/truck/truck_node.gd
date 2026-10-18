@@ -10,20 +10,24 @@ const MODEL_PATHS: Dictionary = {
 	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve.glb",
 	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo.glb",
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
+	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Cabines que existem em .glb (a "padrao" nao tem sufixo no nome do arquivo).
-const CABS: Array[String] = ["padrao", "classica", "aero", "alta", "chata"]
+const CABS: Array[String] = ["padrao", "classica", "aero", "alta", "chata", "curta"]
+## Modelos com cabine fixa (nao combinam com as outras cabines).
+const FIXED_CAB: Dictionary = {"canter": "canter"}
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
-const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5}
+const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6}
 const WHEEL_RADIUS: float = 0.52
+const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## Mural das laterais do bau: troque este PNG (proporcao ~4:1) pela arte que quiser; um
 ## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
 const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
 const MURAL_USER := "user://mural_side.png"
 ## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
 var body_kind: String = "base"
-## Cabine: "padrao", "classica", "aero", "alta" ou "chata" (cara chata, T-119). Definir antes de add_child.
+## Cabine: "padrao", "classica", "aero", "alta", "chata" (cara chata, T-119) ou "curta" (JAC, T-125). Definir antes de add_child.
 var cab_kind: String = "padrao"
 ## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
 var chrome_mode: String = "night"
@@ -118,7 +122,7 @@ func apply_decals(decals: Array) -> void:
 	_decal_nodes.clear()
 	if model == null:
 		return
-	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)), cab_kind)
+	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)), shown_cab())
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
@@ -154,7 +158,7 @@ func set_signal(dir: int) -> void:
 
 ## Gira as rodas e aplica a escala de velocidade; `dt` em segundos reais.
 func animate(speed: float, dt: float, steer: float = 0.0) -> void:
-	_spin += speed / WHEEL_RADIUS * dt
+	_spin += speed / float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)) * dt
 	_spin = fmod(_spin, TAU)                 # evita perder precisao em corridas longas
 	for i in _wheels.size():
 		var w: Node3D = _wheels[i]
@@ -210,8 +214,15 @@ func _apply_mural() -> void:
 				m.set_surface_override_material(s, _mural_mat)
 
 
+## Cabine que aparece de verdade (o Canter so tem a dele, qualquer que seja a escolha do perfil).
+func shown_cab() -> String:
+	return String(FIXED_CAB.get(body_kind, cab_kind))
+
+
 ## Caminho do .glb para a combinacao carroceria + cabine (a cabine "padrao" nao tem sufixo).
 static func model_path(body: String, cab: String) -> String:
+	if FIXED_CAB.has(body):
+		return String(MODEL_PATHS[body])
 	if cab == "padrao" or not ResourceLoader.exists(MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]):
 		return String(MODEL_PATHS.get(body, MODEL_PATH))
 	return MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]

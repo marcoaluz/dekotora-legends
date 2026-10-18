@@ -66,7 +66,7 @@ func _safe_speed(curve: float, grip: float) -> float:
 func _obstacle_ahead(sim: RaceSim, me: TruckSim, index: int, x: float, horizon: float) -> Dictionary:
 	var best: Dictionary = {}
 	var half: float = (TruckSim.WIDTH_X + 0.3) * 0.5
-	var nose: float = me.z + TrafficSim.TRUCK_LEN
+	var nose: float = me.z + me.length
 	if sim.traffic != null:
 		for c in sim.traffic.cars:
 			var gap: float = c.z - nose
@@ -96,11 +96,11 @@ func _lane_side_clear(sim: RaceSim, me: TruckSim, index: int, lane: int) -> bool
 	for j in sim.trucks.size():
 		if j != index:
 			var o: TruckSim = sim.trucks[j]
-			if absf(o.x - lx) < 0.45 and o.z < me.z + TrafficSim.TRUCK_LEN + margin and o.z + TrafficSim.TRUCK_LEN + margin > me.z:
+			if absf(o.x - lx) < 0.45 and o.z < me.z + me.length + margin and o.z + o.length + margin > me.z:
 				return false
 	if sim.traffic != null:
 		for c in sim.traffic.cars:
-			if absf(c.x - lx) < 0.4 and c.z < me.z + TrafficSim.TRUCK_LEN + margin and c.z + TrafficSim.CAR_LEN + margin > me.z:
+			if absf(c.x - lx) < 0.4 and c.z < me.z + me.length + margin and c.z + c.length + margin > me.z:
 				return false
 	return true
 

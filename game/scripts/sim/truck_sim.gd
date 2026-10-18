@@ -39,6 +39,10 @@ var rpm: float = 700.0
 var gear: int = 1
 var boost: float = 0.0
 var mass: float = BASE_MASS + DEFAULT_CARGO
+## Modelo do caminhao (BodyDef, via TruckConfig): massa vazia, comprimento na pista e agilidade na troca de faixa.
+var base_mass: float = BASE_MASS
+var length: float = Collision.LEN         # metros de z a z+length (colisao, vacuo)
+var agility: float = 1.0                  # 1,2 = troca de faixa ~20% mais rapida (Canter)
 var loadout: Array[Dictionary] = []     # pecas instaladas (ver DamageModel.make_part), da mais externa para a interna
 var systems: Dictionary = {"engine": 100.0, "steering": 100.0, "cargo": 100.0}   # saude 0..100
 var steer_pull: float = 0.0             # puxao constante da direcao danificada (x/s)
@@ -67,7 +71,7 @@ var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
-	mass = BASE_MASS + cargo_kg + parts_kg
+	mass = base_mass + cargo_kg + parts_kg
 
 
 func set_loadout(parts: Array[Dictionary]) -> void:
@@ -144,7 +148,7 @@ func _lane_input(steer_: float, dt: float) -> void:
 
 ## Inclinacao visual da cabine (-1..+1) durante a troca de faixa.
 func lean() -> float:
-	return clampf(lateral_vel / LANE_MAX_VEL, -1.0, 1.0)
+	return clampf(lateral_vel / (LANE_MAX_VEL * agility), -1.0, 1.0)
 
 
 func grip() -> float:
@@ -177,8 +181,9 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho. Na curva so escapa se entrar rapido demais.
 	_lane_input(cmd.steer, dt)
 	var authority: float = minf(speed / 6.0, 1.0) * grip()
-	var desired: float = clampf((Lanes.X[lane] - x) * LANE_GAIN, -LANE_MAX_VEL, LANE_MAX_VEL) * authority
-	lateral_vel += (desired - lateral_vel) * minf(STEER_RESPONSE * dt, 1.0)
+	var vmax: float = LANE_MAX_VEL * agility
+	var desired: float = clampf((Lanes.X[lane] - x) * LANE_GAIN * agility, -vmax, vmax) * authority
+	lateral_vel += (desired - lateral_vel) * minf(STEER_RESPONSE * agility * dt, 1.0)
 	var curve: float = track.curve_at(z)
 	var safe: float = curve_safe_speed(curve, grip())
 	var push: float = 0.0

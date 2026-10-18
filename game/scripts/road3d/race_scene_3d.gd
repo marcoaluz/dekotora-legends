@@ -208,6 +208,7 @@ func _spawn_field_online() -> void:
 		var i: int = int(entry["idx"])
 		var node := TruckNode.new()
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
+		node.body_kind = String(entry["loadout"].get("body", "base"))      # o Canter tem outro tamanho na simulacao
 		add_child(node)
 		var defs: Array[PartDef] = []
 		for p in entry["loadout"]["parts"]:
@@ -277,7 +278,7 @@ func _spawn_field() -> void:
 		t.is_bot = i != 0
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
-		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "alta", "chata"][i % 4]
+		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "curta", "chata"][i % 4]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		add_child(node)
 		if i == 0:
@@ -572,14 +573,15 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = path.vehicle_transform(z, x, 12.0, -t.lateral_vel * 0.1, t.lean() * 0.11)
+		node.transform = path.vehicle_transform(z, x, t.length, -t.lateral_vel * 0.1, t.lean() * 0.11)
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 	_traffic3d.refresh()
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
-	var pos: Vector3 = path.world_point(z - 14.5, x * 0.85, 5.6)
+	var k: float = sim.trucks[player].length / Collision.LEN       # Canter (7 m): camera um pouco mais perto e baixa
+	var pos: Vector3 = path.world_point(z - (10.0 + 4.5 * k), x * 0.85, 4.6 + 1.0 * k)
 	var look: Vector3 = path.world_point(z + 14.0, x * 0.45, 1.8)
 	return [pos, look]
 

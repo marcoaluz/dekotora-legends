@@ -3,19 +3,20 @@ extends RefCounted
 ## Contratos do Mercado de fretes (codigo puro, sem tela: roda nos testes).
 ## Um contrato = trecho (RouteDef) + origem/destino (cidades do trecho) + tipo de carga (CargoDef) + peso + valor.
 ## Regras (docs/DECISOES.md):
-## - capacidade do bau: leve 6 t, medio 12 t, longo 16 t (contrato mais pesado que o bau nao pode ser aceito);
+## - capacidade do bau (BodyDef.capacity_t): Canter 4 t, leve 6 t, medio 12 t, longo 16 t (mais pesado nao pode ser aceito);
 ## - valor = frete do trecho x multiplicador da carga x (0,8 + 0,6 x peso relativo na faixa da carga), de 50 em 50;
 ## - o peso entra na massa do caminhao na corrida (mais pesado = mais lento) e a fragilidade multiplica o dano na carga;
 ## - o quadro e sorteado com semente: muda ao concluir um frete ou ao tocar ATUALIZAR.
 
-const CAPACITY_T: Dictionary = {"leve": 6.0, "base": 12.0, "longo": 16.0}
+const CAPACITY_T: Dictionary = {"leve": 6.0, "base": 12.0, "longo": 16.0, "canter": 4.0}   # reserva (sem data/bodies)
 const PER_ROUTE: int = 2                     # contratos por trecho liberado
 const CARGO_DIR := "res://data/cargo/"
 const PERISHABLE_DEADLINE: float = 0.8       # perecivel: prazo 20% menor
 
 
 static func capacity_t(body: String) -> float:
-	return float(CAPACITY_T.get(body, 12.0))
+	var d: BodyDef = BodyDef.find(body)
+	return d.capacity_t if d != null else float(CAPACITY_T.get(body, 12.0))
 
 
 static func all_cargos() -> Array[CargoDef]:
