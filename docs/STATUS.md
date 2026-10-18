@@ -52,6 +52,34 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 5. Rivais de Kanto com **nomes provisórios** (Trovão Rosa, Dragão de Aço, Lua Cromada, Imperador da Estrada).
 6. Áudio em **MP3** (sem ffmpeg para converter) e músicas com 100 s (não 2:30) para economizar créditos; ~5 mil créditos gastos de ~80 mil.
 
+## PRÓXIMAS TAREFAS (para outra sessão do Claude; pedidas pelo Marco em 2026-10-18)
+
+Contexto: o Marco baixa os modelos só com a licença **Royalty Free License (no AI)** e confere antes. Se algum modelo exigir
+crédito ao autor, ele avisa quem é; todos os já usados estão em `game/assets/LICENCAS.md`. Tunnel.obj e van.abc (Downloads)
+continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi iniciada (só registradas).
+
+1. **T-131, Jipe Suzuki no tráfego** (autorizado pelo Marco). Fonte: `docs/Novos modelos/Carro/` (OBJ/FBX, 436 mil triângulos,
+   50 texturas 4K, escala ×0,742 para ~3,95 m, "SUZUKI" na grade para apagar; ver `docs/NOVOS_MODELOS.md` e
+   `docs/INVENTARIO_MODELOS.md`). Seguir o padrão da T-124: `blender/scripts/build_traffic_cars.py -- --model ...`,
+   3 a 6 mil triângulos, `paint_white` trocável, rodas `wheel_f*`/`wheel_r*`, entrar em `traffic_3d.gd` (`MODELS_BY_KIND`),
+   placas (T-130), crédito do autor se houver, teste e medida de FPS.
+2. **T-132, BUG: o caminhão anda "de lado" no asfalto.** O certo é ele seguir a pista de frente, alinhado com a direção da
+   estrada (curvas incluídas), e inclinar/guinar só um pouco ao trocar de faixa. Onde olhar: `race_scene_3d.gd:591`
+   (`path.vehicle_transform(z, x, t.length, -t.lateral_vel * 0.1, t.lean() * 0.11)`: o guinar vem de `lateral_vel` e o
+   sinal/escala podem estar errados), `TrackPath.vehicle_transform` (a direção usa a tangente da pista no ponto do eixo
+   traseiro/dianteiro? caminhões longos de 7 a 12 m podem estar usando a tangente de um ponto só), o ajuste de peso da T-113
+   (`STEER_RESPONSE`, `LANE_GAIN`, `LANE_MAX_VEL`) e o `Lanes`. Também vale conferir se algum `.glb` novo (Canter, cabines
+   `jac`/`americana`/`chata`) está girado em Z. Validar com captura de cima/lado em reta, curva e troca de faixa.
+3. **T-133, BUG: as rodas estão estáticas (não giram).** `TruckNode.animate()` gira os nós `wheel_*`
+   (`game/scripts/truck/truck_node.gd:195`), então conferir: (a) se `find_children("wheel_*")` (linha ~80) acha as rodas dos
+   `.glb` novos e regerados (Canter, `_jac`, `_americana`, `_curta`, `_chata`; o especialista da T-126 já avisou que as
+   calotas/rodas de peça não giram); (b) se `animate()` está sendo chamado para o caminhão do jogador, rivais e tráfego
+   (`race_scene_3d.gd:592`, `traffic_3d.gd`); (c) se a rotação não é sobrescrita pelo `_wheel_rest` ou pela troca de rodas
+   da garagem; (d) rodas das peças (`wheels`, `hub_*`) montadas como filhos fora de `wheel_*`. Corrigir e criar teste
+   (a rotação dos nós `wheel_*` muda com a velocidade, para cada modelo e cabine; rodas de peça acompanham).
+
+Ordem sugerida: T-132 e T-133 primeiro (afetam todo o jogo), depois T-131.
+
 ## PENDENTE — precisa do Marco
 
 - **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo); olhar
