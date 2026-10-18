@@ -90,3 +90,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/truck3d/{jac_*,canter}.py, lib/extract.py, accessories/thirdparty.py, game/data/bodies/*.tres, tests/test_canter.gd, test_parts_thirdparty.gd, docs/capturas_t125, capturas_t126
 - Validação: 165 testes, 0 falhas; modo médio 75 FPS; Canter ~340 chamadas (base ~380); 8 peças novas: +10 mil tri, mesmas chamadas.
 - Decisão pendente: Marco ajustar números do Canter, preços e destaques das peças; dar números próprios ao baú leve e longo.
+
+## 2026-10-18 · T-129 · especialista · CONCLUÍDA
+- Feito: cabines só de arquivo: chata (padrão), jac (Japonesa alta), curta, americana (Kenworth); 4 cabines por código removidas (scripts, 12 .glb, 5 texturas); migração de perfis (padrao/classica/alta→chata, aero→jac); cabine vai no descritor de rede.
+- Validação: 171 testes, 0 falhas; .pck de teste 68,6→57,4 MB; 75 FPS, chamadas iguais.
+- Pendências: Marco aprovar nomes, chata como padrão, olhar contorno fraco no capô da americana; captura da lista de cabines na garagem ainda mostra só carrocerias. Commit 017d888 ("asda") do Marco levou arquivos em andamento.
