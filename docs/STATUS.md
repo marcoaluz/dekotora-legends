@@ -71,10 +71,15 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
   (12 .glb + carreta = 18 MB; arquivos .glb 27 → ~51 MB). Gerar os 12 leva ~75 s. Folha de conferência: sem `--no-preview` o build grava
   `previews/truck_<tag>_sheet.png` (9 vistas). Capturas no jogo: `godot --path game res://scenes/garage/garage.tscn -- --demo --noparts
   --hideui --cab=classica --view=front --zoom=0.55 --shot=C:/caminho/x.png`. Imagens: `docs/direcao_arte/cabine_realista_*.png`.
-  **Pendências:** (1) texturas repetidas em cada .glb (o ideal é uma cópia só, carregada pelo `TruckNode`: economiza ~15 MB no APK e
-  memória quando há vários modelos na corrida); (2) PNGs antigos extraídos que os .glb novos não usam mais (`*_tex_grime.png`,
-  `*_tex_diamond.png`, `*_tex_perforated.png`, `*_tex_perf_grille.png`) continuam na pasta (não apaguei sem o Marco); (3) sem interior
-  (bancos/painel) atrás do vidro escuro; (4) flocos metálicos e reflexo real no vidro dependem de luz do jogo, não da textura.
+  **Texturas compartilhadas (T-118, 2026-10-18):** as texturas grandes do caminhão ficam UMA vez em
+  `game/assets/vehicles/dekotora/textures/tex_*.png` (gravadas pelo `build_truck_3d.py` via `lib/shared_tex.py`); cada .glb leva só
+  miniaturas 4×4 com a cor média (abre sozinho, só fica liso). `TruckTextures.apply()` (`scripts/truck/truck_textures.gd`, chamado pelo
+  `TruckNode` depois do cromo e do mural, e pelo visualizador de acessórios) troca as miniaturas pelas compartilhadas, um material em
+  cache por nome. Medido: .glb 51 → 33 MB; texturas no projeto 18,5 MB (12 cópias) → 1,5 MB (uma) + 0,36 MB de miniaturas; .pck de
+  teste (Windows) 97,5 → 54,0 MB; corrida no modo médio: memória de textura 53 → 43 MB, vídeo 87 → 77 MB, chamadas iguais (~490),
+  FPS igual. Garagem antes/depois praticamente idêntica (diferença média de pixel 0,0008). O mural continua embutido (o TruckNode troca).
+  Pendências: (3) sem interior (bancos/painel) atrás do vidro escuro; (4) flocos metálicos e reflexo real no vidro dependem de luz do
+  jogo, não da textura. (Os PNGs antigos foram apagados na T-117.)
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **Plano visual (`docs/PLANO_VISUAL.md`, análise do Marco em `docs/dekotora_analise_visual/`) — V0 a V7 FEITOS (2026-10-17)**:
   V0 rodas giram no eixo certo; V1 três identidades em `docs/DIRECAO_ARTE.md` (**Marco escolhe A, B ou C**); V2 hora do dia por rota
