@@ -9,6 +9,9 @@ extends RefCounted
 const STEER_MAX: float = 0.35          # rad de esterçamento com steer = 1
 const FACE_FRONT: String = "MOUNT_WHEEL_FRONT_FACE_"
 const FACE_REAR: String = "MOUNT_WHEEL_REAR_FACE_"
+## Distancia (m) ate onde as pecas de roda sao desenhadas: com 6 a 12 rodas por caminhao, poupa chamadas de desenho
+## dos rivais distantes (a 60 m uma calota tem poucos pixels e o pneu ja tem aro cromado).
+const PART_RANGE_M: float = 60.0
 
 var wheels: Array[Node3D] = []
 var rest: Array[Basis] = []            # rotacao original de cada roda no .glb (eixo do pneu em X)
@@ -106,6 +109,10 @@ func attach_part(catalog: AccessoryCatalog, id: String) -> Array[Node3D]:
 		n.set_meta("wheel_part", true)
 		w.add_child(n)
 		n.transform = part_transform(w)
+		for mi in n.find_children("*", "MeshInstance3D", true, false):
+			var m: MeshInstance3D = mi as MeshInstance3D
+			m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF   # fica dentro do arco: sombra imperceptivel
+			m.visibility_range_end = PART_RANGE_M                             # longe vira o aro de fabrica do pneu
 		out.append(n)
 	return out
 
