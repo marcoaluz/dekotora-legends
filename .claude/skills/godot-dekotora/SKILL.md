@@ -93,3 +93,7 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 1. `--import` (se criou `class_name`) → testes → `--quit-after 30` sem `ERROR`.
 2. Explique ao Marco onde clicar no editor e o que ele deve ver.
 3. Se mexeu em algo visual, peça uma captura de tela ou gere uma build para o celular.
+
+## Capturas de tela (depuração)
+
+- Corrida: `--burst=S` grava 2 quadros seguidos (junto com `--shots=PASTA` e `--cam=...`); garagem: `--shot-pair` grava o par junto com `--shot=ARQ.png`, que também gera `ARQ_2.png`.
