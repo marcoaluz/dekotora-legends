@@ -5,6 +5,7 @@ cromo preto).
 Uso: blender -b --factory-startup -P blender/scripts/build_matcaps.py -- [--out game/assets/textures]
 Saída: matcap_chrome_night.png (cidade à noite: postes de sódio, neon rosa/ciano, luzes no horizonte)
        matcap_chrome_day.png   (céu azul, sol, horizonte e asfalto)
+       matcap_chrome_studio.png (estúdio neutro da garagem, sem tom azul; T-138)
 256 px, determinístico (semente fixa).
 """
 import argparse
@@ -84,6 +85,30 @@ def day() -> np.ndarray:
     return np.clip(col, 0, 1)
 
 
+def studio() -> np.ndarray:
+    """Estúdio neutro da garagem (T-138): cinza sem tom azul, softbox grande no teto, duas faixas de luz
+    verticais nas laterais, uma caixa de luz na frente e o piso escuro com o reflexo das lâmpadas."""
+    elev, az, rim = _reflection()
+    white = np.array([1.0, 0.98, 0.95])                   # luz levemente quente (nunca azul)
+    wall = 0.10 + 0.06 * np.exp(-np.abs(elev) * 4)
+    col = np.where(elev[..., None] > 0, wall[..., None] * white,
+                   (0.05 + 0.04 * np.exp(-np.abs(elev) * 6))[..., None] * np.array([1.0, 0.97, 0.93]))
+    # softbox do teto: retângulo largo e suave
+    top = np.clip((elev - 0.55) / 0.08, 0, 1)
+    col += top[..., None] * white * 1.1
+    # faixas verticais nas laterais (luzes de estúdio)
+    for a0 in (-1.75, 1.75):
+        d = (az - a0 + np.pi) % (2 * np.pi) - np.pi
+        band = np.exp(-(d / 0.09) ** 2) * np.clip((elev + 0.05) / 0.2, 0, 1) * np.clip((0.75 - elev) / 0.2, 0, 1)
+        col += band[..., None] * white * 1.2
+    col += _blob(elev, az, 0.25, -0.6, 0.16, [0.9, 0.88, 0.85])     # caixa de luz na frente/esquerda
+    col += _blob(elev, az, 0.18, 2.9, 0.12, [0.5, 0.49, 0.47])      # rebatedor atrás
+    col += np.exp(-((elev + 0.04) / 0.035) ** 2)[..., None] * white * 0.35   # linha de luz no horizonte
+    col += _blob(elev, az, -0.35, 0.0, 0.2, [0.12, 0.115, 0.11])     # piso refletindo o teto
+    col += (rim ** 6)[..., None] * 0.15
+    return np.clip(col, 0, 1)
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     ap = argparse.ArgumentParser()
@@ -92,6 +117,7 @@ def main():
     scene.reset_scene()
     tex.save_png(night()[::-1], os.path.join(out, "matcap_chrome_night.png"))   # save_png grava a linha 0 embaixo
     tex.save_png(day()[::-1], os.path.join(out, "matcap_chrome_day.png"))
+    tex.save_png(studio()[::-1], os.path.join(out, "matcap_chrome_studio.png"))
     print("OK build_matcaps ->", out)
 
 

@@ -9,6 +9,7 @@ var preview: Callable          # func(changes: Dictionary) -> Dictionary (com ca
 var flash: Callable            # func(text: String) -> void
 var live_decals: Callable      # func(decals: Array) -> void: mostra os adesivos no caminhao sem reconstruir a tela (sliders)
 var focus_view: Callable       # func(view: String) -> void: enquadra o caminhao no lugar do adesivo
+var _decals: GarageDecals
 
 
 func _init(gs_: Node, preview_: Callable, flash_: Callable) -> void:
@@ -70,7 +71,7 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 		b.pressed.connect(func() -> void:
 			if gs.buy(d):
 				AudioBus.play_ui("ui_buy")
-				flash.call("Comprou " + Tr.t("part." + String(d.id)))
+				flash.call(Tr.t("garage.bought", [Tr.t("part." + String(d.id))]))
 			else:
 				AudioBus.play_ui("ui_error"))
 		row.add_child(b)
@@ -173,102 +174,16 @@ func build_deco_header(box: VBoxContainer) -> void:
 		row.add_child(pb)
 
 
-# ---------------------------------------------------------------- adesivos
-
-const DECAL_VIEW: Dictionary = {"side_l": "side", "side_r": "side", "rear": "rear", "cab": "front"}
-
-
-## Secao ADESIVOS da aba DECORACAO: um cartao por lugar (esq., dir., traseira, cabine) com adesivo, posicao, tamanho e cor.
+## Secao ADESIVOS (GarageDecals, arquivo proprio). O objeto fica guardado: os botoes chamam metodos dele.
 func build_decals(box: VBoxContainer) -> void:
-	box.add_child(UiKit.heading(Tr.t("garage.decals").to_upper(), 18, UiTheme.PINK))
-	box.add_child(wl(Tr.t("garage.decals_hint") % [StyleCatalog.DECAL_POINTS], 12, UiTheme.TEXT_DIM))
-	var options: Array[String] = [""]
-	options.append_array(DecalCatalog.ids())
-	for slot in DecalCatalog.SLOTS:
-		_decal_card(box, slot, options)
-
-
-func _commit_decals(decals: Array) -> void:
-	gs.profile["decals"] = decals
-	gs.save_profile()
-	gs.profile_changed.emit()
-
-
-func _decal_card(box: VBoxContainer, slot: String, options: Array[String]) -> void:
-	var decals: Array = gs.profile.get("decals", []) as Array
-	var idx: int = DecalCatalog.find(decals, slot)
-	var cur: Dictionary = decals[idx] if idx >= 0 else {}
-	var cur_id: String = String(cur.get("id", ""))
-	var cv: Array = card(UiTheme.PINK if idx >= 0 else Color(1, 1, 1, 0.1))
-	var v: VBoxContainer = cv[1]
-	v.add_child(wl("%s: %s" % [Tr.t("decal.slot." + slot), cur_id if cur_id != "" else "— " + Tr.t("garage.empty")], 16, UiTheme.GOLD if idx >= 0 else UiTheme.TEXT))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
-	v.add_child(row)
-	for dir in [-1, 1]:
-		var b: Button = small_button("◀" if dir < 0 else "▶", 60)
-		b.pressed.connect(func() -> void:
-			var n: int = options.size()
-			var pick: String = options[(options.find(cur_id) + dir + n) % n]
-			var list: Array = (gs.profile.get("decals", []) as Array).duplicate(true)
-			var i2: int = DecalCatalog.find(list, slot)
-			if pick == "":
-				if i2 >= 0:
-					list.remove_at(i2)
-			elif i2 >= 0:
-				(list[i2] as Dictionary)["id"] = pick
-			else:
-				list.append(DecalCatalog.make(pick, slot))
-			AudioBus.play_ui("ui_select")
-			if focus_view.is_valid():
-				focus_view.call(String(DECAL_VIEW[slot]))
-			_commit_decals(list))
-		row.add_child(b)
-	if idx < 0:
-		box.add_child(cv[0])
-		return
-	for spec in [["x", "garage.decal_x", -1.0, 1.0], ["y", "garage.decal_y", -1.0, 1.0], ["size", "garage.decal_size", 0.15, 1.1]]:
-		var key: String = String(spec[0])
-		v.add_child(wl(Tr.t(String(spec[1])), 12, UiTheme.TEXT_DIM))
-		var sl := HSlider.new()
-		sl.min_value = float(spec[2])
-		sl.max_value = float(spec[3])
-		sl.step = 0.02
-		sl.value = float(cur.get(key, 0.0))
-		sl.custom_minimum_size = Vector2(0, 22)
-		sl.value_changed.connect(func(val: float) -> void:
-			var list: Array = gs.profile.get("decals", []) as Array
-			var i3: int = DecalCatalog.find(list, slot)
-			if i3 >= 0:
-				(list[i3] as Dictionary)[key] = val
-				if live_decals.is_valid():
-					live_decals.call(list))
-		sl.drag_ended.connect(func(_changed: bool) -> void: _commit_decals(gs.profile.get("decals", []) as Array))
-		v.add_child(sl)
-	var colors := HFlowContainer.new()
-	colors.add_theme_constant_override("h_separation", 5)
-	colors.add_theme_constant_override("v_separation", 5)
-	v.add_child(colors)
-	for hex in DecalCatalog.COLORS:
-		var cb := Button.new()
-		cb.custom_minimum_size = Vector2(28, 28)
-		var on: bool = String(cur.get("color", "#ffffff")).to_lower() == String(hex)
-		cb.add_theme_stylebox_override("normal", UiTheme.box(Color(String(hex)), UiTheme.GOLD if on else Color(1, 1, 1, 0.3), 3 if on else 1, 6, 0))
-		cb.add_theme_stylebox_override("hover", UiTheme.box(Color(String(hex)).lightened(0.2), UiTheme.PINK, 2, 6, 0))
-		cb.pressed.connect(func() -> void:
-			var list: Array = (gs.profile.get("decals", []) as Array).duplicate(true)
-			var i4: int = DecalCatalog.find(list, slot)
-			if i4 >= 0:
-				(list[i4] as Dictionary)["color"] = String(hex)
-				_commit_decals(list))
-		colors.add_child(cb)
-	box.add_child(cv[0])
+	_decals = GarageDecals.new(gs, live_decals, focus_view)
+	_decals.build(box)
 
 
 # ---------------------------------------------------------------- mecanica
 
 func build_mech(box: VBoxContainer) -> void:
-	box.add_child(wl("Motor, turbo, escape e freio-motor. As mudanças mostram o efeito no 0–100.", 14, UiTheme.TEXT_DIM))
+	box.add_child(wl(Tr.t("garage.mech_hint"), 14, UiTheme.TEXT_DIM))
 	var base: Dictionary = preview.call({})
 	for kind in ["engine", "turbo", "exhaust", "upgrade"]:
 		for id in gs.MECH_KINDS[kind]["ids"]:
@@ -282,13 +197,13 @@ func build_mech(box: VBoxContainer) -> void:
 			var detail: String = ""
 			match kind:
 				"engine":
-					detail = "%d N·m · corte %d rpm · +%d kg" % [int(def.get("max_torque_nm")), int(def.get("redline_rpm")), int(def.get("weight_kg"))]
+					detail = Tr.t("garage.mech_engine", [int(def.get("max_torque_nm")), int(def.get("redline_rpm")), int(def.get("weight_kg"))])
 				"turbo":
-					detail = "+%d%% torque · atraso %.1f s" % [roundi(float(def.get("torque_gain")) * 100.0), float(def.get("lag_s"))]
+					detail = Tr.t("garage.mech_turbo", [roundi(float(def.get("torque_gain")) * 100.0), float(def.get("lag_s"))])
 				"exhaust":
-					detail = "+%d%% torque · destaque +%d" % [roundi(float(def.get("torque_bonus")) * 100.0), int(def.get("fame"))]
+					detail = Tr.t("garage.mech_exhaust", [roundi(float(def.get("torque_bonus")) * 100.0), int(def.get("fame"))])
 				"upgrade":
-					detail = "efeito %+d%%" % roundi(float(def.get("value")) * 100.0)
+					detail = Tr.t("garage.mech_upgrade", [roundi(float(def.get("value")) * 100.0)])
 			v.add_child(wl(detail, 13, UiTheme.TEXT_DIM))
 			if not inst:
 				var ch: Dictionary = {}
@@ -307,7 +222,7 @@ func build_mech(box: VBoxContainer) -> void:
 				b.disabled = gs.can_buy_mech(String(id)) != ""
 				b.pressed.connect(func() -> void: gs.buy_mech(String(id)))
 			else:
-				b = small_button(Tr.t("garage.install") if not inst else ("DESLIGAR" if kind == "upgrade" else Tr.t("garage.installed")))
+				b = small_button(Tr.t("garage.install") if not inst else (Tr.t("garage.turn_off") if kind == "upgrade" else Tr.t("garage.installed")))
 				b.disabled = inst and kind != "upgrade"
 				b.pressed.connect(func() -> void: gs.install_mech(String(id)))
 			v.add_child(b)
@@ -318,16 +233,16 @@ func build_mech(box: VBoxContainer) -> void:
 
 func build_repair(box: VBoxContainer) -> void:
 	var total: int = gs.total_repair_cost()
-	box.add_child(UiKit.heading("Total: " + Tr.yen(total), 22, UiTheme.GOLD))
+	box.add_child(UiKit.heading(Tr.t("garage.repair_total", [Tr.yen(total)]), 22, UiTheme.GOLD))
 	var all: Button = UiKit.primary_button("%s  %s" % [Tr.t("garage.repair_all"), Tr.yen(total)], "wrench", Vector2(0, 44))
 	all.add_theme_font_size_override("font_size", 17)
 	all.disabled = total <= 0 or gs.money() < 1
 	all.pressed.connect(func() -> void:
 		var spent: int = gs.repair_all()
 		AudioBus.play_ui("ui_repair" if spent > 0 else "ui_error")
-		flash.call("Reparos pagos: " + Tr.yen(spent)))
+		flash.call(Tr.t("garage.repairs_paid", [Tr.yen(spent)])))
 	box.add_child(all)
-	box.add_child(wl("Fórmula: preço da peça × % de dano × 0,5. Mural riscado: repintar = 30% do preço.", 13, UiTheme.TEXT_DIM))
+	box.add_child(wl(Tr.t("garage.repair_formula"), 13, UiTheme.TEXT_DIM))
 	var any: bool = false
 	for id in gs.profile["owned"]:
 		var cost: int = gs.part_repair_cost(String(id))
@@ -341,11 +256,11 @@ func build_repair(box: VBoxContainer) -> void:
 		v.add_child(wl(Tr.t("part." + String(id)), 17))
 		var state: String
 		if d.durability <= 0.0:
-			state = "riscado %d%%" % roundi(float(own["scratch"]) * 100.0)
+			state = Tr.t("garage.state_scratched", [roundi(float(own["scratch"]) * 100.0)])
 		elif bool(own["broken"]):
-			state = "QUEBRADA"
+			state = Tr.t("part_state.broken").to_upper()
 		else:
-			state = "dano %d%%" % roundi((1.0 - float(own["dur"]) / d.durability) * 100.0)
+			state = Tr.t("garage.state_damage", [roundi((1.0 - float(own["dur"]) / d.durability) * 100.0)])
 		v.add_child(wl(state, 14, UiTheme.BAD if bool(own["broken"]) else UiTheme.WARN))
 		var row := VBoxContainer.new()                 # empilhados: dois botoes lado a lado nao cabem em 300 px
 		v.add_child(row)
@@ -369,7 +284,7 @@ func build_repair(box: VBoxContainer) -> void:
 		var cv2: Array = card(UiTheme.WARN)
 		var v2: VBoxContainer = cv2[1]
 		v2.add_child(wl(Tr.t("repair." + String(sys)), 17))
-		v2.add_child(wl("saúde %d%%" % roundi(float(gs.profile["systems"][sys])), 14, UiTheme.WARN))
+		v2.add_child(wl(Tr.t("garage.state_health", [roundi(float(gs.profile["systems"][sys]))]), 14, UiTheme.WARN))
 		var sb: Button = small_button("%s  %s" % [Tr.t("garage.repair_one"), Tr.yen(c2)])
 		sb.disabled = gs.money() < c2
 		sb.pressed.connect(func() -> void:

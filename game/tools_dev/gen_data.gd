@@ -162,8 +162,8 @@ func _initialize() -> void:
 func _gen_rivals_and_routes() -> void:
 	# Rivais (nomes PROVISORIOS: decisao aberta do Marco em docs/GDD "rivais de Kanto")
 	var rivals: Array = [
-		["rival_coast", "Trovao Rosa", 0, Color("#ff6fb1"), ["fb_basic", "rb_basic"], false],
-		["rival_urban", "Dragao de Aco", 1, Color("#3a73d6"), ["fb_chrome_steps", "roof_lights_row", "rb_basic"], false],
+		["rival_coast", "Trovão Rosa", 0, Color("#ff6fb1"), ["fb_basic", "rb_basic"], false],
+		["rival_urban", "Dragão de Aço", 1, Color("#3a73d6"), ["fb_chrome_steps", "roof_lights_row", "rb_basic"], false],
 		["rival_mountain", "Lua Cromada", 1, Color("#3fb26f"), ["fb_chrome_steps", "skirt_chrome", "rb_chrome"], false],
 		["boss_kanto", "Imperador da Estrada", 2, Color("#f5cc5a"), ["fb_gold_wing", "skirt_chrome", "rb_chrome", "roof_lights_crown", "andon_kanji"], true],
 	]

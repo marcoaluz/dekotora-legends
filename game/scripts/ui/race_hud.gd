@@ -43,6 +43,9 @@ func show_banner(text: String, seconds: float = 1.6) -> void:
 
 
 func _process(delta: float) -> void:
+	var want: Vector2 = get_viewport_rect().size / 2.0   # T-138: tela comprida = HUD mais largo (cantos nas bordas)
+	if size != want:
+		size = want
 	banner_time = maxf(banner_time - delta, 0.0)
 	queue_redraw()
 

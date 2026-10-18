@@ -145,19 +145,25 @@ func test_front_wheel_parts_steer() -> void:
 	t.free()
 
 
-func test_garage_spins_only_in_wheel_view() -> void:
+## T-138: as rodas so giram com "Ver em movimento" ligado (botao, toque na roda ou roda nova); trocar de vista desliga.
+func test_garage_spins_only_with_spin_button() -> void:
 	var stage := GarageStage.new()
 	var t: TruckNode = _truck("base", "chata", "hub_chrome")
 	stage.truck = t
 	var p: Node3D = _parts(t)[0]
 	var b0: Basis = _rel(p, t.model).basis
-	stage.focus_view("side")
-	stage.spin_wheels(0.5)
-	check(_angle(b0, _rel(p, t.model).basis) < 1e-5, "garagem, vista lateral: rodas paradas")
 	stage.focus_view("wheel")
 	stage.spin_wheels(0.5)
+	check(_angle(b0, _rel(p, t.model).basis) < 1e-5, "garagem, vista da roda sem o botao: rodas paradas")
+	var seen: Array = []
+	stage.wheel_spin_changed.connect(func(on: bool) -> void: seen.append(on))
+	stage.toggle_wheel_spin()
+	stage.spin_wheels(0.5)
 	var a: float = _angle(b0, _rel(p, t.model).basis)
-	check(a > 0.2 and a < 2.0, "garagem, vista da roda: gira devagar (%.2f rad em 0,5 s)" % a)
+	check(a > 0.2 and a < 2.0, "garagem, 'ver em movimento': gira devagar (%.2f rad em 0,5 s)" % a)
+	stage.focus_view("side")
+	check(not stage.wheel_spin, "trocar de vista desliga o giro")
+	check_eq(seen, [true, false], "sinal avisa o botao (liga e desliga)")
 	stage.focus_slot("hubcaps")
 	check_eq(stage.view, "wheel", "escolher calotas leva a vista da roda")
 	stage.focus_default()

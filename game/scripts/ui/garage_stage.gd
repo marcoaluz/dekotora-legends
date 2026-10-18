@@ -2,15 +2,17 @@ class_name GarageStage
 extends Node3D
 ## Palco 3D do menu e da garagem: plataforma com neon, caminhao com os acessorios instalados,
 ## camera que gira sozinha (ou pelo arraste do dedo/mouse). O destino da camera muda por foco (slot).
+## T-138: camera mais perto (caminhao ~60% da largura da tela), cromo neutro de estudio (sem o azul da noite)
+## e rodas paradas ate o jogador pedir "Ver em movimento" (botao, toque na roda ou roda nova instalada).
 
 const HALL_PATH := "res://assets/scenery/garage_hall.glb"
 const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), distancia e azimute
-	"default": {"target": Vector3(-3.5, 1.6, -6.0), "dist": 22.0, "az": 35.0, "el": 14.0},
-	"front": {"target": Vector3(0, 1.4, -10.5), "dist": 9.0, "az": 25.0, "el": 10.0},
-	"roof": {"target": Vector3(0, 3.0, -8.5), "dist": 13.0, "az": 35.0, "el": 18.0},
-	"side": {"target": Vector3(1.2, 1.2, -6.0), "dist": 15.0, "az": 100.0, "el": 8.0},
-	"rear": {"target": Vector3(0, 1.8, -0.5), "dist": 10.0, "az": 160.0, "el": 12.0},
-	"wheel": {"target": Vector3(1.0, 0.7, -10.0), "dist": 8.0, "az": 100.0, "el": 6.0},
+	"default": {"target": Vector3(0.0, 1.8, -6.2), "dist": 15.0, "az": 38.0, "el": 10.0},
+	"front": {"target": Vector3(0, 1.6, -10.5), "dist": 9.5, "az": 28.0, "el": 9.0},
+	"roof": {"target": Vector3(0, 3.0, -8.5), "dist": 12.0, "az": 35.0, "el": 18.0},
+	"side": {"target": Vector3(0.6, 1.5, -6.0), "dist": 15.5, "az": 95.0, "el": 7.0},
+	"rear": {"target": Vector3(0, 1.8, -0.8), "dist": 10.0, "az": 158.0, "el": 11.0},
+	"wheel": {"target": Vector3(1.0, 0.8, -9.6), "dist": 7.0, "az": 100.0, "el": 5.0},
 }
 const SLOT_FOCUS: Dictionary = {
 	"front_bumper": "front", "front_lip": "front", "grille": "front", "front_trim": "front", "front_ornament": "front",
@@ -20,29 +22,40 @@ const SLOT_FOCUS: Dictionary = {
 	"side_box": "side", "side_ornament": "side", "mural": "side", "hubcaps": "wheel", "rear_bumper": "rear",
 	"rear_lamps": "rear", "plate": "rear", "mudflaps": "rear", "rear_ornament": "rear",
 }
+## Velocidade de mentira das rodas em "Ver em movimento" (m/s; ~1 volta a cada 3 s).
+const WHEEL_VIEW_SPEED: float = 1.0
+## Proporcao de referencia (16:9). Tela mais comprida (celular 20:9) aproxima um pouco para o caminhao
+## continuar ocupando a mesma fracao da largura.
+const REF_ASPECT: float = 16.0 / 9.0
+
+signal wheel_spin_changed(on: bool)
 
 var truck: TruckNode
 var day: bool = false                # previa de dia (luz clara) ou noite (luzes do caminhao em destaque)
+## Cromo do palco: "studio" (garagem, neutro). A previa de dia usa o cromo "day" (como na corrida de dia).
+var chrome: String = "studio"
 var _env: Environment
 var _key: SpotLight3D
 var _rim: OmniLight3D
 var _fill: OmniLight3D
 var cam: Camera3D
 var auto_rotate: bool = true
-var _az: float = 35.0
-var _el: float = 14.0
-var _dist: float = 22.0
-var _target: Vector3 = Vector3(0, 1.6, -6.0)
+var _az: float = 38.0
+var _el: float = 11.0
+var _dist: float = 17.0
+var _target: Vector3 = Vector3(0, 1.7, -6.2)
 var _goal: Dictionary = FOCUS["default"]
 var _dragging: bool = false
+var _press_pos: Vector2 = Vector2.ZERO
+var _moved: float = 0.0
 var _shift: float = 0.0            # desloca o caminhao para a direita (fracao da distancia) ao liberar a tela
 var _shift_goal: float = 0.0
 var _zoom: float = 1.0
 var _zoom_goal: float = 1.0
-## Vista atual ("wheel" = rodas: elas giram devagar, so nessa vista).
+## Vista atual ("default", "front", "side", "rear", "roof", "wheel", "hero").
 var view: String = "default"
-## Velocidade de mentira das rodas na vista da roda (m/s; ~1 volta a cada 3 s).
-const WHEEL_VIEW_SPEED: float = 1.0
+## Rodas girando ("Ver em movimento"). Desliga ao trocar de vista.
+var wheel_spin: bool = false
 
 
 func _ready() -> void:
@@ -63,8 +76,8 @@ func _ready() -> void:
 	refresh_truck()
 
 
-## Luz de estudio: principal fria de cima/frente (com sombra quando a qualidade permite), recorte rosa atras
-## e preenchimento ciano do outro lado. Poucas luzes para caber no celular.
+## Luz de estudio: principal branca de cima/frente (com sombra quando a qualidade permite), recorte rosa atras
+## (o neon do galpao) e preenchimento branco quente do outro lado. Poucas luzes para caber no celular.
 func _studio_lights() -> void:
 	var q: int = int(get_node("/root/Settings").quality)
 	var key := SpotLight3D.new()
@@ -73,22 +86,22 @@ func _studio_lights() -> void:
 	key.spot_range = 40.0
 	key.spot_angle = 42.0
 	key.light_energy = 5.0
-	key.light_color = Color(1.0, 0.97, 0.92)
+	key.light_color = Color(1.0, 0.98, 0.95)
 	key.shadow_enabled = q >= 1
 	add_child(key)
 	_key = key
 	var rim := OmniLight3D.new()
 	rim.position = Vector3(-6, 5, -16)
 	rim.omni_range = 16.0
-	rim.light_energy = 2.2
+	rim.light_energy = 1.5
 	rim.light_color = UiTheme.PINK
 	add_child(rim)
 	_rim = rim
 	var fill := OmniLight3D.new()
 	fill.position = Vector3(-9, 4, 3)
 	fill.omni_range = 18.0
-	fill.light_energy = 1.0
-	fill.light_color = Color("#9fd8ff")
+	fill.light_energy = 1.1
+	fill.light_color = Color("#fff1e2")              # antes ciano (#9fd8ff): deixava o cromo azulado
 	add_child(fill)
 	_fill = fill
 
@@ -98,13 +111,13 @@ func _spawn_truck() -> void:
 	var prof: Dictionary = get_node("/root/GameState").profile
 	truck.body_kind = String(prof.get("body", "base"))
 	truck.cab_kind = CabCatalog.normalize(prof.get("cab", ""))
-	truck.chrome_mode = "day" if day else "night"
+	truck.chrome_mode = "day" if day else chrome
 	add_child(truck)
 	truck.set_lights_on(true, day)
 	truck.set_light_pattern(String(prof.get("light_pattern", "steady")))
 
 
-## Previa dia/noite: luz do galpao, cromo (matcap dia/noite) e luzes do caminhao. De dia as luzinhas ficam
+## Previa dia/noite: luz do galpao, cromo (matcap dia/estudio) e luzes do caminhao. De dia as luzinhas ficam
 ## acesas mas fracas; a noite brilham com o padrao escolhido.
 func set_daytime(on: bool) -> void:
 	day = on
@@ -115,11 +128,10 @@ func set_daytime(on: bool) -> void:
 		_env.ambient_light_energy = 1.0 if on else 0.45
 	if _key != null:
 		_key.light_energy = 8.5 if on else 5.0
-		_key.light_color = Color(1.0, 0.98, 0.9) if on else Color(1.0, 0.97, 0.92)
 	if _rim != null:
-		_rim.light_energy = 0.8 if on else 2.2
+		_rim.light_energy = 0.8 if on else 1.5
 	if _fill != null:
-		_fill.light_energy = 1.8 if on else 1.0
+		_fill.light_energy = 1.8 if on else 1.1
 	_respawn()
 
 
@@ -158,21 +170,21 @@ func refresh_truck() -> void:
 func focus_slot(slot: String) -> void:
 	var key: String = String(SLOT_FOCUS.get(slot, "default"))
 	_goal = FOCUS[key]
-	view = key
+	_set_view(key)
 	auto_rotate = false
 
 
 ## Vista pedida pelos botoes da garagem: "default", "front", "side", "rear", "roof" ou "wheel".
 func focus_view(v: String) -> void:
 	_goal = FOCUS.get(v, FOCUS["default"])
-	view = v if FOCUS.has(v) else "default"
+	_set_view(v if FOCUS.has(v) else "default")
 	auto_rotate = view == "default"
 
 
-## Layout da garagem: com os dois paineis abertos sobra so o terco central; com um so, desloca o caminhao.
+## Layout da garagem: os paineis laterais sao de vidro; o caminhao fica no centro, grande (~60% da largura).
 func set_layout(right_panel_open: bool) -> void:
-	_shift_goal = 0.0 if right_panel_open else 0.2
-	_zoom_goal = 1.5 if right_panel_open else 1.15
+	_shift_goal = 0.0 if right_panel_open else 0.12
+	_zoom_goal = 1.0
 
 
 ## Aproximacao fixa da camera (1.0 = normal; menor = mais perto). Usada nas capturas de depuracao.
@@ -186,14 +198,33 @@ func focus_hero() -> void:
 	_goal = {"target": Vector3(-1.0, 1.6, -6.8), "dist": 15.5, "az": 36.0, "el": 5.0}
 	_shift_goal = 0.22
 	_zoom_goal = 1.0
-	view = "hero"
+	_set_view("hero")
 	auto_rotate = false
 
 
 func focus_default() -> void:
 	_goal = FOCUS["default"]
-	view = "default"
+	_set_view("default")
 	auto_rotate = true
+
+
+## Troca de vista: desliga o giro das rodas (o jogador liga de novo se quiser).
+func _set_view(v: String) -> void:
+	if v != view:
+		set_wheel_spin(false)
+	view = v
+
+
+## Liga/desliga o giro das rodas ("Ver em movimento").
+func set_wheel_spin(on: bool) -> void:
+	if on == wheel_spin:
+		return
+	wheel_spin = on
+	wheel_spin_changed.emit(on)
+
+
+func toggle_wheel_spin() -> void:
+	set_wheel_spin(not wheel_spin)
 
 
 func _apply_goal(snap: bool = false) -> void:
@@ -204,10 +235,26 @@ func _apply_goal(snap: bool = false) -> void:
 		_el = float(_goal["el"])
 
 
-## Vista da roda: rodas (e calotas/rodas da loja) girando devagar; nas outras vistas nao faz nada (sem custo).
+## Rodas (e calotas/rodas da loja) girando devagar so com "Ver em movimento" ligado (sem custo parado).
 func spin_wheels(delta: float) -> void:
-	if view == "wheel" and truck != null:
+	if wheel_spin and truck != null:
 		truck.animate(WHEEL_VIEW_SPEED, delta)
+
+
+## true se o ponto da tela (coordenadas da viewport) cai sobre uma roda do caminhao.
+func wheel_at(screen_pos: Vector2) -> bool:
+	if truck == null or cam == null or not cam.is_inside_tree():
+		return false
+	var w: TruckWheels = truck.wheels
+	for i in w.wheels.size():
+		var n: Node3D = w.wheels[i]
+		if not is_instance_valid(n) or not n.is_inside_tree() or cam.is_position_behind(n.global_position):
+			continue
+		var c: Vector2 = cam.unproject_position(n.global_position)
+		var edge: Vector2 = cam.unproject_position(n.global_position + cam.global_transform.basis.y * w.radii[i])
+		if c.distance_to(screen_pos) <= maxf(c.distance_to(edge) * 1.25, 14.0):
+			return true
+	return false
 
 
 func _process(delta: float) -> void:
@@ -230,7 +277,9 @@ func _process(delta: float) -> void:
 	var len_d: float = float(TruckNode.LENGTH_DELTA.get(truck.body_kind, 0.0))
 	var tg: Vector3 = _target
 	tg.z -= len_d * clampf(-_target.z / 11.5, 0.0, 1.0)
-	var reach: float = _dist * _zoom * (1.0 + len_d * 0.04)
+	var vs: Vector2 = get_viewport().get_visible_rect().size
+	var aspect_k: float = clampf(REF_ASPECT / maxf(vs.x / maxf(vs.y, 1.0), 0.1), 0.8, 1.15)
+	var reach: float = _dist * _zoom * aspect_k * (1.0 + len_d * 0.04)
 	cam.global_position = tg + dir * reach
 	cam.look_at(tg, Vector3.UP)
 	cam.global_position -= cam.global_transform.basis.x * (_shift * reach)
@@ -238,14 +287,22 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		_dragging = event.pressed
+		_press(event.pressed, event.position)
 	elif event is InputEventScreenTouch:
-		_dragging = event.pressed
+		_press(event.pressed, event.position)
 	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-		_zoom_goal = clampf(_zoom_goal * (0.9 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1), 0.6, 2.0)
-	elif event is InputEventMouseMotion and _dragging:
+		_zoom_goal = clampf(_zoom_goal * (0.9 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1), 0.5, 2.0)
+	elif (event is InputEventMouseMotion or event is InputEventScreenDrag) and _dragging:
+		_moved += event.relative.length()
 		_az -= event.relative.x * 0.4
 		_el = clampf(_el + event.relative.y * 0.3, -2.0, 70.0)
-	elif event is InputEventScreenDrag and _dragging:
-		_az -= event.relative.x * 0.4
-		_el = clampf(_el + event.relative.y * 0.3, -2.0, 70.0)
+
+
+## Arrastar gira a camera; um toque curto (sem arrastar) sobre uma roda liga/desliga o giro dela.
+func _press(pressed: bool, pos: Vector2) -> void:
+	_dragging = pressed
+	if pressed:
+		_press_pos = pos
+		_moved = 0.0
+	elif _moved < 10.0 and wheel_at(pos):
+		toggle_wheel_spin()

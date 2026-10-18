@@ -1,8 +1,9 @@
 extends Node3D
 ## Garagem: galpao 3D com o caminhao na plataforma (camera orbital: arrastar gira, roda do mouse aproxima).
-## Topo = titulo + saldo/fama. Esquerda = abas MODELO / PECAS / MECANICA / REPARO e a lista da aba.
+## Topo = titulo + saldo/fama. Esquerda = abas MODELO / DECORACAO / MECANICA / REPARO e a lista da aba.
 ## Direita = ficha tecnica real (GarageInfoPanel) ou as pecas do encaixe escolhido.
-## Embaixo = VOLTAR e botoes de vista (frente, lado, traseira, teto, rodas, girar).
+## Embaixo = VOLTAR, botoes de vista, "Ver em movimento" (rodas) e previa dia/noite.
+## Layout por containers (T-138): cabe em 960x540 e em celular comprido (20:9) sem cortar nada.
 
 const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.deco", "paintbrush"],
 		["mech", "garage.mechanics", "cog"], ["repair", "garage.repair", "hammer"]]
@@ -10,6 +11,7 @@ const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
 const BODIES: Array = ["canter", "leve", "base", "longo"]
 const CABS: Array = TruckNode.CABS
+const PANEL_W: float = 284.0
 
 var stage: GarageStage
 var gs: Node
@@ -22,8 +24,10 @@ var _chips: HBoxContainer
 var _tab_buttons: Dictionary = {}
 var _msg: Label
 var _day_btn: Button
+var _spin_btn: Button
 var _ui_layer: CanvasLayer
 var _preview_cache: Dictionary = {}
+var _last_wheel_part: String = "?"          # roda/calota instalada no ultimo redesenho (instalar uma nova liga o giro)
 
 
 func _ready() -> void:
@@ -34,36 +38,56 @@ func _ready() -> void:
 	add_child(stage)
 	shop.live_decals = func(list: Array) -> void: stage.truck.apply_decals(list)
 	shop.focus_view = func(view: String) -> void: stage.focus_view(view)
-	var layer := CanvasLayer.new()
-	add_child(layer)
-	_ui_layer = layer
+	_ui_layer = CanvasLayer.new()
+	add_child(_ui_layer)
 	var root := Control.new()
 	root.theme = UiTheme.make()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.add_child(root)
-	var title: HBoxContainer = UiKit.screen_title(Tr.t("garage.title"), "house")
-	title.position = Vector2(22, 12)
-	root.add_child(title)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE      # o centro livre deixa o arraste/toque chegar ao palco 3D
+	_ui_layer.add_child(root)
+	var margin: MarginContainer = UiKit.screen_margin(16, 10)
+	root.add_child(margin)
+	var vb := VBoxContainer.new()
+	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vb.add_theme_constant_override("separation", 8)
+	margin.add_child(vb)
+	var top := HBoxContainer.new()
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(UiKit.screen_title(Tr.t("garage.title"), "house"))
+	top.add_child(UiKit.spacer())
 	_chips = HBoxContainer.new()
 	_chips.alignment = BoxContainer.ALIGNMENT_END
-	_chips.position = Vector2(400, 12)
-	_chips.size = Vector2(544, 40)
-	root.add_child(_chips)
-	_left = _column(root, Vector2(16, 62), true)
-	_right = _column(root, Vector2(644, 62), false)
-	_build_bottom(root)
-	gs.profile_changed.connect(_refresh)
-	_apply_debug_args()
+	top.add_child(_chips)
+	vb.add_child(top)
+	var mid := HBoxContainer.new()
+	mid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vb.add_child(mid)
+	_left = _column(mid, true)
+	var center := VBoxContainer.new()                 # meio livre (caminhao) com o aviso embaixo
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.alignment = BoxContainer.ALIGNMENT_END
+	mid.add_child(center)
+	_msg = UiKit.heading("", 18, UiTheme.CYAN, false)
+	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	center.add_child(_msg)
+	_right = _column(mid, false)
+	_build_bottom(vb)
+	stage.wheel_spin_changed.connect(func(_on: bool) -> void: _update_spin_button())
+	var dbg: Dictionary = GarageDebug.apply(self, gs, stage, _ui_layer)
+	_tab = String(dbg.get("tab", _tab))
+	_slot = String(dbg.get("slot", _slot))
+	gs.profile_changed.connect(_refresh)               # depois da depuracao: montar o caminhao demo nao conta como "roda nova"
 	_refresh()
 
 
 ## Painel lateral de vidro com rolagem; o da esquerda leva as abas no topo.
-func _column(root: Control, pos: Vector2, with_tabs: bool) -> VBoxContainer:
-	var p: PanelContainer = UiKit.glass_panel(0.84)
-	p.position = pos
-	p.size = Vector2(300, 408)
-	p.custom_minimum_size = Vector2(300, 408)
-	root.add_child(p)
+func _column(parent: Control, with_tabs: bool) -> VBoxContainer:
+	var p: PanelContainer = UiKit.glass_panel(0.82)
+	p.custom_minimum_size = Vector2(PANEL_W, 0)
+	parent.add_child(p)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 10)
 	p.add_child(v)
@@ -71,12 +95,15 @@ func _column(root: Control, pos: Vector2, with_tabs: bool) -> VBoxContainer:
 		var tabs := HBoxContainer.new()
 		tabs.add_theme_constant_override("separation", 4)
 		for t in TABS:
-			var b: Button = UiTheme.button(Tr.t(String(t[1])), Vector2(64, 58))
+			var b: Button = UiTheme.button(Tr.t(String(t[1])), Vector2(0, 58))
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			b.icon = UiKit.icon(String(t[2]))
 			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-			b.add_theme_font_size_override("font_size", 13)
+			b.add_theme_font_size_override("font_size", 12)
 			b.add_theme_constant_override("icon_max_width", 22)
+			b.add_theme_stylebox_override("normal", UiTheme.box(Color(0.1, 0.1, 0.2, 0.82), Color(1, 1, 1, 0.14), 1, 10, 2))
+			b.add_theme_stylebox_override("hover", UiTheme.box(Color(0.14, 0.15, 0.3, 0.92), UiTheme.CYAN, 1, 10, 2))
 			var id: String = String(t[0])
 			b.pressed.connect(func() -> void: _set_tab(id))
 			tabs.add_child(b)
@@ -93,112 +120,58 @@ func _column(root: Control, pos: Vector2, with_tabs: bool) -> VBoxContainer:
 	return box
 
 
-func _build_bottom(root: Control) -> void:
-	var back: Button = UiKit.back_button(Vector2(150, 44))
-	back.position = Vector2(16, 482)
+func _build_bottom(parent: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(row)
+	var back: Button = UiKit.back_button(Vector2(140, 44))
 	back.pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
-	root.add_child(back)
+	row.add_child(back)
+	row.add_child(UiKit.spacer())
 	var strip: PanelContainer = UiKit.glass_panel(0.75)
-	strip.position = Vector2(326, 480)
-	root.add_child(strip)
+	row.add_child(strip)
+	row.add_child(UiKit.spacer())
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 2)
 	strip.add_child(h)
 	h.add_child(UiKit._icon_rect("camera", 18, UiTheme.TEXT_DIM))
 	for vw in VIEWS:
-		var b: Button = UiTheme.button(Tr.t(String(vw[1])), Vector2(0, 30))
-		b.add_theme_font_size_override("font_size", 14)
-		b.add_theme_stylebox_override("normal", UiTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 8))
+		var b: Button = _strip_button(Tr.t(String(vw[1])))
 		var id: String = String(vw[0])
 		b.pressed.connect(func() -> void: stage.focus_view(id))
 		h.add_child(b)
-	var dn: Button = UiTheme.button(Tr.t("garage.preview_night"), Vector2(0, 30))
-	dn.add_theme_font_size_override("font_size", 14)
+	_spin_btn = _strip_button("")
+	_spin_btn.add_theme_constant_override("icon_max_width", 16)
+	_spin_btn.pressed.connect(func() -> void: stage.toggle_wheel_spin())
+	h.add_child(_spin_btn)
+	_update_spin_button()
+	var dn: Button = _strip_button(Tr.t("garage.preview_night"))
 	dn.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.2), UiTheme.PINK, 1, 6, 8))
 	_day_btn = dn
 	dn.pressed.connect(func() -> void:
 		stage.set_daytime(not stage.day)
 		_refresh())
 	h.add_child(dn)
-	_msg = UiKit.heading("", 18, UiTheme.CYAN, false)
-	_msg.position = Vector2(330, 446)
-	root.add_child(_msg)
 
 
-## Argumentos de depuracao: --demo (monta um caminhao cheio de pecas; --noparts = sem pecas; --cab=<estilo>; --body=<modelo>), --tab=model|parts|mech|repair, --slot=<slot>, --damage
-func _apply_debug_args() -> void:
-	var args: PackedStringArray = OS.get_cmdline_user_args()
-	if "--demo" in args:
-		gs.save_path = "user://demo_profile.json"        # a depuracao NUNCA grava por cima do perfil real do jogador
-		gs.new_profile()
-		gs.profile["money"] = 900000
-		gs.profile["fame"] = 500
-		for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning", "hub_chrome",
-				"grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "fender_extension", "side_ornament_wave", "rear_lamp_cluster", "mudflap_designed"]:
-			var d: PartDef = gs.part(id)
-			if "--noparts" in args:                    # so o caminhao de fabrica (capturas da cabine)
-				break
-			if d != null and gs.buy(d):
-				gs.install(id)
-	if "--damage" in args:
-		for id in gs.profile["owned"]:
-			var d2: PartDef = gs.part(String(id))
-			if d2.durability > 0.0:
-				gs.profile["owned"][id]["dur"] = d2.durability * 0.4
-		gs.profile["owned"]["rb_chrome"]["broken"] = true
-		gs.profile["systems"]["engine"] = 55.0
-	for a in args:
-		if a == "--decals":
-			gs.profile["decals"] = [
-				{"id": "kanji_bakusou", "slot": "side_l", "x": -0.5, "y": 0.0, "size": 0.5, "color": "#f5cc5a"},
-				{"id": "estrela", "slot": "side_r", "x": 0.3, "y": 0.0, "size": 0.45, "color": "#ff2e88"},
-				{"id": "raio", "slot": "rear", "x": 0.0, "y": 0.0, "size": 0.7, "color": "#21e6ff"},
-				{"id": "sol", "slot": "cab", "x": 0.0, "y": 0.1, "size": 0.5, "color": "#ffffff"}]
-			stage.refresh_truck()
-		elif a.begins_with("--lights="):
-			gs.profile["light_pattern"] = a.substr(9)
-			stage.refresh_truck()
-			stage.truck.set_light_pattern(a.substr(9))
-		elif a == "--hideui":
-			_ui_layer.visible = false
-		elif a == "--day":
-			stage.set_daytime(true)
-		elif a.begins_with("--view="):
-			stage.focus_view(a.substr(7))
-		elif a.begins_with("--cab=") and "--demo" in args:    # so com --demo (perfil de teste, nunca o real)
-			stage.set_cab(a.substr(6))
-		elif a.begins_with("--body=") and "--demo" in args:   # --body=canter (T-125)
-			stage.set_body(a.substr(7))
-		elif a.begins_with("--parts=") and "--demo" in args:  # --parts=kw_bumper,fumi_wing (T-126): compra e instala
-			for pid in a.substr(8).split(","):
-				var pd: PartDef = gs.part(pid)
-				if pd != null and (gs.owns(pid) or gs.buy(pd)):
-					gs.install(pid)
-			stage.refresh_truck()
-		elif a.begins_with("--zoom="):                      # aproxima a camera (capturas de detalhe)
-			var z: float = float(a.substr(7))
-			get_tree().create_timer(1.0).timeout.connect(func() -> void: stage.set_zoom(z))   # depois do layout
-		elif a.begins_with("--shot="):          # captura de tela depois de 6 s (camera assentada) e fecha (depuracao)
-			var path: String = a.substr(7)
-			get_tree().create_timer(6.0).timeout.connect(func() -> void: _take_shot(path))
-		elif a.begins_with("--tab="):
-			_tab = a.substr(6)
-		elif a.begins_with("--slot="):
-			_tab = "parts"
-			_slot = a.substr(7)
-			stage.focus_slot(_slot)
+func _strip_button(text: String) -> Button:
+	var b: Button = UiTheme.button(text, Vector2(0, 30))
+	b.add_theme_font_size_override("font_size", 14)
+	b.add_theme_stylebox_override("normal", UiTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 7))
+	return b
 
 
-func _take_shot(path: String) -> void:
-	await RenderingServer.frame_post_draw
-	get_viewport().get_texture().get_image().save_png(path)
-	print("CAPTURA: ", path)
-	if "--shot-pair" in OS.get_cmdline_user_args():     # T-133: mais um quadro seguido (rodas girando na vista da roda)
-		await RenderingServer.frame_post_draw
-		var p2: String = path.get_basename() + "_2.png"
-		get_viewport().get_texture().get_image().save_png(p2)
-		print("CAPTURA: ", p2)
-	get_tree().quit()
+## Texto e icone do botao das rodas: "Ver em movimento" (play) ou "Parar rodas" (pausa, destacado).
+func _update_spin_button() -> void:
+	if _spin_btn == null:
+		return
+	var on: bool = stage.wheel_spin
+	_spin_btn.text = Tr.t("garage.spin_stop") if on else Tr.t("garage.spin_start")
+	_spin_btn.icon = UiKit.icon("pause" if on else "circle-play")
+	_spin_btn.add_theme_color_override("font_color", UiTheme.CYAN if on else UiTheme.TEXT)
+	_spin_btn.add_theme_color_override("icon_normal_color", UiTheme.CYAN if on else Color(1, 1, 1, 0.85))
+	_spin_btn.add_theme_stylebox_override("normal", UiTheme.box(Color(0.13, 0.9, 1, 0.14), UiTheme.CYAN, 1, 6, 7) if on
+			else UiTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 6, 7))
 
 
 func _set_tab(t: String) -> void:
@@ -220,6 +193,7 @@ func _refresh() -> void:
 		_day_btn.text = Tr.t("garage.preview_day") if stage.day else Tr.t("garage.preview_night")
 	stage.refresh_truck()
 	stage.set_layout(true)
+	_check_new_wheels()
 	_clear(_left)
 	_clear(_right)
 	_clear(_chips)
@@ -249,6 +223,15 @@ func _refresh() -> void:
 		GarageInfoPanel.build(_right, gs, _preview({}), func() -> void: _set_tab("parts"))
 
 
+## Roda/calota nova instalada: mostra a roda e liga o giro para o jogador ver a peca em movimento.
+func _check_new_wheels() -> void:
+	var cur: String = gs.installed_id("hubcaps")
+	if _last_wheel_part != "?" and cur != _last_wheel_part and cur != "":
+		stage.focus_view("wheel")
+		stage.set_wheel_spin(true)
+	_last_wheel_part = cur
+
+
 func _preview(changes: Dictionary) -> Dictionary:
 	var key: String = JSON.stringify(changes)
 	if not _preview_cache.has(key):
@@ -272,10 +255,7 @@ func _build_model() -> void:
 	_left.add_child(UiKit.heading(Tr.t("garage.cab").to_upper(), 18, UiTheme.PINK))
 	var body: String = String(gs.profile.get("body", "base"))
 	if TruckNode.FIXED_CAB.has(body):              # o Canter so tem a cabine dele (a escolha do perfil fica guardada)
-		var note: Label = UiTheme.label(Tr.t("garage.cab_fixed"), 15, UiTheme.TEXT_DIM)
-		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		note.custom_minimum_size = Vector2(220, 0)
-		_left.add_child(note)
+		_left.add_child(GarageShop.wl(Tr.t("garage.cab_fixed"), 15, UiTheme.TEXT_DIM))
 		return
 	for k in CABS:
 		_choice_card("cab", String(k), CabCatalog.DEFAULT, func() -> void: stage.set_cab(String(k)))
@@ -287,6 +267,7 @@ func _choice_card(field: String, kind: String, default_kind: String, apply: Call
 	var b := Button.new()
 	b.custom_minimum_size = Vector2(0, 52)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.text = "%s\n%s" % [Tr.t(field + "." + kind), Tr.t(field + ".desc." + kind)]
 	b.add_theme_font_size_override("font_size", 15)
 	b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.14) if cur else Color(1, 1, 1, 0.04), UiTheme.PINK if cur else Color(1, 1, 1, 0.1), 1, 8, 12))
@@ -310,6 +291,7 @@ func _build_slots() -> void:
 		b.text = "%s\n%s" % [Tr.t("slot." + String(slot)), sub]
 		b.custom_minimum_size = Vector2(0, 50)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.add_theme_font_size_override("font_size", 15)
 		b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.14) if sel else Color(1, 1, 1, 0.04), UiTheme.PINK if sel else Color(1, 1, 1, 0.08), 1, 8, 12))
 		b.add_theme_color_override("font_color", UiTheme.GOLD if inst != "" else UiTheme.TEXT)
