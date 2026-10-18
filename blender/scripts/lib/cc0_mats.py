@@ -5,8 +5,9 @@
 - metal: ambientCG "Metal012" (CC0): alumínio/aço escovado (cor, rugosidade e normal);
 - borracha: ambientCG "Rubber004" (CC0): rugosidade e normal da borracha de vedação.
 Sujeira: oclusão local (nó Ambient Occlusion do Cycles) escurece frestas e a base do baú fica mais suja.
-O metálico de cada material também sai na emissão (força 0); `metal_pass(True)` liga a força para gravar o metálico
-pelo passe EMIT (o Cycles não tem passe de metálico).
+A cor e o metálico são gravados pelo passe EMIT (`emit_pass("color" | "metal")`): o Cycles não tem passe de metálico
+e o passe DIFFUSE zera a cor do metal. Alumínio com METAL_METALLIC = 0,55 (no Compatibility, sem reflexo de tela,
+metal 100% fica quase preto à noite).
 """
 from __future__ import annotations
 
@@ -24,6 +25,7 @@ FILES = {
     "rubber": (None, "Rubber004/Rubber004_512-JPG_Roughness.jpg", "Rubber004/Rubber004_512-JPG_NormalGL.jpg"),
 }
 _EMIT: list = []
+METAL_METALLIC = 0.55
 
 
 def _img(rel: str, srgb: bool):
@@ -107,21 +109,26 @@ def _common(nt, b, kind: str, scale: float, normal_strength: float, z0: float):
     return uv, rough, dirt, col_f
 
 
-def _finish(nt, b, metal_out) -> None:
-    """Metálico também na emissão (força 0); o passe EMIT grava o metálico com `metal_pass(True)`."""
+def _finish(nt, b, metal_out, base) -> None:
+    """Liga cor e metálico ao BSDF e guarda os dois para os passes de emissão (`emit_pass`): o passe DIFFUSE do Cycles
+    dá cor preta no metal (cor difusa = cor x (1 - metálico)), então a cor e o metálico saem pela emissão."""
     cc = nt.nodes.new("ShaderNodeCombineColor")
     for i in range(3):
         if isinstance(metal_out, (int, float)):
             cc.inputs[i].default_value = metal_out
         else:
             nt.links.new(metal_out, cc.inputs[i])
-    nt.links.new(cc.outputs[0], b.inputs["Emission Color"])
-    b.inputs["Emission Strength"].default_value = 0.0
     if isinstance(metal_out, (int, float)):
         b.inputs["Metallic"].default_value = metal_out
     else:
         nt.links.new(metal_out, b.inputs["Metallic"])
-    _EMIT.append(b)
+    if isinstance(base, tuple):
+        rgb = nt.nodes.new("ShaderNodeRGB")
+        rgb.outputs[0].default_value = base
+        base = rgb.outputs[0]
+    nt.links.new(base, b.inputs["Base Color"])
+    b.inputs["Emission Strength"].default_value = 0.0
+    _EMIT.append((nt, b, base, cc.outputs[0]))
 
 
 def paint(name: str = "hi_paint", color: str = "#eef1f4", z0: float = 1.1, scale: float = 0.55):
@@ -138,11 +145,10 @@ def paint(name: str = "hi_paint", color: str = "#eef1f4", z0: float = 1.1, scale
     base = _mix(nt, _math(nt, "MULTIPLY", rough, 0.12), _rgb(color), _rgb("#c9ccd0"))   # leve mancha
     base = _mix(nt, chip, base, _rgb("#a7adb4"))                       # lasca: alumínio por baixo
     base = _mix(nt, _math(nt, "MINIMUM", dirt, 0.75), base, _rgb("#6e675d"))   # poeira/fuligem
-    nt.links.new(base, b.inputs["Base Color"])
     r = _math(nt, "ADD", 0.24, _math(nt, "MULTIPLY", rough, 0.35))
     r = _math(nt, "ADD", r, _math(nt, "MULTIPLY", dirt, 0.25))
     nt.links.new(r, b.inputs["Roughness"])
-    _finish(nt, b, _math(nt, "ADD", 0.08, _math(nt, "MULTIPLY", chip, 0.85)))
+    _finish(nt, b, _math(nt, "ADD", 0.08, _math(nt, "MULTIPLY", chip, 0.55)), base)
     return m
 
 
@@ -151,23 +157,24 @@ def metal(name: str = "hi_metal", z0: float = 1.1, scale: float = 0.8):
     uv, rough, dirt, col_f = _common(nt, b, "metal", scale, 0.5, z0)
     col = _tex(nt, _img(col_f, True), uv).outputs["Color"]
     col = _mix(nt, _math(nt, "MINIMUM", dirt, 0.8), col, _rgb("#57524b"))
-    nt.links.new(col, b.inputs["Base Color"])
     r = _math(nt, "ADD", _math(nt, "MULTIPLY", rough, 0.8), _math(nt, "MULTIPLY", dirt, 0.3))
     nt.links.new(r, b.inputs["Roughness"])
-    _finish(nt, b, 1.0)
+    _finish(nt, b, METAL_METALLIC, col)
     return m
 
 
 def rubber(name: str = "hi_rubber", z0: float = 1.1, scale: float = 2.0):
     m, nt, b = _new(name)
     uv, rough, dirt, _ = _common(nt, b, "rubber", scale, 0.6, z0)
-    b.inputs["Base Color"].default_value = _rgb("#151517")
     r = _math(nt, "ADD", 0.72, _math(nt, "MULTIPLY", rough, 0.25))
     nt.links.new(r, b.inputs["Roughness"])
-    _finish(nt, b, 0.0)
+    _finish(nt, b, 0.0, _rgb("#151517"))
     return m
 
 
-def metal_pass(on: bool) -> None:
-    for b in _EMIT:
-        b.inputs["Emission Strength"].default_value = 1.0 if on else 0.0
+def emit_pass(kind: str | None) -> None:
+    """Prepara o passe EMIT: "color" grava a cor base, "metal" o metálico, None desliga (render normal)."""
+    for nt, b, base, metal in _EMIT:
+        src = base if kind == "color" else metal
+        nt.links.new(src, b.inputs["Emission Color"])
+        b.inputs["Emission Strength"].default_value = 1.0 if kind else 0.0
