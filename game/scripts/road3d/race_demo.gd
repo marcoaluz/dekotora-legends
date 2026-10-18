@@ -6,6 +6,7 @@ extends RefCounted
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
 ##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
 ##   --snap-every=S com --shots: tambem uma captura a cada S segundos (t01, t02...; placas e sinalizacao, T-130)
+##   --burst=S      com --shots: aos S segundos, 2 capturas em quadros SEGUIDOS (roda_1, roda_2; rodas girando, T-133)
 ## Exemplo: godot --path game res://scenes/race/race3d.tscn -- --demo=close --shots=C:/tmp/capt
 
 var mode: String = ""
@@ -19,6 +20,8 @@ var _count: Dictionary = {}
 var _cam: PackedFloat32Array = []
 var _snap_every: float = 0.0
 var _next_snap: float = 0.0
+var _burst_at: float = -1.0
+var _burst_left: int = 2
 
 
 func _init(args: PackedStringArray) -> void:
@@ -33,6 +36,8 @@ func _init(args: PackedStringArray) -> void:
 		elif a.begins_with("--snap-every="):
 			_snap_every = float(a.substr(13))
 			_next_snap = _snap_every
+		elif a.begins_with("--burst="):
+			_burst_at = float(a.substr(8))
 	if mode == "lanes":
 		_taps = [[1.0, 1], [1.5, 1], [5.0, -1], [5.5, -1], [9.0, 1], [9.5, 1]]
 	elif mode == "close":
@@ -145,6 +150,10 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 	if _snap_every > 0.0 and _clock >= _next_snap:
 		_save(viewport, "t%02d" % roundi(_next_snap / _snap_every))
 		_next_snap += _snap_every
+	if _burst_at >= 0.0 and _clock >= _burst_at and _burst_left > 0:
+		_burst_left -= 1                              # um por quadro: roda_1 e roda_2 sao quadros seguidos
+		_save(viewport, "roda")
+		print("RODA: velocidade %.1f m/s, dt %.4f s" % [player_truck.speed, dt])
 	if _clock > 1.5 and not _count.has("largada"):
 		_save(viewport, "largada")                # contagem regressiva: mostra o aviso da carga
 	if player_truck.lane_changes != _last_lane_changes:

@@ -39,6 +39,10 @@ var _shift: float = 0.0            # desloca o caminhao para a direita (fracao d
 var _shift_goal: float = 0.0
 var _zoom: float = 1.0
 var _zoom_goal: float = 1.0
+## Vista atual ("wheel" = rodas: elas giram devagar, so nessa vista).
+var view: String = "default"
+## Velocidade de mentira das rodas na vista da roda (m/s; ~1 volta a cada 3 s).
+const WHEEL_VIEW_SPEED: float = 1.0
 
 
 func _ready() -> void:
@@ -154,12 +158,14 @@ func refresh_truck() -> void:
 func focus_slot(slot: String) -> void:
 	var key: String = String(SLOT_FOCUS.get(slot, "default"))
 	_goal = FOCUS[key]
+	view = key
 	auto_rotate = false
 
 
 ## Vista pedida pelos botoes da garagem: "default", "front", "side", "rear", "roof" ou "wheel".
-func focus_view(view: String) -> void:
-	_goal = FOCUS.get(view, FOCUS["default"])
+func focus_view(v: String) -> void:
+	_goal = FOCUS.get(v, FOCUS["default"])
+	view = v if FOCUS.has(v) else "default"
 	auto_rotate = view == "default"
 
 
@@ -180,11 +186,13 @@ func focus_hero() -> void:
 	_goal = {"target": Vector3(-1.0, 1.6, -6.8), "dist": 15.5, "az": 36.0, "el": 5.0}
 	_shift_goal = 0.22
 	_zoom_goal = 1.0
+	view = "hero"
 	auto_rotate = false
 
 
 func focus_default() -> void:
 	_goal = FOCUS["default"]
+	view = "default"
 	auto_rotate = true
 
 
@@ -196,7 +204,14 @@ func _apply_goal(snap: bool = false) -> void:
 		_el = float(_goal["el"])
 
 
+## Vista da roda: rodas (e calotas/rodas da loja) girando devagar; nas outras vistas nao faz nada (sem custo).
+func spin_wheels(delta: float) -> void:
+	if view == "wheel" and truck != null:
+		truck.animate(WHEEL_VIEW_SPEED, delta)
+
+
 func _process(delta: float) -> void:
+	spin_wheels(delta)
 	var k: float = 1.0 - exp(-4.0 * delta)
 	_target = _target.lerp(_goal["target"], k)
 	_dist = lerpf(_dist, float(_goal["dist"]), k)
