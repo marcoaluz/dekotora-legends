@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bt7drfr85ccqr"
 path.s3tc="res://.godot/imported/tex_plastic_orm.png-6c6359c547496da663a135eb97d2539c.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_plastic_orm.png-6c6359c547496da663a135eb97d2539c.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/textures/tex_plastic_orm.png"
-dest_files=["res://.godot/imported/tex_plastic_orm.png-6c6359c547496da663a135eb97d2539c.s3tc.ctex"]
+dest_files=["res://.godot/imported/tex_plastic_orm.png-6c6359c547496da663a135eb97d2539c.s3tc.ctex", "res://.godot/imported/tex_plastic_orm.png-6c6359c547496da663a135eb97d2539c.etc2.ctex"]
 
 [params]
 

@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://3la0mb3kxy08"
 path.s3tc="res://.godot/imported/tex_paint_nrm.png-128678eb2b3fb3b549ef74cfb63c4a73.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_paint_nrm.png-128678eb2b3fb3b549ef74cfb63c4a73.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/textures/tex_paint_nrm.png"
-dest_files=["res://.godot/imported/tex_paint_nrm.png-128678eb2b3fb3b549ef74cfb63c4a73.s3tc.ctex"]
+dest_files=["res://.godot/imported/tex_paint_nrm.png-128678eb2b3fb3b549ef74cfb63c4a73.s3tc.ctex", "res://.godot/imported/tex_paint_nrm.png-128678eb2b3fb3b549ef74cfb63c4a73.etc2.ctex"]
 
 [params]
 

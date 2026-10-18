@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cnqht2p7tuagh"
 path.s3tc="res://.godot/imported/tex_plastic_dust.png-da5cb9bf86e529f4a7c40512a3abb060.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_plastic_dust.png-da5cb9bf86e529f4a7c40512a3abb060.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/textures/tex_plastic_dust.png"
-dest_files=["res://.godot/imported/tex_plastic_dust.png-da5cb9bf86e529f4a7c40512a3abb060.s3tc.ctex"]
+dest_files=["res://.godot/imported/tex_plastic_dust.png-da5cb9bf86e529f4a7c40512a3abb060.s3tc.ctex", "res://.godot/imported/tex_plastic_dust.png-da5cb9bf86e529f4a7c40512a3abb060.etc2.ctex"]
 
 [params]
 

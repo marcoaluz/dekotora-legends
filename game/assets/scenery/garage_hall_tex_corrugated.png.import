@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://co1nuub74ffj1"
 path.s3tc="res://.godot/imported/garage_hall_tex_corrugated.png-32b8feb5e51c703eb07e3487e734775c.s3tc.ctex"
+path.etc2="res://.godot/imported/garage_hall_tex_corrugated.png-32b8feb5e51c703eb07e3487e734775c.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/scenery/garage_hall_tex_corrugated.png"
-dest_files=["res://.godot/imported/garage_hall_tex_corrugated.png-32b8feb5e51c703eb07e3487e734775c.s3tc.ctex"]
+dest_files=["res://.godot/imported/garage_hall_tex_corrugated.png-32b8feb5e51c703eb07e3487e734775c.s3tc.ctex", "res://.godot/imported/garage_hall_tex_corrugated.png-32b8feb5e51c703eb07e3487e734775c.etc2.ctex"]
 
 [params]
 

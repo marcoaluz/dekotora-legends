@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bfdmdhjuo864l"
 path.s3tc="res://.godot/imported/tex_glass_wind.png-358cdc2de9145c85d5fca63c318d0e05.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_glass_wind.png-358cdc2de9145c85d5fca63c318d0e05.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/textures/tex_glass_wind.png"
-dest_files=["res://.godot/imported/tex_glass_wind.png-358cdc2de9145c85d5fca63c318d0e05.s3tc.ctex"]
+dest_files=["res://.godot/imported/tex_glass_wind.png-358cdc2de9145c85d5fca63c318d0e05.s3tc.ctex", "res://.godot/imported/tex_glass_wind.png-358cdc2de9145c85d5fca63c318d0e05.etc2.ctex"]
 
 [params]
 

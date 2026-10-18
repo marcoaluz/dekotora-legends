@@ -68,3 +68,20 @@ Gera um `.exe` único (pacote embutido). Opcional: assinar o `.exe` com um certi
 1. Crie a página em itch.io → *Create new project* → tipo **Downloadable**.
 2. Envie `dekotora.exe` (Windows) e o `.apk` (Android). Marque *Visibility: Restricted/Draft* até estar pronto.
 3. Use os textos de `docs/LOJA.md`.
+
+## APK de teste (feito em 2026-10-18, T-140)
+
+Ferramentas instaladas SEM administrador em `D:\DEV\android-tools\` (JDK 17 Temurin 17.0.20.1, SHA-256 conferido;
+Android command-line tools 23.0; SDK Platform 36, Build-Tools 36.0.0, Platform-Tools 37.0.1; licenças aceitas pelo Marco).
+O Godot aponta para elas em `%APPDATA%\Godot\editor_settings-4.7.tres` (backup `.bak_2026-10-18` ao lado).
+O comando novo do SDK é `android.exe sdk install "pacote;versao"` (o `sdkmanager.bat` quebra nomes com `;`).
+
+- **Chave:** a APK de teste usa a chave de debug (`%APPDATA%\Godot\keystores\debug.keystore`). Para a loja use a chave de release (seção 2).
+- **Config do projeto:** `rendering/textures/vram_compression/import_etc2_astc=true` (obrigatório no Android; reimporta texturas em ETC2/ASTC).
+- **Gradle desligado** no preset Android: com isso, "Min SDK" e "Target SDK" do preset precisam estar VAZIOS (o Godot recusa valores sem Gradle).
+  O preset do repositório guarda `26`/`36` para a versão da loja (AAB, com Gradle). Para gerar o APK de teste, esvazie os dois valores
+  numa cópia temporária do `export_presets.cfg` e restaure depois (foi o que se fez).
+- **Gerar:** `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk` (84 MB; `builds/` é ignorado pelo Git).
+- **Instalar no celular:** (1) copie o APK para o celular (cabo, nuvem) e abra, permitindo "instalar apps desconhecidos"; ou (2) com cabo e
+  "Depuração USB" ligada: `D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk`.
+- **Pendente:** testar no celular de verdade (FPS e temperatura nos 3 presets de qualidade: T-097); AAB de loja com Gradle + chave de release.

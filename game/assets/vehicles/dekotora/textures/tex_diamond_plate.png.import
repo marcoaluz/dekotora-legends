@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dl0e7ghy0pxen"
 path.s3tc="res://.godot/imported/tex_diamond_plate.png-4a22e18d4a5966da169a5cd7a13cc1f7.s3tc.ctex"
+path.etc2="res://.godot/imported/tex_diamond_plate.png-4a22e18d4a5966da169a5cd7a13cc1f7.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/vehicles/dekotora/textures/tex_diamond_plate.png"
-dest_files=["res://.godot/imported/tex_diamond_plate.png-4a22e18d4a5966da169a5cd7a13cc1f7.s3tc.ctex"]
+dest_files=["res://.godot/imported/tex_diamond_plate.png-4a22e18d4a5966da169a5cd7a13cc1f7.s3tc.ctex", "res://.godot/imported/tex_diamond_plate.png-4a22e18d4a5966da169a5cd7a13cc1f7.etc2.ctex"]
 
 [params]
 
