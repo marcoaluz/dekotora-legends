@@ -96,7 +96,9 @@ def build_kw(m, add, src=None) -> KwInfo:
     print(f"americana: triangulos {tris_in} -> {tris_out}")
     co = _co(shell)
     y_front = float(_co(objs)[:, 1].max())
-    hw = float(np.abs(co[:, 0]).max())
+    hw = float(np.abs(co[:, 0]).max())                               # com os para-lamas do capô (2,43 m)
+    door = co[(co[:, 1] > y_back + 0.1) & (co[:, 1] < y_back + 0.9) & (co[:, 2] > 1.1) & (co[:, 2] < 1.9)]
+    door_hw = float(np.abs(door[:, 0]).max()) if len(door) else 1.0    # a cabine é mais estreita (1,93 m) na porta
     cabin = co[co[:, 1] < y_back + 1.4]
     roof = float(cabin[:, 2].max())
     tree = _tree(solid)
@@ -124,7 +126,7 @@ def build_kw(m, add, src=None) -> KwInfo:
         "MOUNT_ROOF": (0.0, round(y_back + 0.75, 3), round(roof, 3)),
         "MOUNT_ROOF_LIGHTS": (0.0, round(y_back + 1.2, 3), round(roof, 3)),
     }
-    side = {"MOUNT_STEP_R": (1.2, round(yg(0.55), 3), 0.55), "MOUNT_CAB_SIDE_R": (round(hw, 3), round(yg(0.45), 3), 1.0),
+    side = {"MOUNT_STEP_R": (1.2, round(yg(0.55), 3), 0.55), "MOUNT_CAB_SIDE_R": (round(door_hw, 3), round(yg(0.45), 3), 1.3),
             "MOUNT_WHEEL_FRONT_R": (1.0, axle, r), "MOUNT_WHEEL_FRONT_FACE_R": (1.165, axle, r)}
     for nm, p in side.items():
         mounts[nm] = p

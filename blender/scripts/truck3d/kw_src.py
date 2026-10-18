@@ -27,6 +27,7 @@ CUT_SRC = 1.05            # costas da cabine "dia" no original (atrás da porta;
 FRONT_SRC = -2.09         # frente do para-choque
 AXLE_SRC = -1.16          # eixo dianteiro
 WHEEL_R = 0.53
+MIN_SIZE = 0.04          # ilhas menores somem: rebites, parafusos e os furinhos da tela da grade (vira textura)
 
 # material do original -> NOSSO (pbr.truck_set) ou None (descarta)
 MATS = {
@@ -42,7 +43,7 @@ MATS = {
 BOXES = [((-1.5, -2.25, 0.12), (1.5, CUT_SRC + 0.3, 3.6))]
 EXCLUDE = [
     ((0.95, 0.6, 0.5), (1.6, 1.9, 4.3)), ((-1.6, 0.6, 0.5), (-0.95, 1.9, 4.3)),        # escapamentos + letreiro
-    ((1.05, -0.7, 0.95), (1.4, 0.35, 1.35)), ((-1.4, -0.7, 0.95), (-1.05, 0.35, 1.35)),   # "W990" (ilhas pequenas)
+    ((0.84, 0.26, 1.13), (0.99, 0.6, 1.29)), ((-0.99, 0.26, 1.13), (-0.84, 0.6, 1.29)),   # letras "W990" da lateral
     ((0.8, -1.8, 0.0), (1.45, -0.5, 1.1)), ((-1.45, -1.8, 0.0), (-0.8, -0.5, 1.1)),       # cubos/porcas da roda
 ]
 
@@ -79,7 +80,7 @@ def load(src: str | None, y_back: float) -> list:
     before = set(bpy.data.objects)
     snap = {"im": set(bpy.data.images), "mt": set(bpy.data.materials), "me": set(bpy.data.meshes)}
     srcs = extract.load_glb(path)
-    objs = extract.take(srcs, BOXES, MATS, "kw", max_size=5.5, exclude=EXCLUDE, island_mat=_island_mat)
+    objs = extract.take(srcs, BOXES, MATS, "kw", max_size=5.5, min_size=MIN_SIZE, exclude=EXCLUDE, island_mat=_island_mat)
     for o in [o for o in bpy.data.objects if o not in before and o not in objs]:
         bpy.data.objects.remove(o, do_unlink=True)
     keep = {o.data for o in objs}
