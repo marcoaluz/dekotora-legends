@@ -98,6 +98,35 @@ Depois de cada render, o script gera `blender/renders/contact_sheet.png` com tud
 O Marco abre a imagem e responde com comentários do tipo "cromo muito escuro", "cabine muito alta".
 Claude ajusta parâmetros e roda de novo.
 
+## Baú premium: versão alta, mapas gravados e versão leve (T-136)
+
+Piloto de detalhe "premium" no baú médio (`base`), para as 4 cabines. A ideia: modelar o detalhe fino em ALTA
+(só no Blender), gravar (bake) esse detalhe em mapas e levar para o jogo uma versão LEVE com o mesmo formato.
+
+| Arquivo | Faz |
+| --- | --- |
+| `truck3d/box_layout.py` | Medidas comuns (alta e leve) e o mapa do atlas 1024²; tudo ao longo do baú é fração do comprimento |
+| `truck3d/box_high.py` | Versão alta (~84 mil triângulos, nunca vai ao jogo): nervuras arredondadas, juntas com rebites, rebites nos trilhos/montantes/colunas, arcos do teto, frente ondulada, portas estampadas com vincos e borracha |
+| `truck3d/box_premium.py` | Versão leve do jogo: chapa ondulada de verdade (4 pontos por nervura), trilhos, montantes, colunas, travessa, soleira, portas, teto e frente com UV de atlas; o mural é a própria chapa |
+| `truck3d/box_rear.py` | Ferragens reais nas duas versões: dobradiças, barras de trava com mancais e alavancas, borracha, escada, lanternas com aro, faixa refletiva, frisos, piso e travessas |
+| `lib/meshbuild.py` | Malha com UV escrito à mão (quads, faixas, perfis extrudados, espelho com o mesmo UV) |
+| `lib/cc0_mats.py` | Materiais da versão alta com texturas CC0 de `blender/cc0/` (512 px; fontes em `game/assets/LICENCAS.md`) + sujeira por oclusão local e por altura |
+| `lib/bake.py` | Bake no Cycles por linha de comando (normal, AO, cor, rugosidade, metálico via emissão) e PNG por numpy |
+| `bake_box_premium.py` | Junta tudo: grava `tex_box_albedo/orm/nrm.png` (atlas) e `tex_box_mural_orm/nrm.png` (mural) nas texturas compartilhadas do jogo + folha `blender/renders/t136/box_premium_maps.png` |
+| `pbr.box_premium_set` / `pbr.baked_full` | Materiais da versão leve (`paint_white_box`, `box_metal`, `mural`) com ORM (R = oclusão exportada pelo grupo "glTF Material Output") |
+
+Comandos (raiz do projeto, Git Bash): `source tools/env.sh && bash tools/build_box_premium.sh` (bake ~10 min + 4 caminhões;
+`--no-bake` só regera os .glb; `--src RAIZ` se os modelos de terceiros estiverem em outra pasta). Depois
+`godot --headless --path game --import`. `build_truck_3d.py --box auto|premium|classic` (auto = premium só no `base`).
+
+Regras que valem para estender aos outros baús:
+- O atlas é por FRAÇÃO do comprimento: o mesmo mapa serve para o baú esticado das cabines curta/jac (até ~+15%).
+  Baús muito diferentes (leve 5,4 m) devem ganhar um bake próprio (mais 3 PNGs, ~1,5 MB) para os rebites não esticarem.
+- As tampas das extrusões dividem o retângulo `R_CAPS`: o bake as preenche com normal reta (`_flat_caps`).
+- Parte da oclusão vai também na cor (`AO_IN_ALBEDO = 0,45`): o renderizador Compatibility só usa a AO na luz ambiente.
+- O mural continua trocável (PNG) e é um material por caminhão (cor do rival): o `TruckNode` põe nele as normais/AO
+  compartilhadas (`TruckTextures.swap_textures`); `TruckTextures.apply` não mexe no material "mural".
+
 ## Paleta
 
 `blender/palettes/dekotora.json`: 40 cores iniciais (noite, neon, cromo, dourado, pinturas). Pode ser trocada

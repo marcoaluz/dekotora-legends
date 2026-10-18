@@ -28,13 +28,17 @@ class BoxDims:
 STD = BoxDims()
 
 
-def build_body(m, add, box: BoxDims = STD):
-    _box(m, add, box)
+def build_body(m, add, box: BoxDims = STD, shell: bool = True):
+    """`shell=False` (baú premium, T-136): só o que fica embaixo/atrás do baú (placa, para-choque de segurança,
+    abas de lama, neon, luzes laterais); a casca, a traseira e as lanternas vêm de `truck3d/box_premium.py`."""
+    if shell:
+        _box(m, add, box)
+    else:
+        _rear_under(m, add, box)
 
 
 def _rear_common(m, add, b: BoxDims):
     """Lanternas em 3 lentes, faixa refletiva, placa, para-choque de segurança, abas de lama e neon sob o chassi."""
-    w2 = b.w / 2
     k = b.w / BODY_W
     for sx in (-1, 1):
         add(M.box(f"tail_house_{sx}", (0.4, 0.07, 0.68), (sx * 1.0 * k, -0.035, b.kz(1.55)), m["chrome"], bevel=0.035, seg=1))
@@ -43,6 +47,12 @@ def _rear_common(m, add, b: BoxDims):
     for i in range(10):                               # faixa refletiva vermelho/branco
         x = (-1.1 + i * 0.245) * k
         add(M.box(f"refl_{i}", (0.235 * k, 0.03, 0.14), (x, -0.025, b.kz(1.12)), m["paint_red"] if i % 2 == 0 else m["paint_white"], bevel=0.008, seg=1))
+    _rear_under(m, add, b)
+
+
+def _rear_under(m, add, b: BoxDims):
+    """Placa, para-choque de segurança, abas de lama, neon sob o chassi e luzes laterais de posição."""
+    w2 = b.w / 2
     add(M.box("plate", (0.5, 0.03, 0.22), (0, -0.04, b.kz(1.0) if b.rear_under else b.z0 + 0.25), m["paint_white"], bevel=0.01, seg=1))
     if not b.rear_under:
         for sx in (-1, 1):                            # luzes laterais de posição

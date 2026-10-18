@@ -124,6 +124,52 @@ def textured_full(name: str, color_img, orm_img=None, normal_img=None, metallic:
     return m
 
 
+def _gltf_occlusion(nt, socket) -> None:
+    """Liga `socket` (canal R do ORM) à oclusão do glTF: o exportador do Blender lê o grupo "glTF Material Output"."""
+    g = bpy.data.node_groups.get("glTF Material Output")
+    if g is None:
+        g = bpy.data.node_groups.new("glTF Material Output", "ShaderNodeTree")
+        g.interface.new_socket("Occlusion", in_out="INPUT", socket_type="NodeSocketFloat")
+    n = nt.nodes.new("ShaderNodeGroup")
+    n.node_tree = g
+    nt.links.new(socket, n.inputs["Occlusion"])
+
+
+def baked_full(name: str, color_img, orm_img, normal_img, coat: float = 0.0, coat_rough: float = 0.05):
+    """Material com mapas gravados (T-136): cor, ORM (R = oclusão, G = rugosidade, B = metálico) e normais.
+    No Godot vira StandardMaterial3D com ao_texture (canal R), roughness (G), metallic (B) e normal_texture."""
+    m = textured_full(name, color_img, orm_img, normal_img, metallic=1.0, roughness=1.0, coat=coat, coat_rough=coat_rough)
+    nt = m.node_tree
+    sep = next(n for n in nt.nodes if n.type == "SEPARATE_COLOR")
+    _gltf_occlusion(nt, sep.outputs[0])
+    return m
+
+
+BOX_TEX = ("tex_box_albedo", "tex_box_orm", "tex_box_nrm", "tex_box_mural_orm", "tex_box_mural_nrm")
+
+
+def box_premium_set(m: dict, tex_dir: str) -> dict:
+    """Materiais do baú premium (T-136) com os mapas de `bake_box_premium.py` (em `tex_dir`, a pasta das texturas
+    compartilhadas do jogo): paint_white_box (pintura, tingível), box_metal (alumínio, mesmo atlas) e mural
+    (cor = PNG trocável do mural; normais/oclusão gravadas). Erro claro se os mapas não existirem."""
+    import os
+    imgs = {}
+    for k in BOX_TEX:
+        p = os.path.join(tex_dir, k + ".png")
+        if not os.path.exists(p):
+            raise SystemExit(f"ERRO: falta {p}. Rode antes: blender -b --factory-startup -P blender/scripts/bake_box_premium.py")
+        img = bpy.data.images.load(p, check_existing=False)
+        img.name = k
+        img.colorspace_settings.name = "sRGB" if k == "tex_box_albedo" else "Non-Color"
+        imgs[k] = img
+    m["paint_white_box"] = baked_full("paint_white_box", imgs["tex_box_albedo"], imgs["tex_box_orm"], imgs["tex_box_nrm"],
+                                      coat=0.6, coat_rough=0.06)
+    m["box_metal"] = baked_full("box_metal", imgs["tex_box_albedo"], imgs["tex_box_orm"], imgs["tex_box_nrm"])
+    mural = tex._image("tex_mural", tex.mural_geometric()[::-1])          # embutido; o jogo troca pelo PNG do mural
+    m["mural"] = baked_full("mural", mural, imgs["tex_box_mural_orm"], imgs["tex_box_mural_nrm"], coat=0.6, coat_rough=0.05)
+    return m
+
+
 def truck_set(m: dict) -> dict:
     """Materiais exclusivos do caminhão (T-106), acrescentados ao conjunto padrão. Nomes estáveis: o jogo
     procura "paint_white" no nome da malha para tingir e "chrome"/"paint_gold" para o cromo por matcap."""

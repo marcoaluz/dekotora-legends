@@ -6,6 +6,9 @@
 | Fonte Noto Sans JP | `assets/fonts/NotoSansJP.ttf` | Google Fonts | SIL Open Font License 1.1 |
 | Textura Asphalt 02 (cor e rugosidade, 1k) | `assets/textures/cc0/asphalt_02_*_1k.jpg` | Poly Haven (polyhaven.com/a/asphalt_02), autor Rob Tuytel | CC0 1.0 |
 | Textura Concrete Wall 008 (cor, 1k) | `assets/textures/cc0/concrete_wall_008_diff_1k.jpg` (base de `concrete_streaks.png`) | Poly Haven (polyhaven.com/a/concrete_wall_008), Dario Barresi e Charlotte Baglioni | CC0 1.0 |
+| Textura Blue Metal Plate (cor, rugosidade, normal; reduzida a 512 px; só a rugosidade, os riscos e as lascas entram, a cor do baú é nossa) | `blender/cc0/blue_metal_plate/` (gravada em `assets/vehicles/dekotora/textures/tex_box_*.png`, baú premium T-136) | Poly Haven (polyhaven.com/a/blue_metal_plate), autor Rob Tuytel | CC0 1.0 |
+| Textura Metal 012 (cor, rugosidade, normal; 512 px) | `blender/cc0/Metal012/` (gravada em `tex_box_*.png`) | ambientCG (ambientcg.com/view?id=Metal012) | CC0 1.0 |
+| Textura Rubber 004 (rugosidade, normal; 512 px) | `blender/cc0/Rubber004/` (gravada em `tex_box_*.png`) | ambientCG (ambientcg.com/view?id=Rubber004) | CC0 1.0 |
 | Ícones Lucide v0.400.0 (recoloridos para branco, 48 px) | `assets/ui/icons/*.svg` | lucide.dev (pacote `lucide-static`) | ISC |
 | Cabine "cara chata" (malha reduzida e refeita do International CF500; marca apagada) | `assets/vehicles/dekotora/truck/*_chata.glb` | CGTrader, autor dany-sanchez | Royalty Free (no AI), confirmado pelo Marco em 2026-10-18 |
 | Van 01 (reduzida, sem marca) | `assets/vehicles/traffic/car_van01*` | CGTrader, autor foad3d | Royalty Free, confirmado pelo Marco em 2026-10-18 |

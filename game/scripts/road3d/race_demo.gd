@@ -70,6 +70,7 @@ static func fake_contract(args: PackedStringArray, route: RouteDef) -> Dictionar
 
 ## `--decorated`: perfil de demonstracao (caminhao cheio de pecas, pintura, adesivos e luzes) gravado em
 ## user://demo_profile.json, nunca no perfil real. Chamar antes de montar a corrida.
+## `--decorated --noparts`: o mesmo perfil de teste, mas so o caminhao de fabrica (aceita --body= e --cab=).
 static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 	if not ("--decorated" in args):
 		return
@@ -77,6 +78,13 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 	gs.new_profile()
 	gs.profile["money"] = 900000
 	gs.profile["fame"] = 500
+	if "--noparts" in args:                          # caminhao de fabrica, branco e sem adesivos (comparar o bau, T-136)
+		for a in args:
+			if a.begins_with("--body="):
+				gs.profile["body"] = a.substr(7)
+			elif a.begins_with("--cab="):
+				gs.profile["cab"] = CabCatalog.normalize(a.substr(6))
+		return
 	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning",
 			"hub_gold", "grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "rear_lamp_cluster"]:
 		var d: PartDef = gs.part(id)
