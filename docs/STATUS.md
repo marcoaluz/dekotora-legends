@@ -116,11 +116,27 @@ continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi i
 
 Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
+4. **T-136 FEITA (2026-10-18): baú premium (piloto C3) no baú médio, 4 cabines.** Versão ALTA só no Blender
+   (`truck3d/box_high.py`, ~84 mil triângulos: nervuras arredondadas, juntas e rebites, portas estampadas, borracha) gravada
+   (`blender/scripts/bake_box_premium.py`, Cycles, ~3–4 min) na versão LEVE do jogo (`truck3d/box_premium.py` + ferragens reais
+   em `box_rear.py`): atlas compartilhado `textures/tex_box_albedo/orm/nrm.png` (1024²) e `tex_box_mural_orm/nrm.png`
+   (1024×256; o mural continua o PNG trocável). Texturas de base CC0 em `blender/cc0/` (512 px, créditos em
+   `game/assets/LICENCAS.md`). Regerar tudo: `source tools/env.sh && bash tools/build_box_premium.sh [--no-bake] [--src RAIZ]`
+   e `godot --headless --path game --import`. `build_truck_3d.py --box auto|premium|classic` (auto = premium só no `base`).
+   Medidas (viaduto à noite, modo médio, sem vsync; `bash tools/measure_box.sh`): chamadas 302 → 304, triângulos/quadro
+   185 → 188 mil, textura 40,9 → 44,1 MB, vídeo ~86 MB, FPS igual (~230–280). Baú: 4,1 mil → 7,8 mil triângulos (casca 4,3 mil +
+   ferragens 3,5 mil); .glb base_chata 72,6 → 77,1 mil triângulos, 2,77 → 3,05 MB. Capturas antes/depois (garagem e corrida,
+   dia/noite; `bash tools/capture_box.sh PASTA [cabine] [modelo] [rapido]`): `docs/capturas_t136/` (folha
+   `comparacao_antes_depois.png`). Teste `tests/test_box_premium.gd` (4). **Para estender** aos baús leve/longo: ~1 sessão
+   (ligar `PREMIUM_VARIANTS`, um bake por comprimento para os rebites não esticarem, +3 PNG ≈ +1,5 MB cada; +~3,7 mil
+   triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
+
 ## PENDENTE — precisa do Marco
 
 - **T-138:** escolher o fundo padrão da tela inicial (A posto à noite, B rodovia; compare `docs/capturas_t138/depois_960x540/menu.png`
   e `menu_fundo_b.png`) e dizer se a câmera da garagem ficou perto o bastante.
 
+- **T-136:** olhar `docs/capturas_t136/comparacao_antes_depois.png` e dizer se o baú premium fica (e se vale estender aos baús leve/longo e ao Canter); conferir a chapa ondulada no celular (APK).
 - **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo); olhar
   `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.
 - Instalar **Android SDK + JDK 17** e gerar/testar o APK no celular (P02, P22, P65, P70, P72). Sem isso o Android não foi testado.

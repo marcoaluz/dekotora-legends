@@ -32,10 +32,13 @@ def mural_material():
     return pbr.textured("mural", img, 0.15, 0.35, coat=0.6, coat_rough=0.05)
 
 
-def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None, box: BoxDims = STD):
+def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None, box: BoxDims = STD,
+               mural_plates: bool = True, rear_y: float = -0.11):
     """`body_l` = comprimento final do baú (traseira em Y=0); `cab_top` = altura do teto da cabine;
     `cab_front` = (Y da frente da cabine, altura da base do para-brisa); `box` = largura/piso/teto do baú
-    (o Canter, T-125, tem um baú menor; as alturas acompanham a mesma fração da parede)."""
+    (o Canter, T-125, tem um baú menor; as alturas acompanham a mesma fração da parede).
+    Baú premium (T-136): `mural_plates=False` (o mural é a própria chapa ondulada) e `rear_y` = plano das colunas
+    de luzes da traseira (na frente das lanternas novas, que saem mais)."""
     W2 = box.w / 2
     BODY_TOP = box.top
     kz = box.kz
@@ -54,7 +57,7 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
     for sx in (-1, 1):
         for k in range(7):
             z = kz(1.35 + k * 0.27)
-            add(M.box(f"mk_rear_v_{sx}_{k}", (LAMP, 0.03, LAMP), (sx * (W2 - 0.12), -0.11, z),
+            add(M.box(f"mk_rear_v_{sx}_{k}", (LAMP, 0.03, LAMP), (sx * (W2 - 0.12), rear_y, z),
                       m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
     for k in range(9):
         x = (-1.0 + k * 0.25) * kx
@@ -82,6 +85,8 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
             add(M.box(f"andon_f_leg_{sx}", (0.06, 0.06, z0 - BODY_TOP), (sx * 0.9 * kx, body_l - 0.25, (z0 + BODY_TOP) / 2), m["chrome"], bevel=0.0, seg=1))
     _andon(m, add, "andon_r", 0.12, BODY_TOP + 0.06, REAR_ANDON, front=False, w=2.05 * kx)
     # --- murais
+    if not mural_plates:
+        return
     mat = mural or mural_material()
     for sx in (-1, 1):
         zm0, zm1 = kz(1.365), kz(2.985)                            # 1,62 m de altura no baú padrão

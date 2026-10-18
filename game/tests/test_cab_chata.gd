@@ -11,7 +11,7 @@ const MOUNTS: Array[String] = ["MOUNT_FRONT_BUMPER", "MOUNT_FRONT_GRILLE", "MOUN
 		"MOUNT_SIDE_PANEL_R", "MOUNT_MUDFLAP_R", "MOUNT_WHEEL_FRONT_FACE_R", "MOUNT_WHEEL_FRONT_FACE_L"]
 ## Materiais que o caminhao pode ter (nomes estaveis: tinta, cromo por matcap, luzes, texturas compartilhadas).
 const KNOWN_PREFIX: Array[String] = ["paint_", "chrome", "steel", "rubber", "plastic", "glass", "lamp_", "mesh_perf",
-		"diamond", "andon_panel", "mural", "grille_honeycomb", "vent_slots"]
+		"diamond", "andon_panel", "mural", "grille_honeycomb", "vent_slots", "box_metal"]
 
 
 func _model(body: String) -> Node3D:
@@ -77,7 +77,7 @@ func test_materials_are_truck_materials_and_budget() -> void:
 				var idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
 				tris += idx.size() / 3 if idx.size() > 0 else (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
 		check(paint, "%s_chata: malha paint_white (pintura dos rivais)" % body)
-		var limit: int = 90000 if body == "longo" else 75000
+		var limit: int = 90000 if body == "longo" else 78000          # base: bau premium (T-136) +4,5 mil
 		check(tris > 40000 and tris < limit, "%s_chata: %d triangulos (limite %d)" % [body, tris, limit])
 		m.free()
 

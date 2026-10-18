@@ -14,7 +14,7 @@ const MOUNTS: Array[String] = ["MOUNT_FRONT_BUMPER", "MOUNT_FRONT_GRILLE", "MOUN
 		"MOUNT_SIDE_PANEL_R", "MOUNT_MUDFLAP_R", "MOUNT_WHEEL_FRONT_FACE_R", "MOUNT_WHEEL_FRONT_FACE_L",
 		"MOUNT_WHEEL_REAR_FACE_R", "MOUNT_CAB_SIDE_R"]
 const KNOWN_PREFIX: Array[String] = ["paint_", "chrome", "steel", "rubber", "plastic", "glass", "lamp_", "mesh_perf",
-		"diamond", "andon_panel", "mural", "grille_honeycomb", "vent_slots"]
+		"diamond", "andon_panel", "mural", "grille_honeycomb", "vent_slots", "box_metal"]
 
 
 func _model(tag: String) -> Node3D:

@@ -2,6 +2,7 @@
 
 Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora]
      [--variant base|leve|longo|carreta|canter] [--cab chata|jac|curta|americana] [--cab-src CAMINHO]
+     [--box auto|premium|classic]
 Saída: <out>/truck/dekotora_truck_<baú>_<cabine>.glb (a carreta e o Canter não têm sufixo), <out>/source_blend/,
 <out>/previews/truck_<tag>_*.png
 
@@ -11,6 +12,10 @@ Cabines (todas de modelos de terceiros Royalty Free, marca apagada, materiais NO
   curta     JAC 1045 em escala 0,84 (T-125): cabine baixa, o baú cresce até as costas dela;
   americana Kenworth W990 (T-129, `kw_cab.py`): cabine "dia" de bico longo, eixo dianteiro mais à frente.
 As 4 cabines feitas por código (padrao, classica, aero, alta) foram retiradas na T-129.
+
+Baú premium (T-136, `truck3d/box_premium.py`): chapa ondulada de verdade, trilhos, montantes, portas com mapas de
+normal/oclusão gravados da versão alta (`bake_box_premium.py`, rode antes uma vez) e ferragens reais. `--box auto`
+(padrão) = premium no baú médio (base) e o baú antigo nos outros modelos; `premium`/`classic` forçam.
 
 Convenções: metros, +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro. As peças usam os pontos
 de montagem (empties MOUNT_*) criados aqui; o glTF os exporta como nós.
@@ -23,7 +28,8 @@ import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import mesh3d as M, pbr, preview, scene, shared_tex  # noqa: E402
-from truck3d.body import build_body  # noqa: E402
+from truck3d.body import BoxDims, build_body  # noqa: E402
+from truck3d.box_premium import build_box_premium  # noqa: E402
 from truck3d.chassis import build_chassis  # noqa: E402
 from truck3d.deco import build_deco  # noqa: E402
 from truck3d.cab_chata import build_cab_chata  # noqa: E402
@@ -104,8 +110,21 @@ def _front_wheel_mounts(mounts, info):
         mounts[n[:-1] + "L"] = (-x, info.front_axle, info.front_r)
 
 
-def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = DEFAULT_CAB, cab_src=None):
-    """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set)."""
+PREMIUM_VARIANTS = ("base",)                                          # piloto T-136: só o baú médio
+
+
+def use_premium(box: str, variant: str) -> bool:
+    if box == "auto":
+        return variant in PREMIUM_VARIANTS
+    if box == "premium" and variant in ("canter", "carreta"):
+        raise SystemExit("ERRO: o baú premium ainda não existe para canter/carreta (use --box classic)")
+    return box == "premium"
+
+
+def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = DEFAULT_CAB, cab_src=None,
+                premium: bool = False):
+    """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set; com
+    `premium`, também pbr.box_premium_set)."""
     if paint_name != "paint_white":
         m = dict(m)
         m["paint_white"] = m[paint_name]
@@ -121,7 +140,7 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
     spec = VARIANTS[variant]
     build_chassis(m, add, spec["rear_axles"], spec["tanks"])
     n0 = len(parts)
-    build_body(m, add)
+    build_body(m, add, shell=not premium)
     body_names = {o.name for o in parts[n0:]}
     info = build_file_cab(m, add, cab, cab_src)
     stacks = [o for o in parts if o.name.startswith("stack_")]
@@ -159,6 +178,8 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
         for e in empties:
             if e.name == "MOUNT_BODY_ROOF":
                 e.location.y = (front + ext) / 2
+    if premium:                                     # baú premium no comprimento final (cabines curta/jac esticam)
+        build_box_premium(m, add, BoxDims(l=round(BODY_L + dy + ext, 3)))
     if variant != "carreta":                        # decoracao Dekotora (V7): luzes, andons, murais
         body_l = BODY_L + dy + ext
         cab_z = info.top                            # altura real da cabine (com defletor de teto, se houver)
@@ -172,8 +193,9 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
         def surf(x, z):                                # ponto/normal na casca (fileira de luzes da "sobrancelha")
             p, n = info.surf(x, z)
             return p + Vector((0, dy, 0)), n
-        build_deco(m, add, body_l, cab_z, (CAB_Y1 + dy, info.wz0, surf))
-    print(f"cabine {cab}: {info.tris} triangulos; bau {ext:+.2f} m; eixo dianteiro y={info.front_axle + dy:.2f} r={info.front_r}")
+        build_deco(m, add, body_l, cab_z, (CAB_Y1 + dy, info.wz0, surf), mural_plates=not premium,
+                   rear_y=-0.17 if premium else -0.11)
+    print(f"cabine {cab}: {info.tris} triangulos; bau {ext:+.2f} m{' (premium)' if premium else ''}; eixo dianteiro y={info.front_axle + dy:.2f} r={info.front_r}")
     return parts, wheels, empties
 
 
@@ -187,6 +209,8 @@ def main():
                     ".blend do JAC 1045 para jac/curta/canter (docs/Modelos Melhorados/JAC+1045+Truck.blend) ou "
                     ".glb do Kenworth W990 para americana (docs/Modelos Melhorados/kenworth_w990_truck.glb)")
     ap.add_argument("--no-preview", action="store_true")
+    ap.add_argument("--box", default="auto", choices=("auto", "premium", "classic"),
+                    help="auto = premium no baú médio (base), antigo nos outros; premium | classic forçam (T-136)")
     ap.add_argument("--night", action="store_true", help="previas de revisao a noite (luzes acesas)")
     ap.add_argument("--variant", default="base", choices=list(VARIANTS) + ["canter"], help="base | leve | longo | carreta | canter (cabine do JAC)")
     args = ap.parse_args(argv)
@@ -196,7 +220,10 @@ def main():
     scene.reset_scene()
     m = pbr.truck_set(pbr.standard_set())
     m["rubber_tire"] = pbr.tire_material(tire_profile(WHEEL_R, 0.3), WHEEL_R)
-    parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab, args.cab_src)
+    premium = use_premium(args.box, args.variant)
+    if premium:
+        pbr.box_premium_set(m, os.path.join(out, "textures"))
+    parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab, args.cab_src, premium)
     for o in parts:                                  # texturas precisam de UV que cubra cada face
         name = o.active_material.name if o.active_material else ""
         if name in ("paint_white_panel", "plastic_trim"):

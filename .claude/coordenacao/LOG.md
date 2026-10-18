@@ -117,3 +117,8 @@ Formato em `docs/AGENTES.md`.
 - Feito: telas por containers presas às bordas (aspect expand), resultado novo com frases claras, fundo do menu A/B nas Opções, garagem com câmera mais perto, cromo de estúdio e botão VER EM MOVIMENTO, ~115 chaves pt-BR que faltavam, teste de textos.
 - Validação: 196 testes, 0 falhas na main após o merge; capturas 960x540 e 1200x540 em docs/capturas_t138/.
 - Decisão pendente: fundo padrão do menu (A posto / B rodovia) e se a câmera da garagem está perto o bastante.
+
+## 2026-10-18 · T-136 · especialista · CONCLUÍDA
+- Feito: baú médio premium nas 4 cabines (alta no Blender, bake normal/AO/ORM, leve com chapa ondulada e ferragens reais), CC0 512 px, mural trocável com normais/AO; capturas antes/depois.
+- Validação: 200 testes, 0 falhas na main após o merge; chamadas 302→304, textura 40,9→44,1 MB, FPS igual; baú 4,1→7,8 mil tri.
+- Decisão pendente: Marco aprovar o visual e decidir se estende a leve/longo/Canter.
