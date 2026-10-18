@@ -55,6 +55,7 @@ func _ready() -> void:
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
+	TruckTextures.apply(model)               # texturas grandes compartilhadas (o .glb so traz miniaturas)
 	_apply_light_materials(model)
 	_build_blinkers()
 	for n in model.find_children("wheel_*", "Node3D", true, false):

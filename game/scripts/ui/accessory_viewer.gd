@@ -51,6 +51,7 @@ func _ready() -> void:
 	_cam.make_current()
 	_truck = (load(TruckNode.MODEL_PATH) as PackedScene).instantiate() as Node3D
 	add_child(_truck)
+	TruckTextures.apply(_truck)
 	_showcase = Node3D.new()
 	add_child(_showcase)
 	var layer := CanvasLayer.new()

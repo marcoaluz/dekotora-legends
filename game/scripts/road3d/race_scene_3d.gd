@@ -414,7 +414,8 @@ func _process(delta: float) -> void:
 		_fps_t += delta
 		_fps_n += 1
 		if _fps_t >= 5.0:
-			print("FPS medio: %.1f  (desenhos: %d, triangulos: %d)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)])
+			print("FPS medio: %.1f  (desenhos: %d, triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+					Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0])
 			_fps_t = 0.0
 			_fps_n = 0
 	var dt: float = minf(delta, 0.1)

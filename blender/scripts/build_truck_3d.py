@@ -14,7 +14,7 @@ import sys
 import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import mesh3d as M, pbr, preview, scene  # noqa: E402
+from lib import mesh3d as M, pbr, preview, scene, shared_tex  # noqa: E402
 from truck3d.body import build_body  # noqa: E402
 from truck3d.cab import CAB_STYLES, build_cab, cab_mounts  # noqa: E402
 from truck3d.chassis import build_chassis  # noqa: E402
@@ -124,7 +124,11 @@ def main():
     if not os.path.exists(mural_png):
         from lib import tex
         tex.save_png(tex.mural_geometric()[::-1], mural_png)
+    # texturas grandes: uma cópia só em <out>/textures (o TruckNode aplica no jogo); o .glb leva miniaturas 4x4
+    mats = {sl.material for o in final if o.type == "MESH" for sl in o.material_slots if sl.material}
+    swaps = shared_tex.externalize(sorted(mats, key=lambda mt: mt.name), os.path.join(out, "textures"))
     M.export_glb(glb, final)
+    shared_tex.restore(swaps)
     os.makedirs(os.path.join(out, "source_blend"), exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "source_blend", f"truck_{tag}.blend"))
     if args.no_preview:
