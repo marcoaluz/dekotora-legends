@@ -31,6 +31,10 @@ func setup(setup_: Dictionary, my_truck: int) -> void:
 	var rules: Dictionary = setup_["rules"]
 	var route: RouteDef = load("res://data/routes/%s.tres" % rules["route"]) as RouteDef
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
+	if setup_.has("events"):                                  # T-139: eventos sorteados pelo servidor
+		track.events = TrackEvents.from_array(setup_["events"])
+	elif route != null:
+		track.events = route.build_events(track, int(setup_["seed"]))
 	sim = RaceSim.new(track, int(rules["traffic"]), int(setup_["seed"]))
 	sim.freight = route.freight if route != null else 25000
 	sim.deadline = route.deadline() if route != null else 0.0

@@ -151,6 +151,8 @@ func _build_race(seed_: int) -> void:
 	seed_value = seed_
 	var route: RouteDef = load("res://data/routes/%s.tres" % rules["route"]) as RouteDef
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
+	if route != null and bool(rules.get("events", true)):
+		track.events = route.build_events(track, seed_)       # T-139: o servidor sorteia e manda no setup
 	sim = RaceSim.new(track, int(rules["traffic"]), seed_)
 	sim.freight = route.freight if route != null else 25000
 	sim.deadline = route.deadline() if route != null else 0.0
@@ -299,4 +301,5 @@ func race_setup() -> Dictionary:
 		e["name"] = m.name
 		e["paint"] = m.loadout.get("paint", "#e9eef5")
 		e["loadout"] = m.loadout
-	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick}
+	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick,
+		"events": sim.track.events.to_array()}

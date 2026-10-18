@@ -78,6 +78,7 @@ func _ready() -> void:
 		player = Net.pending_truck
 	else:
 		var track: Track = route.build_track() if route != null else Track.make_test_track()
+		track.events = RaceDemo.track_events(OS.get_cmdline_user_args(), route, track)   # T-139 (--event=, --no-events)
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 		var fake: Dictionary = RaceDemo.fake_contract(OS.get_cmdline_user_args(), route)
 		if not fake.is_empty():

@@ -38,3 +38,4 @@ sections = Array[Dictionary]([{
 }])
 rival_id = &"rival_coast"
 traffic = 0
+events = Array[Dictionary]([{"kind": "narrow", "z": 1650.0, "length": 420.0, "lanes": [3]}])
