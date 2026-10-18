@@ -12,6 +12,8 @@ const MODEL_PATHS: Dictionary = {
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
+## Cabines que existem em .glb (a "padrao" nao tem sufixo no nome do arquivo).
+const CABS: Array[String] = ["padrao", "classica", "aero", "alta", "chata"]
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
 const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5}
 const WHEEL_RADIUS: float = 0.52
@@ -21,7 +23,7 @@ const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
 const MURAL_USER := "user://mural_side.png"
 ## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
 var body_kind: String = "base"
-## Cabine: "padrao", "classica", "aero" ou "alta". Definir antes de add_child.
+## Cabine: "padrao", "classica", "aero", "alta" ou "chata" (cara chata, T-119). Definir antes de add_child.
 var cab_kind: String = "padrao"
 ## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
 var chrome_mode: String = "night"
@@ -116,7 +118,7 @@ func apply_decals(decals: Array) -> void:
 	_decal_nodes.clear()
 	if model == null:
 		return
-	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)))
+	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)), cab_kind)
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).

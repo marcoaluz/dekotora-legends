@@ -67,3 +67,14 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: docs/NOVOS_MODELOS.md, docs/direcao_arte/novos_modelos_{todos,cf500,trafego_6k}.png; scripts de teste em blender/renders/t115/ (fora do Git)
 - Validação: Blender 5.2.2 headless importou/mediu os 4 e converteu (decimate) para .glb: CF500 609.630→40.000 tri (1,4 MB), van 504.334→20.000 (0,97 MB) e 6.000 (0,38 MB), carro 436.059→30.000 (15,7 MB com texturas 1K) e 6.000 (0,32 MB sem texturas), Canter 129.583→40.000; Godot 4.7.2 headless (projeto temporário) importou e carregou os 4 .glb sem erro (rodas wheel_* achadas).
 - Decisão pendente: Marco precisa informar origem/licença de cada modelo (links, se pagou). Opções: (a) licença ok → van e carro no tráfego, depois CF500 como 5ª cabine (2–3 sessões, apagar marcas); (b) sem licença → usar só como referência e fazer a 5ª cabine "cara chata" por código.
+
+## 2026-10-17 · T-116 · ajudante-rapido · CONCLUÍDA
+- Feito: anotei T-115 no STATUS, decisão de modelos de terceiros no DECISOES e duas armadilhas do Blender na SKILL (commit 86c1a90).
+- Arquivos: docs/STATUS.md, docs/DECISOES.md, .claude/skills/blender-pixelart/SKILL.md
+- Observação: LOG.md não foi commitado (pedido da tarefa). Atribuição do commit usa Haiku 5.5 (o modelo real), não Sonnet 5.5 como pedido na tarefa.
+
+## 2026-10-18 00:30 · T-118 · especialista · CONCLUÍDA
+- Feito: texturas do caminhão compartilhadas: uma cópia em game/assets/vehicles/dekotora/textures/ (gravada pelo build via lib/shared_tex.py); .glb com miniaturas 4×4 (cor média) como reserva; TruckTextures.apply() troca em runtime (material em cache por nome), chamado pelo TruckNode (depois do cromo e do mural) e pelo visualizador de acessórios. --fps-log agora mostra memória de textura e de vídeo.
+- Arquivos: blender/scripts/lib/shared_tex.py, build_truck_3d.py, game/scripts/truck/{truck_textures,truck_node}.gd, ui/accessory_viewer.gd, road3d/race_scene_3d.gd, 13 .glb + miniaturas + textures/, docs STATUS/DECISOES
+- Validação: .glb 51,2 → 33,0 MB; PNG de textura 18,5 → 1,5 MB (+0,36 MB de miniaturas); .pck Windows de teste 97,5 → 54,0 MB; corrida modo médio: textura 53,1 → 43,1 MB, vídeo 87,2 → 77,2 MB, ~490 chamadas e ~75 FPS iguais; garagem padrao/aero antes x depois com diferença média de pixel 0,0006–0,0008; corrida com rival ok; 141 testes 0 falhas; corrida, garagem, accessory_viewer, chrome_compare e servidor headless abrem (avisos de saída na garagem vêm da música, já existiam).
+- Decisão pendente: nenhuma. (LOG.md não commitado: tem linhas de outra tarefa sem commit.)

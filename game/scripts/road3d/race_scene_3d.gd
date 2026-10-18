@@ -277,7 +277,7 @@ func _spawn_field() -> void:
 		t.is_bot = i != 0
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
-		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "alta"][i % 3]
+		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "alta", "chata"][i % 4]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		add_child(node)
 		if i == 0:

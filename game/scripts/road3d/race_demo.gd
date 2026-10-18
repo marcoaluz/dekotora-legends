@@ -62,6 +62,11 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 			gs.install(id)
 	gs.profile["paint"] = "#ff2e88"
 	gs.profile["light_pattern"] = "sequential"
+	for a in args:                                   # --cab=chata / --body=leve: modelo do caminhao do jogador (so no perfil demo)
+		if a.begins_with("--cab="):
+			gs.profile["cab"] = a.substr(6)
+		elif a.begins_with("--body="):
+			gs.profile["body"] = a.substr(7)
 	gs.profile["decals"] = [
 		{"id": "kanji_bakusou", "slot": "side_l", "x": -0.55, "y": 0.0, "size": 0.45, "color": "#f5cc5a"},
 		{"id": "estrela", "slot": "side_r", "x": -0.55, "y": 0.0, "size": 0.4, "color": "#21e6ff"},

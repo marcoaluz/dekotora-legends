@@ -9,7 +9,7 @@ const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.d
 const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "view.rear"],
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
 const BODIES: Array = ["leve", "base", "longo"]
-const CABS: Array = ["padrao", "classica", "aero", "alta"]
+const CABS: Array = TruckNode.CABS
 
 var stage: GarageStage
 var gs: Node
