@@ -64,6 +64,8 @@ static func screen_title(text: String, icon_name: String) -> HBoxContainer:
 	h.add_theme_constant_override("separation", 12)
 	h.add_child(_icon_rect(icon_name, 30, UiTheme.PINK))
 	var l: Label = heading(text.to_upper(), 30)
+	l.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.07, 0.85))   # legivel sobre o caminhao branco (T-138)
+	l.add_theme_constant_override("outline_size", 6)
 	h.add_child(l)
 	return h
 

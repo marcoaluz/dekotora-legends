@@ -59,8 +59,12 @@ func _ready() -> void:
 	back.pressed.connect(func() -> void: back_pressed.emit())
 	foot.add_child(back)
 	root.add_child(foot)
-	_show("controls")
-	(_tabs["controls"] as Button).grab_focus.call_deferred()
+	var first: String = "controls"
+	for a in OS.get_cmdline_user_args():             # depuracao/capturas: --options-tab=graphics|audio|account
+		if a.begins_with("--options-tab=") and _tabs.has(a.substr(14)):
+			first = a.substr(14)
+	_show(first)
+	(_tabs[first] as Button).grab_focus.call_deferred()
 
 
 func _show(id: String) -> void:

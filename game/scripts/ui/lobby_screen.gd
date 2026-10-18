@@ -22,6 +22,7 @@ func _ready() -> void:
 	AudioBus.play_music("lobby_wait")
 	stage = GarageStage.new()
 	add_child(stage)
+	stage.focus_hero(0.3, 18.0)                 # caminhao a direita: o painel do lobby fica a esquerda (T-138)
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	_ui = Control.new()

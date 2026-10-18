@@ -674,6 +674,7 @@ func _show_result() -> void:
 
 ## Tela de resultado numa camada propria SEM escala (layout por containers, T-138). `next_scene` = para onde o CONTINUAR leva.
 func _open_result(res: Dictionary, next_scene: String) -> void:
+	_hud_layer.visible = false                   # HUD e toque somem: a tela de resultado fica limpa
 	var layer := CanvasLayer.new()
 	layer.layer = 20
 	add_child(layer)

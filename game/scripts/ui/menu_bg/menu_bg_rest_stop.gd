@@ -46,10 +46,10 @@ func _ground() -> void:
 ## Loja de conveniencia atras do caminhao (lado esquerdo da tela): parede escura, vitrine acesa, faixa de neon.
 func _store() -> void:
 	box(self, Vector3(9.0, 4.4, 30.0), Vector3(-17.0, 2.2, -4.0), Color(0.09, 0.09, 0.1))
-	box(self, Vector3(0.12, 2.5, 20.0), Vector3(-12.45, 1.45, -6.0), WARM, 0.35, 0.2)         # vitrine
+	box(self, Vector3(0.12, 2.5, 20.0), Vector3(-12.45, 1.45, -6.0), Color(0.62, 0.55, 0.42), 0.1, 0.2)   # vitrine (fraca: nao estourar o branco)
 	for z in range(-15, 5, 4):                                                                 # caixilhos
 		box(self, Vector3(0.16, 2.6, 0.14), Vector3(-12.4, 1.45, float(z)), Color(0.15, 0.15, 0.16))
-	box(self, Vector3(0.4, 0.8, 30.2), Vector3(-12.4, 4.0, -4.0), Color(0.92, 0.92, 0.95), 0.25)   # testeira
+	box(self, Vector3(0.4, 0.8, 30.2), Vector3(-12.4, 4.0, -4.0), Color(0.16, 0.16, 0.2), 0.0)     # testeira escura (o neon ciano destaca)
 	box(self, Vector3(0.08, 0.08, 30.0), Vector3(-12.15, 3.55, -4.0), UiTheme.CYAN, 5.0)       # neon ciano
 	omni(self, Vector3(-10.0, 2.6, -6.0), WARM, 1.0, 11.0)
 

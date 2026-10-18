@@ -7,7 +7,7 @@ extends Node3D
 
 const HALL_PATH := "res://assets/scenery/garage_hall.glb"
 const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), distancia e azimute
-	"default": {"target": Vector3(0.0, 1.8, -6.2), "dist": 15.0, "az": 38.0, "el": 10.0},
+	"default": {"target": Vector3(0.0, 1.8, -6.2), "dist": 18.0, "az": 38.0, "el": 10.0},   # antes 22 x zoom 1,5 (= 33)
 	"front": {"target": Vector3(0, 1.6, -10.5), "dist": 9.5, "az": 28.0, "el": 9.0},
 	"roof": {"target": Vector3(0, 3.0, -8.5), "dist": 12.0, "az": 35.0, "el": 18.0},
 	"side": {"target": Vector3(0.6, 1.5, -6.0), "dist": 15.5, "az": 95.0, "el": 7.0},
@@ -194,9 +194,9 @@ func set_zoom(z: float) -> void:
 
 ## Enquadramento de vitrine da tela inicial: 3/4 frontal baixo, caminhao deslocado para a direita
 ## (o menu fica a esquerda), girando bem devagar.
-func focus_hero() -> void:
-	_goal = {"target": Vector3(-1.0, 1.6, -6.8), "dist": 15.5, "az": 36.0, "el": 5.0}
-	_shift_goal = 0.22
+func focus_hero(shift: float = 0.22, dist: float = 15.5) -> void:
+	_goal = {"target": Vector3(-1.0, 1.6, -6.8), "dist": dist, "az": 36.0, "el": 5.0}
+	_shift_goal = shift
 	_zoom_goal = 1.0
 	_set_view("hero")
 	auto_rotate = false

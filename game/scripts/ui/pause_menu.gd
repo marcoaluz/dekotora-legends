@@ -13,10 +13,10 @@ var first_button: Button
 
 func _ready() -> void:
 	theme = UiTheme.make()
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)      # offsets tambem: so a ancora deixava a caixa com 480 px
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(center)
 	var col := VBoxContainer.new()
