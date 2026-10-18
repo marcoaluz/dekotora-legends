@@ -5,6 +5,8 @@ extends RefCounted
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
 ##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
+##   --cam=top|high|side camera presa ao caminhao do jogador: de cima (30 m), bem alta (75 m) ou alta de lado (T-132)
+##   --nohud        esconde o HUD e os botoes (capturas limpas; lido pela RaceScene3D)
 ##   --snap-every=S com --shots: tambem uma captura a cada S segundos (t01, t02...; placas e sinalizacao, T-130)
 ##   --burst=S      com --shots: aos S segundos, 2 capturas em quadros SEGUIDOS (roda_1, roda_2; rodas girando, T-133)
 ## Exemplo: godot --path game res://scenes/race/race3d.tscn -- --demo=close --shots=C:/tmp/capt
@@ -18,6 +20,7 @@ var _last_lane_changes: int = 0
 var _last_close: float = -99.0
 var _count: Dictionary = {}
 var _cam: PackedFloat32Array = []
+var cam_mode: String = ""              # top | high | side (T-132)
 var _snap_every: float = 0.0
 var _next_snap: float = 0.0
 var _burst_at: float = -1.0
@@ -31,8 +34,11 @@ func _init(args: PackedStringArray) -> void:
 		elif a.begins_with("--shots="):
 			shot_dir = a.substr(8)
 		elif a.begins_with("--cam="):
-			for v in a.substr(6).split(","):
-				_cam.append(float(v))
+			if a.substr(6) in ["top", "high", "side"]:
+				cam_mode = a.substr(6)
+			else:
+				for v in a.substr(6).split(","):
+					_cam.append(float(v))
 		elif a.begins_with("--snap-every="):
 			_snap_every = float(a.substr(13))
 			_next_snap = _snap_every
@@ -96,13 +102,28 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 
 
 ## Camera de depuracao (--cam=...): devolve true se assumiu a camera neste quadro.
-func camera(cam: Camera3D, path: TrackPath, z: float) -> bool:
+func camera(cam: Camera3D, path: TrackPath, z: float, x: float = 0.0, length: float = Collision.LEN) -> bool:
+	if cam_mode != "":
+		_place_camera(cam, path, z, x, length)
+		return true
 	if _cam.size() < 6:
 		return false
 	var w: float = Track.ROAD_HALF_WIDTH_M
 	cam.global_position = path.world_point(z + _cam[0], _cam[1] / w, _cam[2])
 	cam.look_at(path.world_point(z + _cam[3], _cam[4] / w, _cam[5]), Vector3.UP)
 	return true
+
+
+## --cam=top|high|side: camera presa ao caminhao em (z, x), olhando o meio dele (alinhamento na faixa, T-132).
+func _place_camera(cam: Camera3D, path: TrackPath, z: float, x: float, length: float) -> void:
+	var mid: float = z + length * 0.5
+	if cam_mode == "side":
+		cam.global_position = path.world_point(mid - 4.0, x - 2.6, 11.0)
+		cam.look_at(path.world_point(mid, x, 1.0), Vector3.UP)
+		return
+	var ahead: float = 0.0 if cam_mode == "top" else 30.0
+	cam.global_position = path.world_point(mid + ahead, x, 30.0 if cam_mode == "top" else 75.0)
+	cam.look_at(path.world_point(mid + ahead, x, 1.0), path.forward_at(mid + ahead))   # frente da pista para cima
 
 
 func active() -> bool:

@@ -215,10 +215,25 @@ func _draw_dash(t: TruckSim, w: float) -> void:
 		draw_line(c + Vector2.from_angle(a) * (rad - 6), c + Vector2.from_angle(a) * (rad - 3), Color(1, 1, 1, 0.4), 1.0)
 	_lbl(Vector2(c.x - 15, c.y + 3), "RPM", 7, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 30.0)
 	_draw_lane_signal(t, cx, r.position.y - 9.0)
+	_draw_curve_warning(t, cx, r.position.y - 44.0)
 	if t.draft > 0.1:                                # chip de vacuo acima do painel
 		var dr := Rect2(cx - 24, r.position.y - 27, 48, 11)
 		draw_style_box(_panel_sb, dr)
 		_lbl(Vector2(dr.position.x, dr.position.y + 8.5), Tr.t("hud.draft"), 7, CYAN, HORIZONTAL_ALIGNMENT_CENTER, dr.size.x)
+
+
+## Aviso de curva (T-132): amarelo "CURVA! ALIVIE" quando a velocidade passa do limite da curva a frente;
+## vermelho piscando "DERRAPANDO!" quando o caminhao perdeu a faixa (passou de +30%).
+func _draw_curve_warning(t: TruckSim, cx: float, y: float) -> void:
+	var warn: float = t.curve_warning(sim.track) if countdown <= 0.0 else 0.0
+	if not t.escaping and warn <= 0.0:
+		return
+	var blink: bool = int(Time.get_ticks_msec() / 140) % 2 == 0
+	var col: Color = (BAD_COL if blink else Color.WHITE) if t.escaping else Color(WARN_COL, 0.55 + 0.45 * warn)
+	var text: String = Tr.t("hud.curve_escape") if t.escaping else Tr.t("hud.curve_warn")
+	var r := Rect2(cx - 60, y, 120, 15)
+	_panel(r, col)
+	_num(Vector2(r.position.x, r.position.y + 12), text, 11, col, HORIZONTAL_ALIGNMENT_CENTER, r.size.x)
 
 
 ## Setas de faixa: a do lado escolhido pisca em ambar enquanto o 2o toque ainda vale; pontos mostram a faixa atual.

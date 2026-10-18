@@ -120,7 +120,22 @@ Meta: nenhum dos três vence mais de ~60% das corridas contra os outros dois.
 - Prazo = comprimento do trecho ÷ 27 m/s (≈ 97 km/h) × 1,2, arredondado (kanto_1 = 133 s). Um trecho pode fixar `deadline_s` no `.tres`: kanto_2 = 130 s e kanto_3 = 150 s (um bot DIFÍCIL leva ~112 s e ~129 s); o contrato do Mercado leva o prazo em `deadline_s`.
 - Vitória = chegar em 1º **e** dentro do prazo. Chegar depois do rival = derrota; prazo esgotado = derrota ("tempo esgotado").
 - Derrota paga **0 ¥** e **0 Fama** (suposição a revisar: ver QUADRO T-101). O dano às peças continua, e o contrato volta a ficar disponível.
-- Curvas (controle por faixas): acima da velocidade segura `sqrt(0,5 × aderência ÷ (|curva| × 7,9e-4))` o caminhão é empurrado para fora da faixa (curva 1,0 = 90 km/h; curva 0,6 = 117 km/h).
+- Curvas (controle por faixas): velocidade segura `sqrt(0,5 × aderência ÷ (|curva| × 7,9e-4))` (curva 1,0 = 90 km/h; curva 0,6 = 117 km/h). Acima dela, ver "Curvas: segue a faixa (T-132)".
+
+## Curvas: segue a faixa (T-132)
+
+Constantes em `game/scripts/sim/curve_grip.gd` (razão r = velocidade ÷ velocidade segura; vale para jogador, bots, servidor e predição).
+
+| r | O que acontece |
+| --- | --- |
+| ≤ 1,0 | nada: segue a faixa |
+| 1,0 a 1,3 | pneu raspa: perde `8 × (r² − 1)` m/s² (r 1,1 = 1,7 m/s²; r 1,3 = 5,5 m/s²), pneu canta (`skid` 0→1), desliza até **0,5 m** para fora |
+| > 1,3 | escapa: o controle de faixa perde a força, a curva joga para fora `0,6 + 4 × (r − 1,3)` faixas-x/s (1 x = 7,2 m) e o pneu deslizando freia só 1,5 m/s²; volta para a faixa quando r cai abaixo de 1,3 |
+
+- Aviso no HUD ("CURVA! ALIVIE") quando a curva dos próximos ~2 s pede r > 1,12 (cheio em 1,3) + vibração curta; "DERRAPANDO!" + vibração ao escapar.
+- Giro do corpo: só na troca de faixa, até **3°** (`TruckSim.MAX_BODY_YAW`), pivô no eixo traseiro (20% do comprimento a partir da traseira).
+- Medido acelerando sem tocar (desvio máximo / tempo da rota): litoral 0,19 m / 95,6 s · viaduto 0,36 m / 102,7 s · montanha 0,25 m / 120,0 s (antes: 2,8 m / 94,1 s · 9,9 m / 95,5 s · 7,9 m / 110,1 s; o "antes" era mais rápido porque não havia atrito na curva). Bot difícil: 96,9 / 105,8 / 122,9 s (antes 96,6 / 104,7 / 121,7 s); prazos de 133 / 130 / 150 s continuam folgados.
+- Com V8 + turbo duplo + escape direto (ou 16 t de carga), acelerando sem soltar o caminhão chega a +47% (+35%) na curva 1,0 do viaduto depois da subida e **escapa** (desvio 9 m): é a regra dos +30%; o aviso vem ~2 s antes. Ajustar jogando.
 
 ## Perda de carga proporcional e tipos de carga (ATB-1, T-102)
 

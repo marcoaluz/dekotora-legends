@@ -1,7 +1,7 @@
 extends Node3D
 ## Corrida em 3D (plano B): liga a simulacao (a mesma do plano A) a uma apresentacao 3D com
 ## estrada em malha, caminhoes .glb PBR, transito, cidade e camera atras do jogador.
-## Debug: -- --autoplay  --start=600  --touch  --shot (sem HUD de toque)
+## Debug: -- --autoplay  --start=600 [--start-speed=20]  --touch  --shot (sem HUD de toque)
 
 const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#3a73d6"), Color("#3fb26f")]
 ## Cabine dos bots por posicao no grid (o 0 e o jogador). Antes da T-129: classica, aero, curta, chata;
@@ -34,6 +34,8 @@ var _demo: RaceDemo                    # capturas/depuracao (--demo=, --shots=)
 var _over_time: float = 0.0          # tempo desde que a corrida acabou (atrasa a tela de tempo esgotado)
 const TIMEOUT_SCREEN_DELAY: float = 1.8
 var _shake: float = 0.0
+var _was_escaping: bool = false         # curva rapida demais (T-132): vibra uma vez ao escapar
+var _was_warn_full: bool = false
 var _result_shown: bool = false
 var _fps_printed: bool = false
 var _debug_events: bool = false
@@ -158,12 +160,18 @@ func _ready() -> void:
 		_demo.setup(sim)
 		for k in sim.trucks.size():
 			_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
+	var v0: float = 30.0
+	for a in args:
+		if a.begins_with("--start-speed="):            # depuracao: velocidade inicial com --start (m/s)
+			v0 = float(a.substr(14))
+	if "--nohud" in args:
+		layer.visible = false
 	for a in args:
 		if a.begins_with("--start="):
 			var z0: float = float(a.substr(8))
 			for k in sim.trucks.size():
 				sim.trucks[k].z = z0 - float(k) * 14.0
-				sim.trucks[k].speed = 30.0
+				sim.trucks[k].speed = v0
 				_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 			_countdown = 0.0
 	if DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false):
@@ -588,7 +596,7 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = path.vehicle_transform(z, x, t.length, -t.lateral_vel * 0.1, t.lean() * 0.11)
+		node.transform = path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11)
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 	_traffic3d.refresh()
@@ -610,7 +618,7 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
-	if _demo.camera(_cam, path, _player_z()):
+	if _demo.camera(_cam, path, _player_z(), _player_x(), t.length):
 		return
 	if _cinema.apply_cut(dt, _cam, _trucks[player]):
 		_speed_fx.update(t.speed, dt)
@@ -647,9 +655,21 @@ func _update_hud() -> void:
 	_hud.countdown = _countdown
 	_hud.rival_idx = _rival_idx[0] if not _rival_idx.is_empty() else -1
 	_hud.cargo_notice = _cargo_notice
+	_curve_feedback(sim.trucks[player])
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])
 		_fx.set_smoke(k, _trucks[k], clampf((60.0 - eng) / 60.0, 0.0, 1.0))
+
+
+## Curva rapida demais (T-132): vibra ao chegar no limite e ao escapar e treme a camera; o aviso escrito e do RaceHud.
+func _curve_feedback(t: TruckSim) -> void:
+	var warn_full: bool = _countdown <= 0.0 and t.curve_warning(sim.track) >= 1.0
+	if (t.escaping and not _was_escaping) or (warn_full and not _was_warn_full):
+		Input.vibrate_handheld(220 if t.escaping else 70)
+	if t.escaping:
+		_shake = maxf(_shake, 0.25)
+	_was_escaping = t.escaping
+	_was_warn_full = warn_full
 
 
 ## Luzinhas e farois: acesos de noite/fim de tarde e quando o jogador esta num tunel (de dia ficam fracos).

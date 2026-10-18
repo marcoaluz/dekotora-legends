@@ -50,7 +50,9 @@ Loop: aceitar frete → correr a rota (bots ou amigos) → entregar → reparar 
 
 **Controle por faixas (decisão ATB-1):** 3 faixas + acostamento. O 1º toque para um lado liga a seta (pisca no caminhão e no HUD);
 o 2º toque no mesmo lado em até ~1,5 s executa a troca (~0,7 s, com leve inclinação). Não existe volante livre nem botão de bater:
-trocar para uma faixa ocupada é a batida/empurrão. Nas curvas o caminhão segue a faixa sozinho.
+trocar para uma faixa ocupada é a batida/empurrão. Nas curvas o caminhão segue a faixa sozinho: acima da velocidade segura
+o pneu canta, ele perde velocidade e desliza no máximo meio metro; só muito acima (+30%) escapa da faixa, com aviso antes.
+O corpo só gira (até 3°) ao trocar de faixa; na curva acompanha a pista (T-132).
 **Prazo e vitória:** o frete tem prazo que desce desde a largada; vence quem chega primeiro **e** dentro do prazo.
 Câmera só externa (primeira pessoa descartada).
 

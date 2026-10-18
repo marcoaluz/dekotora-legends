@@ -47,6 +47,8 @@
  "hud.cargo": "CARGA",
  "hud.gear": "MARCHA",
  "hud.draft": "VÁCUO",
+ "hud.curve_warn": "CURVA! ALIVIE",
+ "hud.curve_escape": "DERRAPANDO!",
  "hud.overtake": "ULTRAPASSAGEM!",
  "hud.go": "LARGOU!",
  "market.heavy": "PESADA",
