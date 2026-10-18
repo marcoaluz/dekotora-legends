@@ -12,7 +12,7 @@ Mais a folha de conferência <sheet>/box_premium_maps.png (os 5 mapas lado a lad
 Fluxo: alta (box_high: nervuras arredondadas, juntas, rebites, portas estampadas, borracha) com materiais PBR CC0
 (lib/cc0_mats) -> passes do Cycles (normal, oclusão, cor, rugosidade, metálico) -> numpy -> PNG. As ferragens
 (box_rear: dobradiças, barras, escada, lanternas) entram só como sombra na oclusão. Determinístico (semente fixa).
-Leva ~2-4 min na CPU do PC do Marco.
+Leva ~3-4 min na CPU do PC do Marco.
 """
 import argparse
 import os

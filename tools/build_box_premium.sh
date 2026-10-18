@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Baú premium (T-136): grava os mapas (bake, ~10 min) e regera o baú médio com as 4 cabines.
+# Baú premium (T-136): grava os mapas (bake, ~3-4 min) e regera o baú médio com as 4 cabines.
 # Uso (raiz do projeto, Git Bash): source tools/env.sh && bash tools/build_box_premium.sh [--no-bake] [--src PASTA_RAIZ]
 #   --no-bake  pula a gravação (usa os tex_box_*.png que já estão em game/assets/vehicles/dekotora/textures/)
 #   --src      raiz onde estão docs/Novos modelos/ e docs/Modelos Melhorados/ (fora do Git; padrão: este projeto)

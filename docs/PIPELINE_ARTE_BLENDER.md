@@ -115,7 +115,7 @@ Piloto de detalhe "premium" no baú médio (`base`), para as 4 cabines. A ideia:
 | `bake_box_premium.py` | Junta tudo: grava `tex_box_albedo/orm/nrm.png` (atlas) e `tex_box_mural_orm/nrm.png` (mural) nas texturas compartilhadas do jogo + folha `blender/renders/t136/box_premium_maps.png` |
 | `pbr.box_premium_set` / `pbr.baked_full` | Materiais da versão leve (`paint_white_box`, `box_metal`, `mural`) com ORM (R = oclusão exportada pelo grupo "glTF Material Output") |
 
-Comandos (raiz do projeto, Git Bash): `source tools/env.sh && bash tools/build_box_premium.sh` (bake ~10 min + 4 caminhões;
+Comandos (raiz do projeto, Git Bash): `source tools/env.sh && bash tools/build_box_premium.sh` (bake ~3–4 min + 4 caminhões ~1,5 min;
 `--no-bake` só regera os .glb; `--src RAIZ` se os modelos de terceiros estiverem em outra pasta). Depois
 `godot --headless --path game --import`. `build_truck_3d.py --box auto|premium|classic` (auto = premium só no `base`).
 
