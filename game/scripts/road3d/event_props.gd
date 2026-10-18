@@ -8,12 +8,13 @@ extends RefCounted
 ##    small works truck with an LED arrow board and beacons, steel plates on the open lane beside the works.
 ##  - narrow: lane reduction diamond + 車線減少 plate, painted merge arrows, the lane-end line, zebra hatching on the
 ##    lane that ends, delineator posts and an LED arrow board.
-## Signs stand on the right (median) barrier, so they never sit on the regular signs of RoadSigns (left side).
+## Signs stand on the right (median side), on the paved strip just inside the barrier: they never sit on the regular
+## signs of RoadSigns (left side) and never cross the viaduct sound walls (BARRIER_IN + 0,45).
 
 const M: float = Track.ROAD_HALF_WIDTH_M
-const SIGN_LAT: float = RoadMesh.BARRIER_IN + 0.3
-const SIGN_TURN: float = -0.1                      # right side: turned a little to the road
-const BARRIER_TOP: float = 0.85
+const BOARD_LAT: float = RoadMesh.BARRIER_IN - 1.1        # LED board centre (3 m wide: ends 0,5 m inside the barrier)
+const DIAMOND_LAT: float = RoadMesh.BARRIER_IN - 0.6      # diamond / limit sign on one post
+const SIGN_TURN: float = 0.0
 const ACCIDENT_MODELS: Array[String] = ["car_ascona", "car_suv", "car_falcon"]   # 4 surfaces each (the code-made cars have 7)
 const ACCIDENT_COLORS: Array[Color] = [Color("#d8dce2"), Color("#2a5cc0"), Color("#c8202f")]
 const CAR_LEN: float = 4.5
@@ -124,27 +125,27 @@ static func _signs(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
 
 static func _board(b: TrackEvents3D, z: float, id: String, plate: String) -> void:
 	var bs: Basis = b.basis(z, SIGN_TURN)
-	var c: Vector3 = b.pt(z, SIGN_LAT, 4.0)
-	b.face(bs, c, Vector2(3.4, 1.7), id)
-	b.box(bs, c - bs.z * 0.06, Vector3(3.5, 1.8, 0.1), Color("#2a2c31"))
-	b.face(bs, b.pt(z, SIGN_LAT, 2.75), Vector2(1.4, 0.7), plate)
-	for sx in [-1.2, 1.2]:
-		var base: Vector3 = b.pt(z, SIGN_LAT, BARRIER_TOP) + bs.x * sx - bs.z * 0.15
-		b.box(Basis(), base + Vector3.UP * 1.6, Vector3(0.12, 3.2, 0.12), POST)
+	var c: Vector3 = b.pt(z, BOARD_LAT, 4.2)
+	b.face(bs, c, Vector2(3.0, 1.5), id)
+	b.box(bs, c - bs.z * 0.06, Vector3(3.1, 1.6, 0.1), Color("#2a2c31"))
+	b.face(bs, b.pt(z, BOARD_LAT, 3.05), Vector2(1.3, 0.65), plate)
+	for sx in [-1.0, 1.0]:
+		var base: Vector3 = b.pt(z, BOARD_LAT, 0.0) + bs.x * sx - bs.z * 0.15
+		b.box(Basis(), base + Vector3.UP * 2.1, Vector3(0.12, 4.2, 0.12), POST)
 
 
 static func _diamond(b: TrackEvents3D, z: float, id: String, aux: String, plate: String) -> void:
 	var bs: Basis = b.basis(z, SIGN_TURN)
-	b.face(bs, b.pt(z, SIGN_LAT, 3.7), Vector2(1.6, 1.6), id)
-	b.box(bs, b.pt(z, SIGN_LAT, 3.7) - bs.z * 0.04, Vector3(1.1, 1.1, 0.05), POST)
+	b.face(bs, b.pt(z, DIAMOND_LAT, 3.7), Vector2(1.6, 1.6), id)
+	b.box(bs, b.pt(z, DIAMOND_LAT, 3.7) - bs.z * 0.04, Vector3(1.1, 1.1, 0.05), POST)
 	var y: float = 2.6
 	if aux != "":
-		b.face(bs, b.pt(z, SIGN_LAT, y), Vector2(1.7, 0.43), aux)
+		b.face(bs, b.pt(z, DIAMOND_LAT, y), Vector2(1.7, 0.43), aux)
 		y -= 0.6
 	if plate != "":
-		b.face(bs, b.pt(z, SIGN_LAT, y), Vector2(1.2, 0.6), plate)
-	var base: Vector3 = b.pt(z, SIGN_LAT, BARRIER_TOP) - bs.z * 0.08
-	b.box(Basis(), base + Vector3.UP * 1.45, Vector3(0.11, 2.9, 0.11), POST)
+		b.face(bs, b.pt(z, DIAMOND_LAT, y), Vector2(1.2, 0.6), plate)
+	var base: Vector3 = b.pt(z, DIAMOND_LAT, 0.0) - bs.z * 0.08
+	b.box(Basis(), base + Vector3.UP * 1.85, Vector3(0.11, 3.7, 0.11), POST)
 
 
 # ---------------------------------------------------------------- accident

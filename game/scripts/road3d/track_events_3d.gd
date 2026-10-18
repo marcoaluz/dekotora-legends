@@ -91,6 +91,7 @@ func build(path_: TrackPath, tod: TimeOfDay) -> void:
 		_commit()
 	if "--fps-log" in OS.get_cmdline_user_args():
 		print("EVENTOS 3D: ", counts, "  grupos=", groups.size())
+	visible = not "--hide-events-3d" in OS.get_cmdline_user_args()   # depuracao: mede o custo so do visual
 
 
 func count(kind: String, n: int = 1) -> void:
