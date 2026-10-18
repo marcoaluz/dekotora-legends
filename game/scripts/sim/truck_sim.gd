@@ -9,15 +9,13 @@ const DRAG: float = 1.5                 # N por (m/s)^2
 const BRAKE_FORCE: float = 60000.0      # N
 const OFFROAD_MAX_SPEED: float = 14.0   # m/s no acostamento
 const OFFROAD_DECEL: float = 8.0        # m/s^2 acima desse limite
-const CURVE_PUSH: float = 7.9e-4        # empurrao da curva: x/s por (m/s)^2 por unidade de curva
 const STEER_SPEED: float = 1.6          # x/s de autoridade maxima de direcao (limite de aderencia nas curvas)
 const STEER_RESPONSE: float = 3.2          # inercia lateral: quanto menor, mais pesado o caminhao para sair da faixa
 const LANE_SIGNAL_WINDOW: float = 1.5   # s: 2o toque no mesmo lado dentro desta janela executa a troca
 const LANE_CHANGE_TIME: float = 1.0     # s: duracao nominal da troca de faixa (pesado, jeito do original)
 const LANE_GAIN: float = 1.9            # 1/s: quanto o x corre atras da faixa alvo
 const LANE_MAX_VEL: float = 0.95        # x/s: velocidade lateral maxima
-const LANE_HOLD: float = 0.5            # aderencia lateral: define a velocidade segura nas curvas (curva 1,0 = 90 km/h)
-const OVERSPEED_PUSH: float = 4.0       # quanto a curva empurra para fora acima da velocidade segura
+const MAX_BODY_YAW: float = 0.0524     # rad (3 graus): giro maximo do corpo, SO na troca de faixa (T-132)
 const MASS_REF: float = 12000.0
 const BASE_MASS: float = 8000.0
 const DEFAULT_CARGO: float = 4000.0
@@ -63,6 +61,9 @@ var signal_time: float = 0.0            # s restantes para dar o 2o toque
 var lane_change_time: float = 0.0       # s restantes da troca em andamento (inclinacao visual)
 var tap_prev: int = 0                   # direcao do comando anterior (detecta o toque)
 var lane_changes: int = 0               # trocas executadas (testes/estatistica)
+var curve_ratio: float = 0.0            # velocidade / velocidade segura da curva (CurveGrip); > 1 = pneu raspando
+var skid: float = 0.0                   # 0..1 pneu cantando (apresentacao: som, fumaca, HUD)
+var escaping: bool = false              # passou de CurveGrip.ESCAPE_RATIO: perdeu a faixa
 var side_hits: int = 0                  # batidas laterais (riscam murais)
 var style_points: int = 0              # destaque da pintura e dos adesivos (somado ao das pecas)
 var cargo_trait: String = "normal"   # fragile | heavy | perishable | normal (muda a fisica/prazo)
@@ -109,12 +110,9 @@ func refresh_damage_effects() -> void:
 	steer_pull = 0.1 * (1.0 - float(systems["steering"]) / 100.0)
 
 
-## Velocidade (m/s) acima da qual a curva `curve` empurra o caminhao para fora da faixa.
+## Velocidade (m/s) acima da qual a curva `curve` comeca a raspar o pneu (ver CurveGrip).
 static func curve_safe_speed(curve: float, grip_: float) -> float:
-	var c: float = absf(curve)
-	if c < 0.05:
-		return EngineModel.MAX_SPEED * 2.0
-	return sqrt(LANE_HOLD * grip_ / (c * CURVE_PUSH))
+	return CurveGrip.safe_speed(curve, grip_)
 
 
 ## Toque de faixa: `steer_` e a direcao segurada (-1, 0, +1). O toque e a borda 0 -> direcao.
@@ -151,12 +149,29 @@ func lean() -> float:
 	return clampf(lateral_vel / (LANE_MAX_VEL * agility), -1.0, 1.0)
 
 
+## Giro do corpo (rad, > 0 = para a esquerda) em relacao a faixa: SO da troca de faixa (velocidade lateral do
+## controle de faixa), no maximo MAX_BODY_YAW, suave. Na curva o corpo acompanha a pista (sem ficar de lado).
+func body_yaw() -> float:
+	var l: float = lean()
+	return -signf(l) * smoothstep(0.0, 1.0, absf(l)) * MAX_BODY_YAW
+
+
+## Aviso de curva 0..1 para o HUD/vibracao (antes de escapar). Ver CurveGrip.warning.
+func curve_warning(track: Track) -> float:
+	return CurveGrip.warning(track, z + length, speed, grip())
+
+
 func grip() -> float:
 	return pow(MASS_REF / mass, 0.3)
 
 
 func step(dt: float, cmd: Commands, track: Track) -> void:
-	# 1) longitudinal: tracao - arrasto - rolamento - freio - ladeira
+	# 0) curva: quanto acima da velocidade segura (raspa o pneu, desliza ate 0,5 m, escapa acima de +30%)
+	var curve: float = track.curve_at(z)
+	curve_ratio = CurveGrip.ratio(speed, curve, grip())
+	skid = CurveGrip.skid(curve_ratio)
+	escaping = curve_ratio > CurveGrip.ESCAPE_RATIO
+	# 1) longitudinal: tracao - arrasto - rolamento - freio - ladeira - atrito do pneu na curva
 	var force: float = engine.step(dt, cmd.throttle, speed, draft * DRAFT_SPEED_BONUS)
 	if force > 0.0:
 		force *= 1.0 + DRAFT_BOOST * draft
@@ -166,7 +181,7 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	if speed > 0.0:
 		force -= resist
 	force -= cmd.brake * BRAKE_FORCE * (1.0 if speed > 0.0 else 0.0)
-	var accel: float = force / mass - GRAVITY * track.hill_at(z) * 0.5
+	var accel: float = force / mass - GRAVITY * track.hill_at(z) * 0.5 - CurveGrip.scrub_decel(curve_ratio)
 	speed = maxf(speed + accel * dt, 0.0)
 	# barra de Passing: enche em alta velocidade, esvazia enquanto usada
 	passing_active = cmd.passing and passing_charge > 0.02
@@ -178,17 +193,15 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	offroad = absf(x) > Lanes.OFFROAD_X
 	if offroad and speed > OFFROAD_MAX_SPEED:
 		speed = maxf(speed - OFFROAD_DECEL * dt, OFFROAD_MAX_SPEED)
-	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho. Na curva so escapa se entrar rapido demais.
+	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho, tambem na curva (T-132).
+	#    Raspando o pneu, aceita uma deslizada de ate 0,5 m para fora; escapando, perde a autoridade.
 	_lane_input(cmd.steer, dt)
-	var authority: float = minf(speed / 6.0, 1.0) * grip()
+	var authority: float = minf(speed / 6.0, 1.0) * grip() * (0.0 if escaping else 1.0)
 	var vmax: float = LANE_MAX_VEL * agility
-	var desired: float = clampf((Lanes.X[lane] - x) * LANE_GAIN * agility, -vmax, vmax) * authority
+	var target_x: float = Lanes.X[lane] + CurveGrip.slide_x(curve, curve_ratio)
+	var desired: float = clampf((target_x - x) * LANE_GAIN * agility, -vmax, vmax) * authority
 	lateral_vel += (desired - lateral_vel) * minf(STEER_RESPONSE * agility * dt, 1.0)
-	var curve: float = track.curve_at(z)
-	var safe: float = curve_safe_speed(curve, grip())
-	var push: float = 0.0
-	if speed > safe:
-		push = -curve * (speed * speed - safe * safe) * CURVE_PUSH * OVERSPEED_PUSH
+	var push: float = CurveGrip.escape_push(curve, curve_ratio)
 	x += (lateral_vel + push + steer_pull * steer_pull_dir) * dt
 	x = clampf(x, -1.6, 1.6)   # limite fisico (fora do acostamento)
 	# 4) avanco

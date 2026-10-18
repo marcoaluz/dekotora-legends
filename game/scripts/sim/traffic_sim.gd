@@ -85,6 +85,16 @@ func _init(seed_: int = 1234, density_: int = Density.NORMAL) -> void:
 		cars.append(c)
 
 
+## Giro do corpo (rad, > 0 = esquerda) na troca de faixa: sobe e desce suave, no maximo TruckSim.MAX_BODY_YAW.
+## Na curva o carro acompanha a pista (mesma regra dos caminhoes, T-132).
+static func body_yaw(c: Car) -> float:
+	var rem: float = LANES[c.lane] - c.x
+	if absf(rem) < 0.001:
+		return 0.0
+	var p: float = clampf(1.0 - absf(rem) / Lanes.SPACING, 0.0, 1.0)
+	return -signf(rem) * sin(PI * p) * TruckSim.MAX_BODY_YAW
+
+
 func _place(c: Car, z: float) -> void:
 	c.z = z
 	c.lane = _rng.randi_range(0, LANES.size() - 1)
