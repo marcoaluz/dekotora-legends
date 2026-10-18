@@ -236,6 +236,7 @@ func _apply_mural() -> void:
 				if _mural_mat == null:
 					_mural_mat = (cur as StandardMaterial3D).duplicate() as StandardMaterial3D if cur is StandardMaterial3D else StandardMaterial3D.new()
 					_mural_mat.albedo_texture = tex
+					TruckTextures.swap_textures(_mural_mat)      # bau premium: normais/oclusao da chapa (T-136)
 					_mural_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 				m.set_surface_override_material(s, _mural_mat)
 

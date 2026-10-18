@@ -32,9 +32,10 @@ static func apply(root: Node) -> void:
 
 
 ## Material compartilhado para `cur` (mesmo nome = mesmo material em todos os .glb do caminhao).
+## O "mural" fica de fora: e um material por caminhao (cor do rival), trocado pelo TruckNode (swap_textures).
 static func material_for(cur: StandardMaterial3D) -> StandardMaterial3D:
 	var key: String = cur.resource_name
-	if key == "":
+	if key == "" or key == "mural":
 		return null
 	if _mats.has(key):
 		return _mats[key]
@@ -62,3 +63,15 @@ static func texture_for(t: Texture2D) -> Texture2D:
 	if not ResourceLoader.exists(path):
 		return null
 	return load(path) as Texture2D
+
+
+## Troca, no proprio `mat`, as miniaturas pelas texturas compartilhadas (normais/oclusao do mural do bau premium,
+## T-136). Devolve true se trocou alguma.
+static func swap_textures(mat: StandardMaterial3D) -> bool:
+	var swapped: bool = false
+	for prop in SLOTS:
+		var full: Texture2D = texture_for(mat.get(prop) as Texture2D)
+		if full != null:
+			mat.set(prop, full)
+			swapped = true
+	return swapped

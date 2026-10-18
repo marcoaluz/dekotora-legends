@@ -118,6 +118,12 @@ def main():
             mo = mirror_x(o, "hi_metal_L")
             M.uv_world(mo, 1.0)
             high.append(mo)
+    bpy.ops.object.select_all(action="DESELECT")           # uma fonte só: o Blender procura pixel a pixel em
+    for o in high:                                         # cada objeto selecionado, sem threads (bem mais lento)
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = high[0]
+    bpy.ops.object.join()
+    high = [bpy.context.view_layer.objects.active]
     hw = []
     box_rear.build_hardware(m, hw.append, STD)             # só fazem sombra (não são selecionadas)
     M.apply_transforms(hw)

@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # Capturas do baú dentro do JOGO (T-136): garagem de noite e de dia (3/4 e traseira) e corrida de noite e de dia
 # (câmera de perseguição e de lado), sempre o caminhão de fábrica branco, sem peças.
-# Uso (raiz do projeto, Git Bash): source tools/env.sh && bash tools/capture_box.sh PASTA [CABINE] [MODELO]
+# Uso (raiz do projeto, Git Bash): source tools/env.sh && bash tools/capture_box.sh PASTA [CABINE] [MODELO] [rapido]
 #   PASTA  = onde gravar os PNG (caminho absoluto, ex.: C:/tmp/bau_depois)
 #   CABINE = chata (padrão) | jac | curta | americana    MODELO = base (padrão) | leve | longo | canter
+#   rapido = só 2 capturas da garagem (3/4 de noite e traseira de dia), para conferir as outras cabines
 # Abre janelas do Godot por alguns segundos (precisa de tela). Para medir FPS use tools/measure_box.sh.
 set -e
 : "${GODOT:?rode antes: source tools/env.sh}"
 OUT="${1:?informe a pasta de saida}"
 CAB="${2:-chata}"
 BODY="${3:-base}"
+QUICK="${4:-}"
 mkdir -p "$OUT"
 G=(--path game --resolution 1280x720)
 garage() {   # nome, argumentos extras
@@ -27,6 +29,11 @@ race() {     # nome, rota, hora, argumentos extras
     rm -rf "${dir:?}"
 }
 garage noite_34 --zoom=0.55
+if [ "$QUICK" = "rapido" ]; then
+    garage dia_traseira --day --view=rear --zoom=0.8
+    ls "$OUT"
+    exit 0
+fi
 garage dia_34 --day --zoom=0.55
 garage noite_traseira --view=rear --zoom=0.8
 garage dia_traseira --day --view=rear --zoom=0.8
