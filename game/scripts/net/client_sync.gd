@@ -37,7 +37,7 @@ func setup(setup_: Dictionary, my_truck: int) -> void:
 		track.events = route.build_events(track, int(setup_["seed"]))
 	sim = RaceSim.new(track, int(rules["traffic"]), int(setup_["seed"]))
 	sim.freight = route.freight if route != null else 25000
-	sim.deadline = route.deadline() if route != null else 0.0
+	sim.deadline = (route.deadline() + track.events.time_allowance()) if route != null else 0.0   # T-139: folga dos eventos
 	var grid: Array = setup_["grid"]
 	for entry in grid:
 		var i: int = int(entry["idx"])

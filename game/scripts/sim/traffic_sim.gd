@@ -204,6 +204,8 @@ func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void
 		var target_speed: float = c.cruise
 		if events != null:
 			target_speed = minf(target_speed, _avoid_closure(c, trucks))
+			target_speed = minf(target_speed, events.limit_ahead(c.z, c.z + c.length, 120.0, BRAKE * 0.5,
+				TrackEvents.WORKS_LIMIT_KMH / 3.6))           # works: slows down to the posted limit
 		var blk: Dictionary = _blocker(c, trucks)
 		if not blk.is_empty() and float(blk["speed"]) < c.cruise:
 			# alcancou alguem mais lento: tenta a faixa da esquerda, depois a da direita; senao, segue atras

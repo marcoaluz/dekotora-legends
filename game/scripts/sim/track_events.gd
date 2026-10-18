@@ -28,6 +28,12 @@ const RANDOM_MIN_Z: float = 650.0         # after the toll gate and the start
 const RANDOM_END_GAP: float = 350.0       # keep the last metres before the finish free
 const RANDOM_GAP_M: float = 200.0         # free road between one event (end) and the next warning
 const RANDOM_SHARP: float = 1.25          # no random event in the tightest curves (the mountain still gets some)
+# road works: steel plates on the open lanes along the full closure (EventContact.truck)
+const WORKS_LIMIT_KMH: float = 60.0       # posted limit beside the works
+const LIMIT_TOL_KMH: float = 5.0          # above limit + tolerance the plates shake the cargo
+# deadline allowance (s) per event, measured with tools_dev/measure_event_times.gd (mean loss of the HARD bots)
+const ALLOWANCE_S: Array[float] = [3.0, 4.0, 3.0]   # accident (1 lane), works, narrow
+const ALLOWANCE_TWO_LANES_S: float = 8.0           # accident or works closing 2 lanes
 
 
 class Event:
@@ -188,6 +194,34 @@ func edge_cut_m(zz: float, side: int) -> float:
 		var inner: float = iv.x if side > 0 else -iv.y
 		cut = maxf(cut, (EDGE - inner) * Track.ROAD_HALF_WIDTH_M)
 	return clampf(cut, 0.0, Lanes.SPACING * Track.ROAD_HALF_WIDTH_M)
+
+
+## Works speed limit (m/s) for a vehicle from `rear_z` to `nose_z`: beside the full closure of road works. INF = none.
+func limit_at(rear_z: float, nose_z: float) -> float:
+	for ev in list:
+		if ev.kind == Kind.WORKS and nose_z > ev.full_z() and rear_z < ev.end_z():
+			return WORKS_LIMIT_KMH / 3.6
+	return INF
+
+
+## Highest speed (m/s) a vehicle with its nose at `nose_z` may have now to be at `limit` when it reaches the works,
+## braking at `decel`. INF = no works ahead within `look` m.
+func limit_ahead(rear_z: float, nose_z: float, look: float, decel: float, limit: float) -> float:
+	var best: float = INF
+	for ev in list:
+		if ev.kind != Kind.WORKS or rear_z >= ev.end_z() or ev.full_z() - nose_z > look:
+			continue
+		var d: float = maxf(ev.full_z() - nose_z, 0.0)
+		best = minf(best, sqrt(limit * limit + 2.0 * decel * d))
+	return best
+
+
+## Extra deadline (s) for these events (the prize deadline stretches: the client knows about the accident/works).
+func time_allowance() -> float:
+	var s: float = 0.0
+	for ev in list:
+		s += ALLOWANCE_TWO_LANES_S if ev.hi > ev.lo else ALLOWANCE_S[ev.kind]
+	return s
 
 
 ## Is z inside any event zone (warning included)? Used to keep paint/markings out of the closures.

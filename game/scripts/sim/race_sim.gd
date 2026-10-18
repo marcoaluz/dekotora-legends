@@ -84,7 +84,8 @@ func step(dt: float = FIXED_DT) -> void:
 
 
 ## Contato com um evento de pista (EventContact): cone = perda de carga; veiculo parado = batida com dano
-## (regras de colisao: DamageModel com a massa do veiculo parado); fim de faixa raspando = toque na carga.
+## (regras de colisao: DamageModel com a massa do veiculo parado); fim de faixa raspando = toque na carga;
+## chapas de aco das obras acima do limite = carga sacudindo (cargo_hit pelo excesso, sem dano).
 func _event_hit(i: int, c: Dictionary) -> void:
 	var t: TruckSim = trucks[i]
 	var kind: String = String(c["kind"])
@@ -97,6 +98,8 @@ func _event_hit(i: int, c: Dictionary) -> void:
 		out["damage"] = dmg
 		t.cargo_touch()
 		t.cargo_hit(float(c["dv"]))
+	elif kind == "plates":
+		t.cargo_hit(float(c["dv"]) * EventContact.PLATE_CARGO)
 	else:
 		t.cargo_touch()
 	events.append(out)

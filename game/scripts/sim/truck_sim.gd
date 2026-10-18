@@ -80,6 +80,7 @@ var event_contact: Dictionary = {}
 var cone_m: float = 0.0
 var scrape_t: float = 0.0
 var hit_t: float = 0.0
+var plate_t: float = 0.0
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:

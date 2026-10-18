@@ -155,7 +155,7 @@ func _build_race(seed_: int) -> void:
 		track.events = route.build_events(track, seed_)       # T-139: o servidor sorteia e manda no setup
 	sim = RaceSim.new(track, int(rules["traffic"]), seed_)
 	sim.freight = route.freight if route != null else 25000
-	sim.deadline = route.deadline() if route != null else 0.0
+	sim.deadline = (route.deadline() + track.events.time_allowance()) if route != null else 0.0   # T-139: folga dos eventos
 	drivers.clear()
 	var slot: int = 0
 	for p in order:
@@ -232,7 +232,7 @@ func _track_damage_changes(evs: Array[Dictionary]) -> void:
 			"truck":
 				_mark_damage(int(e["a"]))
 				_mark_damage(int(e["b"]))
-			"traffic":
+			"traffic", "event_obstacle", "event_cone", "event_scrape", "event_plates":   # T-139: dano/carga dos eventos
 				_mark_damage(int(e["truck"]))
 
 

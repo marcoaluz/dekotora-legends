@@ -12,6 +12,8 @@ extends RefCounted
 ##  - lane end (narrowing): a wall that moves in with the taper; the truck scrapes along it (speed + cargo touch)
 ##    and, once the centre of its lane is gone, its target lane becomes the open neighbour: it MUST merge
 ##    (whoever is beside it disputes the gap through the normal truck collision).
+##  - steel plates (road works, beside the full closure): above TrackEvents.WORKS_LIMIT_KMH + tolerance, every
+##    PLATE_EVERY s the cargo shakes (cargo_hit by the excess speed). No damage to the truck.
 
 const CONE_EVERY_M: float = 5.0
 const CONE_SLOW: float = 0.7            # m/s lost per cone
@@ -22,6 +24,8 @@ const WALL_DECEL: float = 3.0           # m/s^2 while scraping the lane end
 const SCRAPE_EVERY: float = 0.8         # s between cargo touches while scraping
 const SIDE_MIN_DV: float = 1.5          # m/s: lateral speed that counts as a side hit
 const WALL_PUSH: float = 2.0            # x/s: how fast the lane end pushes a vehicle in (no teleport at the taper start)
+const PLATE_EVERY: float = 0.5          # s between cargo shakes on the works steel plates above the limit
+const PLATE_CARGO: float = 0.25         # cargo_hit(dv) factor per shake (dv = m/s above limit + tolerance)
 
 
 ## Applies the closures to truck `t` (call at the end of TruckSim.step). Returns {} or
@@ -59,6 +63,15 @@ static func truck(evs: TrackEvents, t: TruckSim, dt: float) -> Dictionary:
 				t.signal_dir = 0
 			continue
 		var full: float = ev.full_z()
+		if ev.kind == TrackEvents.Kind.WORKS and nose > full and t.z < ev.end_z():   # steel plates beside the works
+			var over: float = t.speed - (TrackEvents.WORKS_LIMIT_KMH + TrackEvents.LIMIT_TOL_KMH) / 3.6
+			if over > 0.0:
+				t.plate_t -= dt
+				if t.plate_t <= 0.0:
+					t.plate_t = PLATE_EVERY
+					out = {"kind": "plates", "zone": "rear", "dv": over, "event": k}
+			else:
+				t.plate_t = 0.0
 		if nose > ev.z and t.z < full:                       # taper: cones under the nose
 			var ivc: Vector2 = evs.interval(ev, minf(nose, full))
 			if t.x + half > ivc.x and t.x - half < ivc.y:

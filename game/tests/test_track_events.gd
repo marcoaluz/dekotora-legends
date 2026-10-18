@@ -131,6 +131,52 @@ func test_closed_lane_cones_cost_cargo_and_vehicle_is_a_crash() -> void:
 		check(t.lane != Lanes.LAST and t.z > ev.end_z(), "%s: saiu para a faixa aberta e seguiu (faixa %d, z=%.0f)" % [kind, t.lane, t.z])
 
 
+func test_works_steel_plates_shake_cargo_above_limit() -> void:
+	var ev: Dictionary = {"kind": "works", "z": 300.0, "length": 200.0, "lanes": [3]}
+	for v in [30.0, 16.0]:
+		var sim := _sim_with(ev)
+		var i: int = sim.add_truck(200.0, Lanes.X[Lanes.FIRST])
+		var t: TruckSim = sim.trucks[i]
+		t.speed = v
+		var evs: Array[Dictionary] = []
+		while t.z < 560.0 and sim.time < 60.0:
+			t.speed = v                                    # velocidade fixa (o teste e da regra, nao do motor)
+			sim.set_command(i, Commands.make(0.0, 0.0, 0.0))
+			sim.step()
+			evs.append_array(sim.drain_events())
+		var n: int = _count(evs, "event_plates")
+		if v > 20.0:
+			check(n >= 6, "a 108 km/h as chapas sacodem a carga (%d)" % n)
+			check(t.cargo_loss() > 0.03, "perdeu carga nas chapas (%.3f)" % t.cargo_loss())
+			check_near(float(t.systems["engine"]) + float(t.systems["steering"]) + float(t.systems["cargo"]), 300.0, 0.001, "chapas nao danificam o caminhao")
+		else:
+			check_eq(n, 0, "a 58 km/h nada acontece")
+			check_near(t.cargo_loss(), 0.0, 0.0001, "sem perda de carga dentro do limite")
+	var evs2 := TrackEvents.new()
+	evs2.add(ev)
+	check(is_inf(evs2.limit_at(0.0, 340.0)), "limite so ao lado da obra (nao no afunilamento)")
+	check_near(evs2.limit_at(380.0, 395.0), TrackEvents.WORKS_LIMIT_KMH / 3.6, 0.001, "limite ao lado da obra")
+
+
+func test_deadline_stretches_with_events_same_on_server_and_client() -> void:
+	var evs := TrackEvents.new()
+	evs.add({"kind": "accident", "z": 900.0, "length": 110.0, "lanes": [2, 3]})
+	evs.add({"kind": "works", "z": 1500.0, "length": 170.0, "lanes": [3]})
+	evs.add({"kind": "narrow", "z": 2300.0, "length": 420.0, "lanes": [1]})
+	check_near(evs.time_allowance(), TrackEvents.ALLOWANCE_TWO_LANES_S + TrackEvents.ALLOWANCE_S[1] + TrackEvents.ALLOWANCE_S[2], 0.001, "folga somada por evento")
+	var room := Room.new("EVT141")
+	room.add_member(100, "A", "AAAAAAAA", TruckConfig.basic_descriptor())
+	room.set_rules(100, {"bots": 1, "traffic": 1, "route": "kanto_2_viaduct"})
+	room.set_ready(100, true)
+	check_eq(room.try_start(100, 4242), "", "corrida iniciada")
+	var route: RouteDef = load("res://data/routes/kanto_2_viaduct.tres") as RouteDef
+	check_near(room.sim.deadline, route.deadline() + room.sim.track.events.time_allowance(), 0.001, "servidor: prazo + folga dos eventos")
+	check(room.sim.deadline > route.deadline(), "o evento fixo estica o prazo")
+	var sync := ClientSync.new()
+	sync.setup(JSON.parse_string(JSON.stringify(room.race_setup())), 0)
+	check_near(sync.sim.deadline, room.sim.deadline, 0.001, "cliente tem o mesmo prazo")
+
+
 # ---------------------------------------------------------------- bots e transito
 func _race_with_bots(ev: Dictionary, density: int, seconds: float = 150.0) -> Dictionary:
 	var sim := _sim_with(ev, density, 3200.0)
@@ -190,6 +236,7 @@ func test_bots_avoid_closures_early() -> void:
 		var name: String = "%s %s" % [ev["kind"], ev["lanes"]]
 		check_eq(_count(evs, "event_obstacle"), 0, "%s: nenhum bot bateu no bloqueio" % name)
 		check(_count(evs, "event_cone") <= 2, "%s: bots quase nao tocam cones (%d)" % [name, _count(evs, "event_cone")])
+		check_eq(_count(evs, "event_plates"), 0, "%s: bots passam pelas obras no limite (carga nao sacode)" % name)
 		var moves: int = 0
 		for b in (r["bots"] as Array):
 			moves += (b as BotDriver).closure_moves

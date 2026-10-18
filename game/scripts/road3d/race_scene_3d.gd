@@ -91,6 +91,8 @@ func _ready() -> void:
 		_cargo_notice = _build_cargo_notice(gs.pending_contract)
 		if sim.deadline <= 0.0 and route != null:
 			sim.deadline = route.deadline()
+		if sim.deadline > 0.0:
+			sim.deadline += track.events.time_allowance()     # T-139: o prazo estica com os eventos de pista
 	path = TrackPath.new(sim.track)
 	var q: int = int(Settings.quality)
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular

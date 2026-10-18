@@ -26,6 +26,9 @@ const CLOSURE_LOOK: float = 260.0                           # T-139: m a frente 
 const OVERTAKE_LOOK: float = 120.0                          # m: para ultrapassar, a faixa so precisa estar aberta ate aqui
 const MUST_MOVE_M: float = 110.0                            # m: daqui em diante sai da faixa fechada mesmo atras de um lento
 const CLOSURE_BRAKE: float = 3.5                            # m/s^2 para parar antes do bloqueio se nao consegue sair
+const WORKS_LIMIT_F: Array[float] = [0.9, 0.95, 1.0]        # fator sobre o limite das obras (a tolerancia e +5 km/h)
+const WORKS_LOOK: float = 260.0                             # m a frente em que comeca a frear para o limite das obras
+const WORKS_BRAKE: float = 1.8                              # m/s^2 planejados (o freio do bot e proporcional: atrasa)
 
 var difficulty: int = Difficulty.NORMAL
 var rival: bool = false                # duela com o jogador mesmo na dificuldade facil
@@ -189,6 +192,9 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 		probe += 12.0
 	var desired: float = minf(vmax, safe)
 	desired = _closure(sim, me, index, desired)
+	if not track.events.is_empty():              # obras: chega no limite e passa por elas sem sacudir a carga
+		desired = minf(desired, track.events.limit_ahead(me.z, me.z + me.length, WORKS_LOOK, WORKS_BRAKE,
+			TrackEvents.WORKS_LIMIT_KMH / 3.6 * WORKS_LIMIT_F[difficulty]))
 	# obstaculo na faixa atual / desejada
 	var horizon: float = REACTION_M[difficulty] + speed * 1.3
 	var obstacle: Dictionary = _obstacle_ahead(sim, me, index, Lanes.X[target_lane], horizon)
