@@ -66,6 +66,7 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `horn_musical_2.wav` | 3 s | Multi-tone train-style air horn chord on a big truck, dramatic |
 | `passing_flash.wav` | 0,5 s | Quick electric click and whoosh of high beam headlights flashing |
 | `cargo_rattle_loop.wav` | 3 s | Loose cargo shaking and rattling inside a metal truck box, steady, seamless loop |
+| `steel_plate_clank.wav` | 0,5 s | Heavy truck tire rolling fast over a loose steel road plate at road works, loud metallic clank and bang |
 
 ## 3. Batidas (`game/assets/audio/sfx/crash/`)
 
@@ -81,6 +82,8 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `glass_break.wav` | 1 s | Truck side window glass breaking |
 | `guardrail_hit.wav` | 1,5 s | Truck hitting a highway steel guardrail, loud clang and scrape |
 | `car_hit.wav` | 1 s | Big truck hitting a small car, crunch of thin metal |
+| `cone_hit.wav` | 1 s | Big truck knocking over a plastic traffic cone, hollow plastic thump and clatter on asphalt |
+| `barrier_scrape.wav` | 1 s | Truck side scraping along plastic road barriers at a lane closure, short rough plastic scrape |
 
 ## 4. Ambiente (`game/assets/audio/sfx/ambient/`)
 
@@ -90,6 +93,7 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `highway_night_loop.wav` | 8 s | Distant Japanese highway at night, faint passing cars, calm ambience, seamless loop |
 | `toll_gate.wav` | 2 s | Japanese highway toll gate electronic beep and barrier lifting |
 | `pass_car_whoosh.wav` | 1,5 s | Car passing very close at high speed, doppler whoosh |
+| `roadworks_loop.wav` | 5 s | Highway road works at night, diesel generator hum, distant jackhammer, faint warning beeps, seamless loop |
 
 ## 5. Interface (`game/assets/audio/sfx/ui/`)
 
@@ -105,6 +109,12 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `win_fanfare.wav` | 4 s | Short triumphant retro arcade victory fanfare with synths |
 | `lose_jingle.wav` | 3 s | Short sad retro arcade game over jingle |
 | `fame_up.wav` | 1 s | Sparkly shimmering chime, reward pickup |
+| `event_alert_chime.wav` | 1 s | Japanese highway information board alert chime, clear two-tone electronic ding dong |
+
+> **T-139 (eventos de pista):** `cone_hit`, `barrier_scrape`, `steel_plate_clank`, `event_alert_chime` e `roadworks_loop` ainda
+> **não foram gerados**. Enquanto não existem, o jogo toca sons de reserva (batida leve / bip da contagem) e o ruído das obras fica
+> mudo. Para gerar: `python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`
+> e ouvir antes de aceitar.
 
 ## 6. Multiplayer (`game/assets/audio/sfx/net/`)
 

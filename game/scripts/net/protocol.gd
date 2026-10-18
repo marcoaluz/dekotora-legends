@@ -2,7 +2,7 @@ class_name Protocol
 extends RefCounted
 ## Constantes do protocolo de rede (docs/MULTIPLAYER.md).
 
-const VERSION: int = 1
+const VERSION: int = 2                    # 2 = T-139: eventos de pista no setup da corrida
 const DEFAULT_PORT: int = 24600
 const MAX_PLAYERS: int = 4
 const COMMAND_RATE: float = 30.0          # comandos por segundo (cliente -> servidor)
@@ -23,6 +23,7 @@ static func default_rules() -> Dictionary:
 		"bots": 1,                       # bots para completar o grid (ate 4 caminhoes no total)
 		"traffic": 1,                    # TrafficSim.Density
 		"night": true,
+		"events": true,                  # T-139: eventos de pista (fixos da rota + sorteados pelo servidor)
 	}
 
 

@@ -13,6 +13,8 @@ var heights: PackedFloat32Array = PackedFloat32Array()   # altura no INICIO de c
 var length_m: float = 0.0
 ## Objetos de beira de estrada: {z, x, kind}. Ordenados por z (adicione em ordem crescente).
 var objects: Array[Dictionary] = []
+## Eventos de pista (T-139): acidente, obras, estreitamento. Vazio = pista livre (RaceSim.set_events).
+var events: TrackEvents = TrackEvents.new()
 
 
 func segment_count() -> int:

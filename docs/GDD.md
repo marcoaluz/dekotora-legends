@@ -69,6 +69,12 @@ Câmbio automático no MVP. Freio-motor entra sozinho ao soltar o acelerador em 
 8. **Passing**: bots abrem espaço; contra humanos só tremor e susto sonoro.
 9. **Vácuo** em reta.
 10. **Tráfego** como obstáculo.
+11. **Eventos de pista** (T-139): **acidente** (carros parados fecham 1 ou 2 faixas), **obras** (cones, barreiras,
+    caminhão de obra, limite de 60 km/h com chapas de aço na faixa ao lado) e **estreitamento** (3 → 2 faixas: uma faixa
+    de fora acaba). Nunca fecham as 3 faixas. Avisos antes (painel de LED e placas a 400 m e 200 m, aviso no HUD), cones
+    no afunilamento (cada cone tocado custa um pouco de carga), batida forte no veículo parado/barreira e troca de faixa
+    recusada para dentro de uma faixa fechada. Cada rota tem 1 evento fixo e pode sortear mais 1 (45%) pela semente da
+    corrida; o prazo estica alguns segundos por evento. Bots e trânsito saem cedo da faixa fechada.
 
 Pagamento = frete × integridade da carga + bônus de posição + bônus de Fama. O dano persiste após a corrida.
 

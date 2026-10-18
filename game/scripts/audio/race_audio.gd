@@ -12,6 +12,17 @@ var _bump_idx: int = 0
 var _crash_idx: int = 0
 var _countdown_last: int = 4
 var _scrape: AudioStreamPlayer
+var _works_loop: AudioStreamPlayer     # T-139: ruido das obras (so se o arquivo existir)
+## T-139: sons dos eventos de pista. Os nomes novos (docs/AUDIO_ELEVENLABS.md) entram quando o arquivo existir;
+## ate la toca o som de reserva que ja existe.
+const EVENT_SOUNDS: Dictionary = {
+	"cone": ["cone_hit", "bump_light_1", -8.0],
+	"scrape": ["barrier_scrape", "bump_light_2", -7.0],
+	"plates": ["steel_plate_clank", "bump_light_1", -9.0],
+	"alert": ["event_alert_chime", "countdown_beep", -9.0],
+}
+const AUDIO_DIRS: Array[String] = ["res://assets/audio/sfx/crash/", "res://assets/audio/sfx/truck/", "res://assets/audio/sfx/ui/",
+	"res://assets/audio/sfx/ambient/"]
 
 
 func setup(truck: TruckSim, engine_set: String, turbo_id: String, straight: bool, music_name: String) -> void:
@@ -101,6 +112,55 @@ func on_event(e: Dictionary, me: int) -> void:
 		"passing_scare":
 			if int(e["to"]) == me:
 				audio.play_sfx("horn_air_basic", -3.0)
+		"event_cone", "event_scrape", "event_plates":     # T-139
+			if int(e["truck"]) == me:
+				_event_sfx(String(e["type"]).substr(6))
+		"event_obstacle":
+			if int(e["truck"]) == me:
+				audio.play_sfx("car_hit", -1.0)
+				_crash_sound(float(e["force"]))
+				if not (e["broken"] as Array).is_empty():
+					audio.play_sfx("chrome_part_break", -2.0)
+
+
+## Aviso de evento de pista no HUD (T-139).
+func event_alert() -> void:
+	_event_sfx("alert")
+
+
+func _event_sfx(kind: String) -> void:
+	var s: Array = EVENT_SOUNDS[kind]
+	get_node("/root/AudioBus").play_sfx(String(s[0]) if has_sound(String(s[0])) else String(s[1]), float(s[2]))
+
+
+## O arquivo de som existe (sem aviso de "som nao encontrado")?
+static func has_sound(name: String) -> bool:
+	for d in AUDIO_DIRS:
+		for ext in [".mp3", ".ogg", ".wav"]:
+			if ResourceLoader.exists(d + name + ext):
+				return true
+	return false
+
+
+## Ruido das obras pela distancia ate a obra mais perto (T-139; so toca se `roadworks_loop` existir).
+func update_events(evs: TrackEvents, z: float) -> void:
+	if evs.is_empty():
+		return
+	if _works_loop == null:
+		if not has_sound("roadworks_loop"):
+			return
+		_works_loop = AudioStreamPlayer.new()
+		_works_loop.bus = "SFX"
+		_works_loop.stream = get_node("/root/AudioBus").stream("roadworks_loop")
+		_works_loop.volume_db = -80.0
+		add_child(_works_loop)
+		_works_loop.play()
+	var best: float = INF
+	for ev in evs.list:
+		if ev.kind == TrackEvents.Kind.WORKS:
+			best = minf(best, maxf(maxf(ev.z - z, z - ev.end_z()), 0.0))
+	var wgt: float = clampf(1.0 - best / 160.0, 0.0, 1.0)
+	_works_loop.volume_db = (linear_to_db(wgt) - 6.0) if wgt > 0.01 else -80.0
 
 
 func _crash_sound(force: float) -> void:

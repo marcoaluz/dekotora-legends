@@ -95,3 +95,40 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   tamanho do monitor e, com essa configuração de stretch, o layout é idêntico (só muda a nitidez).
   `docs/capturas_t138/antes_960x540` (commit dc7c539) e `depois_960x540` / `depois_1200x540`. Não há "antes" em 20:9: o jogo
   antigo desenhava sempre 960x540 e o resto da tela do celular ficava com faixas pretas nas laterais.
+## 2026-10-18 — Eventos de pista (T-139, pedido do Marco "C4: acidente, obras, estreitamento 3 para 2 faixas")
+
+- **Três tipos**, sempre fechando faixas **vizinhas** e **nunca as 3**: acidente (1 ou 2 faixas, inclusive só a do meio), obras
+  (1 ou 2 faixas) e estreitamento (só uma faixa **de fora** acaba). Formato de dado: `{kind, z, length, lanes:[1..3]}`
+  (`RouteDef.events`), z = início do afunilamento; `length` inclui o afunilamento.
+- **Mesma geometria para tudo**: a área fechada em cada z é um intervalo em x (`TrackEvents.interval`), que cresce suave no
+  afunilamento (acidente 45 m, obras 60 m, estreitamento 120 m + 80 m de reabertura). Simulação, bots, trânsito, visual e HUD
+  leem o MESMO intervalo (os cones ficam exatamente onde o caminhão bate).
+- **Regras físicas** (`sim/event_contact.gd`): cone = −0,7 m/s e toque na carga a cada 5 m dentro do afunilamento; veículo
+  parado/barreira = batida de frente com a massa de um carro parado (1.500 kg, `DamageModel`), o caminhão não atravessa, cai
+  para 6 m/s e passa a mirar a faixa aberta mais perto; fim de faixa (estreitamento) = parede que empurra para dentro, raspando
+  (perde velocidade e carga) e obriga a entrar na faixa vizinha (quem está ao lado disputa a vez pela colisão normal).
+  **Faixa aberta só encostando na beirada** (escorregada na curva, empurrão) apenas raspa (sem batida). Trocar de faixa para
+  uma faixa que fecha logo à frente é **recusado** (a seta continua piscando, HUD mostra "FAIXA FECHADA").
+- **Obras com limite de 60 km/h** (pedido "limite de velocidade"): a regra escolhida foi **chapas de aço na faixa ao lado da
+  obra**: acima de 65 km/h, a cada 0,5 s a carga sacode (`cargo_hit` pelo excesso × 0,25; sem dano no caminhão). É uma
+  escolha do jogador: passar devagar (perde ~5 s) ou passar rápido e perder prêmio (a 100 km/h, ~8% numa obra curta).
+  Bots e trânsito respeitam o limite. **Confirmar com o Marco** (alternativas: multa fixa em ¥, ou limite só visual).
+- **Determinismo e rede**: eventos fixos da rota + até `random_events` (1) sorteados com `random_chance` (45%) pela semente
+  da corrida (`RouteDef.build_events`; sem sorteio nos 650 m iniciais, nos 350 m finais, em túneis e nas curvas mais
+  fechadas; 200 m livres entre eventos). Online o **servidor sorteia** e manda a lista no `race_setup` (campo `events`,
+  protocolo versão 2); a regra da sala `events: false` desliga. O dano dos eventos vai pela atualização de dano normal.
+- **Prazo estica** com os eventos (o cliente do frete "sabe" do acidente): acidente de 1 faixa +3 s, obras +7 s,
+  estreitamento +3 s, 2 faixas fechadas +8 s (média medida da perda dos bots difíceis, `tools_dev/measure_event_times.gd`).
+  O HUD mostra "PRAZO +N s" quando o aviso aparece.
+- **Eventos fixos por rota** (propostas): litoral = estreitamento da faixa da direita em 1.650 m; viaduto = acidente nas faixas
+  do meio e da direita em 2.000 m; montanha = obras na faixa da direita em 2.450 m.
+- **Visual** (`road3d/track_events_3d.gd` + `event_props.gd`, atlas `assets/textures/event_atlas.png` feito por
+  `tools_dev/make_event_atlas.gd`): 3 chamadas de desenho por evento (malha única com cones/barreiras/caminhão de obra/
+  pintura, faces com atlas, luzes piscando por shader) + 2 carros batidos do trânsito no acidente (+8). Placas do evento do
+  lado **direito** (canteiro), por dentro da mureta, para não brigar com a sinalização da esquerda nem com a barreira de som.
+- **Som**: usa o que existe (cone = batida leve, raspada = batida leve 2, chapa = batida leve, aviso = bip da contagem);
+  nomes pedidos ao ElevenLabs em `docs/AUDIO_ELEVENLABS.md` (`cone_hit`, `barrier_scrape`, `steel_plate_clank`,
+  `event_alert_chime`, `roadworks_loop`), que entram sozinhos quando o arquivo existir.
+- Suposições a revisar com o Marco: frequência do sorteio (45%), posição dos eventos fixos, a regra das chapas, os valores de folga
+  do prazo, textos do HUD e se o acidente deveria ter viatura de polícia.
+

@@ -37,6 +37,8 @@ const FOLLOW_GAP: float = 8.0            # m de folga minima atras de um mais le
 const LOOK_AHEAD: float = 60.0           # m: ate onde enxerga quem esta a frente
 const ACCEL: float = 3.0                 # m/s^2 para voltar a velocidade de cruzeiro
 const BRAKE: float = 7.0                 # m/s^2 ao alcancar um mais lento
+const CLOSURE_LOOK: float = 220.0        # T-139: m ahead where a car sees a closed lane and moves out of it
+const CLOSURE_STOP_M: float = 6.0        # m kept in front of the closure when it cannot move out (waits for a gap)
 
 
 class Car:
@@ -57,6 +59,7 @@ class Car:
 var cars: Array[Car] = []
 var density: int = Density.NORMAL
 var hits: int = 0                          # contagem de batidas (debug / testes)
+var events: TrackEvents = null             # eventos de pista (T-139); null = pista livre
 var _rng := RandomNumberGenerator.new()
 
 
@@ -105,6 +108,46 @@ func _place(c: Car, z: float) -> void:
 	c.speed = c.cruise
 	c.timer = _rng.randf_range(3.0, 10.0)
 	c.color_id = _rng.randi_range(0, 5)
+	_reseat(c)
+
+
+## Eventos de pista (T-139): guarda a lista e tira os carros que estao numa faixa fechada.
+func set_events(evs: TrackEvents) -> void:
+	events = evs if not evs.is_empty() else null
+	for c in cars:
+		_reseat(c)
+
+
+## Carro numa faixa que fecha logo ali: passa para a faixa aberta mais proxima (sem sortear: deterministico).
+func _reseat(c: Car) -> void:
+	if events == null or not events.lane_blocked_between(c.lane + 1, c.z - 40.0, c.z + 260.0):
+		return
+	var ol: int = events.nearest_open_lane(c.lane + 1, c.z - 40.0, c.z + 260.0)
+	if ol >= 0:
+		c.lane = ol - 1
+		c.x = LANES[c.lane]
+
+
+## Faixa (indice do transito) fechada por um evento entre z0 e z1?
+func _closed(lane: int, z0: float, z1: float) -> bool:
+	return events != null and events.lane_blocked_between(lane + 1, z0, z1)
+
+
+## Faixa fechada a frente: sai dela para a aberta mais proxima; se nao da, para antes do bloqueio e espera a vez.
+## Devolve a velocidade maxima permitida (INF = livre).
+func _avoid_closure(c: Car, trucks: Array) -> float:
+	var nose: float = c.z + c.length
+	var bz: float = events.next_block(c.lane + 1, nose, CLOSURE_LOOK)
+	if bz == INF:
+		return INF
+	if absf(c.x - LANES[c.lane]) < 0.05:
+		var target: int = events.nearest_open_lane(c.lane + 1, c.z, bz + 60.0)
+		if target >= 0:
+			var nl: int = c.lane + signi(target - 1 - c.lane)
+			if nl != c.lane and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) and not _closed(nl, c.z, nose + 10.0):
+				c.lane = nl
+				return INF
+	return sqrt(BRAKE * maxf(bz - nose - CLOSURE_STOP_M, 0.0))
 
 
 ## Faixa `lane` livre para o carro `ignore` ocupar a partir de `z`: nenhuma carroceria a menos de LANE_GAP.
@@ -159,28 +202,35 @@ func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void
 		if c.cruise < 0.0:
 			c.cruise = c.speed
 		var target_speed: float = c.cruise
+		if events != null:
+			target_speed = minf(target_speed, _avoid_closure(c, trucks))
+			target_speed = minf(target_speed, events.limit_ahead(c.z, c.z + c.length, 120.0, BRAKE * 0.5,
+				TrackEvents.WORKS_LIMIT_KMH / 3.6))           # works: slows down to the posted limit
 		var blk: Dictionary = _blocker(c, trucks)
 		if not blk.is_empty() and float(blk["speed"]) < c.cruise:
 			# alcancou alguem mais lento: tenta a faixa da esquerda, depois a da direita; senao, segue atras
 			var moved: bool = false
 			if absf(c.x - LANES[c.lane]) < 0.05:
 				for nl in [c.lane - 1, c.lane + 1]:
-					if nl >= 0 and nl < LANES.size() and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks):
+					if nl >= 0 and nl < LANES.size() and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) \
+							and not _closed(nl, c.z, c.z + CLOSURE_LOOK):
 						c.lane = nl
 						moved = true
 						break
 			if not moved:
-				target_speed = minf(c.cruise, float(blk["speed"]))
+				target_speed = minf(target_speed, float(blk["speed"]))
 		c.speed = move_toward(c.speed, target_speed, (ACCEL if target_speed > c.speed else BRAKE) * dt)
 		c.z += c.speed * dt
 		var target_x: float = LANES[c.lane]
 		c.x = move_toward(c.x, target_x, LANE_CHANGE_RATE * dt)
+		if events != null:
+			EventContact.car(events, c, dt)
 		c.timer -= dt
 		if c.timer <= 0.0:
 			c.timer = _rng.randf_range(4.0, 12.0)
 			var dir: int = -1 if _rng.randf() < 0.5 else 1
 			var nl2: int = c.lane + dir
-			if nl2 >= 0 and nl2 < LANES.size() and _lane_free(nl2, c.z, c):
+			if nl2 >= 0 and nl2 < LANES.size() and _lane_free(nl2, c.z, c) and not _closed(nl2, c.z, c.z + CLOSURE_LOOK):
 				c.lane = nl2
 		if c.z < rear_z - DESPAWN_BEHIND:
 			for attempt in 6:

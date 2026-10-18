@@ -29,6 +29,15 @@ func _init(track_: Track = null, traffic_density: int = -1, seed_: int = 1234) -
 	finish_z = track.length_m
 	if traffic_density >= 0:
 		traffic = TrafficSim.new(seed_, traffic_density)
+	if not track.events.is_empty():
+		set_events(track.events)
+
+
+## Eventos de pista (T-139): liga a lista a pista, ao transito (desvio) e tira os carros de dentro dos bloqueios.
+func set_events(evs: TrackEvents) -> void:
+	track.events = evs
+	if traffic != null:
+		traffic.set_events(evs)
 
 
 func add_truck(start_z: float = 0.0, start_x: float = 0.0) -> int:
@@ -48,6 +57,8 @@ func set_command(index: int, cmd: Commands) -> void:
 func step(dt: float = FIXED_DT) -> void:
 	for i in trucks.size():
 		trucks[i].step(dt, commands[i], track)
+		if not trucks[i].event_contact.is_empty():
+			_event_hit(i, trucks[i].event_contact)
 	if traffic != null and not trucks.is_empty():
 		var lead: float = trucks[0].z
 		var rear: float = trucks[0].z
@@ -58,12 +69,40 @@ func step(dt: float = FIXED_DT) -> void:
 		for i in trucks.size():
 			events.append_array(collision.resolve_traffic(trucks[i], i, traffic))
 	events.append_array(collision.resolve_trucks(trucks, dt))
+	if not track.events.is_empty():              # T-139: nobody is pushed past the end of a lane
+		for t in trucks:
+			t.x = EventContact.wall_x(track.events, t.x, t.z, t.length, TruckSim.WIDTH_X * 0.5, dt)
+		if traffic != null:
+			for c in traffic.cars:
+				c.x = EventContact.wall_x(track.events, c.x, c.z, c.length, c.width_x * 0.5, dt)
 	_update_draft_and_passing(dt)
 	_update_overtakes()
 	_update_finish()
 	time += dt
 	tick += 1
 	_update_deadline()
+
+
+## Contato com um evento de pista (EventContact): cone = perda de carga; veiculo parado = batida com dano
+## (regras de colisao: DamageModel com a massa do veiculo parado); fim de faixa raspando = toque na carga;
+## chapas de aco das obras acima do limite = carga sacudindo (cargo_hit pelo excesso, sem dano).
+func _event_hit(i: int, c: Dictionary) -> void:
+	var t: TruckSim = trucks[i]
+	var kind: String = String(c["kind"])
+	var ev: TrackEvents.Event = track.events.list[int(c["event"])]
+	var out: Dictionary = {"type": "event_" + kind, "truck": i, "zone": String(c["zone"]), "force": float(c["dv"]),
+		"event": TrackEvents.KIND_IDS[ev.kind], "broken": [] as Array[String], "damage": 0.0}
+	if kind == "obstacle":
+		var dmg: float = DamageModel.impact_damage(float(c["dv"]), EventContact.OBSTACLE_MASS)
+		out["broken"] = DamageModel.apply_impact(t, String(c["zone"]), dmg)
+		out["damage"] = dmg
+		t.cargo_touch()
+		t.cargo_hit(float(c["dv"]))
+	elif kind == "plates":
+		t.cargo_hit(float(c["dv"]) * EventContact.PLATE_CARGO)
+	else:
+		t.cargo_touch()
+	events.append(out)
 
 
 ## Vacuo: atras de outro caminhao/carro, na mesma linha, a menos de DRAFT_RANGE.

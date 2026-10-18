@@ -22,6 +22,13 @@ const DUEL_SEEK_M: float = 70.0                             # distancia em que e
 const DUEL_TIME: Vector2 = Vector2(5.0, 9.0)                # s de duelo (emparelhado)
 const PRESS_EVERY: Vector2 = Vector2(1.6, 3.2)              # s entre uma "fechada" e outra
 const PRESS_TIME: float = 1.4                               # s mirando a faixa do jogador
+const CLOSURE_LOOK: float = 260.0                           # T-139: m a frente em que enxerga uma faixa fechada (sai cedo dela)
+const OVERTAKE_LOOK: float = 120.0                          # m: para ultrapassar, a faixa so precisa estar aberta ate aqui
+const MUST_MOVE_M: float = 110.0                            # m: daqui em diante sai da faixa fechada mesmo atras de um lento
+const CLOSURE_BRAKE: float = 3.5                            # m/s^2 para parar antes do bloqueio se nao consegue sair
+const WORKS_LIMIT_F: Array[float] = [0.9, 0.95, 1.0]        # fator sobre o limite das obras (a tolerancia e +5 km/h)
+const WORKS_LOOK: float = 260.0                             # m a frente em que comeca a frear para o limite das obras
+const WORKS_BRAKE: float = 1.8                              # m/s^2 planejados (o freio do bot e proporcional: atrasa)
 
 var difficulty: int = Difficulty.NORMAL
 var rival: bool = false                # duela com o jogador mesmo na dificuldade facil
@@ -34,6 +41,7 @@ var duel_count: int = 0                # duelos iniciados (testes)
 var press_count: int = 0               # vezes que mirou a faixa do jogador para empurrar (testes)
 var mirror_count: int = 0              # vezes que fechou a faixa que o jogador sinalizou (testes)
 var out_of_road_count: int = 0         # vezes em que saiu da pista (testes)
+var closure_moves: int = 0             # trocas de faixa para fugir de um bloqueio (testes)
 var _rng := RandomNumberGenerator.new()
 var _lane_timer: float = 0.0
 var _tap_timer: float = 0.0
@@ -85,8 +93,37 @@ func _obstacle_ahead(sim: RaceSim, me: TruckSim, index: int, x: float, horizon: 
 
 
 func _lane_free(sim: RaceSim, me: TruckSim, index: int, lane: int, horizon: float) -> bool:
-	return Lanes.is_road_lane(lane) and _obstacle_ahead(sim, me, index, Lanes.X[lane], horizon).is_empty() \
+	return Lanes.is_road_lane(lane) and _open(sim, me, lane, OVERTAKE_LOOK) and _obstacle_ahead(sim, me, index, Lanes.X[lane], horizon).is_empty() \
 			and _lane_side_clear(sim, me, index, lane)
+
+
+## Faixa sem bloqueio (evento de pista) do caminhao ate CLOSURE_LOOK a frente.
+func _open(sim: RaceSim, me: TruckSim, lane: int, look: float = CLOSURE_LOOK) -> bool:
+	return not sim.track.events.lane_blocked_between(lane, me.z, me.z + me.length + look)
+
+
+## Evento de pista a frente na faixa alvo: vai cedo para a faixa aberta mais proxima (uma de cada vez, sem
+## bater de lado); se nao da, freia para parar antes do bloqueio e espera a vez. Devolve a velocidade desejada.
+func _closure(sim: RaceSim, me: TruckSim, index: int, desired: float) -> float:
+	var evs: TrackEvents = sim.track.events
+	if evs.is_empty():
+		return desired
+	var nose: float = me.z + me.length
+	var bz: float = evs.next_block(target_lane, me.z, me.length + CLOSURE_LOOK)
+	if bz == INF:
+		return desired
+	var goal: int = evs.nearest_open_lane(target_lane, me.z, bz + 80.0)
+	if goal >= 0 and goal != target_lane:
+		var step_lane: int = target_lane + signi(goal - target_lane)
+		if bz - nose > MUST_MOVE_M and not _obstacle_ahead(sim, me, index, Lanes.X[step_lane], 60.0).is_empty():
+			return desired                       # ultrapassando um lento: termina antes de voltar (ainda ha espaco)
+		if not me.lane_closed_ahead(step_lane, sim.track) and _lane_side_clear(sim, me, index, step_lane):
+			target_lane = step_lane
+			_lane_timer = 0.8
+			_closing_lane = -1
+			closure_moves += 1
+			return desired
+	return minf(desired, sqrt(2.0 * CLOSURE_BRAKE * maxf(bz - nose - 8.0, 0.0)))
 
 
 ## Ninguem ao lado (caminhao ou carro sobreposto em z) na faixa `lane`: trocar para ela nao bate de lado.
@@ -154,6 +191,10 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 		safe = minf(safe, _safe_speed(track.curve_at(me.z + probe), me.grip()) + probe * 0.02)
 		probe += 12.0
 	var desired: float = minf(vmax, safe)
+	desired = _closure(sim, me, index, desired)
+	if not track.events.is_empty():              # obras: chega no limite e passa por elas sem sacudir a carga
+		desired = minf(desired, track.events.limit_ahead(me.z, me.z + me.length, WORKS_LOOK, WORKS_BRAKE,
+			TrackEvents.WORKS_LIMIT_KMH / 3.6 * WORKS_LIMIT_F[difficulty]))
 	# obstaculo na faixa atual / desejada
 	var horizon: float = REACTION_M[difficulty] + speed * 1.3
 	var obstacle: Dictionary = _obstacle_ahead(sim, me, index, Lanes.X[target_lane], horizon)
@@ -186,11 +227,15 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 		var o: TruckSim = sim.trucks[j]
 		if j != index and o.passing_active and me.z - o.z > 0.0 and me.z - o.z < 35.0 and absf(me.x - o.x) < 0.3:
 			var dir: int = 1 if me.x >= o.x else -1
-			target_lane = clampi(me.lane + dir, Lanes.FIRST, Lanes.LAST)
-			_lane_timer = 1.5
+			var yl: int = clampi(me.lane + dir, Lanes.FIRST, Lanes.LAST)
+			if _open(sim, me, yl):
+				target_lane = yl
+				_lane_timer = 1.5
 	# duelo com o jogador: emparelha, espelha a seta e empurra
 	if rival:
 		desired = _duel(sim, me, index, dt, desired, obstacle)
+		if target_lane != me.lane and not _open(sim, me, target_lane):
+			target_lane = me.lane if _open(sim, me, me.lane) else target_lane   # never duels into a closed lane
 	# fora da pista (acostamento): volta para a faixa mais proxima
 	if not Lanes.is_road_lane(me.lane) and target_lane == me.lane:
 		target_lane = clampi(me.lane, Lanes.FIRST, Lanes.LAST)
@@ -226,7 +271,7 @@ func _duel(sim: RaceSim, me: TruckSim, index: int, dt: float, desired: float, ob
 			_react_t = REACT_DELAY[difficulty]
 		_react_t -= dt
 		var wanted: int = prey.lane + prey.signal_dir
-		if _react_t <= 0.0 and Lanes.is_road_lane(wanted) and wanted != me.lane and absf(me.lane - wanted) <= 1:
+		if _react_t <= 0.0 and Lanes.is_road_lane(wanted) and wanted != me.lane and absf(me.lane - wanted) <= 1 and _open(sim, me, wanted):
 			target_lane = wanted
 			_closing_lane = wanted
 			_lane_timer = 1.0

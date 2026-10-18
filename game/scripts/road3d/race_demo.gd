@@ -68,6 +68,51 @@ static func fake_contract(args: PackedStringArray, route: RouteDef) -> Dictionar
 	return {}
 
 
+## Eventos de pista da corrida offline (T-139): os fixos da rota + o sorteio com uma semente nova a cada corrida.
+##   --no-events                 pista livre
+##   --event-seed=N              semente do sorteio (repete os mesmos eventos)
+##   --event=TIPO[:FAIXAS][@Z][+COMPRIMENTO]  forca um evento no lugar dos da rota (pode repetir), ex.:
+##       --event=accident:2-3@900   --event=works:3@700+170   --event=narrow:1@800
+##   TIPO = accident | works | narrow; FAIXAS 1..3 (1 = esquerda); Z = inicio do afunilamento (m)
+static func track_events(args: PackedStringArray, route: RouteDef, track: Track) -> TrackEvents:
+	var seed_: int = randi()
+	var forced: TrackEvents = null
+	for a in args:
+		if a == "--no-events":
+			return TrackEvents.new()
+		elif a.begins_with("--event-seed="):
+			seed_ = int(a.substr(13))
+		elif a.begins_with("--event="):
+			if forced == null:
+				forced = TrackEvents.new()
+			forced.add(parse_event(a.substr(8)))
+	if forced != null:
+		return forced
+	return route.build_events(track, seed_) if route != null else TrackEvents.new()
+
+
+static func parse_event(s: String) -> Dictionary:
+	var at: PackedStringArray = s.split("@")
+	var head: PackedStringArray = at[0].split(":")
+	var kind: String = head[0]
+	var defaults: Dictionary = {"accident": [[2, 3], 110.0], "works": [[3], 170.0], "narrow": [[3], 420.0]}
+	var d: Array = defaults.get(kind, [[3], 170.0])
+	var lanes: Array = d[0]
+	if head.size() > 1:
+		lanes = []
+		var ends: PackedStringArray = head[1].replace(",", "-").split("-")
+		for l in range(int(ends[0]), int(ends[ends.size() - 1]) + 1):
+			lanes.append(l)
+	var z: float = 600.0
+	var length: float = float(d[1])
+	if at.size() > 1:
+		var zl: PackedStringArray = at[1].split("+")
+		z = float(zl[0])
+		if zl.size() > 1:
+			length = float(zl[1])
+	return {"kind": kind, "z": z, "length": length, "lanes": lanes}
+
+
 ## `--decorated`: perfil de demonstracao (caminhao cheio de pecas, pintura, adesivos e luzes) gravado em
 ## user://demo_profile.json, nunca no perfil real. Chamar antes de montar a corrida.
 ## `--decorated --noparts`: o mesmo perfil de teste, mas so o caminhao de fabrica (aceita --body= e --cab=).

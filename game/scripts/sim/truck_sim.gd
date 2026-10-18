@@ -28,6 +28,9 @@ const MAX_CARGO_LOSS: float = 0.4       # a carga estragada tira no maximo 40% d
 const CARGO_HIT_LOSS: float = 0.004     # fracao do premio por m/s de impacto (x fragilidade)
 const CARGO_TOUCH_LOSS: float = 0.004   # encostar em alguem (sem dano) ja custa um pouco
 const HEAVY_ACCEL: float = 0.9          # carga pesada: a tracao rende 10% menos
+const REFUSE_AHEAD_M: float = 40.0       # T-139: lane closed this far ahead of the nose (or speed x REFUSE_AHEAD_S) refuses the change
+const REFUSE_AHEAD_S: float = 2.0
+const REFUSED_SHOW_S: float = 1.2        # s the HUD shows "lane closed" after a refused change
 
 var z: float = 0.0
 var x: float = 0.0
@@ -71,6 +74,15 @@ var cargo_penalty: float = 0.0          # perda de premio por contato/batida (fr
 var cargo_fragility: float = 1.0        # contrato: multiplica o dano na carga (eletronicos/ceramica > 1)
 var cargo_hits: int = 0                 # batidas que sacudiram a carga (tela de resultado explica a perda, T-138)
 var cargo_touches: int = 0              # encostadas sem dano (tambem custam um pouco)
+## Track events (T-139): EventContact state and the contact of this tick (RaceSim turns it into damage/events).
+var lane_refused_t: float = 0.0         # s left showing "lane closed" (the change was refused)
+var lane_refused_dir: int = 0
+var lane_refusals: int = 0              # refused changes (tests)
+var event_contact: Dictionary = {}
+var cone_m: float = 0.0
+var scrape_t: float = 0.0
+var hit_t: float = 0.0
+var plate_t: float = 0.0
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
@@ -121,7 +133,7 @@ static func curve_safe_speed(curve: float, grip_: float) -> float:
 
 ## Toque de faixa: `steer_` e a direcao segurada (-1, 0, +1). O toque e a borda 0 -> direcao.
 ## 1o toque liga a seta; 2o toque no mesmo lado dentro da janela executa a troca.
-func _lane_input(steer_: float, dt: float) -> void:
+func _lane_input(steer_: float, dt: float, track: Track) -> void:
 	var dir: int = 0
 	if steer_ > 0.5:
 		dir = 1
@@ -130,6 +142,7 @@ func _lane_input(steer_: float, dt: float) -> void:
 	var tapped: bool = dir != 0 and dir != tap_prev
 	tap_prev = dir
 	signal_time = maxf(signal_time - dt, 0.0)
+	lane_refused_t = maxf(lane_refused_t - dt, 0.0)
 	lane_change_time = maxf(lane_change_time - dt, 0.0)
 	if signal_time <= 0.0:
 		signal_dir = 0
@@ -137,6 +150,12 @@ func _lane_input(steer_: float, dt: float) -> void:
 		return
 	if signal_dir == dir and signal_time > 0.0:
 		var nl: int = clampi(lane + dir, Lanes.SHOULDER_L, Lanes.SHOULDER_R)
+		if nl != lane and lane_closed_ahead(nl, track):
+			lane_refused_t = REFUSED_SHOW_S        # closed lane: refused; the signal keeps blinking (T-139)
+			lane_refused_dir = dir
+			lane_refusals += 1
+			signal_time = LANE_SIGNAL_WINDOW
+			return
 		signal_dir = 0
 		signal_time = 0.0
 		if nl != lane:
@@ -146,6 +165,13 @@ func _lane_input(steer_: float, dt: float) -> void:
 	else:
 		signal_dir = dir
 		signal_time = LANE_SIGNAL_WINDOW
+
+
+## Lane `l` closed (track event) between the rear and a little ahead of the nose: changing into it is refused.
+func lane_closed_ahead(l: int, track: Track) -> bool:
+	if track.events.is_empty():
+		return false
+	return track.events.lane_blocked_between(l, z, z + length + maxf(REFUSE_AHEAD_M, speed * REFUSE_AHEAD_S))
 
 
 ## Inclinacao visual da cabine (-1..+1) durante a troca de faixa.
@@ -199,7 +225,7 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 		speed = maxf(speed - OFFROAD_DECEL * dt, OFFROAD_MAX_SPEED)
 	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho, tambem na curva (T-132).
 	#    Raspando o pneu, aceita uma deslizada de ate 0,5 m para fora; escapando, perde a autoridade.
-	_lane_input(cmd.steer, dt)
+	_lane_input(cmd.steer, dt, track)
 	var authority: float = minf(speed / 6.0, 1.0) * grip() * (0.0 if escaping else 1.0)
 	var vmax: float = LANE_MAX_VEL * agility
 	var target_x: float = Lanes.X[lane] + CurveGrip.slide_x(curve, curve_ratio)
@@ -210,6 +236,8 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	x = clampf(x, -1.6, 1.6)   # limite fisico (fora do acostamento)
 	# 4) avanco
 	z += speed * dt
+	# 5) track events (T-139): cones, stopped vehicles and lane ends keep the truck out of the closed area
+	event_contact = {} if track.events.is_empty() else EventContact.truck(track.events, self, dt)
 	gear = engine.gear
 	rpm = engine.rpm
 	boost = engine.boost

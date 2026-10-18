@@ -24,13 +24,18 @@ Cliente A            Servidor                   Cliente B
    │                     │◄─────── join_room KX4T9Q ──│
    │◄── lobby_update ────┼──── lobby_update ─────────►│
    │ ready ─────────────►│◄──────────────────── ready │
-   │◄── race_start(seed, rota, regras, garagens) ────►│
+   │◄── race_start(seed, rota, regras, garagens, eventos) ►│
    │ commands (30/s) ───►│◄─────────── commands (30/s)│
    │◄── snapshot (20/s) ─┼──── snapshot (20/s) ──────►│
    │◄── race_end(resultados, dano, pagamento) ───────►│
 ```
 
 ## O que trafega
+
+**Início da corrida** (protocolo versão 2, T-139): o `race_setup` leva também `events`, a lista de eventos de pista
+(acidente, obras, estreitamento) que o **servidor** sorteou (fixos da rota + sorteio pela semente). O cliente monta a
+mesma pista com essa lista; nada mais é enviado durante a corrida por causa deles (o dano vai na atualização normal).
+Regra da sala `events: false` = pista livre.
 
 **Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool).
 Cerca de 12 bytes.

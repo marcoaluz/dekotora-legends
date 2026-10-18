@@ -229,6 +229,39 @@ Proposta para testar (`TrafficSim.KIND_*`). O tipo de cada veículo é fixo pelo
 - O esportivo é mais rápido que todo o trânsito, mas mais lento que o caminhão no limite (38,9 m/s): ele passa o jogador
   que estiver devagar e é alcançado por quem estiver no talo.
 
+## Eventos de pista (T-139)
+
+Código: `sim/track_events.gd` (dados, geometria, sorteio), `sim/event_contact.gd` (física), `BotDriver._closure`, `TrafficSim._avoid_closure`.
+
+| Item | Valor |
+| --- | --- |
+| Afunilamento (área fechada cresce suave) | acidente 45 m · obras 60 m · estreitamento 120 m (+ 80 m reabrindo) |
+| Fechamento total mínimo depois do afunilamento | acidente 50 m · obras 60 m · estreitamento 120 m |
+| Aviso (HUD e placas) | 400 m antes (placas a 400 m e 200 m; limite 60 a 90 m antes e logo depois do início da obra) |
+| Cone | a cada 5 m dentro do afunilamento: −0,7 m/s e toque na carga (0,4% do prêmio × fragilidade) |
+| Veículo parado / barreira | batida de frente com massa 1.500 kg (`DamageModel`), cai para 6 m/s, 1 batida a cada 1,5 s; a 108 km/h ≈ 30% do prêmio + ~100 de dano na frente |
+| Encostar só na beirada estando na faixa aberta | sobreposição < 0,12 x (0,86 m): raspa e volta para a faixa (toque na carga a cada 0,8 s), sem batida |
+| Fim de faixa (estreitamento) | parede: empurra 2 x/s para dentro, −3 m/s², toque na carga a cada 0,8 s; quem ainda está na faixa que acaba é obrigado a entrar na vizinha |
+| Troca de faixa recusada | se a faixa de destino fecha entre a traseira e o nariz + máx(40 m, 2 s × velocidade) |
+| Obras: limite | 60 km/h ao lado do fechamento total; acima de 65 km/h, a cada 0,5 s `cargo_hit(excesso m/s × 0,25)`: a 100 km/h numa obra de 110 m ≈ 8% do prêmio |
+| Sorteio | fixos da rota + 1 vaga com 45% (`RouteDef.random_events`, `random_chance`); tipo e faixas sorteados (2 faixas: 25%); fora dos 650 m iniciais, dos 350 m finais, de túneis (±60 m) e de curvas ≥ 1,25; 200 m livres entre um evento e o aviso do próximo |
+| Folga no prazo | acidente 1 faixa +3 s · obras +7 s · estreitamento +3 s · qualquer fechamento de 2 faixas +8 s |
+| Bots | enxergam a faixa fechada a 260 m e vão para a aberta (uma faixa de cada vez, sem bater de lado); ultrapassagem só se a faixa estiver aberta por 120 m; a 110 m saem mesmo atrás de um lento; sem saída, freiam (3,5 m/s²) e esperam; obras: freiam (1,8 m/s² planejados) para 0,9 / 0,95 / 1,0 × 60 km/h (fácil/normal/difícil) |
+| Trânsito | sai da faixa fechada a 220 m; sem vaga, para 6 m antes e espera; nas obras desacelera para 60 km/h |
+
+Custo medido em tempo (`godot --headless --path game -s res://tools_dev/measure_event_times.gd`, média dos 2 bots difíceis em
+5 sementes de trânsito, evento no z do evento fixo da rota; perda em relação à corrida sem eventos):
+
+| Evento | Litoral | Viaduto | Montanha |
+| --- | --- | --- | --- |
+| acidente, faixa da direita | +2,4 s | +1,4 s | +0,0 s |
+| acidente, meio + direita | +8,4 s | +7,9 s | +4,8 s |
+| obras, faixa da direita (com o limite) | +7,3 s | +9,0 s | +5,1 s |
+| obras, faixa da esquerda (com o limite) | +5,7 s | +8,1 s | +6,0 s |
+| estreitamento, a da direita acaba | +2,8 s | +4,4 s | +0,6 s |
+
+Uma corrida isolada varia muito mais (até ±25 s): o trânsito denso muda de forma caótica com qualquer evento; por isso a média.
+
 ## Peças tiradas de modelos de terceiros (T-126)
 
 Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 30 mil = 20, < 50 mil = 60).

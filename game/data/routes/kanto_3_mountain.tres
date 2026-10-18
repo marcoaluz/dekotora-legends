@@ -49,3 +49,4 @@ scenery = &"mountain"
 rival_id = &"boss_kanto"
 fame_required = 60
 deadline_s = 150.0
+events = Array[Dictionary]([{"kind": "works", "z": 2450.0, "length": 170.0, "lanes": [3]}])

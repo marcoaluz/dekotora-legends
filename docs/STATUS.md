@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (192) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (203) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -27,6 +27,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` |
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
+| Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
+| Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -51,6 +53,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 4. Regras que o GDD não definia (1 Fama = 50 ¥; ultrapassagem = 2 Fama; vácuo +20% tração; Passing 4%/s e 35%/s; revenda 50%; reparo de motor 30.000 ¥ e direção 20.000 ¥; Fama mínima para liberar peças).
 5. Rivais de Kanto com **nomes provisórios** (Trovão Rosa, Dragão de Aço, Lua Cromada, Imperador da Estrada).
 6. Áudio em **MP3** (sem ffmpeg para converter) e músicas com 100 s (não 2:30) para economizar créditos; ~5 mil créditos gastos de ~80 mil.
+7. **Eventos de pista (T-139)**: obras com limite de 60 km/h cobrado como **carga sacudindo nas chapas de aço** (não multa);
+   1 evento fixo por rota + 45% de chance de mais um; prazo estica +3 a +8 s por evento. Ver `docs/DECISOES.md`.
 
 ## PRÓXIMAS TAREFAS (para outra sessão do Claude; pedidas pelo Marco em 2026-10-18)
 
@@ -197,6 +201,23 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   6 amostras de 5 s): litoral 280 → 283 chamadas, viaduto 295 → 298, Hakone 286 → 289; triângulos +0,2 a +2,6 mil; textura +0,9 MB
   (atlas comprimidos com mipmaps); FPS igual (75). Capturas em `docs/capturas_t130/`. Depuração nova da corrida: `--snap-every=S`
   (com `--shots=`) e `--cam=DZ,LAT,H,LDZ,LLAT,LH` (câmera fixa relativa ao jogador); `--fps-log` imprime `SINALIZACAO:`.
+- **T-139 (2026-10-18): eventos de pista** (acidente, obras, estreitamento 3 → 2 faixas). Simulação: `sim/track_events.gd`
+  (dados, intervalo fechado por z, sorteio pela semente, folga do prazo, limite das obras) e `sim/event_contact.gd` (cones, batida
+  no veículo parado/barreira, raspada na beirada, parede do fim de faixa, chapas de aço); `TruckSim` recusa trocar para faixa
+  fechada; `BotDriver._closure` e `TrafficSim._avoid_closure` saem cedo da faixa fechada e respeitam 60 km/h nas obras. Rede: o
+  servidor sorteia e manda `events` no `race_setup` (protocolo 2; regra da sala `events`); dano dos eventos vai na atualização de
+  dano. Visual: `road3d/track_events_3d.gd` + `event_props.gd` + atlas `assets/textures/event_atlas.png`
+  (`tools_dev/make_event_atlas.gd`, precisa de janela); a estrada apaga o tracejado da faixa que acaba (`RoadMesh._lane_ends`).
+  HUD: `ui/event_hud.gd` ("ACIDENTE À FRENTE · 350 m", faixas fechadas, "SAIA DESTA FAIXA!", "PRAZO +8 s", "FAIXA FECHADA",
+  "100 km/h! A CARGA ESTÁ SACUDINDO"); textos em `data/i18n/pt-BR.json` (`hud.event.*`). Som: reservas com arquivos que já
+  existem; 5 nomes novos pedidos em `docs/AUDIO_ELEVENLABS.md`. Eventos fixos: litoral estreitamento (direita) 1.650 m, viaduto
+  acidente (meio + direita) 2.000 m, montanha obras (direita) 2.450 m. Custo medido (modo médio, jogador parado no lugar, mesmo
+  quadro com e sem o visual): **+3 chamadas** por obra/estreitamento, **+11** no acidente (3 + 2 carros do trânsito); FPS igual
+  (75, limitado pelo monitor). Perda de tempo média dos bots difíceis: +0 a +9 s por evento (tabela em `docs/BALANCEAMENTO.md`).
+  Testes `tests/test_track_events.gd` (11); medidores `tools_dev/measure_event_times.gd`, `trace_event.gd`,
+  `debug_events_3d.gd`, `count_model_surfaces.gd`; capturas `docs/capturas_t139/`. Depuração: `--hide-events-3d` (esconde só o
+  visual). Pendências: confirmar com o Marco a regra das chapas e a frequência; gerar os 5 sons; carros batidos ficam escuros à noite
+  (só o pisca-alerta aparece bem).
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).

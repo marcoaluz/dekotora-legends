@@ -151,9 +151,11 @@ func _build_race(seed_: int) -> void:
 	seed_value = seed_
 	var route: RouteDef = load("res://data/routes/%s.tres" % rules["route"]) as RouteDef
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
+	if route != null and bool(rules.get("events", true)):
+		track.events = route.build_events(track, seed_)       # T-139: o servidor sorteia e manda no setup
 	sim = RaceSim.new(track, int(rules["traffic"]), seed_)
 	sim.freight = route.freight if route != null else 25000
-	sim.deadline = route.deadline() if route != null else 0.0
+	sim.deadline = (route.deadline() + track.events.time_allowance()) if route != null else 0.0   # T-139: folga dos eventos
 	drivers.clear()
 	var slot: int = 0
 	for p in order:
@@ -230,7 +232,7 @@ func _track_damage_changes(evs: Array[Dictionary]) -> void:
 			"truck":
 				_mark_damage(int(e["a"]))
 				_mark_damage(int(e["b"]))
-			"traffic":
+			"traffic", "event_obstacle", "event_cone", "event_scrape", "event_plates":   # T-139: dano/carga dos eventos
 				_mark_damage(int(e["truck"]))
 
 
@@ -299,4 +301,5 @@ func race_setup() -> Dictionary:
 		e["name"] = m.name
 		e["paint"] = m.loadout.get("paint", "#e9eef5")
 		e["loadout"] = m.loadout
-	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick}
+	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick,
+		"events": sim.track.events.to_array()}

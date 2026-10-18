@@ -78,6 +78,7 @@ func _ready() -> void:
 		player = Net.pending_truck
 	else:
 		var track: Track = route.build_track() if route != null else Track.make_test_track()
+		track.events = RaceDemo.track_events(OS.get_cmdline_user_args(), route, track)   # T-139 (--event=, --no-events)
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 		var fake: Dictionary = RaceDemo.fake_contract(OS.get_cmdline_user_args(), route)
 		if not fake.is_empty():
@@ -90,6 +91,8 @@ func _ready() -> void:
 		_cargo_notice = _build_cargo_notice(gs.pending_contract)
 		if sim.deadline <= 0.0 and route != null:
 			sim.deadline = route.deadline()
+		if sim.deadline > 0.0:
+			sim.deadline += track.events.time_allowance()     # T-139: o prazo estica com os eventos de pista
 	path = TrackPath.new(sim.track)
 	var q: int = int(Settings.quality)
 	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
@@ -107,6 +110,9 @@ func _ready() -> void:
 	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
 	add_child(signs)
 	signs.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray(), String(route.id) if route != null else "")
+	var events3d := TrackEvents3D.new()           # T-139: acidente, obras, estreitamento (mesma lista da simulacao)
+	add_child(events3d)
+	events3d.build(path, tod)
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
@@ -152,6 +158,12 @@ func _ready() -> void:
 	_hud = RaceHud.new()
 	_hud.bind(sim, player)
 	layer.add_child(_hud)
+	var event_hud := EventHud.new()                 # T-139: avisos de acidente / obras / estreitamento
+	event_hud.bind(sim, player)
+	layer.add_child(event_hud)
+	event_hud.alert_shown.connect(func(_kind: int) -> void:
+		_audio.event_alert()
+		Input.vibrate_handheld(60))
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_autoplay = "--autoplay" in args
 	_debug_events = "--debug-events" in args
@@ -487,6 +499,7 @@ func _player_x() -> float:
 func _update_audio(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	_audio.update(dt, t, _countdown)
+	_audio.update_events(sim.track.events, t.z + t.length * 0.5)
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)

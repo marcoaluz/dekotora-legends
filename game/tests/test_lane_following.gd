@@ -69,7 +69,7 @@ func test_client_prediction_follows_lane_like_server() -> void:
 	for r in ["kanto_2_viaduct", "kanto_3_mountain"]:
 		var room := Room.new("T132AA")
 		room.add_member(100, "A", "AAAAAAAA", TruckConfig.basic_descriptor())
-		room.set_rules(100, {"bots": 0, "traffic": 0, "route": r})
+		room.set_rules(100, {"bots": 0, "traffic": 0, "route": r, "events": false})   # so a curva (sem eventos T-139)
 		room.set_ready(100, true)
 		room.try_start(100, 11)
 		room.advance(4.0)
