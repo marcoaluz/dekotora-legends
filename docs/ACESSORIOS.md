@@ -8,7 +8,7 @@ no Blender, exportados em `.glb` (materiais PBR embutidos) para o Godot 4.7.
 | O quê | Caminho (dentro de `game/`) |
 | --- | --- |
 | Modelos `.glb` | `assets/vehicles/dekotora/accessories/<front\|lighting\|sides\|rear>/<id>.glb` |
-| Caminhão base `.glb` (com pontos `MOUNT_*`) | `assets/vehicles/dekotora/truck/dekotora_truck_base.glb` |
+| Caminhão base `.glb` (com pontos `MOUNT_*`) | `assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb` (baú médio + cabine padrão; T-129) |
 | Fontes `.blend` editáveis | `assets/vehicles/dekotora/source_blend/` (tem `.gdignore`: o Godot não importa) |
 | Prévias (imagens) | `assets/vehicles/dekotora/previews/` (`<id>_34.png` e `assembled_<categoria>_*.png`) |
 | Catálogo | `assets/vehicles/dekotora/catalog.json` |
@@ -125,7 +125,10 @@ exclusão), reduz por ilha (peças simples ficam inteiras) e leva para a conven�
 - `MOUNT_STACK_R/L` (atrás da cabine) ainda não existe nos .glb: o `TruckNode.add_extra_mounts()` cria o ponto ao montar o
   caminhão (padrão/clássica/aero/alta/chata: onde ficam os escapamentos de fábrica; cabine curta: canto de trás da cabine;
   Canter: entre a cabine e o baú, escala 0,88). Quem carregar o .glb sem o TruckNode chama a mesma função.
-- Rodas/calotas não giram (como a `hubcap_decorative`): ficam presas no ponto da face da roda.
+- Rodas/calotas (e a `hubcap_decorative`) **giram com o pneu desde a T-133**: o `TruckNode` (`TruckWheels.attach_part`)
+  põe uma cópia em cada roda externa (frente, todos os eixos de trás, lado esquerdo espelhado) como filha do pneu; os
+  pontos `MOUNT_WHEEL_*_FACE_*` servem só de referência de encaixe. O `AccessoryCatalog.attach` direto (visualizador de
+  acessórios, teste de encaixe) continua prendendo no ponto fixo da frente.
 - Não entraram (de propósito): tomada de ar do capô do Fumi (pequena demais para a cabine e sem lugar num cab-over),
   escapamento esportivo traseiro (briga com o para-choque traseiro), retrovisores (todas as cabines já têm), bull bar e
   faróis auxiliares (o Kenworth não tem).

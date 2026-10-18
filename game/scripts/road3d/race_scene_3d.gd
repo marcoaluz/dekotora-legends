@@ -4,6 +4,9 @@ extends Node3D
 ## Debug: -- --autoplay  --start=600 [--start-speed=20]  --touch  --shot (sem HUD de toque)
 
 const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#3a73d6"), Color("#3fb26f")]
+## Cabine dos bots por posicao no grid (o 0 e o jogador). Antes da T-129: classica, aero, curta, chata;
+## as cabines por codigo viraram a nova mais parecida (aero -> jac).
+const RIVAL_CABS: Array[String] = ["chata", "jac", "curta", "chata"]
 
 var sim: RaceSim
 var path: TrackPath
@@ -15,6 +18,7 @@ var _trucks: Array[TruckNode] = []
 var _bots: Array[BotDriver] = []
 var _cam: Camera3D
 var _traffic3d: Traffic3D
+var _plates: LicensePlates            # placas de todos os veiculos (uma chamada de desenho)
 var _hud: RaceHud
 var _fx: Fx3D
 var _autoplay: bool = false
@@ -100,6 +104,9 @@ func _ready() -> void:
 	var furniture := RoadFurniture.new()
 	add_child(furniture)
 	furniture.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray())
+	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
+	add_child(signs)
+	signs.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray(), String(route.id) if route != null else "")
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
@@ -114,9 +121,12 @@ func _ready() -> void:
 	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)
+	_plates = LicensePlates.new()
+	add_child(_plates)
+	_plates.set_level(AtlasQuads.level_for(tod))
 	_traffic3d = Traffic3D.new()
 	add_child(_traffic3d)
-	_traffic3d.setup(path, sim.traffic)
+	_traffic3d.setup(path, sim.traffic, _plates)
 	if online:
 		_spawn_field_online()
 		_connect_net()
@@ -217,6 +227,8 @@ func _spawn_field_online() -> void:
 		var node := TruckNode.new()
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		node.body_kind = String(entry["loadout"].get("body", "base"))      # o Canter tem outro tamanho na simulacao
+		node.cab_kind = CabCatalog.normalize(entry["loadout"].get("cab", ""))   # descritor antigo/sem cabine -> padrao
+		node.plates = _plates
 		add_child(node)
 		var defs: Array[PartDef] = []
 		for p in entry["loadout"]["parts"]:
@@ -286,8 +298,11 @@ func _spawn_field() -> void:
 		t.is_bot = i != 0
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
-		node.cab_kind = String(gs.profile.get("cab", "padrao")) if i == 0 else ["classica", "aero", "curta", "chata"][i % 4]
+		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
+		node.plates = _plates
+		if i == 0:                                       # gancho: placa escolhida pelo jogador (ainda sem tela)
+			node.plate_cell = int(gs.profile.get("plate_cell", -1))
 		add_child(node)
 		if i == 0:
 			gs.configure_truck(t)
@@ -464,7 +479,7 @@ func _process(delta: float) -> void:
 	_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
-	_demo.update(get_viewport(), sim.trucks[player], dt, sim.time)
+	_demo.update(get_viewport(), sim.trucks[player], dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
@@ -603,8 +618,7 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
-	if _demo.cam_mode != "":                     # depuracao (--cam=top|side): camera presa ao jogador
-		_demo.place_camera(_cam, path, _player_z(), _player_x(), t.length)
+	if _demo.camera(_cam, path, _player_z(), _player_x(), t.length):
 		return
 	if _cinema.apply_cut(dt, _cam, _trucks[player]):
 		_speed_fx.update(t.speed, dt)

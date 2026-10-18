@@ -9,6 +9,9 @@ z = 0, mas ~1,4x maior que um caminhão leve de verdade (cabine com 2,85 m de la
   CANTER: escala 0,74 (cabine 2,1 m, pneu 0,9 m, entre-eixos 3,95 m), traseira do chassi em y = 0 (frente em 6,88);
   CURTA:  escala 0,84 (cabine 2,4 m = CAB_W, pneu 1,02 m): a frente cai em CAB_Y1 = 11,5 e o eixo dianteiro do JAC
           cai exatamente no nosso (FRONT_AXLE_Y = 10,2), então a cabine serve nos baús leve/médio/longo.
+  JAC:    (T-129) escala 0,95 na altura/comprimento e 0,88 na largura (cabine 2,5 m = largura do baú, teto 2,95 m,
+          quase o do baú): a cabine "grande" para os baús leve/médio/longo, com os escapamentos atrás dela.
+          O eixo dianteiro do JAC cai de novo no nosso (frente em 11,67).
 Coordenada do jogo: metros, frente +Y, X = 0 no centro, chão Z = 0. Cada peça vira um objeto sem pais, com a malha
 já transformada e sem materiais (o classificador `jac_parts` põe os nossos).
 """
@@ -32,6 +35,11 @@ DUPLICATES = ("suspensi_n.002", "suspensi_n.003", "Focos_Enciende_0_0", "Base_li
 class Frame:
     scale: float
     y_front: float           # y do jogo onde fica a frente do para-choque
+    sx: float = 0.0          # escala da largura (0 = a mesma de `scale`)
+
+    @property
+    def kx(self) -> float:
+        return self.sx or self.scale
 
     def y(self, y_src: float) -> float:
         return self.y_front + (y_src - Y_FRONT_SRC) * self.scale
@@ -39,11 +47,13 @@ class Frame:
     def pt(self, p74) -> tuple:
         """Ponto medido no quadro do CANTER (escala 0,74, traseira em 0) -> este quadro."""
         k = self.scale / CANTER.scale
-        return (p74[0] * k, self.y_front + (p74[1] - CANTER.y_front) * k, p74[2] * k)
+        return (p74[0] * self.kx / CANTER.scale, self.y_front + (p74[1] - CANTER.y_front) * k, p74[2] * k)
 
 
 CANTER = Frame(0.74, (Y_FRONT_SRC - Y_REAR_SRC) * 0.74)
 CURTA = Frame(0.84, 11.5)
+AXLE_SRC = (11.5 - 10.2) / 0.84          # eixo dianteiro do JAC atrás da frente do para-choque (m no original)
+JAC = Frame(0.95, round(10.2 + AXLE_SRC * 0.95, 3), sx=0.88)
 
 
 def load(frame: Frame, path: str | None = None, keep=None) -> dict:
@@ -73,7 +83,7 @@ def load(frame: Frame, path: str | None = None, keep=None) -> dict:
         co = co.reshape(-1, 3)
         co = (np.c_[co, np.ones(n)] @ mw.T)[:, :3]
         co[:, 1] = frame.y_front + (co[:, 1] - Y_FRONT_SRC) * frame.scale
-        co[:, 0] *= frame.scale
+        co[:, 0] *= frame.kx
         co[:, 2] *= frame.scale
         me.vertices.foreach_set("co", co.ravel())
         if np.linalg.det(mw[:3, :3]) < 0:            # espelhado no original: normais para fora de novo

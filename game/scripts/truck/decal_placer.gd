@@ -26,7 +26,7 @@ static func bau_box(root: Node3D, model: Node3D) -> AABB:
 
 
 ## Cria os quads dos adesivos como filhos de `parent` e devolve a lista de nos criados.
-static func build(parent: Node3D, model: Node3D, decals: Array, front_z: float, cab: String = "padrao") -> Array[Node3D]:
+static func build(parent: Node3D, model: Node3D, decals: Array, front_z: float, cab: String = CabCatalog.DEFAULT) -> Array[Node3D]:
 	var out: Array[Node3D] = []
 	var box: AABB = bau_box(parent, model)
 	var cx: float = box.position.x + box.size.x * 0.5
@@ -62,7 +62,7 @@ static func build(parent: Node3D, model: Node3D, decals: Array, front_z: float, 
 			"cab":
 				var h3: float = size * 0.9
 				var w3: float = minf(h3 * aspect, 1.9)
-				var spot: Array = CAB_SPOT.get(cab, CAB_SPOT["padrao"])
+				var spot: Array = CAB_SPOT.get(cab, CAB_SPOT[CabCatalog.DEFAULT])
 				var door_z: float = front_z + float(spot[1]) - px * 0.6
 				for sx2 in [-1.0, 1.0]:
 					var pos3 := Vector3(float(sx2) * (float(spot[0]) + LIFT), float(spot[2]) + py * float(spot[3]), door_z)
@@ -71,13 +71,12 @@ static func build(parent: Node3D, model: Node3D, decals: Array, front_z: float, 
 
 
 const REAR_Z: float = 0.0                  # a origem do TruckNode e a traseira do bau
-const CAB_HALF_W: float = 1.2                 # meia largura da cabine (m)
-const CAB_Y: float = 1.55                     # altura do centro da porta (m)
 ## Lugar do adesivo "cab" por cabine: [meia largura, distancia da frente ate o centro, altura do centro, folga em y].
 ## A chata (T-119) tem a lateral em 1,153 m e o painel livre e o do dormitorio (entre a faixa rosa e a janela).
-## A curta (JAC, T-125) tem a porta curta: o adesivo fica na chapa embaixo da janela; o Canter e a mesma em escala 0,88.
-const CAB_SPOT: Dictionary = {"padrao": [CAB_HALF_W, 2.1, CAB_Y, 0.35], "chata": [1.157, 2.4, 1.76, 0.15],
-		"curta": [1.2, 0.95, 1.08, 0.12], "canter": [1.06, 0.84, 0.95, 0.1]}
+## A curta (JAC, T-125) tem a porta curta: o adesivo fica na chapa embaixo da janela; o Canter e a mesma em escala 0,88
+## e a jac (T-129) em 0,95 x 0,88. A americana (Kenworth, T-129) tem a porta bem atras do capo.
+const CAB_SPOT: Dictionary = {"chata": [1.157, 2.4, 1.76, 0.15], "jac": [1.255, 1.07, 1.22, 0.14],
+		"curta": [1.2, 0.95, 1.08, 0.12], "canter": [1.06, 0.84, 0.95, 0.1], "americana": [0.97, 2.6, 1.5, 0.12]}
 
 
 static func _quad(parent: Node3D, tex: Texture2D, color: Color, size: Vector2, pos: Vector3, yaw_deg: float) -> Node3D:

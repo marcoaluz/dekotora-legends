@@ -4,9 +4,11 @@ extends RefCounted
 ##   --demo=lanes   o jogador toca a seta/troca sozinho (direita, direita, esquerda, esquerda...)
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
-##   --cam=top|high|side camera de depuracao presa ao jogador: de cima (30 m), bem alta (75 m) ou de lado (T-132)
-##   --nohud        esconde o HUD e os botoes (capturas limpas)
-##   --shot-every=S tambem salva uma captura a cada S segundos de corrida (t_<segundos>.png)
+##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
+##   --cam=top|high|side camera presa ao caminhao do jogador: de cima (30 m), bem alta (75 m) ou alta de lado (T-132)
+##   --nohud        esconde o HUD e os botoes (capturas limpas; lido pela RaceScene3D)
+##   --snap-every=S com --shots: tambem uma captura a cada S segundos (t01, t02...; placas e sinalizacao, T-130)
+##   --burst=S      com --shots: aos S segundos, 2 capturas em quadros SEGUIDOS (roda_1, roda_2; rodas girando, T-133)
 ## Exemplo: godot --path game res://scenes/race/race3d.tscn -- --demo=close --shots=C:/tmp/capt
 
 var mode: String = ""
@@ -17,9 +19,12 @@ var _clock: float = 0.0
 var _last_lane_changes: int = 0
 var _last_close: float = -99.0
 var _count: Dictionary = {}
-var cam_mode: String = ""
-var _shot_every: float = 0.0
-var _next_periodic: float = 0.0
+var _cam: PackedFloat32Array = []
+var cam_mode: String = ""              # top | high | side (T-132)
+var _snap_every: float = 0.0
+var _next_snap: float = 0.0
+var _burst_at: float = -1.0
+var _burst_left: int = 2
 
 
 func _init(args: PackedStringArray) -> void:
@@ -29,10 +34,16 @@ func _init(args: PackedStringArray) -> void:
 		elif a.begins_with("--shots="):
 			shot_dir = a.substr(8)
 		elif a.begins_with("--cam="):
-			cam_mode = a.substr(6)
-		elif a.begins_with("--shot-every="):
-			_shot_every = float(a.substr(13))
-			_next_periodic = _shot_every
+			if a.substr(6) in ["top", "high", "side"]:
+				cam_mode = a.substr(6)
+			else:
+				for v in a.substr(6).split(","):
+					_cam.append(float(v))
+		elif a.begins_with("--snap-every="):
+			_snap_every = float(a.substr(13))
+			_next_snap = _snap_every
+		elif a.begins_with("--burst="):
+			_burst_at = float(a.substr(8))
 	if mode == "lanes":
 		_taps = [[1.0, 1], [1.5, 1], [5.0, -1], [5.5, -1], [9.0, 1], [9.5, 1]]
 	elif mode == "close":
@@ -75,7 +86,7 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 	gs.profile["light_pattern"] = "sequential"
 	for a in args:                                   # --cab=chata / --body=leve / --parts=...: so no perfil demo
 		if a.begins_with("--cab="):
-			gs.profile["cab"] = a.substr(6)
+			gs.profile["cab"] = CabCatalog.normalize(a.substr(6))
 		elif a.begins_with("--body="):
 			gs.profile["body"] = a.substr(7)
 		elif a.begins_with("--parts="):                  # --parts=kw_bumper,fumi_wing: pecas a mais (medir custo, T-126)
@@ -88,6 +99,31 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 		{"id": "estrela", "slot": "side_r", "x": -0.55, "y": 0.0, "size": 0.4, "color": "#21e6ff"},
 		{"id": "raio", "slot": "rear", "x": 0.0, "y": 0.0, "size": 0.7, "color": "#21e6ff"},
 		{"id": "sol", "slot": "cab", "x": 0.0, "y": 0.1, "size": 0.5, "color": "#ffffff"}]
+
+
+## Camera de depuracao (--cam=...): devolve true se assumiu a camera neste quadro.
+func camera(cam: Camera3D, path: TrackPath, z: float, x: float = 0.0, length: float = Collision.LEN) -> bool:
+	if cam_mode != "":
+		_place_camera(cam, path, z, x, length)
+		return true
+	if _cam.size() < 6:
+		return false
+	var w: float = Track.ROAD_HALF_WIDTH_M
+	cam.global_position = path.world_point(z + _cam[0], _cam[1] / w, _cam[2])
+	cam.look_at(path.world_point(z + _cam[3], _cam[4] / w, _cam[5]), Vector3.UP)
+	return true
+
+
+## --cam=top|high|side: camera presa ao caminhao em (z, x), olhando o meio dele (alinhamento na faixa, T-132).
+func _place_camera(cam: Camera3D, path: TrackPath, z: float, x: float, length: float) -> void:
+	var mid: float = z + length * 0.5
+	if cam_mode == "side":
+		cam.global_position = path.world_point(mid - 4.0, x - 2.6, 11.0)
+		cam.look_at(path.world_point(mid, x, 1.0), Vector3.UP)
+		return
+	var ahead: float = 0.0 if cam_mode == "top" else 30.0
+	cam.global_position = path.world_point(mid + ahead, x, 30.0 if cam_mode == "top" else 75.0)
+	cam.look_at(path.world_point(mid + ahead, x, 1.0), path.forward_at(mid + ahead))   # frente da pista para cima
 
 
 func active() -> bool:
@@ -127,28 +163,18 @@ func on_event(e: Dictionary, player: int, race_time: float) -> void:
 	_queue.append([_clock + 0.5, "fechamento_b"])
 
 
-## Camera de depuracao (--cam=top|side) olhando o caminhao em (z, x) de comprimento `length`.
-func place_camera(cam: Camera3D, path: TrackPath, z: float, x: float, length: float) -> void:
-	var mid: float = z + length * 0.5
-	var target: Vector3 = path.world_point(mid, x, 1.0)
-	if cam_mode == "top" or cam_mode == "high":
-		var ahead: float = 0.0 if cam_mode == "top" else 30.0
-		target = path.world_point(mid + ahead, x, 1.0)
-		cam.global_position = path.world_point(mid + ahead, x, 30.0 if cam_mode == "top" else 75.0)
-		cam.look_at(target, path.forward_at(mid + ahead))     # frente da pista para cima na imagem
-	else:
-		cam.global_position = path.world_point(mid - 4.0, x - 2.6, 11.0)
-		cam.look_at(target, Vector3.UP)
-
-
 ## Chame todo quadro (depois de avancar a simulacao).
-func update(viewport: Viewport, player_truck: TruckSim, dt: float, race_time: float = 0.0) -> void:
+func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 	_clock += dt
 	if shot_dir == "":
 		return
-	if _shot_every > 0.0 and race_time >= _next_periodic:
-		_next_periodic += _shot_every
-		_save(viewport, "t_%04.1f" % race_time)
+	if _snap_every > 0.0 and _clock >= _next_snap:
+		_save(viewport, "t%02d" % roundi(_next_snap / _snap_every))
+		_next_snap += _snap_every
+	if _burst_at >= 0.0 and _clock >= _burst_at and _burst_left > 0:
+		_burst_left -= 1                              # um por quadro: roda_1 e roda_2 sao quadros seguidos
+		_save(viewport, "roda")
+		print("RODA: velocidade %.1f m/s, dt %.4f s" % [player_truck.speed, dt])
 	if _clock > 1.5 and not _count.has("largada"):
 		_save(viewport, "largada")                # contagem regressiva: mostra o aviso da carga
 	if player_truck.lane_changes != _last_lane_changes:

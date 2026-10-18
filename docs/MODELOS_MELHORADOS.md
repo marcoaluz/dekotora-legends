@@ -7,6 +7,11 @@
 > Escala usada: 0,74 (Canter, 6,9 m) e 0,84 (cabine curta: eixo dianteiro cai exatamente no nosso). Capturas em `docs/capturas_t125/`.
 > **T-126:** 10 peças de personalização saíram do Kenworth (escapamentos, tanque, degraus, para-sol, para-choque, grade), do Fumi SC
 > (aerofólio, rodas) e do JAC (rodas, caixa de ferramentas): `blender/scripts/accessories/thirdparty.py`, lista em `docs/ACESSORIOS.md`.
+> **T-129:** as cabines do jogo passaram a ser só de arquivo. O JAC virou também a cabine **"jac" (Japonesa alta)**, em escala 0,95 de
+> altura/comprimento e 0,88 de largura (2,5 m, a largura do baú; teto 2,95 m; 11,8 mil triângulos), e o **Kenworth W990** virou a cabine
+> **"americana"** de bico longo: só a cabine "dia" (corte em y = 1,05 do original, atrás da porta), capô e grade; fora o dormitório, a carreta,
+> o chassi, as rodas, o interior, os escapamentos (com o letreiro), os emblemas e as letras "W990"; ilhas menores que 4 cm somem (rebites e a
+> tela da grade); 183 mil → 18,6 mil triângulos, ~45 s por modelo (`truck3d/kw_src.py`, `kw_cab.py`).
 
 Data: 2026-10-18. Pedido do Marco: "pegar para criar novos carros de NPC, cabine e caminhão dentro do jogo; analisa cada arquivo".
 **Só análise e prévias. Nada foi convertido nem entrou no jogo ainda**, porque a licença precisa da sua confirmação (seção 3).

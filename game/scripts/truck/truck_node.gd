@@ -4,17 +4,20 @@ extends Node3D
 ## lanternas. A origem do no e a TRASEIRA do bau no chao; a frente aponta para -Z (convencao Godot).
 ## Pecas (acessorios) entram nos nos MOUNT_* do modelo.
 
-const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb"
+## Caminhao padrao (bau medio + cabine padrao CabCatalog.DEFAULT): visualizador de acessorios e testes.
+const MODEL_PATH := "res://assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb"
 const MODEL_PATHS: Dictionary = {
 	"base": MODEL_PATH,
-	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve.glb",
-	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo.glb",
+	"leve": "res://assets/vehicles/dekotora/truck/dekotora_truck_leve_chata.glb",
+	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo_chata.glb",
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
-## Cabines que existem em .glb (a "padrao" nao tem sufixo no nome do arquivo).
-const CABS: Array[String] = ["padrao", "classica", "aero", "alta", "chata", "curta"]
+## Cabines que existem em .glb (T-129: so de modelos de arquivo; ids antigos caem em CabCatalog.normalize).
+const CABS: Array[String] = CabCatalog.IDS
+## Quanto a frente de cada cabine passa da frente padrao (CAB_Y1 = 11,5 m): JAC grande e bico longo americano.
+const CAB_FRONT_DELTA: Dictionary = {"jac": 0.17, "americana": 0.09}
 ## Modelos com cabine fixa (nao combinam com as outras cabines).
 const FIXED_CAB: Dictionary = {"canter": "canter"}
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
@@ -25,19 +28,26 @@ const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
 const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
 const MURAL_USER := "user://mural_side.png"
-## Modelo: "base" (bau padrao), "leve" (bau curto), "longo" ou "carreta". Definir antes de add_child.
+## Modelo: "base" (bau medio), "leve" (bau curto), "longo", "canter" ou "carreta" (guardada). Definir antes de add_child.
 var body_kind: String = "base"
-## Cabine: "padrao", "classica", "aero", "alta", "chata" (cara chata, T-119) ou "curta" (JAC, T-125). Definir antes de add_child.
-var cab_kind: String = "padrao"
+## Cabine: um id de CabCatalog.IDS ("chata", "jac", "curta", "americana"); ids antigos viram o mais parecido.
+## Definir antes de add_child.
+var cab_kind: String = CabCatalog.DEFAULT
 ## Cromo por matcap: "night" ou "day" (ChromeMatcap); "" = cromo PBR original. Definir antes de add_child.
 var chrome_mode: String = "night"
 
+## Placas de veiculo (T-130): camada da cena (corrida, uma chamada de desenho para todos); null = cria a sua.
+var plates: LicensePlates
+## Celula do atlas de placas (PlateCatalog); -1 = a camada escolhe. Gancho para a placa do jogador. Antes de add_child.
+var plate_cell: int = -1
+var _plate_ids: Array[int] = []
+var _plates_queued: bool = false
+
 var model: Node3D
-var _wheels: Array[Node3D] = []
-var _wheel_rest: Array[Basis] = []
+## Rodas (giro por raio de cada roda, esterçamento, pecas de roda presas no pneu; T-133).
+var wheels: TruckWheels = TruckWheels.new()
 var _headlight: SpotLight3D
 var _tail_glow: OmniLight3D
-var _spin: float = 0.0
 var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
@@ -51,6 +61,7 @@ var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 tr
 
 
 func _ready() -> void:
+	cab_kind = CabCatalog.normalize(cab_kind)
 	var path: String = model_path(body_kind, cab_kind)
 	var scene: PackedScene = load(path) as PackedScene
 	if scene == null:
@@ -65,11 +76,9 @@ func _ready() -> void:
 	TruckTextures.apply(model)               # texturas grandes compartilhadas (o .glb so traz miniaturas)
 	_apply_light_materials(model)
 	_build_blinkers()
-	for n in model.find_children("wheel_*", "Node3D", true, false):
-		_wheels.append(n as Node3D)
-		_wheel_rest.append((n as Node3D).transform.basis)   # rotacao original do .glb (eixo do pneu em X)
+	wheels.setup(model, float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)))
 	_headlight = SpotLight3D.new()
-	_headlight.position = Vector3(0, 1.2, -11.6 - float(LENGTH_DELTA.get(body_kind, 0.0)))
+	_headlight.position = Vector3(0, 1.2, -11.6 - front_delta())
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
 	_headlight.spot_range = 70.0
 	_headlight.spot_angle = 32.0
@@ -78,6 +87,30 @@ func _ready() -> void:
 	_headlight.shadow_enabled = false
 	_headlight.visible = int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1
 	add_child(_headlight)
+	_queue_plates()
+
+
+func _queue_plates() -> void:
+	if not _plates_queued:
+		_plates_queued = true
+		_place_plates.call_deferred()            # uma vez por quadro (depois do queue_free das pecas antigas)
+
+
+## Placa da frente e de tras (PlateCatalog, estilo comercial verde); refeita quando as pecas mudam.
+func _place_plates() -> void:
+	_plates_queued = false
+	if model == null or not is_inside_tree():
+		return
+	if plates == null:
+		plates = LicensePlates.new()
+		add_child(plates)
+	var s: Array = TruckPlateSpots.spots(self, model, shown_cab())
+	if _plate_ids.is_empty():
+		var cell: int = plate_cell if plate_cell >= 0 else plates.pick(PlateCatalog.Style.GREEN, 0)
+		plate_cell = cell
+		_plate_ids = [plates.add_plate(self, s[0], cell), plates.add_plate(self, s[1], cell)]
+	plates.set_plate(_plate_ids[0], s[0], true)
+	plates.set_plate(_plate_ids[1], s[1], bool(s[2]))
 
 
 ## Luzinhas de marcacao (fileiras do bau, cabine, andon e das pecas): `on` = acesas (noite/tunel); apagadas
@@ -123,12 +156,12 @@ func apply_decals(decals: Array) -> void:
 	_decal_nodes.clear()
 	if model == null:
 		return
-	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0)), shown_cab())
+	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - front_delta(), shown_cab())
 
 
 ## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
 func _build_blinkers() -> void:
-	var front_z: float = -11.5 - float(LENGTH_DELTA.get(body_kind, 0.0))
+	var front_z: float = -11.5 - front_delta()
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(1.0, 0.62, 0.05)
 	mat.emission_enabled = true
@@ -157,18 +190,10 @@ func set_signal(dir: int) -> void:
 		_blinkers[i].visible = on and side == dir
 
 
-## Gira as rodas e aplica a escala de velocidade; `dt` em segundos reais.
+## Gira as rodas (cada uma por velocidade / raio dela) e estérça as dianteiras; as calotas e rodas da loja
+## sao filhas das rodas e acompanham. `speed` em m/s, `dt` em segundos reais, `steer` em -1..1.
 func animate(speed: float, dt: float, steer: float = 0.0) -> void:
-	_spin += speed / float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)) * dt
-	_spin = fmod(_spin, TAU)                 # evita perder precisao em corridas longas
-	for i in _wheels.size():
-		var w: Node3D = _wheels[i]
-		var r: Basis = Basis(Vector3.RIGHT, -_spin)
-		var base_yaw: float = 0.0
-		if String(w.name).begins_with("wheel_f"):
-			base_yaw = -steer * 0.35
-		# ordem: rotacao original do modelo -> giro no eixo X -> esterçamento no eixo vertical
-		w.transform.basis = Basis(Vector3.UP, base_yaw) * r * _wheel_rest[i]
+	wheels.animate(speed, dt, steer)
 
 
 func set_headlights(on: bool) -> void:
@@ -220,13 +245,15 @@ func _apply_mural() -> void:
 ## os 20 modelos; um .glb futuro que ja traga o ponto tem prioridade.
 static func extra_mounts(body: String, cab: String) -> Dictionary:
 	var d: float = float(LENGTH_DELTA.get(body, 0.0))
-	var stack: Vector3 = Vector3(1.3, 8.3 + d, 0.9)           # escapamentos de fabrica (padrao, classica, aero, alta, chata)
+	var stack: Vector3 = Vector3(1.3, 8.3 + d, 0.9)           # escapamentos de fabrica (chata, americana)
 	var sc: float = 1.0
 	if body == "canter":
 		stack = Vector3(1.25, 5.09, 0.75)                    # entre a cabine curta e o bau do Canter
 		sc = 0.88
 	elif cab == "curta":
 		stack = Vector3(1.4, 9.47 + d, 0.9)                  # canto de tras da cabine curta (o bau cresceu ate ali)
+	elif cab == "jac":
+		stack = Vector3(1.3, 9.15 + d, 0.9)                  # atras da cabine JAC grande (escapamentos de fabrica)
 	return {"MOUNT_STACK_R": [stack, sc], "MOUNT_STACK_L": [Vector3(-stack.x, stack.y, stack.z), sc]}
 
 
@@ -246,16 +273,26 @@ static func add_extra_mounts(root: Node3D, body: String, cab: String) -> void:
 
 ## Cabine que aparece de verdade (o Canter so tem a dele, qualquer que seja a escolha do perfil).
 func shown_cab() -> String:
-	return String(FIXED_CAB.get(body_kind, cab_kind))
+	return String(FIXED_CAB.get(body_kind, CabCatalog.normalize(cab_kind)))
 
 
-## Caminho do .glb para a combinacao carroceria + cabine (a cabine "padrao" nao tem sufixo).
+## Quanto a frente deste caminhao passa da do caminhao padrao (m): comprimento do bau + bico da cabine.
+func front_delta() -> float:
+	var d: float = float(LENGTH_DELTA.get(body_kind, 0.0))
+	if not FIXED_CAB.has(body_kind):
+		d += float(CAB_FRONT_DELTA.get(CabCatalog.normalize(cab_kind), 0.0))
+	return d
+
+
+## Caminho do .glb para a combinacao carroceria + cabine (`dekotora_truck_<bau>_<cabine>.glb`; o Canter e a
+## carreta tem cabine fixa). Cabine antiga ou desconhecida vira a nova mais parecida (CabCatalog.normalize).
 static func model_path(body: String, cab: String) -> String:
-	if FIXED_CAB.has(body):
+	if FIXED_CAB.has(body) or body == "carreta":
 		return String(MODEL_PATHS[body])
-	if cab == "padrao" or not ResourceLoader.exists(MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]):
+	var path: String = MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, CabCatalog.normalize(cab)]
+	if not ResourceLoader.exists(path):
 		return String(MODEL_PATHS.get(body, MODEL_PATH))
-	return MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, cab]
+	return path
 
 
 ## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao.
@@ -274,8 +311,13 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 		if entry.is_empty():
 			continue
 		var list: Array = []
-		for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
-			var n: Node3D = catalog.attach(model, d.accessory_id, side)
+		var made: Array[Node3D] = []
+		if TruckWheels.is_wheel_part(entry):            # calota/roda da loja: em TODAS as rodas externas, presa no pneu
+			made = wheels.attach_part(catalog, d.accessory_id)
+		else:
+			for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
+				made.append(catalog.attach(model, d.accessory_id, side))
+		for n in made:
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
 				if chrome_mode != "":
@@ -284,6 +326,7 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 				list.append(n)
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
+	_queue_plates()
 
 
 ## Estado visual de uma peca: "ok", "dent" (opaca/amassada) ou "broken" (some do caminhao).
@@ -297,7 +340,8 @@ func set_part_state(part_id: String, state: String) -> void:
 		node.visible = state != "broken"
 		if state == "dent":
 			catalog.swap_material(node, "chrome", "steel")
-			node.rotation.x = 0.06
+			if not node.has_meta("wheel_part"):          # peca de roda gira com o pneu: sem inclinar o encaixe
+				node.rotation.x = 0.06
 
 
 ## Sincroniza todos os acessorios com o dano da simulacao (lista de pecas de TruckSim.loadout).

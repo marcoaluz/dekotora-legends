@@ -2,8 +2,6 @@
 
 Convenções: +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro.
 """
-import math
-
 BODY_W, BODY_L, BODY_Z0, BODY_TOP = 2.5, 8.2, 1.1, 3.2
 CAB_W, CAB_Y0, CAB_Y1, CAB_Z0, CAB_TOP = 2.4, 8.45, 11.5, 0.9, 3.35
 REAR_AXLES_Y = (1.5, 3.0)
@@ -45,28 +43,3 @@ for _n, _p in _MOUNTS_SIDE_R.items():
     MOUNTS[_n] = _p
     MOUNTS[_n[:-1] + "L"] = (-_p[0], _p[1], _p[2])
 
-
-# --- forma da cabine (usada para construir e para encostar detalhes na superfície)
-WIND_Z0, WIND_Z1 = 2.1, 3.2          # trecho inclinado do para-brisa
-WIND_SETBACK = 0.38                  # quanto o topo do para-brisa recua
-ROOF_R = 0.15                        # altura do arredondado do teto
-ROOF_INSET = 0.13
-
-
-def cab_yf(z: float) -> float:
-    """Y da face frontal da cabine na altura z (antes do arredondado do teto)."""
-    if z <= WIND_Z0:
-        return CAB_Y1
-    t = min(1.0, (z - WIND_Z0) / (WIND_Z1 - WIND_Z0))
-    return CAB_Y1 - WIND_SETBACK * t
-
-
-def cab_hw(z: float) -> float:
-    """Meia-largura da cabine na altura z (leve afunilamento para cima)."""
-    if z <= 2.4:
-        return CAB_W / 2
-    t = min(1.0, (z - 2.4) / 0.8)
-    return CAB_W / 2 - 0.05 * t
-
-
-SLOPE_DEG = math.degrees(math.atan2(WIND_SETBACK, WIND_Z1 - WIND_Z0))

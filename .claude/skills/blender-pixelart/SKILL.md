@@ -84,7 +84,10 @@ um problema visual não puder ser entendido pelos renders.
 
 ## Caminhão 3D (T-106)
 
-- Placas que seguem a casca da cabine usam `truck3d/cab_surface.py` (função `patch()`). Toda placa precisa de uma
+- (T-129) As cabines agora são todas de modelos de arquivo (`cab_chata.py`, `jac_cab.py`, `kw_cab.py`); os módulos de cabine por código
+  (`cab_surface.py` etc.) foram apagados. Gerar todos os caminhões: `bash tools/build_all_trucks.sh`. Modelo grande demais (Kenworth,
+  2 milhões de triângulos): descarte ilhas < 4 cm ANTES de `extract.decimate_islands` (milhares de ilhas = minutos de `bpy.ops`).
+- (histórico T-106) Placas que seguem a casca da cabine usavam `truck3d/cab_surface.py` (função `patch()`). Toda placa precisa de uma
   linha nas dobras da casca; isso já é automático pelo atributo `kinks` da casca.
 - Texturas por altura usam `mesh3d.uv_height` (u e v em metros, sujeira sempre embaixo, chuva descendo de cima).
 - A folha de conferência sai em `previews/truck_<tag>_sheet.png` (com `--night`, `truck_<tag>_night_sheet.png`).

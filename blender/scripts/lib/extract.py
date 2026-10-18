@@ -103,8 +103,10 @@ def islands_info(o):
 
 
 def take(src: dict, boxes, material_map: dict, name: str, max_size: float = 99.0, objects=None, exclude=(),
-         min_size: float = 0.0):
-    """Copia as ilhas cujo centro cai em `boxes`. Devolve objetos novos (um por material nosso), sem transformação."""
+         min_size: float = 0.0, island_mat=None):
+    """Copia as ilhas cujo centro cai em `boxes`. Devolve objetos novos (um por material nosso), sem transformação.
+    `island_mat(nosso, centro, tamanho)` (opcional) troca o material nosso de uma ilha inteira ou devolve None para
+    descartá-la (ex.: lente do farol vira lâmpada acesa; plástico do interior some)."""
     per_mat = {}
     for oname in sorted(objects or src):
         o = src[oname]
@@ -114,7 +116,7 @@ def take(src: dict, boxes, material_map: dict, name: str, max_size: float = 99.0
         bm = _world_bmesh(o)
         vlab, lab = _islands(bm)
         co = np.array([v.co[:] for v in bm.verts]).reshape(-1, 3)
-        keep_lab = set()
+        keep_lab = {}
         for k, (lo, hi, _n) in _boxes(vlab, co).items():
             c = (lo + hi) / 2
             if float((hi - lo).max()) > max_size or float((hi - lo).max()) < min_size:
@@ -122,11 +124,14 @@ def take(src: dict, boxes, material_map: dict, name: str, max_size: float = 99.0
             inside = any(all(b0[i] <= c[i] <= b1[i] for i in range(3)) for b0, b1 in boxes)
             out_ex = any(all(b0[i] <= c[i] <= b1[i] for i in range(3)) for b0, b1 in exclude)
             if inside and not out_ex:
-                keep_lab.add(int(k))
+                keep_lab[int(k)] = (c, hi - lo)
         for fi, f in enumerate(bm.faces):
-            if int(lab[fi]) not in keep_lab:
+            isl = keep_lab.get(int(lab[fi]))
+            if isl is None:
                 continue
             ours = material_map.get(mats[f.material_index] if f.material_index < len(mats) else "")
+            if ours and island_mat is not None:
+                ours = island_mat(ours, isl[0], isl[1])
             if not ours:
                 continue
             per_mat.setdefault(ours, []).append([v.co.copy() for v in f.verts])

@@ -4,7 +4,7 @@
   "godot_forward": "-Z",
   "truck": {
     "id": "dekotora_truck_base",
-    "model": "res://assets/vehicles/dekotora/truck/dekotora_truck_base.glb",
+    "model": "res://assets/vehicles/dekotora/truck/dekotora_truck_base_chata.glb",
     "mount_points_godot_xyz": {
       "MOUNT_FRONT_BUMPER": [
         0.0,
