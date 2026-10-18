@@ -99,3 +99,12 @@ um problema visual não puder ser entendido pelos renders.
 - (a) Gerar com `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all [--preview <pasta absoluta>]`.
 - (b) Armadilha: não soldar vértices (`remove_doubles`) antes de separar peças soltas, senão pneu e aro viram uma peça só.
 - (c) Armadilha: limpar o cache de imagens entre modelos (`C._IMG_CACHE.clear()`), porque os `.glb` do Sketchfab repetem os nomes `Image_0...`.
+
+## Bake alta → leve (T-136, baú premium)
+
+- Código: `blender/scripts/bake_box_premium.py` + `lib/bake.py`, `lib/cc0_mats.py`, `lib/meshbuild.py` (UV escrito à mão). Ver `docs/PIPELINE_ARTE_BLENDER.md`.
+- (a) Armadilha: com "selected to active", o Blender procura cada pixel em CADA objeto selecionado sem threads: junte a malha alta num objeto só (3× mais rápido).
+- (b) Armadilha: o passe DIFFUSE (cor) dá PRETO no metal (cor difusa = cor × (1 − metálico)); grave cor e metálico pelo passe EMIT (`cc0_mats.emit_pass`).
+- (c) Oclusão no glTF: grupo de nós "glTF Material Output" com entrada "Occlusion" (`pbr.baked_full`); o Godot vira `ao_texture` canal R.
+- (d) No Compatibility, metálico 1,0 sem reflexo fica quase preto: alumínio com 0,55. Texturas novas de `textures/`: conferir no `.import` `compress/mode=2` (e `normal_map=1` nas normais), senão ocupam 4× mais memória.
+
