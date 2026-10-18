@@ -90,3 +90,9 @@ um problema visual não puder ser entendido pelos renders.
 - A folha de conferência sai em `previews/truck_<tag>_sheet.png` (com `--night`, `truck_<tag>_night_sheet.png`).
   O build sem `--no-preview` gera sozinho.
 - Para medir triângulos e MB de textura: `python tools/glb_stats.py <arquivos .glb>` (só biblioteca padrão do Python).
+
+## Carros de trânsito (T-124)
+
+- (a) Gerar com `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all [--preview <pasta absoluta>]`.
+- (b) Armadilha: não soldar vértices (`remove_doubles`) antes de separar peças soltas, senão pneu e aro viram uma peça só.
+- (c) Armadilha: limpar o cache de imagens entre modelos (`C._IMG_CACHE.clear()`), porque os `.glb` do Sketchfab repetem os nomes `Image_0...`.

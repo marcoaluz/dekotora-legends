@@ -39,6 +39,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P44] Motor, turbo, escape e freio-motor na simulação
 - [x] [P45] Save local e campanha de Kanto (3 trechos + chefe)
 - [x] [P46] Bots, tráfego e cenário de Kanto no Blender
+- [x] [T-121/T-124] Carros de tráfego com modelos de terceiros (Royalty Free): Van 01, Ascona, Falcon, SUV, Fumi SC e ônibus (ver `docs/MODELOS_MELHORADOS.md`, seção Status)
 
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins
