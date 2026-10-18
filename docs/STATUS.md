@@ -105,9 +105,21 @@ continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi i
    da garagem; (d) rodas das peças (`wheels`, `hub_*`) montadas como filhos fora de `wheel_*`. Corrigir e criar teste
    (a rotação dos nós `wheel_*` muda com a velocidade, para cada modelo e cabine; rodas de peça acompanham).
 
-Ordem sugerida: T-131 (T-132 e T-133 já resolvidas).
+4. **T-138 RESOLVIDA (2026-10-18): telas com acabamento final (E1).** Todas as telas (menu, garagem, mercado, lobby, opções,
+   pausa, resultado, HUD e toque) são montadas por containers e presas às bordas: `window/stretch/aspect="expand"` (antes
+   "keep" punha faixas pretas no celular 20:9). Resultado novo (`ui/result_screen.gd` + `ui/result_text.gd`): "1º LUGAR",
+   "DERROTA" ou "TEMPO ESGOTADO" e frases simples (por que, carga estragada e por quê, peças, Fama). Fundo do menu em 2
+   opções (`ui/menu_bg/`): A posto à noite (padrão) e B rodovia, em Opções > Gráficos. Garagem com câmera mais perto,
+   cromo neutro de estúdio (`matcap_chrome_studio.png`) e botão VER EM MOVIMENTO (rodas). Teste `tests/test_i18n_keys.gd`.
+   Capturas antes/depois em `docs/capturas_t138/` (960x540 e 1200x540 = layout de 2400x1080): `bash tools/ui_shots.sh 960x540 PASTA`.
+   Detalhes em `docs/DECISOES.md` (2026-10-18, T-138).
+
+Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
+
+- **T-138:** escolher o fundo padrão da tela inicial (A posto à noite, B rodovia; compare `docs/capturas_t138/depois_960x540/menu.png`
+  e `menu_fundo_b.png`) e dizer se a câmera da garagem ficou perto o bastante.
 
 - **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo); olhar
   `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.

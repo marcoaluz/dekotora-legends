@@ -92,3 +92,5 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   (Trovão Rosa, Dragão de Aço).
 - **Capturas**: `bash tools/ui_shots.sh 960x540 PASTA` (todas as telas). Para 2400x1080 use `1200x540`: a janela não passa do
   tamanho do monitor e, com essa configuração de stretch, o layout é idêntico (só muda a nitidez).
+  `docs/capturas_t138/antes_960x540` (commit dc7c539) e `depois_960x540` / `depois_1200x540`. Não há "antes" em 20:9: o jogo
+  antigo desenhava sempre 960x540 e o resto da tela do celular ficava com faixas pretas nas laterais.

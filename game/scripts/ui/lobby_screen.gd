@@ -8,6 +8,7 @@ var stage: GarageStage
 var _ui: Control
 var _holder: VBoxContainer
 var _panel: Control
+var _foot: HBoxContainer              # rodape do painel, fora da rolagem (botoes principais sempre visiveis)
 var _status: Label
 var _code_edit: LineEdit
 var _members_box: VBoxContainer
@@ -98,12 +99,17 @@ func _new_panel(title: String, icon_name: String, width: float = 520.0) -> VBoxC
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sc.custom_minimum_size = Vector2(0, 0)
 	outer.add_child(sc)
+	_foot = HBoxContainer.new()
+	_foot.add_theme_constant_override("separation", 8)
+	outer.add_child(_foot)
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sc.add_child(v)
-	v.resized.connect(func() -> void:             # cresce com o conteudo ate caber na tela; depois rola
-		var room: float = get_viewport().get_visible_rect().size.y - 200.0
-		sc.custom_minimum_size.y = minf(v.size.y, maxf(room, 160.0)))
+	var fit := func() -> void:                    # cresce com o conteudo ate caber na tela (menos o rodape); depois rola
+		var room: float = get_viewport().get_visible_rect().size.y - 150.0 - (_foot.size.y + 10.0 if _foot.get_child_count() > 0 else 0.0)
+		sc.custom_minimum_size.y = minf(v.size.y, maxf(room, 120.0))
+	v.resized.connect(fit)
+	_foot.resized.connect(fit)
 	return v
 
 
@@ -182,19 +188,18 @@ func _show_room() -> void:
 	v.add_child(_members_box)
 	_rules_box = VBoxContainer.new()
 	v.add_child(_rules_box)
-	var row := HBoxContainer.new()
-	v.add_child(row)
-	_ready_btn = UiTheme.button(Tr.t("lobby.ready"), Vector2(180, 52))
+	_ready_btn = UiTheme.button(Tr.t("lobby.ready"), Vector2(150, 48))
 	_ready_btn.pressed.connect(func() -> void: Net.set_ready(not _my_ready()))
-	row.add_child(_ready_btn)
-	_start_btn = UiKit.primary_button(Tr.t("lobby.start"), "flag", Vector2(260, 52))
+	_foot.add_child(_ready_btn)
+	_start_btn = UiKit.primary_button(Tr.t("lobby.start"), "flag", Vector2(0, 48))
+	_start_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_start_btn.pressed.connect(func() -> void: Net.start_race())
-	row.add_child(_start_btn)
-	var leave: Button = UiTheme.button(Tr.t("lobby.leave"), Vector2(0, 48))
+	_foot.add_child(_start_btn)
+	var leave: Button = UiTheme.button(Tr.t("lobby.leave"), Vector2(170, 48))
 	leave.pressed.connect(func() -> void:
 		Net.leave_room()
 		_show_menu())
-	v.add_child(leave)
+	_foot.add_child(leave)
 
 
 ## `--lobby-demo`: sala de mentira (2 jogadores, voce e o anfitriao) so para ver o layout; nada vai a rede.
