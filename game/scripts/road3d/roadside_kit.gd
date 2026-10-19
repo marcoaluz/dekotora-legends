@@ -50,11 +50,12 @@ static func material(id: String, tod: TimeOfDay) -> Material:
 			o.orm_texture = _tex("barrier_orm.png")
 			o.normal_enabled = true
 			o.normal_texture = _tex("barrier_nrm.png")
-			o.normal_scale = 0.8
-			o.emission_enabled = day < 0.7          # listras refletivas sob os farois (sem luz real)
+			o.albedo_color = Color(1.3, 1.27, 1.18)  # a textura original e escura (sujeira); no Compatibility ficava preta
+			o.normal_scale = 0.6
+			o.emission_enabled = true               # tinta refletiva: um pouco de brilho proprio, mais a noite
 			o.emission_texture = o.albedo_texture
 			o.emission = Color(1, 1, 1)
-			o.emission_energy_multiplier = 0.55 * (1.0 - day)
+			o.emission_energy_multiplier = 0.25 + 0.6 * (1.0 - day)
 			o.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			m = o
 		"kit_sign_metal":

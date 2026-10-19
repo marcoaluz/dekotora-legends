@@ -134,6 +134,10 @@ func _make_materials() -> void:
 	_mats["rail"] = rail
 	var glass := StandardMaterial3D.new()         # barreira de som (acrilico translucido)
 	glass.albedo_color = Color(0.62, 0.8, 0.86, 0.22)
+	var fence: Texture2D = load(RoadsideKit.TEX + "truss_fence.png") as Texture2D if RoadsideKit.enabled() 		and ResourceLoader.exists(RoadsideKit.TEX + "truss_fence.png") else null
+	if fence != null:                             # T-146: paineis de vidro com moldura (Grade1.png do "Placao")
+		glass.albedo_texture = fence
+		glass.albedo_color = Color(0.85, 0.95, 1.0, 0.5)
 	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
 	glass.roughness = 0.1
@@ -193,6 +197,24 @@ func _barrier(st: SurfaceTool, i: int, j: int, inner: float, side: float, col: C
 func _blade(st: SurfaceTool, i: int, j: int, lat: float, h0: float, h1: float) -> void:
 	_quad(st, _edge(i, lat, h1), _edge(i, lat, h0), _edge(j, lat, h0), _edge(j, lat, h1))
 	_quad(st, _edge(i, lat, h0), _edge(i, lat, h1), _edge(j, lat, h1), _edge(j, lat, h0))
+
+
+## Barreira de som (T-146): lamina das duas faces com UV na faixa dos paineis de vidro do truss_fence.png
+## (linhas 128-262 da imagem; u = 12 m por repeticao, 6 paineis).
+func _glass_blade(st: SurfaceTool, i: int, j: int, lat: float, h0: float, h1: float) -> void:
+	var u0: float = float(i) * Track.SEG_LEN / 12.0
+	var u1: float = float(j) * Track.SEG_LEN / 12.0
+	var a: Vector3 = _edge(i, lat, h1)
+	var b: Vector3 = _edge(i, lat, h0)
+	var c: Vector3 = _edge(j, lat, h0)
+	var d: Vector3 = _edge(j, lat, h1)
+	var uv: Dictionary = {a: Vector2(u0, 0.127), b: Vector2(u0, 0.255), c: Vector2(u1, 0.255), d: Vector2(u1, 0.127)}
+	_used[st] = true
+	for tri in [[a, c, b, a, d, c], [b, c, a, c, d, a]]:          # as duas faces
+		for v in tri:
+			st.set_color(Color.WHITE)
+			st.set_uv(uv[v])
+			st.add_vertex(v)
 
 
 ## Cor do asfalto (multiplica a textura) por faixa e por trecho: recapeamento, remendos, tunel.
@@ -282,7 +304,7 @@ func _build_chunk(s0: int, s1: int) -> void:
 			_strip(sts["ground"], i, j, bo, bo + GRASS_WIDTH, -_deck, -_deck)
 			if q >= 1 and sound_wall_at(z) and not tunnel:
 				for side in [-1.0, 1.0]:
-					_blade(sts["glass"], i, j, side * (BARRIER_IN + 0.45), 0.85, 4.0)
+					_glass_blade(sts["glass"], i, j, side * (BARRIER_IN + 0.45), 0.85, 4.0)
 			continue
 		_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -BARRIER_IN)        # grama do lado esquerdo
 		if coast:                                                           # lado do mar: guard-rail, grama curta e praia

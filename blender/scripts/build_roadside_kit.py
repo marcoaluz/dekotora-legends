@@ -273,8 +273,8 @@ def export(objs: list, name: str) -> str:
 # ---------------------------------------------------------------- Metais
 BARRIERS = {   # objeto original -> (nosso nome, triangulos maximos)
     "Concrete_Barrier_1": ("barrier_jersey", 200),
-    "Concrete_Barrier_2": ("barrier_jersey_fence", 200),
-    "Concrete_Barrier_3": ("barrier_wall", 200),
+    "Concrete_Barrier_2": ("barrier_wall", 200),           # muro alto (1,3 m)
+    "Concrete_Barrier_3": ("barrier_jersey_fence", 200),   # New Jersey com grade em cima
     "Metal_Barrier_1": ("barrier_aframe_s", 260),
     "Metal_Barrier_2": ("barrier_aframe", 280),
 }
