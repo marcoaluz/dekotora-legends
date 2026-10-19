@@ -105,3 +105,24 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Medidor de faixa: `godot --headless --path game -s res://tools_dev/measure_lane_following.gd` (imprime desvio máximo e % de corpo torto por rota).
 - Capturas de cima: `-- --route=kanto_3_mountain --time=day --cam=top --nohud --autoplay --start=300 --start-speed=21 --snap-every=2 --shots=PASTA`.
   - `--cam=high` para 75 m; `--cam=side` para alta de lado; `--demo=lanes` para troca de faixa.
+
+## Capturas de telas (T-138)
+
+- Todas as telas de uma vez: `bash tools/ui_shots.sh 960x540 PASTA [tela...]` (na raiz do projeto). Sem lista de telas, tira todas. Cada tela abre uma janela, por isso não funciona com `--headless`.
+- Para 2400x1080 use `1200x540`: a janela não cabe no monitor, mas o layout é o mesmo (só muda a nitidez).
+- Gancho `--shot=` de qualquer tela: chame `DebugShot.arm(self)` no `_ready()` da tela (ex.: `scripts/ui/main_menu.gd`). Sem `--shot=` não faz nada.
+- Em Control criado já dentro da árvore, use `set_anchors_and_offsets_preset(PRESET_FULL_RECT)`, não `set_anchors_preset`.
+- Toda chave nova de texto precisa entrar em `game/data/i18n/pt-BR.json`. O teste `tests/test_i18n_keys.gd` acusa se faltar.
+
+## Eventos de pista (T-139)
+
+- Flags da corrida (`scripts/road3d/race_demo.gd`):
+  - `--event=TIPO:FAIXAS@Z+COMPRIMENTO` força um evento no lugar dos da rota (pode repetir). Ex.: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`.
+  - `--no-events` deixa a pista livre.
+  - `--event-seed=N` fixa a semente do sorteio (repete os mesmos eventos).
+  - `--hide-events-3d` esconde só o visual (`track_events_3d.gd`), para medir o custo de desenho.
+- Medidores (headless):
+  - `godot --headless --path game -s res://tools_dev/measure_event_times.gd -- --seeds=5 --route=ROTA` (`--seeds` e `--route`).
+  - `godot --headless --path game -s res://tools_dev/trace_event.gd -- --route=R --event=... --tseed=N --bot=K` (`--route`, `--event`, `--tseed`, `--bot`, `--seed`, `--from`, `--to`).
+- `tools_dev/make_event_atlas.gd` precisa de janela: rode sem `--headless`.
+- Todos leem o mesmo intervalo, `TrackEvents.interval(ev, zz)` em `scripts/sim/track_events.gd`. Assim a simulação, os medidores e o visual (`event_props.gd`) ficam iguais.
