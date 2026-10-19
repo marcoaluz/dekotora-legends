@@ -45,7 +45,8 @@ func _billboards(path: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Arr
 	var k: int = 0
 	while z < L - 200.0:
 		var g: float = fposmod(z - RoadSigns.GANTRY_FIRST, RoadSigns.GANTRY_EVERY)
-		if RoadMesh.in_tunnel(z, tunnels, 150.0) or minf(g, RoadSigns.GANTRY_EVERY - g) < 70.0:
+		if RoadMesh.in_tunnel(z, tunnels, 150.0) or minf(g, RoadSigns.GANTRY_EVERY - g) < 70.0 \
+				or LaneSections.at(path.track.events, z, 60.0) != null:       # T-153: nem na ponte nem no trecho estreito
 			z += 90.0                                        # escapa do tunel/portico mais adiante
 			continue
 		var side: float = -1.0 if kind == &"coast" or k % 2 == 0 else 1.0   # litoral: o mar fica a direita
@@ -83,11 +84,12 @@ func _portals(path: TrackPath, tod: TimeOfDay, tunnels: Array[Vector2]) -> void:
 	var mesh: ArrayMesh = RoadsideKit.mesh("barrier_wall", tod)
 	if mesh == null:
 		return
-	var lat: float = RoadMesh.BARRIER_IN + RoadsideKit.JERSEY_W * 0.5
 	for t in tunnels:
 		for n in 2:
 			var z: float = t.x - RoadsideKit.JERSEY_LEN * (n + 0.5) - 0.2
 			var b := Basis(Vector3.UP, path.yaw_at(z))
+			var p: Vector3 = LaneSections.profile(path.track.events, z)      # T-153: tunel antigo, muretas do trecho
 			for side in [-1.0, 1.0]:
+				var lat: float = (p.x if side < 0.0 else p.y) + RoadsideKit.JERSEY_W * 0.5
 				_walls.add(mesh, Transform3D(b, path.world_point(z, side * lat / Track.ROAD_HALF_WIDTH_M, 0.0)), z)
 				counts["portal_wall"] = int(counts.get("portal_wall", 0)) + 1

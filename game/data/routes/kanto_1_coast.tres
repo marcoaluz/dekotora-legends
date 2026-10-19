@@ -31,11 +31,21 @@ sections = Array[Dictionary]([{
 "length": 300.0
 }, {
 "curve": -0.4,
-"length": 400.0
+"length": 200.0
+}, {
+"curve": -0.4,
+"hill": 0.03,
+"length": 200.0
 }, {
 "curve": 0.0,
-"length": 400.0
+"hill": -0.03,
+"length": 200.0
+}, {
+"curve": 0.0,
+"length": 200.0
 }])
 rival_id = &"rival_coast"
 traffic = 0
 events = Array[Dictionary]([{"kind": "narrow", "z": 1650.0, "length": 420.0, "lanes": [3]}])
+lane_sections = Array[Dictionary]([{"start": 2400.0, "end": 2760.0, "lanes": 2, "taper": 130.0, "look": "bridge"}])
+bridges = Array[Vector2]([Vector2(2440, 305)])

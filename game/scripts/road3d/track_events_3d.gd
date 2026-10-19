@@ -92,7 +92,10 @@ func build(path_: TrackPath, tod: TimeOfDay) -> void:
 		_mats[sh[0]] = m
 	for k in events.list.size():
 		_begin(k)
-		EventProps.build(self, events.list[k], k)
+		if events.list[k].kind == TrackEvents.Kind.SECTION:      # T-153: trecho de 2 faixas (placas, setas, listras)
+			SectionProps.build(self, events.list[k], k)
+		else:
+			EventProps.build(self, events.list[k], k)
 		_commit()
 	if "--fps-log" in OS.get_cmdline_user_args():
 		print("EVENTOS 3D: ", counts, "  grupos=", groups.size())

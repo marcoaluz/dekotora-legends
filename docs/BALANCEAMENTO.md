@@ -262,6 +262,31 @@ Custo medido em tempo (`godot --headless --path game -s res://tools_dev/measure_
 
 Uma corrida isolada varia muito mais (até ±25 s): o trânsito denso muda de forma caótica com qualquer evento; por isso a média.
 
+## Trechos com 2 faixas (T-153)
+
+Código: `sim/lane_sections.gd` (dados e geometria), `TrackEvents.Kind.SECTION` (as mesmas consultas de faixa fechada dos
+eventos), `sim/event_contact.gd` (muretas). Dados: `RouteDef.lane_sections` `{start, end, lanes: 2, taper, look}`.
+
+| Item | Valor |
+| --- | --- |
+| Faixa que acaba | sempre a da **direita** (ultrapassagem; no Japão se anda pela esquerda) |
+| Mureta da direita (face interna) | 13 m → **3,0 m** do centro (faixa do meio termina em 1,8 m + 1,2 m de acostamento) |
+| Mureta da esquerda | 13 m → **7,8 m** (acostamento de 2,4 m: o acostamento da esquerda continua cabendo um caminhão) |
+| Linha de borda da direita | 5,15 m → 1,95 m; termina o afunilamento a 80% dele (sempre por dentro da mureta), zebrado entre as duas |
+| Afunilamento / alargamento | `taper` m antes de `start` e depois de `end` (rotas: 130 m), curva suave (smoothstep) |
+| Faixa da direita fecha | quando um caminhão nela encostaria na mureta (~30% do afunilamento antes de `start`); o acostamento da direita fecha antes |
+| Quem insiste na faixa que acaba | mureta empurra 2 x/s, −3 m/s², toque na carga a cada 0,8 s, troca de faixa obrigatória (disputa a vez pela batida normal) |
+| Troca para a faixa que acabou | recusada ("FAIXA FECHADA"), como nos eventos |
+| Avisos | painel de LED 600 m antes do afunilamento, losangos 車線減少 a 400 m e 200 m, placa azul この先 2車線 a 90 m; HUD "PISTA COM 2 FAIXAS" a 400 m até 40 m depois do início |
+| Prazo | **sem folga** (o trecho faz parte da rota) |
+| Eventos sorteados | ficam a 120 m ou mais da zona do trecho (`TrackEvents.SECTION_GAP_M`); nunca dentro |
+
+Rotas: litoral 2.400–2.760 m (ponte 2.440–2.745 m; a rota ganhou uma lombada de 3% em 2.400–2.800 m para a ponte
+ficar ~10 m acima do mar), viaduto 2.270–2.510 m (viaduto antigo), montanha 780–1.060 m (túnel antigo 805–1.040 m).
+
+Custo no tempo (`tools_dev/measure_section_times.gd`, 4 bots, trânsito da rota, 4 sementes, corrida inteira com e sem o
+trecho): litoral +1,2 s na média (bot difícil +2,3 s), viaduto +2,9 s (+5,8 s), montanha +2,1 s (+2,9 s).
+
 ## Peças tiradas de modelos de terceiros (T-126)
 
 Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 30 mil = 20, < 50 mil = 60).

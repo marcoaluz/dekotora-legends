@@ -116,8 +116,8 @@ static func _signs(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
 	var dists: Array = [[400.0, "d400"], [200.0, "d200"]]
 	for d in dists:
 		var z: float = ev.z - float(d[0])
-		if z < 30.0:
-			continue
+		if z < 30.0 or LaneSections.at(b.events, z, 15.0) != null:
+			continue                                         # T-153: nada de placa solta dentro do trecho de 2 faixas
 		match ev.kind:
 			TrackEvents.Kind.ACCIDENT:
 				_board(b, z, "vms_accident", String(d[1]))

@@ -42,3 +42,4 @@ rival_id = &"rival_urban"
 fame_required = 20
 deadline_s = 130.0
 events = Array[Dictionary]([{"kind": "accident", "z": 2000.0, "length": 110.0, "lanes": [2, 3]}])
+lane_sections = Array[Dictionary]([{"start": 2270.0, "end": 2510.0, "lanes": 2, "taper": 130.0, "look": "old_viaduct"}])

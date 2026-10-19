@@ -48,23 +48,30 @@ func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[V
 	var bar: float = RoadMesh.BARRIER_IN + 0.3
 	var edge: float = Track.ROAD_HALF_WIDTH_M - 0.35
 	var deck: float = RoadMesh.deck_height(kind)
+	var evs: TrackEvents = path.track.events
 	var z: float = 6.0
 	while z < L - 2.0:                                                    # delineadores (a cada 12 m)
+		var p: Vector3 = LaneSections.profile(evs, z)                     # T-153: em cima da mureta que estreitou
 		for side in [-1.0, 1.0]:
-			_box(z, side * bar, 1.15, Vector3(0.08, 0.6, 0.08), Color("#9aa0a8", 0.0))
-			_box(z - 0.06, side * bar, 1.38, Vector3(0.16, 0.16, 0.04), Color("#35e07a") if side < 0.0 else Color("#f2f2f2"))
+			var lat: float = side * ((p.x if side < 0.0 else p.y) + 0.3)
+			if p.y >= RoadMesh.BARRIER_IN and p.x >= RoadMesh.BARRIER_IN:
+				lat = side * bar
+			_box(z, lat, 1.15, Vector3(0.08, 0.6, 0.08), Color("#9aa0a8", 0.0))
+			_box(z - 0.06, lat, 1.38, Vector3(0.16, 0.16, 0.04), Color("#35e07a") if side < 0.0 else Color("#f2f2f2"))
 		z += 12.0
 	z = 3.0
 	while z < L - 2.0:                                                    # olhos de gato (a cada 10 m)
-		_box(z, -edge, 0.03, Vector3(0.16, 0.05, 0.1), Color("#ffb347"))
-		_box(z, edge, 0.03, Vector3(0.16, 0.05, 0.1), Color("#f4f4ff"))
+		var p2: Vector3 = LaneSections.profile(evs, z)
+		_box(z, -minf(edge, p2.x - 0.4), 0.03, Vector3(0.16, 0.05, 0.1), Color("#ffb347"))
+		_box(z, minf(edge, minf(p2.y - 0.4, p2.z + 0.3)) if p2.z < LaneSections.EDGE_LINE_M - 0.01 else edge, 0.03,
+			Vector3(0.16, 0.05, 0.1), Color("#f4f4ff"))
 		z += 10.0
 	if deck > 0.0:
 		_viaduct(L, deck)
 	var gz: float = 320.0
 	var k: int = 0
 	while gz < L - 120.0:                                                 # porticos com placas
-		if not RoadMesh.in_tunnel(gz, tunnels, 40.0):
+		if not RoadMesh.in_tunnel(gz, tunnels, 40.0) and LaneSections.at(path.track.events, gz, 40.0) == null:
 			_gantry(gz, places, k, L)
 			k += 1
 		gz += 650.0
@@ -88,12 +95,16 @@ func _viaduct(L: float, deck: float) -> void:
 	var concrete := Color("#8d9099", 0.0)
 	var z: float = 16.0
 	while z < L:                                                          # pilar em T sob o tabuleiro
-		_box(z, 0.0, -(deck + 1.6) * 0.5, Vector3(3.0, deck - 1.6, 2.4), concrete)
-		_box(z, 0.0, -2.3, Vector3(bo * 2.0 - 1.0, 1.4, 2.4), concrete)
-		z += 32.0
+		var p: Vector3 = LaneSections.profile(path.track.events, z)        # T-153: viaduto antigo mais estreito
+		var w: float = p.x + p.y + 2.0 * RoadMesh.BARRIER_W
+		var c: float = (p.y - p.x) * 0.5
+		var old: bool = p.y < RoadMesh.BARRIER_IN - 0.01
+		_box(z, c, -(deck + 1.6) * 0.5, Vector3(2.2 if old else 3.0, deck - 1.6, 2.0 if old else 2.4), Color("#7d7a73", 0.0) if old else concrete)
+		_box(z, c, -2.3, Vector3(w - 1.0, 1.4, 2.4), Color("#7d7a73", 0.0) if old else concrete)
+		z += 24.0 if old else 32.0
 	z = 0.0
 	while z < L:                                                          # montantes das barreiras de som
-		if RoadMesh.sound_wall_at(z):
+		if RoadMesh.sound_wall_at(z) and LaneSections.at(path.track.events, z, 4.0) == null:
 			for side in [-1.0, 1.0]:
 				_box(z, side * (RoadMesh.BARRIER_IN + 0.45), 2.45, Vector3(0.14, 3.2, 0.14), Color("#5c636e", 0.0))
 		z += 4.0
@@ -167,16 +178,24 @@ func _markings(L: float, tunnels: Array[Vector2]) -> void:
 		var sharp: bool = absf(path.track.curve_at(z)) >= SHARP_CURVE
 		if sharp and not prev_sharp and z > 140.0:
 			for lx in lanes:
-				_road_text("速度落とせ", z - 110.0, lx, 64, 3.2)
-				_road_text("80", z - 60.0, lx, 96, 2.6)
+				if not _lane_gone(lx, z - 110.0):
+					_road_text("速度落とせ", z - 110.0, lx, 64, 3.2)
+				if not _lane_gone(lx, z - 60.0):
+					_road_text("80", z - 60.0, lx, 96, 2.6)
 		prev_sharp = sharp
 		z += 10.0
 	z = 260.0
 	while z < L - 60.0:                                                   # setas a cada 420 m
 		if not RoadMesh.in_tunnel(z, tunnels, 0.0):
 			for lx in lanes:
-				_road_text("↑", z, lx, 170, 2.2)
+				if not _lane_gone(lx, z):
+					_road_text("↑", z, lx, 170, 2.2)
 		z += 420.0
+
+
+## T-153: faixa da direita dentro da zona de um trecho de 2 faixas (sem pintura nela: vai acabar ou ja acabou).
+func _lane_gone(lane_x: float, z: float) -> bool:
+	return lane_x > 0.25 and LaneSections.at(path.track.events, z, 10.0) != null
 
 
 func _commit() -> void:

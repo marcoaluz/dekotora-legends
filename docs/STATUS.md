@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (256) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (265) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -31,6 +31,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; com `--shots=PASTA` o `--demo=crash` grava `batida_antes` e `batida_a..e` e o console mostra `BATIDA ... 101 -> 61 km/h (penalidade 40%)` (T-152); sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
 | Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` (T-152: chegada de cada bot e quanto as batidas custaram) |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
+| Trechos de 2 faixas (T-153) | corrida: `-- --route=kanto_1_coast --start=2200` (ponte), `--route=kanto_2_viaduct --start=2100` (viaduto antigo), `--route=kanto_3_mountain --start=560` (túnel antigo); `--no-sections` tira os trechos (comparar); capturas `bash tools/capture_t153.sh PASTA [filtro]`; custo `bash tools/measure_t153.sh [quadros] [--no-sections]`; sem tela: `tools_dev/trace_section.gd -- --route=R [--human] [--log]` e `tools_dev/measure_section_times.gd`; só estes testes: `-s res://tests/run_tests.gd -- --only=lane_sections` |
 | Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
@@ -154,6 +155,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   porque o câmbio fica na 6ª; decidir se o câmbio deve reduzir sozinho depois da batida (~7,5 s) e se o tranco vale também
   entre caminhões. **Gerar o APK de novo** (protocolo de rede 4).
 
+- **T-153 (trechos com 2 faixas):** olhar `docs/capturas_t153/` e jogar os 3 trechos; confirmar as posições (ponte do
+  litoral no fim da rota, viaduto antigo logo depois do acidente, túnel antigo nas curvas do começo da montanha), a
+  lombada nova do litoral (para a ponte ficar alta), o nome fictício 湯坂隧道 e se o trecho deve esticar o prazo (hoje não:
+  os bots perdem 1 a 3 s). **Gerar o APK de novo** (protocolo de rede 5).
+
 - **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
   outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as
   barreiras listradas nas obras/bocas de túnel e os pórticos de treliça. A mureta contínua continua a feita por código (o pacote
@@ -243,6 +249,16 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   (arfagem/rolagem) e a câmera; velocímetro vermelho no tranco. Testes `tests/test_traffic_penalty.gd` (11). Bots: −1,2 a
   +2,5 s na chegada (tabela em `docs/BALANCEAMENTO.md`). `net_test` (0 ms e 150 ms + 2%) passa; `bot_client` imprime
   `PRED:` (erro de predição máximo/médio). Capturas `docs/capturas_t152/`.
+- **T-153 (2026-10-19): trechos com 2 faixas de verdade (F2).** Dados `RouteDef.lane_sections` (+ `RouteDef.bridges`,
+  visual); simulação `sim/lane_sections.gd` + `TrackEvents.Kind.SECTION` (a faixa da direita acaba; muretas que entram,
+  `EventContact` empurra e obriga a entrar na fila; `Track.events` sempre recebe os trechos, `Track.lanes_at(z)`). Rede:
+  `lane_sections` no setup (protocolo 5). Visual: `road3d/road_mesh_narrow.gd` (asfalto, linhas, zebrado, muretas,
+  ponte e viaduto antigo no MESMO perfil da sim), `section_props.gd` (placas no lote dos eventos; atlas `event_atlas.png`
+  512x704 com 2 artes novas), `section_structures_3d.gd` (pilares, longarinas, cabeceiras da ponte), `Tunnel3D` (túnel
+  antigo: arco estreito, concreto escuro, lâmpadas nas paredes, boca de pedra com 湯坂隧道), filtros em
+  `RoadFurniture`/`RoadSigns`/`KitProps3D`/`Roadside3D`/`EventProps`. HUD "PISTA COM 2 FAIXAS". Trechos: litoral
+  2.400–2.760 m (ponte; lombada nova de 3%), viaduto 2.270–2.510 m, montanha 780–1.060 m (túnel 805–1.040). Testes
+  `tests/test_lane_sections.gd` (9). Custo: chamadas iguais (±5), FPS no ruído. Capturas `docs/capturas_t153/`.
 - **T-146 (2026-10-19): modelos de `docs/Novas Melhorias` (Metais, Placas, Placão) no jogo** (Royalty Free, no AI; inventário
   em `docs/INVENTARIO_MODELOS.md`, créditos em `game/assets/LICENCAS.md`). Gerador: `blender/scripts/build_roadside_kit.py`
   (14 .glb em `assets/scenery/kit/`, 60–280 triângulos cada, só geometria + UV; texturas `assets/textures/kit/` 1024/512 px

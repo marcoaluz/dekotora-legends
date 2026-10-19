@@ -54,10 +54,17 @@ func test_routes_have_a_fixed_event_and_roll_is_deterministic() -> void:
 				var ev: TrackEvents.Event = a.list[i]
 				check(ev.hi - ev.lo <= 1, "%s: nunca fecha as 3 faixas" % r)
 				check(ev.z > 300.0 and ev.reopen_end() < track.length_m - 100.0, "%s: evento dentro da pista (z=%.0f)" % [r, ev.z])
-				if i > 0:
-					check(ev.z - TrackEvents.WARN_M > a.list[i - 1].reopen_end(), "%s: eventos nao se sobrepoem" % r)
+				var prev: TrackEvents.Event = a.list[i - 1] if i > 0 else null
+				# T-153: the 2-lane sections are part of the road (fixed, may hold a tunnel): a fixed event may sit right
+				# after one; a random event keeps SECTION_GAP_M of free road from its zone
+				var with_section: bool = prev != null and (ev.kind == TrackEvents.Kind.SECTION or prev.kind == TrackEvents.Kind.SECTION)
+				if prev != null and not with_section:
+					check(ev.z - TrackEvents.WARN_M > prev.reopen_end(), "%s: eventos nao se sobrepoem" % r)
+				elif with_section and not (ev.fixed and prev.fixed):
+					check(ev.z - TrackEvents.SECTION_GAP_M >= prev.reopen_end() - 1.0, "%s: evento sorteado longe do trecho de 2 faixas" % r)
 				for t in route.tunnels:
-					check(ev.reopen_end() < t.x or ev.z > t.x + t.y, "%s: evento fora do tunel" % r)
+					if ev.kind != TrackEvents.Kind.SECTION:
+						check(ev.reopen_end() < t.x or ev.z > t.x + t.y, "%s: evento fora do tunel" % r)
 				if not ev.fixed:
 					randoms += 1
 					kinds[ev.kind] = true
@@ -332,4 +339,5 @@ func test_online_events_come_from_server_and_are_equal_for_all() -> void:
 	other.set_rules(100, {"route": "kanto_2_viaduct", "events": false})
 	other.set_ready(100, true)
 	other.try_start(100, 4242)
-	check(other.sim.track.events.is_empty(), "regra events = false: pista livre")
+	check(other.sim.track.events.only_sections(), "regra events = false: pista livre (so os trechos de 2 faixas, T-153)")
+	check(other.sim.track.lanes_at(2400.0) == 2, "regra events = false: o trecho de 2 faixas continua")

@@ -18,7 +18,7 @@ const GRASS_WIDTH: float = 110.0
 const RUMBLE_W: float = 0.9
 const SHOULDER_W: float = 1.4
 const BARRIER_W: float = 0.6
-const BARRIER_IN: float = 13.0             # face interna da mureta: alem do limite fisico da sim (|x| <= 1,6 = 11,5 m + meia largura)
+const BARRIER_IN: float = LaneSections.OPEN_WALL_M   # face interna da mureta (13 m): alem do limite fisico da sim (|x| <= 1,6 = 11,5 m + meia largura)
 const TEX_TILE: float = 4.0                 # metros por repeticao da textura
 const COAST_GRASS: float = 14.0             # litoral: grama do lado do mar antes da praia
 const COAST_SAND: float = 16.0              # largura da praia (desce ate o mar)
@@ -36,9 +36,11 @@ var path: TrackPath
 var kind: StringName = &"city"
 var tod: TimeOfDay
 var tunnels: Array[Vector2] = []
+var bridges: Array[Vector2] = []            # T-153 (RouteDef.bridges): sem chao embaixo, guarda-corpo dos dois lados
 var _mats: Dictionary = {}
 var _deck: float = 0.0
 var _used: Dictionary = {}                  # SurfaceTool com algum vertice neste pedaco
+var _prof: PackedVector3Array = PackedVector3Array()   # T-153: perfil da pista no inicio de cada segmento (LaneSections.profile)
 
 
 ## Altura do tabuleiro (viaduto) do cenario; 0 = estrada no chao.
@@ -66,6 +68,9 @@ func build(path_: TrackPath, kind_: StringName = &"city", tod_: TimeOfDay = null
 	_deck = deck_height(kind)
 	_make_materials()
 	var total: int = path.track.segment_count()
+	_prof.resize(total + 1)
+	for i in total + 1:
+		_prof[i] = LaneSections.profile(path.track.events, float(i) * Track.SEG_LEN)
 	var start: int = 0
 	while start < total:
 		var end: int = mini(start + CHUNK_SEGS, total)
@@ -162,19 +167,30 @@ func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, col:
 
 ## Faixa lateral entre `l0` e `l1` (alturas h0, h1) do segmento i ao j. Funciona dos dois lados.
 func _strip(st: SurfaceTool, i: int, j: int, l0: float, l1: float, h0: float = 0.0, h1: float = 0.0, col: Color = Color.WHITE) -> void:
-	if l0 < l1:
-		_quad(st, _edge(i, l0, h0), _edge(i, l1, h1), _edge(j, l1, h1), _edge(j, l0, h0), col)
+	_strip2(st, i, j, l0, l1, l0, l1, h0, h1, col)
+
+
+## Como _strip, com laterais diferentes em i e em j (T-153: a pista estreita ou alarga dentro do segmento).
+func _strip2(st: SurfaceTool, i: int, j: int, l0i: float, l1i: float, l0j: float, l1j: float, h0: float = 0.0,
+		h1: float = 0.0, col: Color = Color.WHITE) -> void:
+	if l0i + l0j < l1i + l1j:
+		_quad(st, _edge(i, l0i, h0), _edge(i, l1i, h1), _edge(j, l1j, h1), _edge(j, l0j, h0), col)
 	else:
-		_quad(st, _edge(i, l1, h1), _edge(i, l0, h0), _edge(j, l0, h0), _edge(j, l1, h1), col)
+		_quad(st, _edge(i, l1i, h1), _edge(i, l0i, h0), _edge(j, l0j, h0), _edge(j, l1j, h1), col)
 
 
 ## Como _strip, mas UV = (metros ao longo da pista, altura): para paredes (textura escorre de cima para baixo).
 func _wall_strip(st: SurfaceTool, i: int, j: int, l0: float, l1: float, h0: float, h1: float, col: Color = Color.WHITE) -> void:
+	_wall_strip2(st, i, j, l0, l1, l0, l1, h0, h1, col)
+
+
+func _wall_strip2(st: SurfaceTool, i: int, j: int, l0i: float, l1i: float, l0j: float, l1j: float, h0: float, h1: float,
+		col: Color = Color.WHITE) -> void:
 	var u0: float = float(i) * Track.SEG_LEN / TEX_TILE
 	var u1: float = float(j) * Track.SEG_LEN / TEX_TILE
-	var vs: Array = [[_edge(i, l0, h0), Vector2(u0, 0.85 - h0)], [_edge(i, l1, h1), Vector2(u0, 0.85 - h1)],
-		[_edge(j, l1, h1), Vector2(u1, 0.85 - h1)], [_edge(j, l0, h0), Vector2(u1, 0.85 - h0)]]   # v = 0 no topo da mureta
-	var order: Array = [0, 2, 1, 0, 3, 2] if l0 < l1 else [0, 1, 2, 0, 2, 3]   # mesma orientacao de _strip
+	var vs: Array = [[_edge(i, l0i, h0), Vector2(u0, 0.85 - h0)], [_edge(i, l1i, h1), Vector2(u0, 0.85 - h1)],
+		[_edge(j, l1j, h1), Vector2(u1, 0.85 - h1)], [_edge(j, l0j, h0), Vector2(u1, 0.85 - h0)]]   # v = 0 no topo da mureta
+	var order: Array = [0, 2, 1, 0, 3, 2] if l0i + l0j < l1i + l1j else [0, 1, 2, 0, 2, 3]   # mesma orientacao de _strip
 	_used[st] = true
 	for k in order:
 		st.set_color(col)
@@ -184,19 +200,31 @@ func _wall_strip(st: SurfaceTool, i: int, j: int, l0: float, l1: float, h0: floa
 
 ## Mureta de concreto tipo New Jersey (perfil trapezio) com a face interna em `inner`; side = -1 ou 1.
 func _barrier(st: SurfaceTool, i: int, j: int, inner: float, side: float, col: Color = Color.WHITE) -> void:
+	_barrier2(st, i, j, inner, inner, side, col, _deck > 0.0)
+
+
+## Mureta com a face interna em `inner_i` no segmento i e `inner_j` no j (T-153). `drop` = a face externa desce ate a
+## borda do tabuleiro (viaduto, ponte).
+func _barrier2(st: SurfaceTool, i: int, j: int, inner_i: float, inner_j: float, side: float, col: Color = Color.WHITE,
+		drop: bool = false) -> void:
 	var prof: Array = [[0.0, 0.0], [0.05, 0.25], [0.2, 0.85], [0.4, 0.85], [0.55, 0.25], [BARRIER_W, 0.0]]
-	if _deck > 0.0:
+	if drop:
 		prof[prof.size() - 1] = [BARRIER_W, -1.6]                     # viaduto: a face externa desce ate a borda do tabuleiro
 	for k in prof.size() - 1:
 		var p0: Array = prof[k]
 		var p1: Array = prof[k + 1]
-		_wall_strip(st, i, j, side * (inner + float(p0[0])), side * (inner + float(p1[0])), float(p0[1]), float(p1[1]), col)
+		_wall_strip2(st, i, j, side * (inner_i + float(p0[0])), side * (inner_i + float(p1[0])),
+			side * (inner_j + float(p0[0])), side * (inner_j + float(p1[0])), float(p0[1]), float(p1[1]), col)
 
 
 ## Lamina vertical com as duas faces (guard-rail, barreira de som).
 func _blade(st: SurfaceTool, i: int, j: int, lat: float, h0: float, h1: float) -> void:
-	_quad(st, _edge(i, lat, h1), _edge(i, lat, h0), _edge(j, lat, h0), _edge(j, lat, h1))
-	_quad(st, _edge(i, lat, h0), _edge(i, lat, h1), _edge(j, lat, h1), _edge(j, lat, h0))
+	_blade2(st, i, j, lat, lat, h0, h1)
+
+
+func _blade2(st: SurfaceTool, i: int, j: int, lat_i: float, lat_j: float, h0: float, h1: float) -> void:
+	_quad(st, _edge(i, lat_i, h1), _edge(i, lat_i, h0), _edge(j, lat_j, h0), _edge(j, lat_j, h1))
+	_quad(st, _edge(i, lat_i, h0), _edge(i, lat_i, h1), _edge(j, lat_j, h1), _edge(j, lat_j, h0))
 
 
 ## Barreira de som (T-146): lamina das duas faces com UV na faixa dos paineis de vidro do truss_fence.png
@@ -243,6 +271,16 @@ func _lane_ends(z: float, side: float) -> bool:
 	return false
 
 
+## T-153: a pista e mais estreita que a normal no inicio do segmento i (mureta ou linha de borda fora do lugar).
+func narrowed(i: int) -> bool:
+	var p: Vector3 = _prof[mini(i, _prof.size() - 1)]
+	return p.y < BARRIER_IN - 0.01 or p.x < BARRIER_IN - 0.01 or p.z < LaneSections.EDGE_LINE_M - 0.01
+
+
+func profile(i: int) -> Vector3:
+	return _prof[mini(i, _prof.size() - 1)]
+
+
 func _hash(n: int) -> float:
 	return fmod(absf(sin(float(n) * 12.9898) * 43758.5453), 1.0)
 
@@ -266,6 +304,9 @@ func _build_chunk(s0: int, s1: int) -> void:
 		var z: float = float(i) * Track.SEG_LEN
 		var tunnel: bool = in_tunnel(z, tunnels)
 		var rs: SurfaceTool = sts["troad"] if tunnel else sts["road"]
+		if narrowed(i) or narrowed(j) or in_tunnel(z, bridges):            # T-153: trecho de 2 faixas / ponte
+			RoadMeshNarrow.segment(self, sts, i, j, tunnel, in_tunnel(z, bridges), band, q)
+			continue
 		if tunnel:
 			for side in [-1.0, 1.0]:
 				_barrier(sts["tbarrier"], i, j, BARRIER_IN, side, Color(0.62, 0.52, 0.4) * _lane_tint(i, 9))

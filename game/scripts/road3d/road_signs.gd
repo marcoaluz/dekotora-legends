@@ -60,6 +60,9 @@ func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Ve
 		_place(L - 520.0, tunnels, exit_sign, "exit")
 		if not counts.has("exit"):                          # caiu no tunel ou num portico: mais perto do fim
 			_place(L - 280.0, tunnels, exit_sign, "exit")
+		var sec: TrackEvents.Event = LaneSections.at(path.track.events, L - 520.0, 30.0)
+		if not counts.has("exit") and sec != null:          # T-153: trecho de 2 faixas no fim: antes dele
+			_place(sec.z - 140.0, tunnels, exit_sign, "exit")
 	_curves(L, kind, tunnels)
 	_limits(L, kind, tunnels)
 	_distances(L, places, tunnels)
@@ -77,6 +80,8 @@ func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Ve
 func _free(z: float, tunnels: Array[Vector2], gap: float = 30.0) -> bool:
 	if z < 40.0 or z > path.track.length_m - 40.0 or RoadMesh.in_tunnel(z, tunnels, 60.0):
 		return false
+	if LaneSections.at(path.track.events, z, 30.0) != null:
+		return false                                            # T-153: o trecho de 2 faixas tem as placas dele
 	var g: float = fposmod(z - GANTRY_FIRST, GANTRY_EVERY)
 	if minf(g, GANTRY_EVERY - g) < 35.0 or absf(z - TOLL_Z) < 40.0:
 		return false
@@ -139,7 +144,9 @@ func _curves(L: float, kind: StringName, tunnels: Array[Vector2]) -> void:
 		var z: float = run.x + 6.0
 		while z < run.y:
 			if not RoadMesh.in_tunnel(z, tunnels, 8.0):
-				_sign(z, outside * (RoadMesh.BARRIER_IN + 0.3), 1.6, Vector2(1.0, 1.25), id, -1, 0.0, -0.18 * outside)
+				var p: Vector3 = LaneSections.profile(path.track.events, z)        # T-153: em cima da mureta que estreitou
+				var wall: float = p.x if outside < 0.0 else p.y
+				_sign(z, outside * (wall + 0.3), 1.6, Vector2(1.0, 1.25), id, -1, 0.0, -0.18 * outside)
 				counts["chevron"] = int(counts.get("chevron", 0)) + 1
 			z += 24.0
 	if kind == &"mountain":                                       # queda de pedras nas encostas
@@ -215,6 +222,9 @@ func _tunnel(t: Vector2, route_id: String, kind: StringName) -> void:
 		_sign(z, SIDE_LAT, 3.6, SMALL_SIGN, "warn_tunnel", 1, 0.45)
 		_sign(z, SIDE_LAT, 2.35, AUX_SIGN, "aux_tunnel", 0)
 	_place(t.x - 260.0, tunnels, warn, "tunnel_warn")
+	if LaneSections.profile(path.track.events, t.x + t.y * 0.5).y <= LaneSections.RIGHT_WALL_M + 0.05:
+		counts["tunnel_plaque_old"] = int(counts.get("tunnel_plaque_old", 0)) + 1
+		return                                                  # T-153: tunel antigo (o Tunnel3D poe a placa de pedra)
 	var z0: float = t.x - 0.35
 	var b: Basis = _basis(z0, 0.0)
 	var c: Vector3 = _at(z0, 0.0, float(Tunnel3D.ARCH[Tunnel3D.ARCH.size() - 1][1]) + 2.2)
