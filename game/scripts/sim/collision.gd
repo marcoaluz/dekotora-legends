@@ -5,6 +5,13 @@ extends RefCounted
 ##
 ## Geometria: cada caminhao ocupa z .. z+length (z = traseira; LEN = 12 m do caminhao padrao, o Canter tem 7 m) e |x - x0| < WIDTH_X/2 (unidades de x).
 ## Se a penetracao longitudinal e menor que a lateral, e batida de frente/traseira; senao e lateral.
+##
+## Forca das batidas (T-141, no espirito de Art Truck Battle, docs/REFERENCIA_ART_TRUCK_BATTLE.md §2):
+##  - caminhao x caminhao de lado: quem entra na faixa do outro com forca EMPURRA o outro para a faixa vizinha
+##    (o mais pesado ganha; leve demais quica de volta). Pneus de quem foi empurrado soltam fumaca (shove_t).
+##  - caminhao x carro: troca de momento com restituicao; acima de THROW_MIN_DV o carro e ARREMESSADO
+##    (ThrownCar: sai da linha do caminhao girando, pode quicar); o caminhao perde so a parte do momento
+##    que o carro leva (12 t contra 1,5 t: ~1,5 m/s numa batida de 10 m/s). Onibus (12 t) segura muito mais.
 
 const LEN: float = 12.0
 const RESTITUTION: float = 0.25
@@ -12,28 +19,45 @@ const MIN_EVENT_DV: float = 1.0           # abaixo disso e so encostar, sem dano
 const M_X: float = Track.ROAD_HALF_WIDTH_M   # metros por unidade de x
 const WIDTH_ALIGNED: float = 0.1         # |dx| abaixo disso = alinhados: batida de frente/traseira
 const SEPARATION_PUSH: float = 2.0        # x/s empurrando os dois para longe enquanto sobrepostos
-
 const EVENT_COOLDOWN: float = 0.8         # s: encostar de novo no mesmo par nao repete dano antes disto
+# T-141: caminhao x carro
+const CAR_RESTITUTION: float = 0.45
+const THROW_MIN_DV: float = 3.0           # m/s: abaixo disto o carro so e empurrado
+const THROW_SIDE_BASE: float = 0.9        # x/s de deslize para fora da linha do caminhao (batida de tras)
+const THROW_SIDE_PER_DV: float = 0.05     # x/s por m/s de impacto
+const THROW_SPIN_PER_DV: float = 0.28     # rad/s por m/s de impacto
+const THROW_HOP_FROM_DV: float = 9.0      # m/s: acima disto o carro tira as rodas do chao
+const THROW_HOP_PER_DV: float = 0.35      # m/s para cima por m/s acima do limite
+const THROW_HOP_MAX: float = 3.5
+const THROW_MAX_MASS: float = 3000.0      # mais pesado que isto (onibus) e empurrado, nao arremessado
+const THROW_TIME: float = 1.3             # s fora de controle (+ THROW_TIME_PER_DV por m/s)
+const THROW_TIME_PER_DV: float = 0.05
+# T-141: caminhao x caminhao de lado
+const SHOVE_DV: float = 2.5               # m/s laterais: batida assim empurra o outro para a faixa vizinha
+const SHOVE_MASS_RATIO: float = 0.75      # quem empurra precisa de 75% da massa do outro; senao quica de volta
+const SHOVE_SMOKE_S: float = 0.9          # s de fumaca nos pneus de quem foi empurrado
+const BOUNCE_LAT_VEL: float = 0.35        # x/s de volta para quem quicou
 
 var _contacts: Dictionary = {}            # "i:j" -> true enquanto encostados
 var _clock: float = 0.0
 var _last_event: Dictionary = {}          # "i:j" -> instante do ultimo dano
 
 
-## Resolve todos os pares de caminhoes. Devolve a lista de eventos novos.
-func resolve_trucks(trucks: Array[TruckSim], dt: float) -> Array[Dictionary]:
+## Resolve todos os pares de caminhoes. Devolve a lista de eventos novos. `track` (opcional) recusa empurrar
+## alguem para dentro de uma faixa fechada por evento de pista.
+func resolve_trucks(trucks: Array[TruckSim], dt: float, track: Track = null) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
 	_clock += dt
 	for i in trucks.size():
 		for j in range(i + 1, trucks.size()):
 			var key: String = "%d:%d" % [i, j]
-			var ev: Dictionary = _pair(trucks[i], trucks[j], i, j, key, dt)
+			var ev: Dictionary = _pair(trucks[i], trucks[j], i, j, key, dt, track)
 			if not ev.is_empty():
 				events.append(ev)
 	return events
 
 
-func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -> Dictionary:
+func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float, track: Track) -> Dictionary:
 	var dx: float = b.x - a.x
 	var pen_x: float = (TruckSim.WIDTH_X - absf(dx)) * M_X
 	var pen_z: float = minf(a.z + a.length, b.z + b.length) - maxf(a.z, b.z)
@@ -73,6 +97,12 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 		var dv_lat: float = absf(left.lateral_vel - right.lateral_vel) + 0.15 * absf(left.speed - right.speed)
 		if started and dv_lat * M_X > MIN_EVENT_DV:
 			ev = _event(a, b, ia, ib, "right" if left == a else "left", "left" if left == a else "right", dv_lat * M_X)
+			if dv_lat * M_X > SHOVE_DV:
+				var res: Array = _shove(left, right, track)
+				var pushed: TruckSim = res[0]
+				var bounced: TruckSim = res[1]
+				ev["shoved"] = (ia if pushed == a else ib) if pushed != null else -1
+				ev["bounced"] = (ia if bounced == a else ib) if bounced != null else -1
 		# empurrao lateral proporcional ao peso do OUTRO: o mais leve vai mais longe
 		var total: float = left.mass + right.mass
 		var push: float = pen_x / M_X
@@ -82,6 +112,36 @@ func _pair(a: TruckSim, b: TruckSim, ia: int, ib: int, key: String, dt: float) -
 		left.lateral_vel -= imp * (right.mass / total) * dt * 4.0
 		right.lateral_vel += imp * (left.mass / total) * dt * 4.0
 	return ev
+
+
+## Batida lateral forte: quem vinha entrando na faixa do outro (mais momento lateral) empurra o outro uma faixa
+## para o lado; se for leve demais, ou o outro estiver encostado na mureta / numa faixa fechada, quica de volta.
+## Devolve [empurrado ou null, quicou ou null].
+func _shove(left: TruckSim, right: TruckSim, track: Track) -> Array:
+	var att_l: float = maxf(left.lateral_vel, 0.0) * left.mass
+	var att_r: float = maxf(-right.lateral_vel, 0.0) * right.mass
+	if att_l <= 0.0 and att_r <= 0.0:
+		return [null, null]
+	var pusher: TruckSim = left if att_l >= att_r else right
+	var pushed: TruckSim = right if pusher == left else left
+	var dir: int = 1 if pusher == left else -1      # para onde o empurrado vai
+	if pusher.mass >= SHOVE_MASS_RATIO * pushed.mass:
+		var nl: int = pushed.lane + dir
+		var ok: bool = nl >= Lanes.SHOULDER_L and nl <= Lanes.SHOULDER_R
+		if ok and track != null and pushed.lane_closed_ahead(nl, track):
+			ok = false
+		if ok:
+			pushed.lane = nl
+			pushed.lane_change_time = TruckSim.LANE_CHANGE_TIME
+			pushed.signal_dir = 0
+			pushed.signal_time = 0.0
+			pushed.shove_t = SHOVE_SMOKE_S
+			pushed.shoved += 1
+			return [pushed, null]
+	pusher.lane = Lanes.nearest(pusher.x - dir * 0.2)     # volta para a faixa do proprio lado
+	pusher.lateral_vel = -dir * BOUNCE_LAT_VEL
+	pusher.shove_t = SHOVE_SMOKE_S * 0.6
+	return [null, pusher]
 
 
 func _event(a: TruckSim, b: TruckSim, ia: int, ib: int, zone_a: String, zone_b: String, dv: float) -> Dictionary:
@@ -96,18 +156,17 @@ func _event(a: TruckSim, b: TruckSim, ia: int, ib: int, zone_a: String, zone_b: 
 		"damage_a": dmg_a, "damage_b": dmg_b, "broken_a": broken_a, "broken_b": broken_b}
 
 
-## Caminhao contra carro do transito. Massa, comprimento e largura vem do tipo do veiculo (TrafficSim.Kind). O carro e empurrado/acelerado e some do
-## caminho; o caminhao leva dano na frente (ou na lateral).
+## Caminhao contra carro do transito. Massa, comprimento e largura vem do tipo do veiculo (TrafficSim.Kind).
+## Batida forte arremessa o carro (ThrownCar); o caminhao leva dano na frente (ou na lateral).
 func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
-		var car_mass: float = c.mass                                   # onibus 12 t, carro 1,5 t (TrafficSim.KIND_MASS)
 		var half: float = (TruckSim.WIDTH_X + c.width_x) * 0.5
 		var key: String = "t%d:c%d" % [truck_id, i]
 		var pen_x: float = (half - absf(c.x - truck.x)) * M_X
 		var pen_z: float = minf(truck.z + truck.length, c.z + c.length) - maxf(truck.z, c.z)
-		if pen_x <= 0.0 or pen_z <= 0.0:
+		if pen_x <= 0.0 or pen_z <= 0.0 or c.y > 1.2:     # pulando por cima da altura do para-choque: passa
 			_contacts.erase(key)
 			continue
 		var started: bool = not _contacts.has(key)
@@ -115,22 +174,49 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 		if started:
 			truck.cargo_touch()
 		var rear_hit: bool = (pen_z < pen_x or absf(c.x - truck.x) < WIDTH_ALIGNED) and truck.z < c.z
-		var dv: float = maxf(truck.speed - c.speed, 0.0) if rear_hit else absf(truck.lateral_vel) * M_X + 0.2 * absf(truck.speed - c.speed)
+		var side: float = signf(c.x - truck.x)
+		if side == 0.0:
+			side = 1.0 if i % 2 == 0 else -1.0             # alinhados: lado fixo pelo indice (deterministico)
+		var toward: float = maxf(truck.lateral_vel * side, 0.0)   # x/s do caminhao entrando no carro
+		var dv: float = maxf(truck.speed - c.speed, 0.0) if rear_hit else toward * M_X + 0.2 * absf(truck.speed - c.speed)
+		var thrown: bool = false
 		if started and dv > MIN_EVENT_DV:
 			var zone: String = "front" if rear_hit else ("right" if c.x > truck.x else "left")
-			var dmg: float = DamageModel.impact_damage(dv, car_mass)
+			var dmg: float = DamageModel.impact_damage(dv, c.mass)
 			var broken: Array[String] = DamageModel.apply_impact(truck, zone, dmg)
 			truck.cargo_hit(dv)
 			traffic.hits += 1
+			thrown = dv >= THROW_MIN_DV and c.mass <= THROW_MAX_MASS
 			events.append({"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv,
-				"damage": dmg, "broken": broken})
+				"damage": dmg, "broken": broken, "thrown": thrown, "car_kind": c.kind})
+		var share_car: float = truck.mass / (truck.mass + c.mass)    # quanto do impulso fica no carro
+		var share_truck: float = c.mass / (truck.mass + c.mass)
 		if rear_hit:
-			var m: float = truck.mass
-			var v: float = (m * truck.speed + car_mass * c.speed) / (m + car_mass)
-			truck.speed = minf(truck.speed, maxf(v, c.speed * 0.9))
-			c.speed = maxf(c.speed, v + 2.0)
+			var dvv: float = truck.speed - c.speed
+			if dvv > 0.0:
+				truck.speed = maxf(truck.speed - (1.0 + CAR_RESTITUTION) * share_truck * dvv, 0.0)
+				var new_car: float = c.speed + (1.0 + CAR_RESTITUTION) * share_car * dvv
+				if thrown:
+					var lat: float = side * (THROW_SIDE_BASE + THROW_SIDE_PER_DV * dvv) * share_car
+					traffic.throw_car(c, new_car, lat, -side * THROW_SPIN_PER_DV * dvv * share_car, _hop(dvv, c.mass, share_car),
+						THROW_TIME + THROW_TIME_PER_DV * dvv)
+				else:
+					c.speed = maxf(c.speed, new_car)
+			c.z = maxf(c.z, truck.z + truck.length)             # nunca fica dentro da frente do caminhao
 		else:
-			var side: float = 1.0 if c.x > truck.x else -1.0
+			if thrown:
+				var lever: float = clampf(((truck.z + truck.length * 0.5) - (c.z + c.length * 0.5)) / maxf(c.length, 1.0), -1.0, 1.0)
+				var lat2: float = side * (toward * (1.0 + CAR_RESTITUTION) * share_car + 0.25)
+				traffic.throw_car(c, c.speed, lat2, -side * lever * THROW_SPIN_PER_DV * dv * 1.5 * share_car,
+					_hop(dv, c.mass, share_car) * 0.5, THROW_TIME + THROW_TIME_PER_DV * dv)
+				truck.lateral_vel -= side * toward * (1.0 + CAR_RESTITUTION) * share_truck
 			c.x += side * pen_x / M_X * 0.8
 			truck.x -= side * pen_x / M_X * 0.2
 	return events
+
+
+## Pulo do carro arremessado (m/s para cima): so batida forte e veiculo leve.
+static func _hop(dv: float, car_mass: float, share_car: float) -> float:
+	if car_mass > THROW_MAX_MASS:
+		return 0.0
+	return clampf((dv - THROW_HOP_FROM_DV) * THROW_HOP_PER_DV, 0.0, THROW_HOP_MAX) * share_car

@@ -91,6 +91,7 @@ func _show(id: String) -> void:
 			_toggle(Tr.t("options.fx_reflections"), _s.fx_reflections, func(on: bool) -> void: _s.fx_reflections = on)
 			_toggle(Tr.t("options.fx_trails"), _s.fx_trails, func(on: bool) -> void: _s.fx_trails = on)
 			_toggle(Tr.t("options.fx_rain"), _s.fx_rain, func(on: bool) -> void: _s.fx_rain = on)
+			_toggle(Tr.t("options.fx_impact"), _s.fx_impact, func(on: bool) -> void: _s.fx_impact = on)
 			_hint(Tr.t("options.fx_hint"))
 		"audio":
 			_slider(Tr.t("options.music"), _s.music_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.music_volume = v, true)

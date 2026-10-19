@@ -121,6 +121,8 @@ func _copy_state(tr: TruckSim, st: Dictionary) -> void:
 	tr.draft = float(st["draft"])
 	tr.offroad = bool(st["offroad"])
 	tr.passing_active = bool(st["passing"])
+	if bool(st.get("shoved", false)):            # T-141: so o servidor sabe da batida (fumaca de quem foi empurrado)
+		tr.shove_t = maxf(tr.shove_t, Collision.SHOVE_SMOKE_S * 0.5)
 	Snapshot._apply_lane(tr, st)
 	if bool(st["finished"]) and tr.finish_position == 0:
 		tr.finish_position = 1
@@ -163,6 +165,7 @@ func interpolate(now_ms: int, dt: float) -> void:
 		ts.horn = bool(tb["horn"])                    # T-144: buzina e freada forte dos outros (som e fumaca)
 		ts.hard_braking = bool(tb["hard_braking"])
 		ts.brake_intensity = 0.7 if ts.hard_braking else 0.0
+		ts.shove_t = Collision.SHOVE_SMOKE_S if bool(tb["shoved"]) else 0.0     # T-141: fumaca de quem foi empurrado
 		ts.draft = float(tb["draft"])
 		ts.passing_charge = float(tb["passing_charge"])
 		Snapshot._apply_lane(ts, tb)
@@ -171,9 +174,15 @@ func interpolate(now_ms: int, dt: float) -> void:
 	if sim.traffic != null:
 		var ca: Array = a["s"]["cars"]
 		var cb: Array = b["s"]["cars"]
+		var sa: Array = a["s"].get("cars_spin", [])
+		var sb: Array = b["s"].get("cars_spin", [])
 		for k in mini(mini(ca.size(), cb.size()), sim.traffic.cars.size()):
-			sim.traffic.cars[k].z = lerpf((ca[k] as Vector2).x, (cb[k] as Vector2).x, f)
-			sim.traffic.cars[k].x = lerpf((ca[k] as Vector2).y, (cb[k] as Vector2).y, f)
+			var car: TrafficSim.Car = sim.traffic.cars[k]
+			car.z = lerpf((ca[k] as Vector2).x, (cb[k] as Vector2).x, f)
+			car.x = lerpf((ca[k] as Vector2).y, (cb[k] as Vector2).y, f)
+			if k < sa.size() and k < sb.size():          # carro arremessado (T-141): giro e pulo vem do servidor
+				car.yaw = lerp_angle((sa[k] as Vector2).x, (sb[k] as Vector2).x, clampf(f, 0.0, 1.0))
+				car.y = maxf(lerpf((sa[k] as Vector2).y, (sb[k] as Vector2).y, clampf(f, 0.0, 1.0)), 0.0)
 
 
 ## Dano completo de um caminhao enviado pelo servidor (so quando muda).

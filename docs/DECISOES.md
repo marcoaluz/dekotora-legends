@@ -154,3 +154,39 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   chamadas de desenho iguais (357/335/352 → 358/330/354), textura +0,4 MB, vídeo +1 MB, FPS igual (~74, limitado pelo monitor).
 - Depuração nova: `--traffic-model=car_jeep` (todo carro comum do trânsito vira esse modelo, para capturas).
 
+## 2026-10-19 — T-141 + T-144: força das batidas, arremesso do trânsito, freada forte e buzina
+
+- **Força "igual ao original"** (referência `docs/REFERENCIA_ART_TRUCK_BATTLE.md` §2: no ATB quase não há batida dura;
+  quem leva a batida lateral é **empurrado para a faixa vizinha**, com fumaça nos pneus). Regras (`sim/collision.gd`):
+  - **Caminhão × caminhão de lado**: batida lateral acima de 2,5 m/s → quem entrava na faixa do outro (mais momento lateral)
+    **empurra o outro uma faixa** para o lado (a faixa alvo dele muda; ele vai sozinho, com fumaça nos pneus por 0,9 s).
+    Quem empurra precisa de **75% da massa** do outro; senão **quica de volta** para a própria faixa (Canter contra caminhão
+    pesado). Encostado na mureta (acostamento) ou com a faixa vizinha fechada por evento → não sai do lugar e o outro quica.
+    **Pode ser empurrado para o acostamento** (lento): é o "empurrão para fora" do GDD. **Confirmar com o Marco.**
+  - **Caminhão × carro do trânsito**: troca de momento com restituição 0,45. Acima de 3 m/s de diferença o carro é
+    **arremessado** (estado na simulação: `TrafficSim.Car.out_t/vx/yaw/yaw_rate/y/vy`, física em `sim/thrown_car.gd`): sai da
+    linha do caminhão escorregando de lado, gira, quica nas batidas acima de 9 m/s (até ~0,7 m), bate na mureta e, quando
+    para, o motorista endireita o carro e volta a andar. O caminhão de 12 t perde só a parte do momento que o carro leva
+    (~1,5 m/s numa batida de 10 m/s). **Ônibus (12 t) não voa**: é empurrado e segura muito mais o caminhão.
+  - Tudo determinístico (roda igual no servidor); online o snapshot leva giro e altura de cada carro (protocolo 3).
+- **Freada forte** (`sim/hard_brake.gd`, já do WIP): freio ≥ 70% acima de 60 km/h perdendo ≥ 9 km/h por segundo. Só estado
+  (não muda a física): chiado do freio, "pssh" do freio a ar ao soltar (se perdeu ≥ 4 m/s), fumaça branca nas rodas
+  de trás, marcas pretas no asfalto (um MultiMesh), tremor leve e vibração no começo. Ícone vermelho no HUD.
+- **Buzina**: tecla **H**, botão **X** do controle, botão **BUZINA** dourado na tela (entre as setas, do lado do polegar
+  esquerdo). Segurar = som contínuo (a buzina básica) ou a melodia da peça instalada (buzina musical). O carro do trânsito
+  **até 55 m à frente na mesma faixa sai da frente** se tiver faixa livre (efeito na simulação; os bots não buzinam).
+  Vai pela rede (comando + bit no snapshot); os outros caminhões tocam com volume pela distância. Ícone dourado no HUD
+  (seta · buzina · seta, como no original).
+- **Visual das batidas** (`road3d/impact_fx.gd`): faíscas em risco presas ao caminhão (de frente saem pelos dois cantos,
+  porque a câmera atrás do baú não vê o nariz), clarão rápido no ponto do impacto, até 64 pedaços (cromo, aço, lanterna
+  vermelha/âmbar, vidro) num MultiMesh só (1 chamada), saindo com o embalo do caminhão por cima/do lado do baú,
+  chacoalhada do caminhão atingido e tremor da câmera. Shaders aquecidos na largada (sem soluço na 1ª batida).
+- **Chave nova em Opções > Gráficos: "Faíscas, pedaços e fumaça dos pneus"** (`Settings.fx_impact`): desliga faíscas,
+  pedaços, peças caindo, chacoalhada/tremor das batidas e freadas, fumaça e marcas. A qualidade gráfica corta a
+  quantidade (pedaços/faíscas ×0,4 / ×0,7 / ×1; fumaça 14 / 24 / 34 puffs).
+- **Sons em camadas** (`audio/race_audio.gd`): pancada leve/pesada + estrondo de lataria (≥ 7 m/s) + lata com lata na lateral
+  + pedaços espalhando (≥ 5 m/s) + peça quebrando; carro arremessado = lata fina + capotando (≥ 9 m/s) + vidro (≥ 12 m/s).
+  Batidas dos outros caminhões agora se ouvem, mais baixo com a distância (até 150 m). 4 sons novos gerados no ElevenLabs
+  (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble`).
+- Números em `docs/BALANCEAMENTO.md` (seção "Batidas: força e arremesso").
+

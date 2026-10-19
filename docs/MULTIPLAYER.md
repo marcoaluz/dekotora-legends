@@ -37,12 +37,14 @@ Cliente A            Servidor                   Cliente B
 mesma pista com essa lista; nada mais é enviado durante a corrida por causa deles (o dano vai na atualização normal).
 Regra da sala `events: false` = pista livre.
 
-**Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool).
-Cerca de 12 bytes.
+**Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool),
+`horn` (bool, buzina segurada, T-144). Cerca de 13 bytes.
 
 **Servidor → clientes (20 por segundo)**: para cada caminhão `id`, `z`, `x`, `speed`, `lateral_vel`, `rpm`, `gear`,
-`boost`, mais **eventos** do tick (colisão com zona e força, peça quebrada, Passing). O dano completo só vai
-quando muda.
+`boost`, flags (Passing, acostamento, chegou, **buzina**, **freada forte**, **empurrado** — fumaça nos pneus), mais
+**eventos** do tick (colisão com zona e força, peça quebrada, Passing, carro arremessado, freada). Cada carro do trânsito
+leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
+(T-141). O dano completo só vai quando muda. **Protocolo versão 3** (cliente e servidor precisam da mesma versão: gere o APK de novo).
 
 ## Suavidade no cliente
 

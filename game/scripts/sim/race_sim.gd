@@ -69,7 +69,7 @@ func step(dt: float = FIXED_DT) -> void:
 		traffic.step(dt, lead, rear, trucks)
 		for i in trucks.size():
 			events.append_array(collision.resolve_traffic(trucks[i], i, traffic))
-	events.append_array(collision.resolve_trucks(trucks, dt))
+	events.append_array(collision.resolve_trucks(trucks, dt, track))
 	if not track.events.is_empty():              # T-139: nobody is pushed past the end of a lane
 		for t in trucks:
 			t.x = EventContact.wall_x(track.events, t.x, t.z, t.length, TruckSim.WIDTH_X * 0.5, dt)
