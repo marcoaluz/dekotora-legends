@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (245) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (256) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -28,8 +28,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
-| Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
-| Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` |
+| Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; com `--shots=PASTA` o `--demo=crash` grava `batida_antes` e `batida_a..e` e o console mostra `BATIDA ... 101 -> 61 km/h (penalidade 40%)` (T-152); sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
+| Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` (T-152: chegada de cada bot e quanto as batidas custaram) |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
 | Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
@@ -60,6 +60,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
    1 evento fixo por rota + 45% de chance de mais um; prazo estica +3 a +8 s por evento. Ver `docs/DECISOES.md`.
 8. **Batidas (T-141)**: batida lateral forte empurra o outro caminhão para a faixa vizinha (pode ir para o acostamento; leve
    demais quica de volta); carro do trânsito voa/gira acima de 3 m/s; buzina tira o carro da frente (55 m). Ver `docs/DECISOES.md`.
+9. **Batida no trânsito custa velocidade (T-152)**: ônibus × 1,35 sobre a penalidade do carro (de frente 34–54%); tranco só
+   na batida com o trânsito (não entre caminhões); câmbio sem redução automática depois da batida. Ver `docs/DECISOES.md`.
 
 ## PRÓXIMAS TAREFAS (para outra sessão do Claude; pedidas pelo Marco em 2026-10-18)
 
@@ -147,6 +149,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   **ouvir** os 4 sons novos (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble` em
   `game/assets/audio/sfx/crash/`). Decidir se os bots também buzinam. ~~Gerar o APK de novo (protocolo 3)~~ FEITO em 2026-10-19: `builds/kaido-bakuso-debug.apk`, 105 MB (antes 88 MB), chave de debug; falta instalar no celular.
 
+- **T-152 (batida no trânsito custa velocidade):** jogar e dizer se a perda está boa (de frente 25–40%, raspão 8–15%,
+  ônibus mais; olhar `docs/capturas_t152/folha_sequencia_carro.png`). Uma batida de frente forte custa ~10 s numa reta
+  porque o câmbio fica na 6ª; decidir se o câmbio deve reduzir sozinho depois da batida (~7,5 s) e se o tranco vale também
+  entre caminhões. **Gerar o APK de novo** (protocolo de rede 4).
+
 - **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
   outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as
   barreiras listradas nas obras/bocas de túnel e os pórticos de treliça. A mureta contínua continua a feita por código (o pacote
@@ -228,6 +235,14 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   corrida normal sem diferença (314–318 chamadas com e sem os efeitos); na batida o máximo do período sobe 336 → 342; na freada
   328 → 334; FPS igual (75). Testes `tests/test_impacts.gd` (15). Capturas `docs/capturas_t141/`.
 
+- **T-152 (2026-10-19): batida no trânsito custa velocidade (F1).** Simulação: `sim/collision.gd` (`penalty_fraction`,
+  constantes `PEN_*` e `JOLT_TIME`): de frente 25–40% pela força, raspão 8–15%, ônibus × 1,35; o caminhão fica com o menor
+  entre a física e a penalidade; `TruckSim.jolt_t/jolt_side/jolts` (tranco de 0,6 s: acelerador sem efeito, freio funciona;
+  uma penalidade por batida). Evento `traffic` ganhou `penalty`, `speed_before`, `speed_after`. Rede: tranco no snapshot em
+  ticks (protocolo 4); `ClientSync` suaviza o recuo do snapshot da batida (até 6 m). Visual: `ImpactFx` balança o caminhão
+  (arfagem/rolagem) e a câmera; velocímetro vermelho no tranco. Testes `tests/test_traffic_penalty.gd` (11). Bots: −1,2 a
+  +2,5 s na chegada (tabela em `docs/BALANCEAMENTO.md`). `net_test` (0 ms e 150 ms + 2%) passa; `bot_client` imprime
+  `PRED:` (erro de predição máximo/médio). Capturas `docs/capturas_t152/`.
 - **T-146 (2026-10-19): modelos de `docs/Novas Melhorias` (Metais, Placas, Placão) no jogo** (Royalty Free, no AI; inventário
   em `docs/INVENTARIO_MODELOS.md`, créditos em `game/assets/LICENCAS.md`). Gerador: `blender/scripts/build_roadside_kit.py`
   (14 .glb em `assets/scenery/kit/`, 60–280 triângulos cada, só geometria + UV; texturas `assets/textures/kit/` 1024/512 px

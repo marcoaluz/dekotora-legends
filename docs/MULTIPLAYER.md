@@ -41,10 +41,11 @@ Regra da sala `events: false` = pista livre.
 `horn` (bool, buzina segurada, T-144). Cerca de 13 bytes.
 
 **Servidor → clientes (20 por segundo)**: para cada caminhão `id`, `z`, `x`, `speed`, `lateral_vel`, `rpm`, `gear`,
-`boost`, flags (Passing, acostamento, chegou, **buzina**, **freada forte**, **empurrado** — fumaça nos pneus), mais
+`boost`, flags (Passing, acostamento, chegou, **buzina**, **freada forte**, **empurrado** — fumaça nos pneus, **lado do
+tranco** — 2 bits, T-152), **tranco** (u8, ticks que faltam, T-152), mais
 **eventos** do tick (colisão com zona e força, peça quebrada, Passing, carro arremessado, freada). Cada carro do trânsito
 leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
-(T-141). O dano completo só vai quando muda. **Protocolo versão 3** (cliente e servidor precisam da mesma versão: gere o APK de novo).
+(T-141). O dano completo só vai quando muda. **Protocolo versão 4** (T-152; cliente e servidor precisam da mesma versão: gere o APK de novo).
 
 ## Suavidade no cliente
 
@@ -55,6 +56,11 @@ leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro
   senão a predição do cliente discordaria do servidor.
 - **Interpolação**: os outros caminhões são desenhados ~100 ms no passado, entre dois snapshots, para não tremer.
 - **Colisão**: o cliente pode mostrar a batida na hora (faísca, som), mas o **dano** só vale o que o servidor mandar.
+- **Batida no trânsito (T-152)**: a penalidade de velocidade e o tranco são calculados só no servidor (o cliente vê o
+  trânsito ~100 ms no passado e não prevê a batida). O snapshot leva o tranco em ticks, então a predição bloqueia o
+  acelerador nos mesmos ticks que o servidor. No 1º snapshot com o tranco o caminhão "volta" Δv × RTT (1–3 m a 150 ms);
+  nesse snapshot a correção é suave até 6 m (`ClientSync.JOLT_SMOOTH_Z`) em vez de teleportar: na tela parece a freada da
+  batida. Medido (`tools/net_test.sh 150 0.02`, com batidas de 26% e 32%): erro de predição máximo 2,5–2,6 m, médio ~0,3 m.
 
 ## Perfis e economia
 

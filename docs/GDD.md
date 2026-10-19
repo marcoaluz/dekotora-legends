@@ -63,7 +63,9 @@ Câmbio automático no MVP. Freio-motor entra sozinho ao soltar o acelerador em 
 1. **Peso**: menos aceleração e curva, mais força de empurrão.
 2. **Colisões entre caminhões**: bate-lata lateral, batida traseira, empurrão para fora. Batida lateral forte **empurra o
    outro para a faixa vizinha** (o mais pesado ganha; o leve quica de volta). Carro do trânsito atingido com força é
-   **arremessado** (gira, quica, sai da faixa) e o caminhão perde pouca velocidade (T-141).
+   **arremessado** (gira, quica, sai da faixa) (T-141). A batida no trânsito **custa velocidade** (T-152): de frente na
+   traseira do carro perde 25–40% conforme a força, raspão lateral 8–15%, ônibus mais; depois ~0,6 s de **tranco**
+   (acelerador sem efeito, o caminhão balança, velocímetro vermelho).
 3. **Dano por zona** (frente, traseira, esquerda, direita): peças da zona absorvem primeiro; peça zerada quebra e cai.
 4. **Dano mecânico**: motor (potência, fumaça), direção (puxa), carga.
 5. **Integridade da carga** reduz o pagamento.
