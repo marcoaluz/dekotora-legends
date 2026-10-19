@@ -3,7 +3,8 @@ extends RefCounted
 ## What each track event looks like (T-139), placed from the SAME closed interval the simulation uses
 ## (TrackEvents.interval): cones and lights sit on the edge the trucks collide with.
 ##  - accident: warning signs (LED board "この先 事故 / 車線規制" 400 m and 200 m before), cones and red flares along the
-##    taper, warning triangle, LED arrow board, 1 or 2 stopped cars with hazard lights.
+##    taper, warning triangle, LED arrow board, a police car with its light bar flashing (T-143) in front of the
+##    crashed pickup (hazard lights).
 ##  - works: LED board + works diamond + 60 km/h limit, cones, striped barricades with yellow lamps, 工事中 board,
 ##    small works truck with an LED arrow board and beacons, steel plates on the open lane beside the works.
 ##  - narrow: lane reduction diamond + 車線減少 plate, painted merge arrows, the lane-end line, zebra hatching on the
@@ -15,9 +16,11 @@ const M: float = Track.ROAD_HALF_WIDTH_M
 const BOARD_LAT: float = RoadMesh.BARRIER_IN - 1.1        # LED board centre (3 m wide: ends 0,5 m inside the barrier)
 const DIAMOND_LAT: float = RoadMesh.BARRIER_IN - 0.6      # diamond / limit sign on one post
 const SIGN_TURN: float = 0.0
-const ACCIDENT_MODELS: Array[String] = ["car_ascona", "car_suv", "car_falcon"]   # 4 surfaces each (the code-made cars have 7)
-const ACCIDENT_COLORS: Array[Color] = [Color("#d8dce2"), Color("#2a5cc0"), Color("#c8202f")]
-const CAR_LEN: float = 4.5
+## T-143: the police car stands first (the one the drivers meet), the crashed pickup behind it.
+## Draw calls: police 4 (body, 2 axles, light bar), wreck 2 (paint + atlas).
+const POLICE_MODEL := "car_police"
+const WRECK_MODEL := "car_wreck"
+const ACCIDENT_COLORS: Array[Color] = [Color("#2a5cc0"), Color("#c8202f"), Color("#5d6168")]   # wreck paint (contrasts with the white/black police car)
 const AMBER := Color(1.0, 0.6, 0.12)
 const RED_L := Color(1.0, 0.18, 0.08)
 const YELLOW_L := Color(1.0, 0.82, 0.25)
@@ -159,18 +162,26 @@ static func _accident(b: TrackEvents3D, ev: TrackEvents.Event, k: int) -> void:
 	var lane: int = _front_lane(ev)
 	_arrow_board(b, full - 2.5, Lanes.X[lane] * M, 1.6, _arrow_id(ev), 0.1 * k)
 	var other: int = ev.lo if lane == ev.hi else ev.hi
-	var cars: Array = [[lane, full + 1.5, 0.38 * dir], [other, full + (8.5 if other != lane else 9.5), -0.5 * dir]]
-	for i in cars.size():
-		var c: Array = cars[i]
-		var lat: float = Lanes.X[int(c[0])] * M + (0.35 * dir if i == 0 else -0.25 * dir)
-		var model: String = ACCIDENT_MODELS[(k + i) % ACCIDENT_MODELS.size()]
-		var n: Node3D = b.stopped_car(model, float(c[1]), lat, float(c[2]), ACCIDENT_COLORS[(k * 2 + i) % ACCIDENT_COLORS.size()])
-		if n == null:
-			continue
+	# police car parked slightly across its lane, protecting the scene; the wreck further on, turned the other way
+	var zp: float = full + 1.5
+	var police: Node3D = b.stopped_car(POLICE_MODEL, zp, Lanes.X[lane] * M + 0.35 * dir, 0.22 * dir, Color.WHITE)
+	if police != null:
 		b.count("car")
-		var bs: Basis = b.basis(float(c[1]))
-		for p in [Vector3(-0.72, 0.78, 0.05), Vector3(0.72, 0.78, 0.05), Vector3(-0.72, 0.72, -CAR_LEN + 0.1), Vector3(0.72, 0.72, -CAR_LEN + 0.1)]:
-			b.light(bs, n.transform * p, 0.5, AMBER, 0.5 * i)
+		b.count("police")
+		var c: Vector3 = PoliceBeacon.apply(police, b.level)
+		if c != Vector3.INF:                  # glow around the light bar (same batch as the other event lights)
+			var bp: Basis = b.basis(zp)
+			for sx in [-0.42, 0.42]:
+				b.light(bp, police.transform * (c + Vector3(sx, 0.05, 0.0)), 0.9, RED_L, 0.0 if sx < 0.0 else 0.5)
+	var zw: float = full + (8.5 if other != lane else 9.5)
+	var wreck: Node3D = b.stopped_car(WRECK_MODEL, zw, Lanes.X[other] * M - 0.25 * dir, -0.5 * dir,
+		ACCIDENT_COLORS[k % ACCIDENT_COLORS.size()])
+	if wreck != null:
+		b.count("car")
+		b.count("wreck")
+		var bs: Basis = b.basis(zw)
+		for p in [Vector3(-0.8, 0.85, -0.02), Vector3(0.8, 0.85, -0.02)]:          # rear hazards (the front is crushed)
+			b.light(bs, wreck.transform * p, 0.5, AMBER, 0.5)
 
 
 # ---------------------------------------------------------------- road works

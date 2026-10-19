@@ -9,6 +9,7 @@ const NEW_MODELS: Dictionary = {
 	"car_ascona": [TrafficSim.Kind.CAR, 6000],
 	"car_falcon": [TrafficSim.Kind.CAR, 6000],
 	"car_suv": [TrafficSim.Kind.CAR, 6000],
+	"car_jeep": [TrafficSim.Kind.CAR, 6000],
 	"car_fumi": [TrafficSim.Kind.SPORT, 6000],
 	"car_bus": [TrafficSim.Kind.BUS, 9000],
 }

@@ -9,7 +9,7 @@ extends Node3D
 ## Modelos por tipo (indice = TrafficSim.Kind). Os 4 primeiros carros sao os genericos feitos por codigo;
 ## os outros vem de modelos de terceiros reduzidos (blender/scripts/build_traffic_*.py, creditos em LICENCAS.md).
 const MODELS_BY_KIND: Array = [
-	["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_van01", "car_ascona", "car_falcon", "car_suv"],
+	["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_van01", "car_ascona", "car_falcon", "car_suv", "car_jeep"],
 	["car_bus"],
 	["car_fumi"],
 ]
@@ -19,7 +19,7 @@ const DIR := "res://assets/vehicles/traffic/"
 const PLATE_Y: Dictionary = {
 	"car_hatch": [0.45, 0.65], "car_sedan": [0.45, 0.6], "car_van": [0.45, 0.6], "car_kei_truck": [0.45, 0.62],
 	"car_van01": [0.42, 0.55], "car_ascona": [0.48, 0.55], "car_falcon": [0.5, 0.62], "car_suv": [0.55, 0.62],
-	"car_bus": [0.48, 0.75], "car_fumi": [0.32, 0.57]}
+	"car_bus": [0.48, 0.75], "car_fumi": [0.32, 0.57], "car_jeep": [0.58, 0.6]}
 const KEI_MODELS: Array[String] = ["car_hatch", "car_kei_truck"]
 const BODY_COLORS: Array[Color] = [
 	Color("#2a5cc0"), Color("#c8202f"), Color("#2c9a5a"), Color("#d29a2e"), Color("#aeb8c8"), Color("#8a3fd0")]
@@ -51,6 +51,10 @@ func setup(path_: TrackPath, traffic_: TrafficSim, plates: LicensePlates = null)
 	traffic = traffic_
 	var scenes: Dictionary = {}          # nome do modelo -> PackedScene (so os usados nesta corrida)
 	var classic: bool = "--traffic-classic" in OS.get_cmdline_user_args()
+	var forced: String = ""              # depuracao (--traffic-model=car_jeep): todo carro comum vira esse modelo (capturas)
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--traffic-model="):
+			forced = a.substr(16)
 	var spots: Dictionary = {}           # modelo -> [transform da placa da frente, de tras]
 	var paints: Array[StandardMaterial3D] = []
 	for c in BODY_COLORS:
@@ -66,6 +70,8 @@ func setup(path_: TrackPath, traffic_: TrafficSim, plates: LicensePlates = null)
 		var model: String = model_for(car.kind, i, car.color_id)
 		if classic:                       # depuracao (--traffic-classic): so os 4 carros antigos, para comparar custo
 			model = String(MODELS_BY_KIND[0][(i + car.color_id) % 4])
+		elif forced != "" and car.kind == TrafficSim.Kind.CAR and ResourceLoader.exists("%s%s.glb" % [DIR, forced]):
+			model = forced
 		if not scenes.has(model):
 			scenes[model] = load("%s%s.glb" % [DIR, model]) as PackedScene
 		var n: Node3D = (scenes[model] as PackedScene).instantiate() as Node3D

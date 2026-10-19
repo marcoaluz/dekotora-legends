@@ -8,13 +8,15 @@ Nada do arquivo original que tenha marca ou texto vem junto:
   - as placas (`0cce...`, foto de placa real de Nova York), os emblemas `toyota`/`toyota_2`, a grade de colmeia com o
     logotipo (`front_grill`), o interior (volante com emblema, bancos) e o painel saem.
 A barra de luzes (`roof_lights` + `lightsholher`) vira um objeto à parte, "beacon", com o material "beacon": lentes
-vermelhas à esquerda, azuis à direita, brancas no meio, carcaça escura (atlas 4 x 1). No Godot o material é trocado
-pelo giroflex animado (`road3d/police_beacon.gd`).
+vermelhas (padrão japonês: giroflex só vermelho; as azuis do original viram vermelhas) separadas em metade esquerda e
+direita, brancas no meio, carcaça escura (atlas 4 x 1). No Godot o material é trocado pelo giroflex animado
+(`road3d/police_beacon.gd`: esquerda e direita piscam alternadas).
 """
 from __future__ import annotations
 
 import os
 
+import bmesh
 import bpy
 import numpy as np
 
@@ -26,10 +28,11 @@ POLICE_CELLS["police_white"] = ("#eceeef", 0.28, 0.1, None)
 POLICE_CELLS["police_black"] = ("#111214", 0.30, 0.25, None)
 WHITE, BLACK = "police_white", "police_black"
 BELT_SRC = 0.78            # altura (m no original) da divisa preto/branco: logo abaixo das maçanetas
+BORDER_WEIGHT = 50.0       # a redução preserva as divisas entre classes (a linha preto/branco fica reta)
 
 # barra de luzes: colunas do atlas do material "beacon" (u = coluna); o shader do Godot lê só a coluna
-BEACON_COLS = ("b_red", "b_blue", "b_white", "b_house")
-BEACON_RGB = {"b_red": ("#ff2418", "#ff2418"), "b_blue": ("#2050ff", "#2050ff"), "b_white": ("#f4f4ff", "#9a9aa4"),
+BEACON_COLS = ("b_left", "b_right", "b_white", "b_house")
+BEACON_RGB = {"b_left": ("#ff2418", "#ff2418"), "b_right": ("#ff2418", "#ff2418"), "b_white": ("#f4f4ff", "#9a9aa4"),
               "b_house": ("#16171a", None)}
 
 DROP = ("interior", "seats", "doors_inside", "bottom_interior", "Cover", "Brake_disc", "brake_disc", "breakes",
@@ -73,6 +76,9 @@ def load_blend(path: str, subsurf_max: int = 1) -> list:
     bpy.data.collections.remove(col)
     out = []
     for name, me in made:
+        if len(me.polygons) == 0:           # formas do rig (WGT-CarRig.*): sem faces, mas esticam a caixa do carro
+            bpy.data.meshes.remove(me)
+            continue
         ob = bpy.data.objects.new(name, me)
         me.name = name
         bpy.context.scene.collection.objects.link(ob)
@@ -86,6 +92,16 @@ def _mat_names(o) -> list:
     o.data.polygons.foreach_get("material_index", mi)
     names = [m.name.split(".")[0] if m else "" for m in o.data.materials]
     return [names[i] if i < len(names) else "" for i in mi]
+
+
+def _bisect_z(o, z: float) -> None:
+    """Corta a malha no plano horizontal z (as faces cortadas mantêm o material)."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=(0.0, 0.0, z),
+                           plane_no=(0.0, 0.0, 1.0))
+    bm.to_mesh(o.data)
+    bm.free()
 
 
 def _face_class(obj: str, mat: str, z: float, nz: float, belt: float) -> str:
@@ -118,7 +134,7 @@ def _face_class(obj: str, mat: str, z: float, nz: float, belt: float) -> str:
 
 def _beacon_class(mat: str, x: float) -> str:
     if mat in ("blue_glass", "blue_light", "Red_Glass", "Red__light"):
-        return "b_red" if x < 0.0 else "b_blue"          # esquerda vermelha, direita azul (frente = +Y)
+        return "b_left" if x < 0.0 else "b_right"        # metade esquerda / direita (frente = +Y), as duas vermelhas
     if mat in ("white_glass", "light"):
         return "b_white"
     return "b_house"
@@ -135,8 +151,11 @@ def prep_police(spec, objs, dims, _to_final):
             K.assign_classes(o, ["rubber" if o.name.startswith("tire") else "rim"] * n)
             wheels.append(o)
             continue
-        ctr, nrm, _a, _uv = K.face_data(o)
         mats = _mat_names(o)
+        if "Carpaint" in mats:
+            _bisect_z(o, belt)               # divisa reta: sem isso a borda preto/branco sai em "dentes" dos triângulos
+            mats = _mat_names(o)
+        ctr, nrm, _a, _uv = K.face_data(o)
         if o.name.startswith(BEACON_OBJS):
             K.assign_classes(o, [_beacon_class(m, float(c[0])) for m, c in zip(mats, ctr)])
             beacon.append(o)
