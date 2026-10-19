@@ -19,14 +19,14 @@ static func lines_for(route_id: String, kind: StringName, path: TrackPath) -> Ar
 	var g: float = RoadMesh.deck_height(kind)
 	match route_id:
 		"kanto_1_coast":
-			out.append(RailLine.parallel(path, 0.0, 2150.0, -1.0, 36.0, RAIL_TOP, 0.0, Vector2i(0, 1)))
+			out.append(RailLine.parallel(path, 0.0, 2150.0, -1.0, 36.0, RAIL_TOP, 0.0, Vector2i(1, 1)))
 		"kanto_2_viaduct":
-			out.append(RailLine.parallel(path, 0.0, L, -1.0, 40.0, 0.0, g))
-			out.append(RailLine.crossing(path, 1500.0, deg_to_rad(64.0), CLEARANCE, 330.0, g))
+			out.append(RailLine.parallel(path, 0.0, L, -1.0, 40.0, 0.0, g, Vector2i(1, 1)))
+			out.append(RailLine.crossing(path, 1500.0, deg_to_rad(64.0), CLEARANCE, 330.0, g, Vector2i(1, 1)))
 		"kanto_3_mountain":
 			out.append(RailLine.crossing(path, 240.0, deg_to_rad(70.0), CLEARANCE, 150.0, 0.0, Vector2i(1, 1)))
 			out.append(RailLine.parallel(path, 1240.0, 2080.0, -1.0, 38.0, RAIL_TOP, 0.0, Vector2i(1, 1)))
-			out.append(RailLine.parallel(path, 2380.0, L, -1.0, 38.0, RAIL_TOP, 0.0, Vector2i(1, 0)))
+			out.append(RailLine.parallel(path, 2380.0, L, -1.0, 38.0, RAIL_TOP, 0.0, Vector2i(1, 1)))
 	return out
 
 

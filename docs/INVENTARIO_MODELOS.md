@@ -134,3 +134,59 @@ são de outras tarefas.
 - Peso: 60–280 triângulos por peça; texturas 1024 px (barreira, treliça) e 512 px (ORM, normal, metal), comprimidas na VRAM
   (S3TC no PC, ETC2/ASTC no Android); +3,2 MB de memória de textura, ~4,7 MB de PNG no projeto. Medidas em `docs/STATUS.md` (T-146).
 - Capturas: `docs/capturas_t146/` (`litoral|viaduto|montanha_dia_noite.png`, `antes_depois_dia.png`, `kit_modelos.png`).
+
+
+---
+
+# T-154 (2026-10-19): ferrovia ao lado da rodovia e busca por arquivos novos
+
+Pedido do Marco: "coloquei novos modelos nas pastas de docs/ (Novas Melhorias e outras), entre eles peças de FERROVIA".
+
+## O que a busca encontrou (2026-10-19, à tarde)
+
+Procurei em `docs/Novas Melhorias/`, `docs/Novos modelos/`, `docs/Modelos Melhorados/`, nas outras pastas de `docs/`, em
+`C:\Users\Marco Aurelio Luz\` (Downloads, Desktop, Documentos, Imagens, OneDrive, 3D Objects) e em `D:\DEV`, por data (arquivos
+novos desde 2026-10-17) e por nome (rail, trilho, ferrovia, train, trem, tunnel, wagon, catenary, locomotive...).
+
+| Onde | O que tem | Resultado |
+| --- | --- | --- |
+| `docs/Novas Melhorias/` | As mesmas 5 pastas de antes (Carro batido, Carroceria, Metais, Placas, Placão), sem arquivo novo desde 18/10 21:46 | Tudo já no jogo (T-143, T-145, T-146) |
+| `docs/Novos modelos/` | Cabine, Caminhão (Canter), Carro (jipe), Van+01; nada novo desde 17/10 | No jogo, menos o Canter (extraído de outro jogo) |
+| `docs/Modelos Melhorados/` | Nada novo desde 18/10; o único item de trilho é o **bonde CAF Urbos 3** | **Entrou agora** como o bonde amarelo (abaixo) |
+| `Downloads` | **Vazia** (só `desktop.ini`). `Tunnel.obj`, `van.abc` e a pasta `Ge\` (zips) **não estão mais lá** nem em outra pasta procurada | Continuam fora do jogo (sem arquivo e sem licença) |
+| Resto do disco | Nenhum modelo de trilho, trem, poste de catenária, muro ou estação | — |
+
+**Conclusão: não há peças de ferrovia de terceiros no PC.** Se o Marco baixou um pacote de ferrovia, ele não foi salvo em nenhuma
+dessas pastas (talvez tenha ficado só no navegador ou ido para outra unidade). Por isso a ferrovia foi feita **por código**, como a
+tarefa pedia para esse caso.
+
+## O que entrou no jogo (T-154)
+
+| Item | Veio de | Triângulos | Textura | Onde |
+| --- | --- | --- | --- | --- |
+| **Bonde amarelo** (2 carros engatados, 70 m) | **Arquivo do Marco**: `docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb` (licença SKETCHFAB Standard no `license.txt`: royalty free, crédito não obrigatório). Sem o interior (43 mil triângulos), verde de Kaohsiung trocado por amarelo, logotipos "CAF" e da linha apagados | 71 mil → **6,9 mil** | 1024 + 512 px (do próprio arquivo, repintadas) | Trem principal da cidade (viaduto); às vezes no litoral e na montanha |
+| **Trem de carga** (locomotiva vermelha + 8 vagões com contêineres coloridos, 186 m) | **Por código** (`blender/scripts/build_railway_kit.py`) | 316 (loco), 204–216 (vagão) | atlas 512 px | Trem principal do litoral e da montanha; sempre no viaduto que cruza a pista |
+| Via dupla: lastro com dormentes, 4 trilhos, muro do lado da pista, fios da catenária | Por código (malha montada no jogo seguindo a curva da pista, seções de 4 m) | ~3,2 mil por 300 m (com os pórticos) | `rail_bed.png` 1024 px | Linhas paralelas |
+| Pórtico de catenária (2 colunas + viga + braços e isoladores) a cada 50 m | Por código | 112 | a mesma da via | Todas as linhas |
+| Viaduto de concreto com guarda-corpo, pilares e travessas | Por código | 8 + 12 por pilar | a mesma da via | Linha da cidade e os 2 cruzamentos |
+| Boca de túnel ferroviário + morro de grama (ou bloco de concreto na cidade) | Por código | 66 + ~20 | a mesma da via / grama | Fim da linha do litoral, entrada e saída do túnel da montanha, pontas dos cruzamentos |
+
+Todas as texturas novas são comprimidas na VRAM (S3TC no PC, ETC2/ASTC no Android) com mipmaps.
+
+## Onde fica a ferrovia em cada rota
+
+| Rota | Linha paralela (lado esquerdo, o da terra) | Viaduto de trem por cima da pista | Fica livre |
+| --- | --- | --- | --- |
+| Litoral (3 km) | 0 → 2.150 m, a 36 m do centro da pista, no chão, com muro; termina numa boca de túnel num morro | Não (do outro lado é o mar) | 2.270–2.890 m (ponte e trecho de 2 faixas da T-153) |
+| Viaduto/cidade (2,75 km) | A rota inteira, elevada na altura da via expressa, a 40 m (passa ao lado da caixa de concreto do túnel) | Em 1.500 m (entre o túnel e o pórtico de 1.620 m), 8,5 m acima da pista, com prédios-estação nas pontas | Os prédios que cairiam em cima do viaduto de trem são retirados |
+| Montanha (2,8 km) | 1.240 → 2.080 m (entra no morro do túnel da pista por uma boca própria) e 2.380 → fim (sai do morro) | Em 240 m (logo depois do pedágio), 8,5 m acima da pista, entre duas bocas de túnel | 650–1.190 m (túnel antigo de 2 faixas da T-153) e o túnel da pista |
+
+## Propostas para o que ainda não entrou
+
+| Item | Proposta |
+| --- | --- |
+| `Tunnel.obj` (sumiu de Downloads) | Se o Marco achar o arquivo e a licença: luminárias e tubulação do teto no nosso túnel, e os semáforos de faixa na boca |
+| `van.abc` (sumiu de Downloads) | Se voltar com licença: caminhão aberto antigo no trânsito (a origem dos Dekotora) |
+| Carreta do Kenworth W990 | Pode virar uma carreta no trânsito lento (pesada: precisa reduzir muito) |
+| Bonde no menu | O fundo "B rodovia" da tela inicial pode ganhar a ferrovia com o bonde passando (falta o Marco escolher o fundo do menu, T-138) |
+| Trem na garagem/posto | Não faz sentido (não há trilho perto da garagem); fica só na estrada |
