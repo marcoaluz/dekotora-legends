@@ -145,7 +145,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-141 + T-144 (batidas, freada, buzina):** jogar e dizer se a força está boa (empurrão de faixa, inclusive para o
   acostamento; carro voando; ônibus só empurrado), se a fumaça/faíscas/pedaços estão no tamanho certo (`docs/capturas_t141/`) e
   **ouvir** os 4 sons novos (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble` em
-  `game/assets/audio/sfx/crash/`). Decidir se os bots também buzinam. **Gerar o APK de novo** (protocolo de rede versão 3).
+  `game/assets/audio/sfx/crash/`). Decidir se os bots também buzinam. ~~Gerar o APK de novo (protocolo 3)~~ FEITO em 2026-10-19: `builds/kaido-bakuso-debug.apk`, 105 MB (antes 88 MB), chave de debug; falta instalar no celular.
 
 - **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
   outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as

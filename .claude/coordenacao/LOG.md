@@ -151,3 +151,10 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/build_roadside_kit.py, game/assets/scenery/kit/, textures/kit/, scenery/billboards/, road3d/{roadside_kit,mesh_batch,kit_props_3d,road_signs,road_furniture,event_props,track_events_3d,road_mesh,glb_mesh}.gd, tests/test_roadside_kit.gd, docs/capturas_t146/
 - Validação: merge no wip com 5 conflitos aditivos de docs resolvidos; 245 testes ok; net_test PASSOU; modo médio nas 3 rotas 71–75 FPS, máx ~402–426 chamadas, textura +3,2 MB.
 - Decisão pendente: aprovar outdoors (quantidade, lugar, artes) e manter a mureta feita por código (o pacote Metais é de barreira de obra).
+
+## 2026-10-19 · T-147, T-150 · coordenador · CONCLUÍDA
+- Feito: T-147: `bot_client.gd` aceita `--body=` e `tools/net_test.sh` aceita `BODY=`; corrida online com a graneleira passou (0 SCRIPT ERROR). T-150: APK de teste gerado (105 MB, chave de debug, protocolo 3), com a cópia temporária do preset sem Min/Target SDK (restaurado depois).
+- Validação: 245 testes ok na main; net_test PASSOU (padrão e BODY=graneleira).
+
+## 2026-10-19 · T-148, T-149, T-151 · ajudante-rapido · CONCLUÍDA
+- Feito: notas nas skills blender-pixelart e godot-dekotora (graneleira, trânsito, kit de beira de estrada) e no PIPELINE_ARTE_BLENDER.md (commit 39f5cc7, merge 1c11dbe).

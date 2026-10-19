@@ -81,7 +81,7 @@ O comando novo do SDK é `android.exe sdk install "pacote;versao"` (o `sdkmanage
 - **Gradle desligado** no preset Android: com isso, "Min SDK" e "Target SDK" do preset precisam estar VAZIOS (o Godot recusa valores sem Gradle).
   O preset do repositório guarda `26`/`36` para a versão da loja (AAB, com Gradle). Para gerar o APK de teste, esvazie os dois valores
   numa cópia temporária do `export_presets.cfg` e restaure depois (foi o que se fez).
-- **Gerar:** `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk` (84 MB; `builds/` é ignorado pelo Git).
+- **Gerar:** `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk` (84 MB na T-140; 105 MB em 2026-10-19 com graneleira, kit de beira de estrada e sons novos; `builds/` é ignorado pelo Git).
 - **Instalar no celular:** (1) copie o APK para o celular (cabo, nuvem) e abra, permitindo "instalar apps desconhecidos"; ou (2) com cabo e
   "Depuração USB" ligada: `D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk`.
 - **Pendente:** testar no celular de verdade (FPS e temperatura nos 3 presets de qualidade: T-097); AAB de loja com Gradle + chave de release.
