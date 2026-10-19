@@ -133,3 +133,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/truck3d/{gran_src,graneleira}.py, data/bodies/graneleira.tres, data/cargo/{graos,brita}.tres, contracts.gd, game_state.gd, tests/test_graneleira.gd, docs/capturas_t145/
 - Validação: 221 testes ok (merge 166f612 no branch wip/t141-t143-t144); capturas olhadas; modo médio 73–75 FPS, chamadas iguais ao baú médio.
 - Decisão pendente: regra de carga, tamanho único, lona preta, 14 t / 7.500 kg, preço. Observação do coordenador: na ficha técnica a linha "Leva" fica cortada embaixo (rola o painel).
+
+## 2026-10-19 · T-143 · especialista · CONCLUÍDA
+- Feito: viatura (Camry 709k→7,3k tri, sem NYPD/Toyota/placas, preto/branco japonês, giroflex vermelho piscando), carro batido (picape amassada refeita em voxels, 6k tri) no acidente; jipe (5,1k tri, sem "SUZUKI") no trânsito (9 modelos).
+- Arquivos: blender/scripts/build_traffic_cars.py, lib/traffic_{police,jeep,wreck,kit}.py, road3d/{police_beacon,event_props}.gd, tests/test_accident_cars.gd, docs/capturas_t143/
+- Validação: merge no wip com 2 conflitos aditivos (STATUS, LICENCAS) resolvidos; 225 testes ok; modo médio: chamadas e FPS iguais, textura +0,4 MB.
+- Decisão pendente: giroflex só vermelho e pintura preto/branco japonesa; carros parados sem placa; bordas irregulares do carro batido.
