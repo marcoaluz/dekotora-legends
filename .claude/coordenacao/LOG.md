@@ -145,3 +145,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: sim/{collision,thrown_car,traffic_sim,truck_sim,race_sim,hard_brake}.gd, net/{snapshot,client_sync,protocol}.gd, road3d/{impact_fx,brake_fx,race_scene_3d,traffic_3d}.gd, audio/race_audio.gd, ui/race_hud.gd, tests/test_impacts.gd, docs/capturas_t141/
 - Validação: merge no wip com 3 conflitos aditivos de docs resolvidos; 240 testes ok; net_test passou (0 e 150 ms + 2% perda); modo médio igual (pico +6 chamadas na batida/freada).
 - Decisão pendente: empurrão para o acostamento, regra dos 75%, bots buzinarem, ouvir os 4 sons. APK precisa ser gerado de novo (protocolo 3).
+
+## 2026-10-19 · T-146 · especialista · CONCLUÍDA
+- Feito: kit de beira de estrada de docs/Novas Melhorias: barreiras de obra listradas (obras, acidente, estreitamento, bocas de túnel), cavaletes e destroços, chapas e postes reais na sinalização da T-130, pórticos de treliça, vidro com moldura na barreira de som, outdoors com 4 artes fictícias trocáveis (acesos à noite); --no-kit para comparar.
+- Arquivos: blender/scripts/build_roadside_kit.py, game/assets/scenery/kit/, textures/kit/, scenery/billboards/, road3d/{roadside_kit,mesh_batch,kit_props_3d,road_signs,road_furniture,event_props,track_events_3d,road_mesh,glb_mesh}.gd, tests/test_roadside_kit.gd, docs/capturas_t146/
+- Validação: merge no wip com 5 conflitos aditivos de docs resolvidos; 245 testes ok; net_test PASSOU; modo médio nas 3 rotas 71–75 FPS, máx ~402–426 chamadas, textura +3,2 MB.
+- Decisão pendente: aprovar outdoors (quantidade, lugar, artes) e manter a mureta feita por código (o pacote Metais é de barreira de obra).
