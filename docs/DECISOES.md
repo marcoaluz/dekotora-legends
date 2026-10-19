@@ -133,3 +133,24 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - Suposições a revisar com o Marco: frequência do sorteio (45%), posição dos eventos fixos, a regra das chapas, os valores de folga
   do prazo, textos do HUD e se o acidente deveria ter viatura de polícia.
 
+## 2026-10-19 · T-143: viatura e carro batido no acidente, jipe no trânsito
+
+- **Licença**: Camry (viatura), jipe Suzuki e o carro batido são "Royalty Free License (no AI)", confirmado pelo Marco
+  (`game/assets/LICENCAS.md`). Os originais continuam fora do Git; só os `.glb` reduzidos entram.
+- **Viatura** (`car_police.glb`, 7,3 mil triângulos, 4 chamadas): pintura **japonesa genérica** (metade de baixo preta, de
+  cima branca, divisa reta logo abaixo das maçanetas) no lugar do NYPD; sem textos, brasão, números, emblemas Toyota, grade
+  com logotipo, placas e interior. **Giroflex só vermelho** (padrão do Japão; as lentes azuis do original viraram
+  vermelhas), esquerda e direita piscando alternadas por shader (`road3d/police_beacon.gd`) + 2 brilhos no lote de luzes
+  do evento (sem chamada a mais). A viatura **não anda no trânsito**: só aparece parada no acidente.
+- **Acidente**: a viatura fica primeiro (a que o motorista encontra), um pouco atravessada na faixa ao lado da pista
+  livre; o carro batido (picape amassada, `car_wreck.glb`, 6 mil triângulos, 2 chamadas) fica ~7 m depois, virado para o
+  outro lado, com pisca-alerta só atrás (a frente está amassada). Cor do batido: azul, vermelho ou cinza escuro
+  (contrasta com o preto/branco). Antes eram 2 carros comuns do trânsito.
+- **Jipe** (`car_jeep.glb`, 5,1 mil triângulos, pintura trocável, letras "SUZUKI" apagadas) entrou no tipo CARRO do
+  trânsito (9 modelos agora); comprimento 4,0 m para caber no hitbox de 4,5 m do tipo.
+- **Carro batido sem materiais**: o arquivo só tem geometria (sem UV nem cores); a malha é refeita em voxels de 3 cm e
+  alisada antes da redução (a original virava espinhos), e as cores saem da posição (rodas, interior, lanternas, fundo).
+- Custo medido (viaduto à noite, modo médio, `--fps-log --quality=1`, parado no acidente): superfícies do evento 11 → 9,
+  chamadas de desenho iguais (357/335/352 → 358/330/354), textura +0,4 MB, vídeo +1 MB, FPS igual (~74, limitado pelo monitor).
+- Depuração nova: `--traffic-model=car_jeep` (todo carro comum do trânsito vira esse modelo, para capturas).
+

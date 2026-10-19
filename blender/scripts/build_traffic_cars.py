@@ -1,5 +1,6 @@
 """Carros de trânsito a partir de modelos de terceiros (T-124): Ascona, Falcon, SUV, Fumi SC e ônibus Jetset;
-(T-143) viatura de polícia (Camry, padrão japonês fictício, barra de luzes "beacon") e jipe Suzuki.
+(T-143) viatura de polícia (Camry, padrão japonês fictício, barra de luzes "beacon"), jipe (Samurai) e o carro
+batido do acidente (picape amassada, parada: sem nós de roda).
 
 Os originais ficam em docs/Modelos Melhorados/ (FORA do Git; licenças e autores em game/assets/LICENCAS.md).
 Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado com cores lisas
@@ -8,8 +9,8 @@ Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado
 Uso:
   blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all \
       [--src-dir "docs/Modelos Melhorados"] [--out game/assets/vehicles/traffic] [--preview <pasta absoluta>]
-  --model: ascona | falcon | suv | fumi | bus | police | jeep | all
-  (o jipe vem de docs/Novos modelos/, pasta trocável com --new-dir)
+  --model: ascona | falcon | suv | fumi | bus | police | jeep | wreck | all
+  (o jipe vem de docs/Novos modelos/ (--new-dir); o carro batido de docs/Novas Melhorias/ (--wreck-dir))
 
 Saída: game/assets/vehicles/traffic/car_<modelo>.glb, cada um com:
   - "body": pintura "paint_white" (o Godot troca a cor) + atlas "<tag>_trim" (vidro, cromo, plástico, luzes);
@@ -32,6 +33,7 @@ from lib import traffic_jeep as J  # noqa: E402
 from lib import traffic_kit as K  # noqa: E402
 from lib import traffic_police as PO  # noqa: E402
 from lib import traffic_preview as P  # noqa: E402
+from lib import traffic_wreck as WR  # noqa: E402
 
 
 # ---------------------------------------------------------------- receitas por modelo
@@ -162,10 +164,13 @@ SPECS = {
                 body_tris=7800, wheel_tris=1000, paint="#8a3fd0", min_wheel_part=0.08),
     # T-143: viatura (sem pintura trocável; atlas próprio preto/branco; barra de luzes à parte) e jipe
     "police": dict(src="nypd_toyota_camry_.blend", importer=PO.import_police, rotz=180, length=4.9, prep=PO.prep_police,
-                   drop=PO.DROP, body_tris=6400, own_wheels=True, cells=PO.POLICE_CELLS, extra_tris={"beacon": 420},
+                   drop=PO.DROP, body_tris=6400, own_wheels=True, border_weight=PO.BORDER_WEIGHT, cells=PO.POLICE_CELLS, extra_tris={"beacon": 420},
                    paint="#ffffff"),
-    "jeep": dict(src_new="Carro/obj/obj.obj", importer=J.import_jeep, rotz=0, length=3.95, prep=J.prep_jeep,
+    "jeep": dict(src_new="Carro/obj/obj.obj", importer=J.import_jeep, rotz=0, length=4.0, prep=J.prep_jeep,
                  body_tris=4600, own_wheels=True, paint="#2c9a5a"),
+    # T-143: carro batido (parado no acidente): rodas no corpo, só pintura + atlas
+    "wreck": dict(src_wreck="Carro batido/model_download+(24).obj", importer=WR.import_wreck, rotz=-90, length=4.75,
+                  prep=WR.prep_wreck, body_tris=6000, voxel=0.03, smooth=4, static=True, paint="#d8dce2"),
 }
 
 
@@ -217,6 +222,8 @@ def build(key: str, spec: dict, args) -> None:
     name = "car_" + key
     if "src_new" in spec:
         src = os.path.join(os.path.abspath(args.new_dir), spec["src_new"])
+    elif "src_wreck" in spec:
+        src = os.path.join(os.path.abspath(args.wreck_dir), spec["src_wreck"])
     else:
         src = os.path.join(os.path.abspath(args.src_dir), spec["src"])
     if not os.path.isfile(src):
@@ -241,7 +248,16 @@ def build(key: str, spec: dict, args) -> None:
 
     body = K.join(bodies, "body")
     K.weld(body, 1e-5)
-    K.decimate(body, spec["body_tris"])
+    K.decimate(body, spec["body_tris"], spec.get("border_weight", 0.0))
+    if spec.get("static"):                     # parado (carro batido): sem rodas separadas
+        imgs, uv = K.build_atlas(tag, spec.get("cells"))
+        K.finalize(body, K.paint_material(), K.trim_material(tag, imgs), uv)
+        path = K.export(name, body, [], args.out)
+        print(f"[{tag}] origem={tris_src} tris, escala={s:.3f}")
+        print(P.stats_line(tag, body, [], path))
+        if args.preview:
+            P.render_preview([body], os.path.abspath(args.preview), tag, spec["paint"])
+        return
     wall = K.join(wheels, "wheel_r")
     K.weld(wall, 1e-5)
     if spec.get("min_wheel_part"):
@@ -291,6 +307,7 @@ def main():
     ap.add_argument("--model", default="all")
     ap.add_argument("--src-dir", default="docs/Modelos Melhorados")
     ap.add_argument("--new-dir", default="docs/Novos modelos")
+    ap.add_argument("--wreck-dir", default="docs/Novas Melhorias")
     ap.add_argument("--out", default="game/assets/vehicles/traffic")
     ap.add_argument("--preview", default="", help="pasta ABSOLUTA para os renders de conferência (opcional)")
     args = ap.parse_args(argv)

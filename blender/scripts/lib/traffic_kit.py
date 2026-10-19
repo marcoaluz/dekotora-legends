@@ -289,9 +289,29 @@ def delete_faces(o, mask) -> None:
     bm.free()
 
 
-def decimate(o, target: int) -> None:
+def _border_group(o, name: str = "keep_border"):
+    """Grupo de vértices com peso 1 nos vértices entre faces de classes (materiais) diferentes."""
+    me = o.data
+    mi = np.zeros(len(me.polygons), np.int32)
+    me.polygons.foreach_get("material_index", mi)
+    first = np.full(len(me.vertices), -1, np.int32)
+    border = np.zeros(len(me.vertices), bool)
+    for p in me.polygons:
+        m = mi[p.index]
+        for v in p.vertices:
+            if first[v] < 0:
+                first[v] = m
+            elif first[v] != m:
+                border[v] = True
+    vg = o.vertex_groups.new(name=name)
+    vg.add([int(i) for i in np.nonzero(border)[0]], 1.0, "REPLACE")
+    return vg
+
+
+def decimate(o, target: int, border_weight: float = 0.0) -> None:
     """Reduz para `target` triângulos e copia as normais da peça ORIGINAL (Data Transfer): a lataria
-    continua lisa em vez de ficar 'amassada' pelos triângulos longos da redução."""
+    continua lisa em vez de ficar 'amassada' pelos triângulos longos da redução.
+    `border_weight` > 0 (T-143): a redução evita mexer nas divisas entre classes (ex. preto/branco da viatura)."""
     cur = M.count_tris([o])
     if cur <= target:
         return
@@ -302,8 +322,16 @@ def decimate(o, target: int) -> None:
     md.decimate_type = "COLLAPSE"
     md.ratio = target / cur
     md.use_collapse_triangulate = True
+    vg = None
+    if border_weight > 0.0:
+        vg = _border_group(o)
+        md.vertex_group = vg.name
+        md.invert_vertex_group = True        # no Collapse o peso 1 é "pode reduzir": invertido, a divisa é a que fica
+        md.vertex_group_factor = border_weight
     select_only([o])
     bpy.ops.object.modifier_apply(modifier=md.name)
+    if vg is not None and o.vertex_groups.get("keep_border") is not None:
+        o.vertex_groups.remove(o.vertex_groups["keep_border"])
     for p in o.data.polygons:
         p.use_smooth = True
     dt = o.modifiers.new("nrm", "DATA_TRANSFER")

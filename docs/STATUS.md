@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (221) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (225) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -62,7 +62,7 @@ Contexto: o Marco baixa os modelos só com a licença **Royalty Free License (no
 crédito ao autor, ele avisa quem é; todos os já usados estão em `game/assets/LICENCAS.md`. Tunnel.obj e van.abc (Downloads)
 continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi iniciada (só registradas).
 
-1. **T-131, Jipe Suzuki no tráfego** (autorizado pelo Marco). Fonte: `docs/Novos modelos/Carro/` (OBJ/FBX, 436 mil triângulos,
+1. **T-131 FEITA na T-143 (2026-10-19)**: jipe no trânsito (`car_jeep.glb`, ver T-143 abaixo). Texto original: **T-131, Jipe Suzuki no tráfego** (autorizado pelo Marco). Fonte: `docs/Novos modelos/Carro/` (OBJ/FBX, 436 mil triângulos,
    50 texturas 4K, escala ×0,742 para ~3,95 m, "SUZUKI" na grade para apagar; ver `docs/NOVOS_MODELOS.md` e
    `docs/INVENTARIO_MODELOS.md`). Seguir o padrão da T-124: `blender/scripts/build_traffic_cars.py -- --model ...`,
    3 a 6 mil triângulos, `paint_white` trocável, rodas `wheel_f*`/`wheel_r*`, entrar em `traffic_3d.gd` (`MODELS_BY_KIND`),
@@ -238,6 +238,15 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   `-- --demo --body=graneleira [--cab=jac] [--noparts]`, corrida `-- --decorated --body=graneleira`, Mercado
   `res://scenes/menu/main_menu.tscn -- --demo-body=graneleira --screen=market`. **Pendente do Marco:** confirmar a regra de
   carga, o tamanho único (médio), a lona preta, 14 t/7.500 kg e se a graneleira deve custar algo (ver `docs/DECISOES.md`).
+- **T-143 (2026-10-19): viatura + carro batido no acidente, jipe no trânsito** (Royalty Free (no AI), confirmado pelo Marco).
+  Blender: `build_traffic_cars.py -- --model police,jeep,wreck` (+ `lib/traffic_police.py`, `traffic_jeep.py`, `traffic_wreck.py`;
+  lê `docs/Modelos Melhorados/`, `docs/Novos modelos/` (`--new-dir`) e `docs/Novas Melhorias/` (`--wreck-dir`), fora do Git;
+  num worktree passe os caminhos absolutos da pasta principal). Viatura `car_police.glb` 7,3 mil tri (preto/branco japonês
+  genérico, sem NYPD/Toyota/placa, giroflex vermelho animado por `road3d/police_beacon.gd`), carro batido `car_wreck.glb`
+  6 mil tri (picape amassada), jipe `car_jeep.glb` 5,1 mil tri ("SUZUKI" apagado; tipo CARRO do trânsito). Acidente
+  (`event_props.gd`): viatura primeiro, batido depois; superfícies do evento 11 → 9, chamadas e FPS iguais (modo médio).
+  Teste `tests/test_accident_cars.gd` (4). Capturas `docs/capturas_t143/`. Depuração: `--traffic-model=car_jeep`.
+  Pendências: os carros parados do acidente não têm placa; o carro batido é uma malha "esculpida" (bordas irregulares).
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).
