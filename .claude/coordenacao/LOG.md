@@ -139,3 +139,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/build_traffic_cars.py, lib/traffic_{police,jeep,wreck,kit}.py, road3d/{police_beacon,event_props}.gd, tests/test_accident_cars.gd, docs/capturas_t143/
 - Validação: merge no wip com 2 conflitos aditivos (STATUS, LICENCAS) resolvidos; 225 testes ok; modo médio: chamadas e FPS iguais, textura +0,4 MB.
 - Decisão pendente: giroflex só vermelho e pintura preto/branco japonesa; carros parados sem placa; bordas irregulares do carro batido.
+
+## 2026-10-19 · T-141 + T-144 · especialista · CONCLUÍDA (retomada do WIP da outra sessão)
+- Feito: batidas como no original (empurrão de faixa entre caminhões com regra de 75% da massa, quicar de volta, carro do trânsito arremessado na sim com giro/pulo/recuperação, ônibus só empurrado), efeitos (faíscas, clarão, até 64 pedaços num MultiMesh, chacoalhada), sons em camadas (4 novos no ElevenLabs, ~100–250 créditos), freada forte (chiado, pssh, fumaça, marcas, ícone) e buzina (H / X / botão na tela; abre caminho no trânsito; pela rede, protocolo 3); chave nova "Faíscas, pedaços e fumaça dos pneus".
+- Arquivos: sim/{collision,thrown_car,traffic_sim,truck_sim,race_sim,hard_brake}.gd, net/{snapshot,client_sync,protocol}.gd, road3d/{impact_fx,brake_fx,race_scene_3d,traffic_3d}.gd, audio/race_audio.gd, ui/race_hud.gd, tests/test_impacts.gd, docs/capturas_t141/
+- Validação: merge no wip com 3 conflitos aditivos de docs resolvidos; 240 testes ok; net_test passou (0 e 150 ms + 2% perda); modo médio igual (pico +6 chamadas na batida/freada).
+- Decisão pendente: empurrão para o acostamento, regra dos 75%, bots buzinarem, ouvir os 4 sons. APK precisa ser gerado de novo (protocolo 3).
