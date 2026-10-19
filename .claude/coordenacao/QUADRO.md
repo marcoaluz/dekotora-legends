@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-153 | F2: trecho com 2 faixas de verdade em cada rota (pista inteira estreita com transição, placas e zebrado; túnel antigo na montanha, ponte no litoral; faixas por trecho na RouteDef; fila, bots, trânsito e online respeitam; evento de estreitamento continua) | pedido do Marco (F2) | difícil | especialista | em andamento | 2026-10-19 | |
 | T-152 | F1: batida no carro do trânsito custa velocidade (penalidade arcade na sim: frente 25–40%, raspão 8–15%, ônibus/caminhão maior, tranco 0,6 s), valores no BALANCEAMENTO, testes e captura do velocímetro | pedido do Marco (F1) | difícil | especialista | em andamento | 2026-10-19 | |
 | T-151 | Skills e pipeline: seção "Kit de beira de estrada (T-146)" em blender-pixelart e godot-dekotora + linha do build_roadside_kit.py em docs/PIPELINE_ARTE_BLENDER.md | DELEGAR (T-146) | fácil | ajudante-rapido | concluída (commit 39f5cc7) | 2026-10-19 | 2026-10-19 |
 | T-150 | Gerar de novo o APK de teste (protocolo de rede 3) seguindo docs/RELEASE_ANDROID.md e anotar data e tamanho no STATUS | DELEGAR (T-141/T-144) | fácil | coordenador | concluída (APK de teste 105 MB, chave de debug; falta instalar no celular) | 2026-10-19 | 2026-10-19 |
