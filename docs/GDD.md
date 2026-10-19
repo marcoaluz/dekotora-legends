@@ -46,6 +46,7 @@ Loop: aceitar frete → correr a rota (bots ou amigos) → entregar → reparar 
 | Acelerar | Botão grande à direita | W ou ↑ | Gatilho direito |
 | Frear | Botão menor à direita | S ou ↓ | Gatilho esquerdo |
 | Passing | Botão redondo | Espaço | A |
+| Buzina | Botão BUZINA (entre as setas) | H | X |
 | Pausa | Ícone | Esc | Start |
 
 **Controle por faixas (decisão ATB-1):** 3 faixas + acostamento. O 1º toque para um lado liga a seta (pisca no caminhão e no HUD);
@@ -60,13 +61,17 @@ Câmbio automático no MVP. Freio-motor entra sozinho ao soltar o acelerador em 
 
 ### Mecânicas
 1. **Peso**: menos aceleração e curva, mais força de empurrão.
-2. **Colisões entre caminhões**: bate-lata lateral, batida traseira, empurrão para fora.
+2. **Colisões entre caminhões**: bate-lata lateral, batida traseira, empurrão para fora. Batida lateral forte **empurra o
+   outro para a faixa vizinha** (o mais pesado ganha; o leve quica de volta). Carro do trânsito atingido com força é
+   **arremessado** (gira, quica, sai da faixa) e o caminhão perde pouca velocidade (T-141).
 3. **Dano por zona** (frente, traseira, esquerda, direita): peças da zona absorvem primeiro; peça zerada quebra e cai.
 4. **Dano mecânico**: motor (potência, fumaça), direção (puxa), carga.
 5. **Integridade da carga** reduz o pagamento.
 6. **Motor, turbo e marcha** com RPM, turbo lag e sons distintos.
 7. **Fama (Kirameki)**: peças inteiras, ultrapassagens, entregas. Libera conteúdo.
 8. **Passing**: bots abrem espaço; contra humanos só tremor e susto sonoro.
+   **Buzina** (tecla H / botão BUZINA): o carro logo à frente sai da faixa se puder. **Freada forte** em velocidade: chiado,
+   fumaça dos pneus e marcas no asfalto (T-144).
 9. **Vácuo** em reta.
 10. **Tráfego** como obstáculo.
 11. **Eventos de pista** (T-139): **acidente** (carros parados fecham 1 ou 2 faixas), **obras** (cones, barreiras,

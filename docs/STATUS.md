@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-18**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-19**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (203) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (226) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -28,6 +28,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
+| Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
+| Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
@@ -55,6 +57,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 6. Áudio em **MP3** (sem ffmpeg para converter) e músicas com 100 s (não 2:30) para economizar créditos; ~5 mil créditos gastos de ~80 mil.
 7. **Eventos de pista (T-139)**: obras com limite de 60 km/h cobrado como **carga sacudindo nas chapas de aço** (não multa);
    1 evento fixo por rota + 45% de chance de mais um; prazo estica +3 a +8 s por evento. Ver `docs/DECISOES.md`.
+8. **Batidas (T-141)**: batida lateral forte empurra o outro caminhão para a faixa vizinha (pode ir para o acostamento; leve
+   demais quica de volta); carro do trânsito voa/gira acima de 3 m/s; buzina tira o carro da frente (55 m). Ver `docs/DECISOES.md`.
 
 ## PRÓXIMAS TAREFAS (para outra sessão do Claude; pedidas pelo Marco em 2026-10-18)
 
@@ -137,6 +141,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-141 + T-144 (batidas, freada, buzina):** jogar e dizer se a força está boa (empurrão de faixa, inclusive para o
+  acostamento; carro voando; ônibus só empurrado), se a fumaça/faíscas/pedaços estão no tamanho certo (`docs/capturas_t141/`) e
+  **ouvir** os 4 sons novos (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble` em
+  `game/assets/audio/sfx/crash/`). Decidir se os bots também buzinam. **Gerar o APK de novo** (protocolo de rede versão 3).
+
 - **T-139 (eventos de pista):** confirmar a regra das obras (60 km/h; passar rápido na chapa de aço custa carga; alternativas: multa em ¥ ou só visual), a chance de 45% de um evento extra por corrida, as posições dos eventos fixos e se quer viatura de polícia no acidente. **Gerar o APK de novo** (o protocolo de rede passou para a versão 2). Autorizar o gasto no ElevenLabs para os 5 sons novos (`python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`).
 
 - **T-138:** escolher o fundo padrão da tela inicial (A posto à noite, B rodovia; compare `docs/capturas_t138/depois_960x540/menu.png`
@@ -203,6 +212,15 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   6 amostras de 5 s): litoral 280 → 283 chamadas, viaduto 295 → 298, Hakone 286 → 289; triângulos +0,2 a +2,6 mil; textura +0,9 MB
   (atlas comprimidos com mipmaps); FPS igual (75). Capturas em `docs/capturas_t130/`. Depuração nova da corrida: `--snap-every=S`
   (com `--shots=`) e `--cam=DZ,LAT,H,LDZ,LLAT,LH` (câmera fixa relativa ao jogador); `--fps-log` imprime `SINALIZACAO:`.
+- **T-141 + T-144 (2026-10-19): impacto das batidas, freada forte e buzina.** Simulação: `sim/collision.gd` (empurrão de faixa,
+  arremesso), `sim/thrown_car.gd` (carro fora de controle), `sim/hard_brake.gd`, `TruckSim.horn/hard_braking/shove_t`, `TrafficSim`
+  (buzina abre caminho, `throw_car`). Rede: comando com `horn`, snapshot com bits buzina/freada/empurrado e giro/altura de cada
+  carro (protocolo 3). Visual: `road3d/impact_fx.gd` (faíscas presas ao caminhão, clarão, pedaços num MultiMesh, chacoalhada,
+  tremor), `road3d/brake_fx.gd` (fumaça e marcas), `Traffic3D` (pulo e rolagem do carro). Som: `audio/truck_sfx.gd` (buzina
+  segurada, chiado, "pssh"), `audio/race_audio.gd` (camadas e distância). HUD: ícones buzina/freada; botão BUZINA; tecla H.
+  Chave "Faíscas, pedaços e fumaça dos pneus" em Opções > Gráficos. Medido (modo médio, litoral, sem vsync limitado a 75):
+  corrida normal sem diferença (314–318 chamadas com e sem os efeitos); na batida o máximo do período sobe 336 → 342; na freada
+  328 → 334; FPS igual (75). Testes `tests/test_impacts.gd` (15). Capturas `docs/capturas_t141/`.
 - **T-139 (2026-10-18): eventos de pista** (acidente, obras, estreitamento 3 → 2 faixas). Simulação: `sim/track_events.gd`
   (dados, intervalo fechado por z, sorteio pela semente, folga do prazo, limite das obras) e `sim/event_contact.gd` (cones, batida
   no veículo parado/barreira, raspada na beirada, parede do fim de faixa, chapas de aço); `TruckSim` recusa trocar para faixa

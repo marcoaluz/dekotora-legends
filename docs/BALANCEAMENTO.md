@@ -278,3 +278,24 @@ Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 
 | `fumi_sport_rims` | Calotas | Rodas | 30 | 50 | 14 | 20.000 | 20 |
 | `jac_steel_rims` | Calotas | Rodas | 50 | 80 | 9 | 9.000 | 0 |
 | `jac_toolbox` | Caixa lateral | Esq./Dir. | 80 | 100 | 6 | 8.000 | 0 |
+
+## Batidas: força e arremesso (T-141) e freada/buzina (T-144)
+
+Constantes em `game/scripts/sim/collision.gd`, `thrown_car.gd`, `hard_brake.gd` e `traffic_sim.gd`.
+
+| Regra | Valor |
+| --- | --- |
+| Empurrão de faixa (caminhão × caminhão) | batida lateral > 2,5 m/s; quem empurra precisa de ≥ 75% da massa do outro; fumaça 0,9 s |
+| Quicar de volta | volta para a própria faixa com 0,35 x/s |
+| Restituição caminhão × carro | 0,45 (o caminhão perde `1,45 × m_carro/(m_caminhão+m_carro) × Δv`) |
+| Arremesso do carro | Δv ≥ 3 m/s e veículo ≤ 3 t (ônibus só é empurrado); fora de controle 1,3 s + 0,05 s por m/s |
+| Deslize lateral | (0,9 + 0,05 × Δv) x/s × fração do impulso; atrito 1,1 x/s² |
+| Giro | 0,28 rad/s por m/s; perde 3,5 rad/s² |
+| Pulo | acima de 9 m/s: 0,35 m/s para cima por m/s (máx. 3,5 m/s) |
+| Escorregando para a frente | −6,5 m/s²; depois endireita a 0,9 rad/s, no máximo 4 m/s enquanto torto |
+| Freada forte | freio ≥ 70% a ≥ 60 km/h, perdendo ≥ 9 km/h/s; "pssh" ao soltar se perdeu ≥ 4 m/s |
+| Buzina | carro até 55 m à frente do nariz, na mesma faixa, troca para uma faixa livre |
+
+Medido com 4 bots, sem eventos (`tools_dev/measure_impacts.gd`, 4 sementes): por corrida, 0–0,8 batida entre caminhões,
+0–0,3 empurrão de faixa, 2–3 batidas no trânsito, 0,3–0,8 carro arremessado; bots difíceis chegam em 117–133 s.
+

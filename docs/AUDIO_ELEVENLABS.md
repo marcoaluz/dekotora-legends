@@ -89,6 +89,11 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `chrome_debris_scatter.wav` | 1,5 s | Small chrome metal pieces and plastic light fragments scattering and bouncing on asphalt after a crash |
 | `car_tumble.wav` | 1,5 s | Small car flipping and tumbling on a highway after being hit by a big truck, thin metal crunching and glass cracking |
 
+> **T-141 (2026-10-19):** `truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter` e `car_tumble` foram gerados com
+> `tools/gen_audio.py` (~100–250 créditos; conta em 60.935 de 131.000 depois). Marco: ouvir e pedir regeração se algum ficar ruim
+> (`python tools/gen_audio.py --only nome --force`). Freio (`brake_squeal`, `air_brake_hiss`) e buzinas já existiam.
+> `tools/gen_audio.py` agora acha a `.chaves.env` também quando roda numa worktree (procura nas pastas acima).
+
 ## 4. Ambiente (`game/assets/audio/sfx/ambient/`)
 
 | Arquivo | Duração | Prompt |
