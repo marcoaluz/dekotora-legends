@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Teste de ponta a ponta do multiplayer: 1 servidor + 2 clientes automaticos no mesmo PC.
 # Uso: bash tools/net_test.sh [latencia_ms] [perda]    (padrao: 0 e 0)
+# BODY=graneleira bash tools/net_test.sh  -> o cliente Beto corre com essa carroceria
 source "$(dirname "$0")/env.sh"
 LAT=${1:-0}; LOSS=${2:-0}
 PORT=$((24600 + RANDOM % 300))
@@ -18,7 +19,7 @@ for i in $(seq 1 40); do
   sleep 0.5
 done
 echo "sala criada: $CODE"
-"$GODOT" --headless --path game -- --bot-client --port=$PORT --name=Beto --code=BETO3333 --join=$CODE --latency=$LAT --loss=$LOSS > "$LOGDIR/beto.log" 2>&1 &
+"$GODOT" --headless --path game -- --bot-client --port=$PORT --name=Beto --code=BETO3333 --join=$CODE --latency=$LAT --loss=$LOSS ${BODY:+--body=$BODY} > "$LOGDIR/beto.log" 2>&1 &
 BETO=$!
 wait $ANA; RA=$?
 wait $BETO; RB=$?

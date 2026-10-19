@@ -18,6 +18,7 @@ var racing: bool = false
 var _acc: float = 0.0
 var _started_sent: bool = false
 var _elapsed: float = 0.0
+var _body: String = ""
 var _max_runtime: float = 300.0
 var _log_acc: float = 0.0
 var _name: String = "Bot"
@@ -53,10 +54,14 @@ func _ready() -> void:
 			Net.debug_loss = float(a.substr(7))
 		elif a.begins_with("--max-runtime="):
 			_max_runtime = float(a.substr(14))
+		elif a.begins_with("--body="):
+			_body = a.substr(7)
 	# perfil proprio e isolado para este bot (nao mexe no perfil real do Marco)
 	gs.save_path = "user://botclient_%s.json" % code
 	gs.new_profile()
 	gs.profile["player_code"] = code
+	if _body != "":
+		gs.profile["body"] = _body      # testa outra carroceria na rede (ex.: graneleira)
 	Net.player_name = _name
 	Net.welcome.connect(_on_welcome)
 	Net.error_received.connect(func(m: String) -> void: print("[botclient %s] erro do servidor: %s" % [_name, m]))
