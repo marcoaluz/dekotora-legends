@@ -94,11 +94,20 @@ um problema visual não puder ser entendido pelos renders.
   O build sem `--no-preview` gera sozinho.
 - Para medir triângulos e MB de textura: `python tools/glb_stats.py <arquivos .glb>` (só biblioteca padrão do Python).
 
+## Graneleira (T-145)
+
+- Comando: `blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- --variant graneleira --cab chata|jac|curta|americana --body-src "docs/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj"`
+- Em worktree, o `--body-src` não acha a pasta (ela é ignorada pelo Git e só existe na pasta principal): passe o caminho absoluto da pasta principal.
+- Armadilha: os 64 trincos do original têm 964 triângulos cada; `gran_src._boxify` troca cada um por uma caixa (12 triângulos). Os parafusos de 1–2 cm são descartados de propósito (somem a 10 m).
+
 ## Carros de trânsito (T-124)
 
 - (a) Gerar com `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all [--preview <pasta absoluta>]`.
 - (b) Armadilha: não soldar vértices (`remove_doubles`) antes de separar peças soltas, senão pneu e aro viram uma peça só.
 - (c) Armadilha: limpar o cache de imagens entre modelos (`C._IMG_CACHE.clear()`), porque os `.glb` do Sketchfab repetem os nomes `Image_0...`.
+- (d) `traffic_kit.decimate(o, n, border_weight=50)` preserva as divisas entre classes de material (a linha preto/branco da viatura fica reta); serve para pintura de duas cores como a viatura. Não usar em malhas com muitas classes: o jipe se desfaz.
+- (e) Malha sem materiais ou "esculpida" (carro batido): refazer em voxels (REMESH VOXEL 0,03) e alisar (SMOOTH 4 passadas) antes de reduzir. Código em `lib/traffic_wreck.py` (`_remesh`, `_smooth`).
+- (f) Em worktree, passe `--src-dir`, `--new-dir` e `--wreck-dir` com caminho absoluto da pasta principal, por exemplo `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model police,jeep,wreck --src-dir "<pasta principal>/docs/Modelos Melhorados" --new-dir "<pasta principal>/docs/Novos modelos" --wreck-dir "<pasta principal>/docs/Novas Melhorias"`. Os originais ficam fora do Git.
 
 ## Bake alta → leve (T-136, baú premium)
 
@@ -107,4 +116,12 @@ um problema visual não puder ser entendido pelos renders.
 - (b) Armadilha: o passe DIFFUSE (cor) dá PRETO no metal (cor difusa = cor × (1 − metálico)); grave cor e metálico pelo passe EMIT (`cc0_mats.emit_pass`).
 - (c) Oclusão no glTF: grupo de nós "glTF Material Output" com entrada "Occlusion" (`pbr.baked_full`); o Godot vira `ao_texture` canal R.
 - (d) No Compatibility, metálico 1,0 sem reflexo fica quase preto: alumínio com 0,55. Texturas novas de `textures/`: conferir no `.import` `compress/mode=2` (e `normal_map=1` nas normais), senão ocupam 4× mais memória.
+
+## Kit de beira de estrada (T-146)
+
+- Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<repo principal>/docs/Novas Melhorias" [--preview]`. Em worktree passe `--src` (o padrão aponta para `<raiz>/docs/Novas Melhorias`, pasta que a worktree não tem, pois fica fora do Git).
+- Saídas: `game/assets/scenery/kit/*.glb` (só geometria + UV) e `game/assets/textures/kit/*.png`.
+- Os .glb saem sem textura (`export_image_format="NONE"`) e o Godot cria os materiais pelo nome (`RoadsideKit.material`).
+- Textura nova em `textures/kit/`: conferir no `.import` `compress/mode=2`, senão ocupa 4× mais memória.
+- `.rar` (pacote do Placão, `tex.rar`) abre com o 7-Zip em `C:/Program Files/7-Zip/7z.exe`.
 
