@@ -278,3 +278,24 @@ Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 
 | `fumi_sport_rims` | Calotas | Rodas | 30 | 50 | 14 | 20.000 | 20 |
 | `jac_steel_rims` | Calotas | Rodas | 50 | 80 | 9 | 9.000 | 0 |
 | `jac_toolbox` | Caixa lateral | Esq./Dir. | 80 | 100 | 6 | 8.000 | 0 |
+
+## Carroceria graneleira e regra carga x carroceria (T-145)
+
+Proposta para testar (`data/bodies/graneleira.tres`, `CargoDef.needs`, `BodyDef.cargo_kind`).
+
+| Modelo | Massa vazia | Carga sem contrato | Capacidade | Na pista | Agilidade | Torque | Leva |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Baú leve / médio / longo, Canter | (ver acima) | | 6 / 12 / 16 / 4 t | | | | carga fechada e comum |
+| **Graneleira** | **7.500 kg** | 4.000 kg | **14 t** | 12 m | 1,0 | ×1,0 | granel e carga aberta |
+
+| Carga | Peso (t) | Pagamento | Fragilidade | Tipo | Carroceria |
+| --- | --- | --- | --- | --- | --- |
+| Eletrônicos · Alimentos refrigerados · Louça e cerâmica | (sem mudança) | | | | **só baú** |
+| **Grãos (milho e soja)** — nova | 8–14 | ×0,85 | 0,7 | normal | **só graneleira** |
+| **Brita e pedra** — nova | 10–16 | ×0,8 | 0,3 | pesada | **só graneleira** |
+| Madeira · Bobinas de aço · Peças industriais | (sem mudança) | | | | qualquer |
+
+- Granel paga menos por tonelada, mas a graneleira leva até 14 t (mais que o baú médio) e é 500 kg mais leve.
+- Brita acima de 14 t aparece como "PESADA DEMAIS" na graneleira (só o 2º contrato de um trecho pode passar da capacidade).
+- Medido (modo médio, litoral à noite, `--fps-log --quality=1`): baú médio 72–75 FPS, 384–425 chamadas, 196–247 mil triângulos,
+  textura 50 MB; graneleira 73–75 FPS, 365–409 chamadas, 191–238 mil triângulos, textura 46 MB.

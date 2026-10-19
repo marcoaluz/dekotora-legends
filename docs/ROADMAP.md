@@ -47,6 +47,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-133] Rodas girando: peças de roda presas ao pneu, todas as rodas, garagem gira na vista RODAS (concluída em 2026-10-18, referência `docs/direcao_arte/rodas_girando_*.png`)
 - [x] [T-132] Caminhão segue a faixa nas curvas: atrito acima da velocidade segura, deslizada de até 0,5 m, escape só acima de +30% com aviso, giro do corpo só na troca de faixa (≤ 3°, eixo traseiro); bots, servidor, predição e trânsito com a mesma regra (concluída em 2026-10-18, `tests/test_lane_following.gd`, `docs/direcao_arte/faixa_curva_*.png`)
 
+- [x] [T-145] Carroceria graneleira (aberta com lona, 4 cabines, garagem/perfil/rede/bots) e regra carga x carroceria nos contratos: baú leva carga fechada, graneleira leva granel (grãos, brita), madeira/aço/peças vão nas duas (concluída em 2026-10-19, `tests/test_graneleira.gd`, `docs/capturas_t145/`; regra a confirmar pelo Marco)
+
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins
 - [x] [P50] Preparar loops e importar áudio

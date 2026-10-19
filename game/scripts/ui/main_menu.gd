@@ -3,7 +3,8 @@ extends Node3D
 ## `--menu-bg=a|b|hall`) e menu com acoes reais: Continuar (proximo frete liberado), Nova carreira (com
 ## confirmacao), Garagem, Mercado de fretes, Multiplayer, Corrida rapida, Configuracoes e Sair.
 ## Saldo e fama no topo direito; progresso e codigo do jogador no rodape. Layout por containers (T-138).
-## Depuracao: --screen=options|market|newcareer, --shot=ARQUIVO.png [--shot-delay=S].
+## Depuracao: --screen=options|market|newcareer, --shot=ARQUIVO.png [--shot-delay=S], --demo-body=graneleira (perfil de
+## teste user://demo_profile.json com Fama 500 e esse modelo: Mercado com os bloqueios por carroceria, T-145).
 
 var stage: MenuBackdrop
 var _ui: Control
@@ -13,6 +14,13 @@ var _panel: Control
 func _ready() -> void:
 	AudioBus.play_music("menu_citypop")
 	get_node("/root/GameState").pending_contract = {}   # corrida abandonada nao leva o contrato adiante
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--demo-body="):                # nunca no perfil real
+			var gs: Node = get_node("/root/GameState")
+			gs.save_path = "user://demo_profile.json"
+			gs.new_profile()
+			gs.profile["fame"] = 500
+			gs.profile["body"] = a.substr(12)
 	stage = MenuBackdrop.create()
 	add_child(stage)
 	var layer := CanvasLayer.new()
