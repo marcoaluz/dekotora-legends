@@ -247,3 +247,25 @@ func test_snapshot_carries_jolt_and_client_prediction_agrees() -> void:
 		max_dv = maxf(max_dv, absf(server.speed - client.speed))
 		check_eq(client.jolted(), server.jolted(), "tick %d: cliente e servidor no mesmo estado de tranco" % n)
 	check(max_dv < 0.01, "predicao igual ao servidor durante e depois do tranco (%.4f m/s)" % max_dv)
+
+
+## O cliente nao ve a batida (so o servidor): no 1o snapshot com o tranco a correcao de ~3 m e suave (parece a
+## freada da batida); o mesmo erro sem tranco continua teleportando (regra antiga, SNAP_THRESHOLD_Z).
+func test_client_smooths_the_jump_back_of_a_new_hit() -> void:
+	for jolt in [true, false]:
+		var sync := ClientSync.new()
+		sync.sim = RaceSim.new(_flat_track())
+		sync.me = sync.sim.add_truck(100.0, 0.0)
+		sync.sim.trucks[0].speed = 25.0
+		for n in 3:
+			sync.local_step(Commands.make(0.0, 1.0, 0.0))
+		var server := RaceSim.new(_flat_track())
+		server.add_truck(sync.sim.trucks[0].z - 3.0, 0.0)
+		server.trucks[0].speed = 16.0
+		server.trucks[0].jolt_t = Collision.JOLT_TIME if jolt else 0.0
+		sync.on_snapshot(Snapshot.pack(server, [3]), 0)
+		if jolt:
+			check(sync.correction.x > 2.5, "batida nova: correcao suave (%.2f m)" % sync.correction.x)
+			check(sync.my_truck().jolted(), "o caminhao previsto entra no tranco")
+		else:
+			check_near(sync.correction.x, 0.0, 0.001, "sem batida: erro de 3 m teleporta como antes")

@@ -11,6 +11,7 @@ const SNAP_BUFFER_MAX: int = 12
 const SNAP_THRESHOLD_Z: float = 2.5          # erro maior que isto: teleporta em vez de suavizar
 const SNAP_THRESHOLD_X: float = 0.2
 const CORRECTION_DECAY: float = 8.0          # 1/s: velocidade com que o erro visual some
+const JOLT_SMOOTH_Z: float = 6.0             # T-152: m; no snapshot que traz uma batida nova (tranco), ate isto suaviza
 
 var sim: RaceSim
 var me: int = -1
@@ -89,6 +90,7 @@ func _reconcile(snap: Dictionary) -> void:
 	var tr: TruckSim = sim.trucks[me]
 	var old_z: float = tr.z
 	var old_x: float = tr.x
+	var was_jolted: bool = tr.jolted()
 	_copy_state(tr, st)
 	if not predict:
 		last_error = Vector2.ZERO
@@ -100,7 +102,10 @@ func _reconcile(snap: Dictionary) -> void:
 		tr.step(RaceSim.FIXED_DT, h["cmd"], sim.track)
 	var err := Vector2(old_z - tr.z, old_x - tr.x)
 	last_error = err
-	if absf(err.x) > SNAP_THRESHOLD_Z or absf(err.y) > SNAP_THRESHOLD_X:
+	# T-152: so o servidor ve a batida no transito; no 1o snapshot com o tranco o caminhao "volta" Δv x RTT (1-3 m a
+	# 150 ms). Em vez de teleportar, deixa a correcao suave: na tela parece a freada da batida.
+	var limit_z: float = JOLT_SMOOTH_Z if tr.jolted() and not was_jolted else SNAP_THRESHOLD_Z
+	if absf(err.x) > limit_z or absf(err.y) > SNAP_THRESHOLD_X:
 		correction = Vector2.ZERO             # erro grande: aceita o servidor de uma vez
 	else:
 		correction += err                     # erro pequeno: some suavemente
