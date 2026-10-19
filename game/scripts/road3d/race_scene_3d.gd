@@ -7,6 +7,8 @@ const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#
 ## Cabine dos bots por posicao no grid (o 0 e o jogador). Antes da T-129: classica, aero, curta, chata;
 ## as cabines por codigo viraram a nova mais parecida (aero -> jac).
 const RIVAL_CABS: Array[String] = ["chata", "jac", "curta", "chata"]
+## Modelo de cada bot da corrida offline (indice = lugar no grid; o 0 e o jogador): baú leve, longo e a graneleira (T-145).
+const RIVAL_BODIES: Array[String] = ["base", "leve", "longo", "graneleira"]
 
 var sim: RaceSim
 var path: TrackPath
@@ -317,7 +319,7 @@ func _spawn_field() -> void:
 		var t: TruckSim = sim.trucks[idx]
 		t.is_bot = i != 0
 		var node := TruckNode.new()
-		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else ["base", "leve", "longo"][i % 3]
+		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else RIVAL_BODIES[i % RIVAL_BODIES.size()]
 		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		node.plates = _plates

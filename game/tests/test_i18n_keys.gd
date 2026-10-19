@@ -69,8 +69,16 @@ func test_data_families_have_text() -> void:
 		if f.ends_with(".tres"):
 			var rv: RivalDef = load("res://data/rivals/" + f) as RivalDef
 			check(rv.display_name.strip_edges() != "", "rival %s tem nome" % rv.id)
-	for b in ["canter", "leve", "base", "longo"]:
+	for b in ["canter", "leve", "base", "longo", "graneleira"]:
 		check(_has(d, "body." + b), "modelo: body.%s" % b)
+		check(_has(d, "body.desc." + b), "modelo: body.desc.%s" % b)
+	for f in DirAccess.get_files_at("res://data/cargo/"):
+		if f.ends_with(".tres"):
+			var cg: CargoDef = load("res://data/cargo/" + f) as CargoDef
+			check(_has(d, cg.display_key), "carga: %s" % cg.display_key)
+	for k in ["reason.needs_box", "reason.needs_open", "reason.small_open", "market.needs.box", "market.needs.open",
+			"garage.carries", "garage.carries.box", "garage.carries.open"]:
+		check(_has(d, k), "carroceria x carga (T-145): %s" % k)
 	for c in TruckNode.CABS:
 		check(_has(d, "cab." + String(c)), "cabine: cab.%s" % c)
 	for k in ["engine", "steering", "cargo"]:

@@ -6,9 +6,11 @@ extends RefCounted
 ## - capacidade do bau (BodyDef.capacity_t): Canter 4 t, leve 6 t, medio 12 t, longo 16 t (mais pesado nao pode ser aceito);
 ## - valor = frete do trecho x multiplicador da carga x (0,8 + 0,6 x peso relativo na faixa da carga), de 50 em 50;
 ## - o peso entra na massa do caminhao na corrida (mais pesado = mais lento) e a fragilidade multiplica o dano na carga;
-## - o quadro e sorteado com semente: muda ao concluir um frete ou ao tocar ATUALIZAR.
+## - o quadro e sorteado com semente: muda ao concluir um frete ou ao tocar ATUALIZAR;
+## - tipo de carroceria (T-145, CargoDef.needs x BodyDef.cargo_kind): eletronicos, refrigerados e louca so no bau
+##   fechado; graos e brita (granel) so na graneleira; madeira, aco e pecas industriais em qualquer uma.
 
-const CAPACITY_T: Dictionary = {"leve": 6.0, "base": 12.0, "longo": 16.0, "canter": 4.0}   # reserva (sem data/bodies)
+const CAPACITY_T: Dictionary = {"leve": 6.0, "base": 12.0, "longo": 16.0, "canter": 4.0, "graneleira": 14.0}   # reserva (sem data/bodies)
 const PER_ROUTE: int = 2                     # contratos por trecho liberado
 const CARGO_DIR := "res://data/cargo/"
 const PERISHABLE_DEADLINE: float = 0.8       # perecivel: prazo 20% menor
@@ -17,6 +19,36 @@ const PERISHABLE_DEADLINE: float = 0.8       # perecivel: prazo 20% menor
 static func capacity_t(body: String) -> float:
 	var d: BodyDef = BodyDef.find(body)
 	return d.capacity_t if d != null else float(CAPACITY_T.get(body, 12.0))
+
+
+## Tipo de carroceria do modelo: &"box" (bau fechado) ou &"open" (graneleira).
+static func body_kind(body: String) -> StringName:
+	var d: BodyDef = BodyDef.find(body)
+	return d.cargo_kind if d != null else &"box"
+
+
+## O que a carga exige (&"any", &"box" ou &"open"); contrato salvo antes da T-145 nao tem "needs": vem do CargoDef.
+static func needs_of(contract: Dictionary) -> StringName:
+	if contract.has("needs"):
+		return StringName(String(contract["needs"]))
+	var path: String = CARGO_DIR + String(contract.get("cargo", "")) + ".tres"
+	var cargo: CargoDef = load(path) as CargoDef if contract.has("cargo") and ResourceLoader.exists(path) else null
+	return cargo.needs if cargo != null else &"any"
+
+
+## Carroceria que falta para levar a carga: &"" (serve), &"box" (precisa de bau) ou &"open" (precisa de graneleira).
+static func missing_body(contract: Dictionary, body: String) -> StringName:
+	var need: StringName = needs_of(contract)
+	return &"" if need == &"any" or need == body_kind(body) else need
+
+
+## Cabe no modelo (tipo de carroceria e peso)? Nao olha o rival (GameState.contract_block_reason).
+static func fits(contract: Dictionary, body: String) -> bool:
+	return missing_body(contract, body) == &"" and float(contract.get("weight_t", 0.0)) <= capacity_t(body)
+
+
+static func _cargo_fits(cargo: CargoDef, body: String, cap: float) -> bool:
+	return cargo.weight_min_t <= cap and (cargo.needs == &"any" or cargo.needs == body_kind(body))
 
 
 static func all_cargos() -> Array[CargoDef]:
@@ -36,8 +68,8 @@ static func reward(route: RouteDef, cargo: CargoDef, weight_t: float) -> int:
 	return int(round(v / 50.0)) * 50
 
 
-## Gera o quadro: PER_ROUTE contratos para cada trecho liberado (sempre pelo menos um que caiba no bau
-## informado). Determinístico para a mesma semente.
+## Gera o quadro: PER_ROUTE contratos para cada trecho liberado (sempre pelo menos um que caiba no modelo
+## informado: peso e tipo de carroceria). Determinístico para a mesma semente.
 static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, body: String) -> Array[Dictionary]:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
@@ -50,10 +82,17 @@ static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, bo
 		for k in PER_ROUTE:
 			var cargo: CargoDef = cargos[rng.randi() % cargos.size()]
 			var hi: float = cargo.weight_max_t
-			if k == 0:                                   # o primeiro de cada trecho sempre cabe no bau atual
-				while cargo.weight_min_t > cap:
+			if k == 0:                                   # o primeiro de cada trecho sempre serve no modelo atual
+				var tries: int = 0
+				while not _cargo_fits(cargo, body, cap) and tries < 64:
 					cargo = cargos[rng.randi() % cargos.size()]
-				hi = minf(hi, cap)
+					tries += 1
+				if not _cargo_fits(cargo, body, cap):    # azar demais no sorteio: a primeira carga que serve
+					for alt in cargos:
+						if _cargo_fits(alt, body, cap):
+							cargo = alt
+							break
+				hi =maxf(minf(hi, cap), cargo.weight_min_t)
 			var w: float = snappedf(rng.randf_range(cargo.weight_min_t, hi), 0.5)
 			var pl: PackedStringArray = r.places if r.places.size() >= 2 else PackedStringArray(["Origem", "Destino"])
 			var a: int = rng.randi() % pl.size()
@@ -62,6 +101,7 @@ static func generate(seed_: int, routes: Array[RouteDef], unlocked: Callable, bo
 				"id": "%s_%d_%d" % [r.id, seed_ % 100000, k], "route": String(r.id),
 				"origin": pl[a], "destination": pl[b], "cargo": String(cargo.id), "weight_t": w,
 				"reward": reward(r, cargo, w), "fragility": cargo.fragility, "trait": String(cargo.trait_kind),
+				"needs": String(cargo.needs),
 				"deadline_s": roundf(r.deadline() * (PERISHABLE_DEADLINE if cargo.trait_kind == &"perishable" else 1.0)),
 			})
 	return out

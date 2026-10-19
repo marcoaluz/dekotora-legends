@@ -10,7 +10,7 @@ const DT: float = 1.0 / 60.0
 
 func _models() -> Array:
 	var out: Array = []
-	for body in ["base", "leve", "longo"]:
+	for body in ["base", "leve", "longo", "graneleira"]:          # graneleira: T-145
 		for cab in CabCatalog.IDS:
 			out.append([body, cab])
 	out.append(["canter", "chata"])

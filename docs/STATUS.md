@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (203) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (221) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -220,6 +220,24 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   `debug_events_3d.gd`, `count_model_surfaces.gd`; capturas `docs/capturas_t139/`. Depuração: `--hide-events-3d` (esconde só o
   visual). Pendências: confirmar com o Marco a regra das chapas e a frequência; gerar os 5 sons; carros batidos ficam escuros à noite
   (só o pisca-alerta aparece bem).
+- **T-145 (2026-10-19): carroceria graneleira + regra carga x carroceria.** Modelo "Carroceria_Brasil_Graneleiro" (pasta
+  `docs/Novas Melhorias/Carroceria/`, fora do Git, Royalty Free (no AI)) reduzido 81 mil → 7,8 mil triângulos por
+  `blender/scripts/truck3d/gran_src.py` (piso, fueiros, lona preta, lanternas e para-choque do original; 64 trincos de 964
+  triângulos viram caixinhas; parafusos somem) + `truck3d/graneleira.py` (tampas com o mural repetido 3x, cabeceira "torii"
+  cromada com o andon da frente, armação traseira com o andon de trás, luzes, placa, neon; pontos de montagem do teto/painel
+  lateral movidos para a lona/tampas). Chassi do baú médio (8,2 m, 12 m na pista). Gerar: `build_truck_3d.py -- --variant
+  graneleira --cab chata|jac|curta|americana [--body-src OBJ] [--cab-src ...]` (ou `tools/build_all_trucks.sh`) →
+  `dekotora_truck_graneleira_<cabine>.glb` (66–78 mil triângulos). Jogo: `data/bodies/graneleira.tres` (14 t, 7.500 kg,
+  `cargo_kind = open`), garagem aba Modelo (grátis como os outros), bot 3 da corrida offline, descritor de rede `"body"`.
+  Regra (`CargoDef.needs`, `Contracts.missing_body/fits`): eletrônicos/refrigerados/louça só no baú; **grãos e brita (novas)**
+  só na graneleira; madeira/aço/peças nas duas; Mercado mostra "SÓ BAÚ"/"SÓ GRANELEIRA" e bloqueia com "PRECISA DE BAÚ"/
+  "PRECISA DE GRANELEIRA"/"PESADA DEMAIS"; trocar de modelo sorteia quadro novo se nenhum frete servir
+  (`GameState.board_serves_body`); migração do perfil (modelo desconhecido → baú médio; contrato antigo ganha `needs`).
+  Medido (modo médio, litoral à noite): 75 FPS igual ao baú médio, ~385 vs ~405 chamadas, textura 46 vs 50 MB. Teste
+  `tests/test_graneleira.gd` (10) + graneleira no `test_wheels_spin`; capturas `docs/capturas_t145/`; depuração: garagem
+  `-- --demo --body=graneleira [--cab=jac] [--noparts]`, corrida `-- --decorated --body=graneleira`, Mercado
+  `res://scenes/menu/main_menu.tscn -- --demo-body=graneleira --screen=market`. **Pendente do Marco:** confirmar a regra de
+  carga, o tamanho único (médio), a lona preta, 14 t/7.500 kg e se a graneleira deve custar algo (ver `docs/DECISOES.md`).
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).
