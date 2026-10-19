@@ -27,6 +27,7 @@ var _snap_every: float = 0.0
 var _next_snap: float = 0.0
 var _burst_at: float = -1.0
 var _burst_left: int = 2
+var _sim: RaceSim                      # --demo=crash: olha o transito para a captura "batida_antes" (T-152)
 
 
 func _init(args: PackedStringArray) -> void:
@@ -187,6 +188,7 @@ func active() -> bool:
 
 ## Prepara o grid: no modo "close" o rival (indice 1) comeca ao lado do jogador, na faixa da direita.
 func setup(sim: RaceSim) -> void:
+	_sim = sim
 	if mode == "crash" and sim.traffic != null and sim.traffic.cars.size() >= 3:
 		var p: TruckSim = sim.trucks[0]
 		var lane_t: int = clampi(p.lane - 1, 0, 2)             # faixa do jogador no indice do transito
@@ -229,6 +231,8 @@ func on_event(e: Dictionary, player: int, race_time: float) -> void:
 		_queue.append([_clock + 0.1, "batida_a"])
 		_queue.append([_clock + 0.22, "batida_b"])
 		_queue.append([_clock + 0.6, "batida_c"])
+		_queue.append([_clock + 1.0, "batida_d"])       # T-152: tranco acabou (velocimetro branco de novo)
+		_queue.append([_clock + 2.5, "batida_e"])       # ... e voltando a acelerar
 		return
 	if shot_dir == "" or String(e["type"]) != "truck":
 		return
@@ -253,6 +257,8 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 		_burst_left -= 1                              # um por quadro: roda_1 e roda_2 sao quadros seguidos
 		_save(viewport, "roda")
 		print("RODA: velocidade %.1f m/s, dt %.4f s" % [player_truck.speed, dt])
+	if mode == "crash" and _sim != null and _sim.traffic != null and _about_to_hit(player_truck):
+		_save(viewport, "batida_antes")           # T-152: velocimetro logo antes da batida (uma por carro, ate 3)
 	if _clock > 1.5 and not _count.has("largada"):
 		_save(viewport, "largada")                # contagem regressiva: mostra o aviso da carga
 	if player_truck.lane_changes != _last_lane_changes:
@@ -277,6 +283,19 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 		else:
 			keep.append(q)
 	_queue = keep
+
+
+## --demo=crash: um carro do transito na linha do caminhao a menos de ~0,25 s do nariz (so uma vez por aproximacao).
+var _armed: bool = true
+func _about_to_hit(t: TruckSim) -> bool:
+	var near: bool = false
+	for c in _sim.traffic.cars:
+		var gap: float = c.z - (t.z + t.length)
+		if absf(c.x - t.x) < (TruckSim.WIDTH_X + c.width_x) * 0.5 and gap > 0.0 and gap < maxf(t.speed - c.speed, 0.0) * 0.25:
+			near = true
+	var fire: bool = near and _armed
+	_armed = not near
+	return fire
 
 
 ## Agenda uma captura daqui a `delay` s (tempo real).
