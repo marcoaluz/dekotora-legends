@@ -28,5 +28,8 @@ for T in day night; do
   shot kanto_3_mountain obras 2490 $T "$E" "$@"
   shot kanto_3_mountain tunel 2062 $T "$E" "$@"
   shot kanto_3_mountain outdoor 675 $T "$O" "$@"
+  shot kanto_3_mountain obras_perto 2540 $T "4,-5,2.2,14,-1.5,0.4" "$@"
+  shot kanto_2_viaduct boca_tunel 972 $T "-6,-8,2.5,8,-13.5,1" "$@"
+  shot kanto_2_viaduct barreira_som 320 $T "-6,-8,3,20,-14,2.5" "$@"
 done
 echo "capturas em $OUT"

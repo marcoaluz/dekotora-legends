@@ -31,6 +31,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P34] HUD de corrida
 - [x] [P35] Efeitos visuais de batida (faísca, fumaça, peça caindo)
 - [x] [T-139] Eventos de pista: acidente, obras (limite 60 km/h) e estreitamento 3 → 2 faixas; simulação, rede (servidor sorteia), bots, trânsito, visual (3 chamadas por evento), HUD, sons e prazo (concluída em 2026-10-18, `tests/test_track_events.gd`, `docs/capturas_t139/`)
+- [x] [T-146] Modelos de `docs/Novas Melhorias` (Metais, Placas, Placão): barreiras listradas nas obras/acidente/estreitamento e nas bocas dos túneis, chapas e postes reais nas placas, pórticos de treliça, outdoors com arte trocável, vidro com moldura na barreira de som (concluída em 2026-10-19, `tests/test_roadside_kit.gd`, `docs/capturas_t146/`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)

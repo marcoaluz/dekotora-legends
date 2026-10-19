@@ -98,3 +98,36 @@ Nenhum dos dois foi copiado para o projeto. Foram só abertos no Blender em segu
 2. A pasta `Downloads\Ge\` pode ser apagada por você se quiser liberar 380 MB: é só cópia zipada do que já está em
    `docs/Modelos Melhorados/` (eu não apaguei nada).
 3. O jipe Suzuki (`docs/Novos modelos/Carro/`) ainda pode virar carro do trânsito, se você quiser (1 sessão).
+
+---
+
+# T-146 (2026-10-19): `docs/Novas Melhorias/`: Metais, Placas e Placão
+
+Pedido do Marco: "coloquei novos modelos na pasta docs/Novas Melhorias, quero todos estes itens no jogo". Licença dos três
+pacotes: **Royalty Free License (no AI)**, confirmada pelo Marco (créditos em `game/assets/LICENCAS.md`). A pasta continua
+fora do Git; só o resultado reduzido entra (`blender/scripts/build_roadside_kit.py`). As pastas "Carroceria" e "Carro batido"
+são de outras tarefas.
+
+| Pasta / arquivo | O que é de verdade | Triângulos | Texturas | Textos/marcas reais? | No jogo |
+| --- | --- | --- | --- | --- | --- |
+| `Metais/` "Metal and Concrete Barriers" (.blend, .fbx, .3ds, .max, .unitypackage, texturas .zip) | **Barreiras de obra**, não guard-rail: 3 blocos de concreto com **listras amarelas e pretas** (New Jersey 0,9 m; muro alto 1,3 m; New Jersey com grade de cano em cima 1,66 m), 2 **cavaletes de metal** em "A" (1,85 e 2,78 m) e 4 pedaços soltos de cantoneira/cano | 1.532 (84 a 536 por peça) | 1 atlas 4096 px (cor, normal, oclusão, rugosidade, metálico; .tga no .zip) | Não | Inteiro: obras, acidente, estreitamento e bocas de túnel |
+| `Placas/` "ROAD SIGNS" (.blend, .fbx, texturas) | **74 chapas de placa** em 5 formatos (redonda com borda, triângulo, octógono, losango, retângulo, cantos arredondados), 34 postes com base, 4 postes duplos, 70 braçadeiras e 70 cintas (atrás das placas), 4 parafusos e um boneco de referência | **1,06 milhão** (70% são as braçadeiras: 10,6 mil cada) | Metal azul da Poly Haven (CC0) + **uma captura de tela de propaganda "80+ ROAD SIGNS SVG BUNDLE"** com placas americanas/europeias (STOP, GIVE WAY, km/h…) usada como face | Sim: textos em inglês e placas ocidentais na captura de tela | Chapas (redonda, triângulo, losango, retângulo) e poste, **com as faces japonesas da T-130**. A captura de tela, o octógono, as braçadeiras/cintas (ficam atrás da placa, ninguém vê da pista) e o boneco **não** entram |
+| `Placão/nodel.fbx` + `tex.rar` | **Pórtico de treliça** (2 pernas de 7,5 m + viga de 24 m; caixas com textura de treliça recortada) com **2 placas verdes americanas** "I-96 EAST Detroit" e "HORTON / HANOVER / LIBERTY"; exportado de um projeto Unity "main_offrd_oiltanker" | 76 | `tex.rar` (aberto com o 7-Zip): `Grade1.png` (grades, guarda-corpo de vidro, treliça; com alfa) e `Metal.png` (as 2 placas, chapas e parafusos). Falta `Atlas-1.psd` (só as sapatas) | Sim: escudo da Interstate 96 e cidades reais dos EUA | A treliça vira os **pórticos** da pista (medidas da nossa pista, 27 m) e as pernas dos **outdoors**; o vidro com moldura do `Grade1.png` vai na **barreira de som do viaduto**. As placas americanas **não** entram (o pórtico continua com as placas japonesas em kanji) |
+
+## O que entrou no jogo (T-146)
+
+- **Barreiras (Metais)**: obras = fileira contínua de barreiras listradas na borda da faixa fechada depois do afunilamento (no
+  lugar dos cones espaçados; a cada 5, uma com grade em cima); acidente = cavaletes de metal atravessados antes dos carros e
+  destroços de metal no chão; estreitamento = muro listrado onde a faixa acaba + barreiras ao longo dela; **bocas dos túneis** =
+  2 muros listrados na ponta da mureta, dos dois lados. A **mureta contínua** e o guard-rail do litoral continuam os feitos por
+  código (seguem as curvas, 0 chamada extra, e o pacote não tem guard-rail de rodovia); a simulação não mudou (as peças ficam
+  no mesmo intervalo fechado que ela usa).
+- **Placas**: toda a sinalização da T-130 ganhou chapa de verdade (borda, espessura, cantos arredondados) no formato da face
+  (limite = redonda, aviso = losango, 止まれ = triângulo de ponta para baixo, apoio/saída/km/chevron = retângulo) e poste
+  redondo com base. Juntadas por bloco de 400 m (`MeshBatch`).
+- **Placão**: pórtico de treliça no lugar das vigas de caixa; **outdoors** (painel 9,6 x 3,6 m sobre 2 pernas de treliça, com
+  passarela e luminárias; no viaduto as pernas descem até o chão) a cada ~1,15 km, fora da mureta, virados para a pista e
+  acesos à noite. Arte trocável: `game/assets/scenery/billboards/ad_01..04.png` (1024 x 384) ou `user://billboards/ad_0N.png`.
+- Peso: 60–280 triângulos por peça; texturas 1024 px (barreira, treliça) e 512 px (ORM, normal, metal), comprimidas na VRAM
+  (S3TC no PC, ETC2/ASTC no Android); +3,2 MB de memória de textura, ~4,7 MB de PNG no projeto. Medidas em `docs/STATUS.md` (T-146).
+- Capturas: `docs/capturas_t146/` (`litoral|viaduto|montanha_dia_noite.png`, `antes_depois_dia.png`, `kit_modelos.png`).
