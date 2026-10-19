@@ -127,3 +127,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: eventos de pista (acidente, obras com limite 60 km/h, estreitamento 3→2): sim, rede (servidor sorteia, protocolo 2), bots, trânsito, visual (3 chamadas/evento, 11 no acidente), HUD, sons de reserva, folga no prazo, testes e docs.
 - Validação: 211 testes, 0 falhas na main após o merge (2 conflitos aditivos resolvidos em truck_sim.gd e DECISOES.md); net_test.sh passou; FPS igual (75).
 - Decisão pendente: regra das chapas de aço nas obras (alternativas: multa em ¥ ou só visual); chance de 45% e posições dos eventos fixos; viatura de polícia no acidente. Gerar o APK de novo (protocolo 2). 5 sons novos pedidos em docs/AUDIO_ELEVENLABS.md (aguardam autorização de gasto no ElevenLabs).
+
+## 2026-10-19 · T-145 · especialista · CONCLUÍDA (PRECISA DECISÃO do Marco)
+- Feito: graneleira (modelo do Marco reduzido 81k→7,8k tri, tampas com mural trocável, cabeceira torii) nas 4 cabines; garagem/perfil/rede/bot; regra carga x carroceria (grãos e brita novos; "PRECISA DE BAÚ/GRANELEIRA").
+- Arquivos: blender/scripts/truck3d/{gran_src,graneleira}.py, data/bodies/graneleira.tres, data/cargo/{graos,brita}.tres, contracts.gd, game_state.gd, tests/test_graneleira.gd, docs/capturas_t145/
+- Validação: 221 testes ok (merge 166f612 no branch wip/t141-t143-t144); capturas olhadas; modo médio 73–75 FPS, chamadas iguais ao baú médio.
+- Decisão pendente: regra de carga, tamanho único, lona preta, 14 t / 7.500 kg, preço. Observação do coordenador: na ficha técnica a linha "Leva" fica cortada embaixo (rola o painel).

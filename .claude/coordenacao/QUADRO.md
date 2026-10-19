@@ -5,8 +5,10 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-148 | Skill blender-pixelart: seção "Graneleira (T-145)" (comando com --body-src e armadilha dos trincos em gran_src._boxify) | DELEGAR (T-145) | fácil | ajudante-rapido | fila (depois de juntar T-141/143/144/146) | 2026-10-19 | |
+| T-147 | Rodar tools/net_test.sh com o cliente automático usando body "graneleira" e conferir que a corrida termina sem SCRIPT ERROR | DELEGAR (T-145) | fácil | ajudante-rapido | fila (depois de juntar T-141/143/144/146) | 2026-10-19 | |
 | T-146 | Novas Melhorias: barreiras de metal e concreto, pacote de placas de trânsito e placão (docs/Novas Melhorias/Metais, Placas, Placão) na pista | pedido do Marco | difícil | especialista | em andamento | 2026-10-18 | |
-| T-145 | Novas Melhorias: carroceria nova graneleira (docs/Novas Melhorias/Carroceria) como opção de carroceria nas 4 cabines, ao lado dos baús, com regra lógica de carga | pedido do Marco | difícil | especialista | em andamento | 2026-10-18 | |
+| T-145 | Novas Melhorias: carroceria nova graneleira (docs/Novas Melhorias/Carroceria) como opção de carroceria nas 4 cabines, ao lado dos baús, com regra lógica de carga | pedido do Marco | difícil | especialista | concluída (merge 166f612 no wip; 221 testes ok; precisa Marco: regra de carga, tamanho, lona, 14 t, preço) | 2026-10-18 | 2026-10-19 |
 | T-113 | Ajuste pós-ATB-1: faixas do asfalto alinhadas com a simulação, caminhão centrado na faixa, troca de faixa mais pesada (jeito do original) | pedido do Marco | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-112 | ATB-2 item 6: largada e chegada com clima (corte de câmera lateral 1–2 s, banner, clarão na saída do túnel) | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-111 | ATB-2 item 5: rivais que recusam por fama e destaque mínimos, com fala curta | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
