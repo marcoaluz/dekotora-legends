@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dr52u3jpoe5ra"
 path.s3tc="res://.godot/imported/event_atlas.png-a96b8a627ab010fdb8f0eb7834c16ab2.s3tc.ctex"
+path.etc2="res://.godot/imported/event_atlas.png-a96b8a627ab010fdb8f0eb7834c16ab2.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/textures/event_atlas.png"
-dest_files=["res://.godot/imported/event_atlas.png-a96b8a627ab010fdb8f0eb7834c16ab2.s3tc.ctex"]
+dest_files=["res://.godot/imported/event_atlas.png-a96b8a627ab010fdb8f0eb7834c16ab2.s3tc.ctex", "res://.godot/imported/event_atlas.png-a96b8a627ab010fdb8f0eb7834c16ab2.etc2.ctex"]
 
 [params]
 

@@ -137,6 +137,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-139 (eventos de pista):** confirmar a regra das obras (60 km/h; passar rápido na chapa de aço custa carga; alternativas: multa em ¥ ou só visual), a chance de 45% de um evento extra por corrida, as posições dos eventos fixos e se quer viatura de polícia no acidente. **Gerar o APK de novo** (o protocolo de rede passou para a versão 2). Autorizar o gasto no ElevenLabs para os 5 sons novos (`python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`).
+
 - **T-138:** escolher o fundo padrão da tela inicial (A posto à noite, B rodovia; compare `docs/capturas_t138/depois_960x540/menu.png`
   e `menu_fundo_b.png`) e dizer se a câmera da garagem ficou perto o bastante.
 
