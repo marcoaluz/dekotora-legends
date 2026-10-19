@@ -146,3 +146,19 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - `MeshBatch` (`road3d/mesh_batch.gd`) junta peças diferentes num único nó por bloco e material: uma chamada de desenho por material e bloco visível. Diferente do MultiMesh, aceita modelos diferentes.
 - `GlbMesh` (`road3d/glb_mesh.gd`) mantém as tangentes do .glb (mapa de normais funciona).
 - As artes dos outdoors saem de `godot --path game -s res://tools_dev/make_billboard_art.gd`. Precisa de janela: rode sem `--headless`.
+
+## Trechos de 2 faixas (T-153)
+
+- Dados (`scripts/data/route_def.gd`):
+  - `RouteDef.lane_sections`: `{start, end, lanes: 2, taper, look}` em metros ao longo da pista. A faixa que acaba é sempre a da DIREITA. `look` (`tunnel` | `bridge` | `old_viaduct`) só muda o visual.
+  - `RouteDef.bridges`: lista de `Vector2` (início m, comprimento m), só visual (pilares, guarda-corpo).
+- Simulação (`scripts/sim/lane_sections.gd`):
+  - Os trechos entram na lista de eventos como `TrackEvents.Kind.SECTION`.
+  - O setter de `Track.events` sempre junta os trechos, então `--no-events` e a regra de sala `events: false` não tiram os trechos da pista.
+  - `Track.lanes_at(z)` devolve 2 onde a faixa da direita está fechada, senão 3.
+- Visual: lê `LaneSections.profile(evs, z)`, que devolve um `Vector3` em metros: x = mureta esquerda, y = mureta direita, z = linha de borda da direita (sem trecho: 13, 13, 5,15).
+- Flags:
+  - `--no-sections` na corrida (depois de `--`): pista sem os trechos, para medir custo.
+  - Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=lane_sections` (o filtro é um trecho do nome do arquivo de teste).
+- Capturas: `bash tools/capture_t153.sh PASTA [filtro]` (na raiz do projeto, Git Bash). O filtro é um trecho do nome (ex.: `coast`, `tunel`, `night`; `all` = tudo). Grava `PASTA/<rota>_<cena>_<hora>/t01.png`. O script já converte caminho relativo em absoluto, porque o jogo roda com `--path game`. `GODOT=...` troca o executável do Godot.
+- Setup online: leva `lane_sections` (protocolo 5, `scripts/net/protocol.gd`). O cliente usa a pista do servidor.
