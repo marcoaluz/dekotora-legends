@@ -214,6 +214,39 @@ func test_bots_and_traffic_respect_the_section_on_every_route() -> void:
 			check(sim.trucks[k].z > end_z, "%s: bot %d passou pelo trecho (z=%.0f)" % [r, k, sim.trucks[k].z])
 
 
+# ---------------------------------------------------------------- visual (mesmo perfil da simulacao)
+func test_visuals_follow_the_section() -> void:
+	check_near(RoadMesh.BARRIER_IN, LaneSections.OPEN_WALL_M, 0.001, "mureta normal do visual = a da simulacao")
+	for r in ROUTES:
+		var route: RouteDef = load("res://data/routes/%s.tres" % r) as RouteDef
+		var track: Track = route.build_track()
+		var path := TrackPath.new(track)
+		var tod: TimeOfDay = TimeOfDay.by_id(route.time_of_day)
+		var s: Dictionary = route.lane_sections[0]
+		var mid_i: int = int((float(s["start"]) + float(s["end"])) * 0.5 / Track.SEG_LEN)
+		var road := RoadMesh.new()
+		road.bridges = route.bridges
+		road.build(path, route.scenery, tod, route.tunnels)
+		check(road.narrowed(mid_i), "%s: a estrada estreita no trecho" % r)
+		check(not road.narrowed(int(float(s["start"]) / Track.SEG_LEN) - 120), "%s: e normal bem antes" % r)
+		check_near(road.profile(mid_i).y, LaneSections.RIGHT_WALL_M, 0.01, "%s: mureta desenhada onde a sim para o caminhao" % r)
+		var ev3d := TrackEvents3D.new()
+		ev3d.build(path, tod)
+		check_eq(int(ev3d.counts.get("section", 0)), 1, "%s: placas do trecho" % r)
+		check(int(ev3d.counts.get("sign", 0)) >= 4, "%s: painel, losangos e placa azul (%d)" % [r, int(ev3d.counts.get("sign", 0))])
+		var tun := Tunnel3D.new()
+		tun.build(path, route.tunnels, route.scenery, null, null)
+		if r == "kanto_3_mountain":
+			check_eq(tun.narrow, [true, false] as Array[bool], "montanha: o 1o tunel e o antigo de 2 faixas")
+		if not route.bridges.is_empty():
+			var st := SectionStructures3D.new()
+			st.build(path, route.bridges, tod)
+			check(int(st.counts.get("pier", 0)) >= 8, "%s: pilares da ponte (%d)" % [r, int(st.counts.get("pier", 0))])
+			st.free()
+		for n in [road, ev3d, tun]:
+			n.free()
+
+
 # ---------------------------------------------------------------- rede e determinismo
 func test_online_setup_carries_the_sections_and_the_server_wins() -> void:
 	var room := Room.new("SEC153")

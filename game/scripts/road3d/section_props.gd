@@ -77,7 +77,7 @@ static func _wall_stripes(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
 		var w0: float = LaneSections.profile(b.events, zz).y
 		var w1: float = LaneSections.profile(b.events, zz + 2.4).y
 		if w0 < 9.6 and w1 > LaneSections.RIGHT_WALL_M + 0.4:
-			var slope: float = atanf((w0 - w1) / 2.4)                  # the wall comes in: its face looks back a little
+			var slope: float = atan((w0 - w1) / 2.4)                  # the wall comes in: its face looks back a little
 			var bs: Basis = b.basis(zz + 1.2, -(PI * 0.5 - slope))
 			b.face(bs, b.pt(zz + 1.2, (w0 + w1) * 0.5 - 0.06, 0.52), Vector2(2.3, 0.45), "barricade")
 		zz += 2.6

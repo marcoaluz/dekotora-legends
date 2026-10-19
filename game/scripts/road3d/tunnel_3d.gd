@@ -132,7 +132,7 @@ func _lit(z: float, h: float, old: bool = false) -> Color:
 	var lamp: float = 0.5 + 0.5 * cos(fmod(z, every) / every * TAU)
 	if old:
 		var conc := Color(0.4, 0.37, 0.33) if h > 1.0 else Color(0.2, 0.19, 0.18)
-		return conc * (0.32 + 0.5 * lamp) * clampf(1.15 - h / 9.0, 0.4, 1.0)
+		return conc * (0.3 + 0.7 * lamp * lamp) * clampf(1.2 - h / 9.0, 0.45, 1.0)
 	var tile := Color(0.62, 0.52, 0.4) if h > 1.2 else Color(0.3, 0.26, 0.22)
 	var near_top: float = clampf(h / 8.2, 0.3, 1.0)
 	return tile * (0.45 + 0.55 * lamp) * near_top
@@ -194,16 +194,23 @@ func _portal(st: SurfaceTool, z: float, facing: float, old: bool = false) -> voi
 	var rf: float = float(_arch[_arch.size() - 1][0])
 	var c: float = (lf + rf) * 0.5
 	var w: float = 30.0 + absf(c)                                       # cobre ate os muros laterais (_caps, em +-30)
-	var top: float = PORTAL_H if not old else 10.5
+	var top: float = PORTAL_H if not old else 10.0
+	var lw: float = (lf - 2.6) if old else lf                            # tunel antigo: so a moldura de pedra em volta do arco
+	var rw: float = (rf + 2.6) if old else rf
 	for k in _arch.size() - 1:                                          # do arco ate o topo
 		var p0: Array = _arch[k]
 		var p1: Array = _arch[k + 1]
 		_face(st, z, facing, [Vector2(p0[0], p0[1]), Vector2(p1[0], p1[1]), Vector2(p1[0], top), Vector2(p0[0], top)], col)
+	if old:
+		_face(st, z, facing, [Vector2(lw, 0), Vector2(lf, 0), Vector2(lf, top), Vector2(lw, top)], col)
+		_face(st, z, facing, [Vector2(rf, 0), Vector2(rw, 0), Vector2(rw, top), Vector2(rf, top)], col)
+		var hill := Color(0.24, 0.3, 0.21)                              # o morro em volta e por cima da boca de pedra
+		_face(st, z, facing, [Vector2(c - w, 0), Vector2(lw, 0), Vector2(lw, PORTAL_H), Vector2(c - w, PORTAL_H)], hill)
+		_face(st, z, facing, [Vector2(rw, 0), Vector2(c + w, 0), Vector2(c + w, PORTAL_H), Vector2(rw, PORTAL_H)], hill)
+		_face(st, z, facing, [Vector2(lw, top), Vector2(rw, top), Vector2(rw, PORTAL_H), Vector2(lw, PORTAL_H)], hill)
+		return
 	_face(st, z, facing, [Vector2(c - w, 0), Vector2(lf, 0), Vector2(lf, top), Vector2(c - w, top)], col)
 	_face(st, z, facing, [Vector2(rf, 0), Vector2(c + w, 0), Vector2(c + w, top), Vector2(rf, top)], col)
-	if old and top < PORTAL_H:                                           # o morro por cima da boca baixa de pedra
-		_face(st, z, facing, [Vector2(c - w, top), Vector2(c + w, top), Vector2(c + w, PORTAL_H), Vector2(c - w, PORTAL_H)],
-			Color(0.22, 0.28, 0.2))
 
 
 ## Tunel antigo: lampadas fracas nas paredes, alternando os lados; placa verde de emergencia mais rara.
@@ -214,7 +221,7 @@ func _old_lamps(t: Vector2, lamps: Array) -> void:
 	var n: int = 0
 	while z < t.x + t.y - 2.0:
 		var side_lat: float = (lf + 0.12) if n % 2 == 0 else (rf - 0.12)
-		lamps.append([_xf(z, side_lat, 4.3, Vector3(0.12, 0.22, 0.9)), Color(0.85, 0.48, 0.16)])
+		lamps.append([_xf(z, side_lat + (0.1 if n % 2 == 0 else -0.1), 3.4, Vector3(0.16, 0.24, 1.0)), Color(0.9, 0.5, 0.16)])
 		if n % 10 == 5:
 			lamps.append([_xf(z + 3.0, lf + 0.08, 2.4, Vector3(0.06, 0.5, 0.8)), Color(0.15, 0.85, 0.35)])
 		z += OLD_LAMP_EVERY * 0.5

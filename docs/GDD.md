@@ -82,6 +82,12 @@ Câmbio automático no MVP. Freio-motor entra sozinho ao soltar o acelerador em 
     no afunilamento (cada cone tocado custa um pouco de carga), batida forte no veículo parado/barreira e troca de faixa
     recusada para dentro de uma faixa fechada. Cada rota tem 1 evento fixo e pode sortear mais 1 (45%) pela semente da
     corrida; o prazo estica alguns segundos por evento. Bots e trânsito saem cedo da faixa fechada.
+12. **Trechos com 2 faixas** (T-153, parte da pista, não é evento): em cada rota a pista INTEIRA estreita para 2 faixas
+    (asfalto, linhas, muretas e acostamentos entram em diagonal, com zebrado; alarga de novo depois). A faixa da
+    **direita** (ultrapassagem) acaba; quem está nela entra na fila antes de a mureta fechar (se insistir, raspa na
+    mureta, perde carga e é obrigado a entrar). Avisos: painel de LED a 600 m, losango "車線減少" a 400 m e 200 m, placa
+    azul "この先 2車線" e "PISTA COM 2 FAIXAS" no HUD. Litoral: ponte sobre o mar no fim da rota; viaduto: viaduto antigo
+    depois do acidente; montanha: túnel antigo (湯坂隧道) nas curvas do começo.
 
 Pagamento = frete × integridade da carga + bônus de posição + bônus de Fama. O dano persiste após a corrida.
 

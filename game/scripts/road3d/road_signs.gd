@@ -60,6 +60,9 @@ func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Ve
 		_place(L - 520.0, tunnels, exit_sign, "exit")
 		if not counts.has("exit"):                          # caiu no tunel ou num portico: mais perto do fim
 			_place(L - 280.0, tunnels, exit_sign, "exit")
+		var sec: TrackEvents.Event = LaneSections.at(path.track.events, L - 520.0, 30.0)
+		if not counts.has("exit") and sec != null:          # T-153: trecho de 2 faixas no fim: antes dele
+			_place(sec.z - 140.0, tunnels, exit_sign, "exit")
 	_curves(L, kind, tunnels)
 	_limits(L, kind, tunnels)
 	_distances(L, places, tunnels)
@@ -220,6 +223,7 @@ func _tunnel(t: Vector2, route_id: String, kind: StringName) -> void:
 		_sign(z, SIDE_LAT, 2.35, AUX_SIGN, "aux_tunnel", 0)
 	_place(t.x - 260.0, tunnels, warn, "tunnel_warn")
 	if LaneSections.profile(path.track.events, t.x + t.y * 0.5).y <= LaneSections.RIGHT_WALL_M + 0.05:
+		counts["tunnel_plaque_old"] = int(counts.get("tunnel_plaque_old", 0)) + 1
 		return                                                  # T-153: tunel antigo (o Tunnel3D poe a placa de pedra)
 	var z0: float = t.x - 0.35
 	var b: Basis = _basis(z0, 0.0)

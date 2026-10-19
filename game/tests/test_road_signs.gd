@@ -27,7 +27,8 @@ func test_signs_on_every_route_two_draws() -> void:
 		check(int(c.get("distance", 0)) >= 1, rid + ": painel de distancia")
 		check_eq(int(c.get("stop", 0)), 1, rid + ": pare no pedagio")
 		check_eq(int(c.get("exit", 0)), 1, rid + ": placa de saida")
-		check_eq(int(c.get("tunnel_plaque", 0)), route.tunnels.size(), rid + ": placa na boca de cada tunel")
+		check_eq(int(c.get("tunnel_plaque", 0)) + int(c.get("tunnel_plaque_old", 0)), route.tunnels.size(),
+			rid + ": placa na boca de cada tunel (a do tunel antigo da T-153 e de pedra, no Tunnel3D)")
 		if rid != "kanto_1_coast":
 			check(int(c.get("chevron", 0)) > 0, rid + ": chevrons nas curvas fortes")
 			check(int(c.get("curve", 0)) > 0, rid + ": aviso de curva")

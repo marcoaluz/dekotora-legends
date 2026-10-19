@@ -36,6 +36,9 @@ Cliente A            Servidor                   Cliente B
 (acidente, obras, estreitamento) que o **servidor** sorteou (fixos da rota + sorteio pela semente). O cliente monta a
 mesma pista com essa lista; nada mais é enviado durante a corrida por causa deles (o dano vai na atualização normal).
 Regra da sala `events: false` = pista livre.
+**Protocolo versão 5** (T-153): o `race_setup` leva também `lane_sections`, os trechos de 2 faixas da pista
+(`{start, end, lanes, taper, look}`, os da rota). O cliente usa a lista do servidor no lugar da rota dele; os trechos não
+vão em `events` e continuam com `events: false` (são a pista, não um evento).
 
 **Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool),
 `horn` (bool, buzina segurada, T-144). Cerca de 13 bytes.
@@ -45,7 +48,7 @@ Regra da sala `events: false` = pista livre.
 tranco** — 2 bits, T-152), **tranco** (u8, ticks que faltam, T-152), mais
 **eventos** do tick (colisão com zona e força, peça quebrada, Passing, carro arremessado, freada). Cada carro do trânsito
 leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
-(T-141). O dano completo só vai quando muda. **Protocolo versão 4** (T-152; cliente e servidor precisam da mesma versão: gere o APK de novo).
+(T-141). O dano completo só vai quando muda. **Protocolo versão 5** (4 = T-152, 5 = T-153; cliente e servidor precisam da mesma versão: gere o APK de novo).
 
 ## Suavidade no cliente
 
