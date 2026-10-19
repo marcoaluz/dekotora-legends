@@ -8,16 +8,16 @@ extends Node3D
 ## Tudo junto: no maximo 1 + caminhoes freando ao mesmo tempo (<= 5 chamadas).
 ## T-141: o mesmo puff sai dos pneus de quem foi EMPURRADO de faixa por outro caminhao (TruckSim.shove_t; ATB:
 ## "fumaca/poeira branca nas rodas de quem raspa"). Chave "Faiscas, pedacos e fumaca" em Opcoes > Graficos;
-## a qualidade grafica corta a quantidade de puffs (baixa 10, media 18, alta 26).
+## a qualidade grafica corta a quantidade de puffs (baixa 14, media 24, alta 34).
 
-const SMOKE_AMOUNT: Array[int] = [10, 18, 26]
+const SMOKE_AMOUNT: Array[int] = [14, 24, 34]
 
 const MARK_COUNT: int = 360
 const MARK_EVERY: float = 0.07           # s entre tracos
 const MARK_WIDTH: float = 0.34           # m
 const WHEEL_X: float = 1.02              # m do centro ate a roda de fora
 const MAX_DIST: float = 160.0            # m da camera: mais longe nao solta fumaca nem marca
-const SMOKE_LIFE: float = 1.3
+const SMOKE_LIFE: float = 1.8
 
 var _smoke: Dictionary = {}              # indice -> CPUParticles3D
 var _smoke_off_t: Dictionary = {}        # indice -> s desde que parou (esconde depois de SMOKE_LIFE)
@@ -72,7 +72,7 @@ func _ready() -> void:
 	_puff_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	_puff_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 	_puff_mesh = QuadMesh.new()
-	_puff_mesh.size = Vector2(1.0, 1.0)
+	_puff_mesh.size = Vector2(2.0, 2.0)
 
 
 ## Compila os shaders da fumaca e das marcas na largada (desenhados escondidos embaixo do asfalto, ver ImpactFx.warmup).
@@ -109,11 +109,11 @@ func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: f
 			p.emitting = true
 			_smoke_off_t[index] = 0.0
 			var k: float = t.brake_intensity if braking else 0.55      # empurrao: puff medio
-			var shade: float = 0.62 if night else 0.88
-			p.color = Color(shade, shade, shade * 1.02, 0.25 + 0.45 * k)
-			p.scale_amount_min = 0.7 + 0.6 * k
-			p.scale_amount_max = 1.4 + 1.6 * k
-			p.global_transform = node.global_transform * Transform3D(Basis.IDENTITY, Vector3(0, 0.35, rear))
+			var shade: float = 0.82 if night else 0.95
+			p.color = Color(shade, shade, shade * 1.02, 0.55 + 0.45 * k)
+			p.scale_amount_min = 1.1 + 1.0 * k
+			p.scale_amount_max = 2.2 + 2.6 * k
+			p.global_transform = node.global_transform * Transform3D(Basis.IDENTITY, Vector3(0, 0.9, rear))   # alto: o puff nao corta no asfalto
 		else:
 			p.emitting = false
 			var off: float = float(_smoke_off_t.get(index, 0.0)) + dt
