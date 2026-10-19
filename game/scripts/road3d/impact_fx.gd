@@ -25,6 +25,7 @@ var _free: Array[int] = []
 var _jolt: Dictionary = {}               # indice do caminhao -> [amplitude rad, tempo, lado]
 var _shake: float = 0.0                  # tremor pedido para a camera (a cena le com take_shake)
 var _lengths: Array[float] = []
+var sim: RaceSim                         # velocidade dos caminhoes (os pedacos saem com o embalo do caminhao)
 
 
 func setup(fx_: Fx3D, trucks_: Array[TruckNode], lengths: Array[float], traffic3d_: Traffic3D) -> void:
@@ -68,6 +69,7 @@ func warmup(hidden_pos: Vector3) -> void:
 		return
 	if fx != null:
 		fx.sparks(hidden_pos, 1.0, 0.1)
+		fx.flash(hidden_pos, 0.01)
 		fx.debris(hidden_pos, Vector3.ZERO, Vector3(0.1, 0.1, 0.1), 0.3)
 	var slot: int = _free.pop_back()
 	_shards.append({"pos": hidden_pos, "vel": Vector3.ZERO, "rot": Basis(), "spin": Vector3.ZERO, "ttl": 0.3,
@@ -92,7 +94,10 @@ func on_event(e: Dictionary, player: int) -> void:
 			var pa: Vector3 = zone_point(ia, String(e["zone_a"]))
 			var pb: Vector3 = zone_point(ib, String(e["zone_b"]))
 			var contact: Vector3 = (pa + pb) * 0.5
-			_sparks(contact, f)
+			if String(e["zone_a"]) in ["left", "right"]:
+				_sparks(contact, f)
+			else:
+				_sparks_zone(ia, String(e["zone_a"]), f)
 			_burst(contact, Vector3.UP, f, ia, ib, String(e["zone_a"]))
 			var side: float = -1.0 if String(e["zone_a"]) == "left" else 1.0
 			_kick(ia, f, side)
@@ -103,7 +108,7 @@ func on_event(e: Dictionary, player: int) -> void:
 			var ti: int = int(e["truck"])
 			var f2: float = float(e["force"])
 			var p: Vector3 = zone_point(ti, String(e["zone"]))
-			_sparks(p, f2 * 0.8)
+			_sparks_zone(ti, String(e["zone"]), f2 * 0.8)
 			_burst(p, Vector3.UP, f2 * (1.2 if bool(e.get("thrown", false)) else 0.7), ti, -1, String(e["zone"]))
 			_kick(ti, f2 * 0.5, -1.0 if String(e["zone"]) == "left" else 1.0)
 			if ti == player:
@@ -122,9 +127,23 @@ func zone_point(i: int, zone: String) -> Vector3:
 	return trucks[i].global_transform * off
 
 
-func _sparks(pos: Vector3, force: float) -> void:
+## `follow`: as faiscas andam junto com este caminhao (soltas no mundo ficariam para tras, escondidas pelo bau).
+func _sparks(pos: Vector3, force: float, follow: Node3D = null) -> void:
 	if enabled and fx != null:
-		fx.sparks(pos, force, amount)
+		fx.sparks(pos, force, amount, follow)
+		if force >= 4.0:
+			fx.flash(pos, clampf(1.2 + force * 0.12, 1.2, 3.2), follow)
+
+
+## Batida de frente/traseira: faiscas nos DOIS cantos (a camera atras do bau so ve o que sai pelos lados).
+func _sparks_zone(i: int, zone: String, force: float) -> void:
+	if zone != "front" and zone != "rear":
+		_sparks(zone_point(i, zone), force, trucks[i])
+		return
+	var c: Vector3 = zone_point(i, zone)
+	var r: Vector3 = trucks[i].global_transform.basis.x * 1.15
+	_sparks(c + r, force * 0.6, trucks[i])
+	_sparks(c - r, force * 0.6, trucks[i])
 
 
 ## Pedacos voando: quantos pela forca (e pela qualidade). Saem do ponto, para cima e para o lado da zona.
@@ -137,13 +156,16 @@ func _burst(pos: Vector3, up: Vector3, force: float, ia: int, ib: int, zone: Str
 	var out: Vector3 = basis * Vector3(-1.0 if zone == "left" else (1.0 if zone == "right" else 0.0), 0.0, -1.0 if zone == "front" else 0.0)
 	var fwd: Vector3 = -basis.z
 	var ground: float = node.global_position.y
+	var carry: float = sim.trucks[ia].speed if sim != null and ia < sim.trucks.size() else 0.0
 	for k in n:
 		if _free.is_empty():
 			_recycle_oldest()
 		var slot: int = _free.pop_back()
-		var dir: Vector3 = (up * randf_range(0.6, 1.4) + out * randf_range(0.3, 1.2) + Vector3(randf_range(-0.6, 0.6), 0, randf_range(-0.6, 0.6))).normalized()
-		var v: Vector3 = dir * randf_range(3.5, 6.0 + force * 0.4) + fwd * randf_range(0.0, 4.0)
-		var size: float = randf_range(0.16, 0.42)
+		# para cima e para os lados: passa por cima/do lado do bau e cai atras (a camera do jogador ve)
+		var lateral: Vector3 = basis.x * (randf_range(0.5, 1.3) * (1.0 if randf() < 0.5 else -1.0))
+		var dir: Vector3 = (up * randf_range(0.9, 1.6) + out * randf_range(0.2, 0.9) + lateral).normalized()
+		var v: Vector3 = dir * randf_range(6.0, 9.0 + force * 0.4) + fwd * carry * randf_range(0.55, 0.95)
+		var size: float = randf_range(0.28, 0.65)
 		_shards.append({"pos": pos, "vel": v, "rot": Basis.from_euler(Vector3(randf() * TAU, randf() * TAU, 0)),
 			"spin": Vector3(randf_range(-14, 14), randf_range(-14, 14), randf_range(-14, 14)), "ttl": SHARD_LIFE,
 			"ground": ground + 0.02, "size": size, "slot": slot})

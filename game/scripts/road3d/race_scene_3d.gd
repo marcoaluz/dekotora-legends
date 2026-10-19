@@ -152,6 +152,7 @@ func _ready() -> void:
 	for t in sim.trucks:
 		lens.append(t.length)
 	_impact.setup(_fx, _trucks, lens, _traffic3d)
+	_impact.sim = sim
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2

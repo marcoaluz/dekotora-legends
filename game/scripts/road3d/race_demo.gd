@@ -223,7 +223,7 @@ func on_event(e: Dictionary, player: int, race_time: float) -> void:
 		return
 	if shot_dir != "" and String(e["type"]) == "traffic" and int(e["truck"]) == player and race_time - _last_close >= 2.0:
 		_last_close = race_time
-		_queue.append([_clock + 0.03, "batida_a"])
+		_queue.append([_clock + 0.1, "batida_a"])
 		_queue.append([_clock + 0.22, "batida_b"])
 		_queue.append([_clock + 0.6, "batida_c"])
 		return
