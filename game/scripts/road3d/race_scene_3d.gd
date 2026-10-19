@@ -59,6 +59,10 @@ var tod: TimeOfDay
 var _tunnel: Tunnel3D
 var _speed_fx: SpeedFx
 var _scrape_t: float = 0.0
+var _brake_fx: BrakeFx                  # T-144: fumaca dos pneus e marcas no asfalto na freada forte
+var _truck_sfx: Array[TruckSfx] = []    # T-144: buzina e freio de cada caminhao (os outros com volume pela distancia)
+var _horns: Array[String] = []          # som de buzina de cada caminhao (peca instalada ou a basica)
+var _was_hard_braking: bool = false
 
 
 func _ready() -> void:
@@ -127,6 +131,8 @@ func _ready() -> void:
 	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)
+	_brake_fx = BrakeFx.new()
+	add_child(_brake_fx)
 	_plates = LicensePlates.new()
 	add_child(_plates)
 	_plates.set_level(AtlasQuads.level_for(tod))
@@ -233,6 +239,10 @@ func _setup_audio() -> void:
 			if not online:
 				_rival_idx.append(k)
 			_rival_audio.append(_audio.make_rival_engine(_trucks[k], "i6_std"))
+		var sfx := TruckSfx.new()
+		var horn: String = gs.installed_horn() if k == player and not online else (_horns[k] if k < _horns.size() else "")
+		sfx.setup(self if k == player else _trucks[k], k == player, horn)
+		_truck_sfx.append(sfx)
 
 
 ## Corrida online: monta os caminhoes do grid recebido do servidor (pecas, tinta, bots).
@@ -252,6 +262,7 @@ func _spawn_field_online() -> void:
 			if d != null:
 				defs.append(d)
 		node.apply_loadout(defs)
+		_horns.append(_horn_of(defs))
 		var paint: String = String(entry.get("paint", "#e9eef5"))
 		if bool(entry["bot"]):
 			paint = FIELD_COLORS[i % FIELD_COLORS.size()].to_html(false)
@@ -338,11 +349,21 @@ func _spawn_field() -> void:
 			t.set_loadout(parts)
 			node.apply_loadout(defs)
 			node.set_paint_color(paint)
+			_horns.resize(i + 1)
+			_horns[i] = _horn_of(defs)
 			_bots.append(BotDriver.new(diff, 100 + i, xs[i], i == 1 and rival != null))
 		node.set_headlights(tod.headlights)
 		node.set_light_pattern(String(gs.profile.get("light_pattern", "steady")) if i == 0 else LightPatterns.IDS[i % LightPatterns.IDS.size()])
 		_trucks.append(node)
 		_prev.append(Vector2(t.z, t.x))
+
+
+## Buzina que a lista de pecas traz (PartDef.horn) ou a basica (T-144).
+static func _horn_of(defs: Array[PartDef]) -> String:
+	for d in defs:
+		if d != null and d.horn != "":
+			return d.horn
+	return "horn_air_basic"
 
 
 func _build_pause_menu() -> void:
@@ -500,6 +521,8 @@ func _update_audio(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	_audio.update(dt, t, _countdown)
 	_audio.update_events(sim.track.events, t.z + t.length * 0.5)
+	for k in _truck_sfx.size():
+		_truck_sfx[k].update(sim.trucks[k], dt)
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
@@ -568,6 +591,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		node.transform = path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11)
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
+		if _cam != null:
+			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights)
 	_traffic3d.refresh()
 
 
@@ -637,6 +662,11 @@ func _curve_feedback(t: TruckSim) -> void:
 		Input.vibrate_handheld(220 if t.escaping else 70)
 	if t.escaping:
 		_shake = maxf(_shake, 0.25)
+	if t.hard_braking:                         # T-144: freada forte treme de leve (e vibra no comeco)
+		_shake = maxf(_shake, 0.1 + 0.18 * t.brake_intensity)
+		if not _was_hard_braking:
+			Input.vibrate_handheld(int(30.0 + 50.0 * t.brake_intensity))
+	_was_hard_braking = t.hard_braking
 	_was_escaping = t.escaping
 	_was_warn_full = warn_full
 

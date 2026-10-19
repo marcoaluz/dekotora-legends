@@ -155,9 +155,9 @@ func send_commands(tick: int, cmd: Commands) -> void:
 	if debug_loss > 0.0 and randf() < debug_loss:
 		return
 	if debug_latency_ms > 0:
-		_delayed.append({"due": Time.get_ticks_msec() + debug_latency_ms / 2, "kind": "cmd", "args": [tick, cmd.steer, cmd.throttle, cmd.brake, cmd.passing]})
+		_delayed.append({"due": Time.get_ticks_msec() + debug_latency_ms / 2, "kind": "cmd", "args": [tick, cmd.steer, cmd.throttle, cmd.brake, cmd.passing, cmd.horn]})
 		return
-	rpc_id(1, "c_commands", tick, cmd.steer, cmd.throttle, cmd.brake, cmd.passing)
+	rpc_id(1, "c_commands", tick, cmd.steer, cmd.throttle, cmd.brake, cmd.passing, cmd.horn)
 
 
 func _process(delta: float) -> void:
@@ -169,7 +169,7 @@ func _process(delta: float) -> void:
 				match String(d["kind"]):
 					"cmd":
 						var a: Array = d["args"]
-						rpc_id(1, "c_commands", a[0], a[1], a[2], a[3], a[4])
+						rpc_id(1, "c_commands", a[0], a[1], a[2], a[3], a[4], a[5])
 					"snap":
 						snapshot_received.emit(d["args"])
 			else:
@@ -233,9 +233,9 @@ func c_start_race() -> void:
 
 
 @rpc("any_peer", "unreliable")
-func c_commands(tick: int, steer: float, throttle: float, brake: float, passing: bool) -> void:
+func c_commands(tick: int, steer: float, throttle: float, brake: float, passing: bool, horn: bool) -> void:
 	if is_server:
-		host.on_commands(multiplayer.get_remote_sender_id(), tick, steer, throttle, brake, passing)
+		host.on_commands(multiplayer.get_remote_sender_id(), tick, steer, throttle, brake, passing, horn)
 
 
 @rpc("any_peer", "reliable")

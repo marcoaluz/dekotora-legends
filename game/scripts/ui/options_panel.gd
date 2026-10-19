@@ -76,6 +76,7 @@ func _show(id: String) -> void:
 		"controls":
 			_slider(Tr.t("options.touch_size"), _s.touch_scale, 0.7, 1.5, 0.05, func(v: float) -> void: _s.touch_scale = v, true)
 			_hint(Tr.t("options.lane_hint"))
+			_hint(Tr.t("options.keys_hint"))
 		"graphics":
 			var bgs: Array[String] = MenuBackdrop.KINDS
 			_choice(Tr.t("options.menu_bg"), bgs.map(func(k: String) -> String: return Tr.t("options.menu_bg_" + k)), maxi(bgs.find(String(_s.menu_bg)), 0),

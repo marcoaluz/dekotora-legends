@@ -47,15 +47,18 @@ PAINT = "paint"
 
 
 # ---------------------------------------------------------------- materiais
-def build_atlas(tag: str):
-    """3 imagens 128x128 empacotadas no .glb: cor, ORM (G = rugosidade, B = metal) e emissão."""
+def build_atlas(tag: str, cells: dict | None = None):
+    """3 imagens 128x128 empacotadas no .glb: cor, ORM (G = rugosidade, B = metal) e emissão.
+    `cells`: outra tabela de células (máx. 16), ex. a da viatura (T-143); padrão CELLS."""
+    cells = cells or CELLS
+    assert len(cells) <= GRID * GRID, "atlas do trânsito: no máximo 16 células"
     size = GRID * CELL_PX
     col = np.zeros((size, size, 4), np.float32)
     orm = np.zeros((size, size, 4), np.float32)
     emi = np.zeros((size, size, 4), np.float32)
     col[..., 3] = orm[..., 3] = emi[..., 3] = 1.0
     uv = {}
-    for i, (name, (c, rough, metal, e)) in enumerate(CELLS.items()):
+    for i, (name, (c, rough, metal, e)) in enumerate(cells.items()):
         cx, cy = i % GRID, i // GRID
         sl = (slice(cy * CELL_PX, (cy + 1) * CELL_PX), slice(cx * CELL_PX, (cx + 1) * CELL_PX))
         col[sl][..., :3] = hex_to_rgb(c)

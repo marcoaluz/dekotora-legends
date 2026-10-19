@@ -186,10 +186,10 @@ func on_start_race(peer: int) -> void:
 	_broadcast_lobby(room)
 
 
-func on_commands(peer: int, tick: int, steer: float, throttle: float, brake: float, passing: bool) -> void:
+func on_commands(peer: int, tick: int, steer: float, throttle: float, brake: float, passing: bool, horn: bool = false) -> void:
 	var room: Room = _room_of(peer)
 	if room != null and room.state == Protocol.RoomState.RACING:
-		room.apply_command(peer, tick, steer, throttle, brake, passing)
+		room.apply_command(peer, tick, steer, throttle, brake, passing, horn)
 
 
 func on_action(peer: int, action: String, arg: String) -> void:

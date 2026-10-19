@@ -176,13 +176,13 @@ func _build_race(seed_: int) -> void:
 		slot += 1
 
 
-func apply_command(peer: int, tick: int, steer: float, throttle: float, brake: float, passing: bool) -> void:
+func apply_command(peer: int, tick: int, steer: float, throttle: float, brake: float, passing: bool, horn: bool = false) -> void:
 	if not members.has(peer):
 		return
 	var m: Member = members[peer]
 	if tick < m.ack_tick:
 		return                                  # comando antigo/duplicado
-	m.last_cmd = Commands.make(steer, throttle, brake, passing)
+	m.last_cmd = Commands.make(steer, throttle, brake, passing, horn)
 	m.ack_tick = tick
 
 

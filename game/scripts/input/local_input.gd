@@ -4,11 +4,13 @@ extends RefCounted
 ## pelo mesmo caminho: TouchControls escreve em `touch_*` e este arquivo mistura tudo.
 ## Controle por faixas (ATB-1): `steer` sai como -1/0/+1 SEGURADO; a simulacao detecta o toque
 ## (borda 0 -> lado): 1o toque liga a seta, 2o toque no mesmo lado executa a troca.
+## Buzina (T-144): tecla H (acao "horn") ou botao BUZINA na tela.
 
 var touch_steer: float = 0.0
 var touch_throttle: float = 0.0
 var touch_brake: float = 0.0
 var touch_passing: bool = false
+var touch_horn: bool = false
 const MIN_HOLD_MS: int = 70             # um toque curto dura ao menos 2 passos da simulacao (30/s)
 var _latch_dir: int = 0
 var _latch_until: int = 0
@@ -31,4 +33,5 @@ func poll() -> Commands:
 	var throttle: float = maxf(Input.get_action_strength("throttle"), touch_throttle)
 	var brake: float = maxf(Input.get_action_strength("brake"), touch_brake)
 	var passing: bool = Input.is_action_pressed("passing") or touch_passing
-	return Commands.make(steer, throttle, brake, passing)
+	var horn: bool = touch_horn or (InputMap.has_action("horn") and Input.is_action_pressed("horn"))
+	return Commands.make(steer, throttle, brake, passing, horn)

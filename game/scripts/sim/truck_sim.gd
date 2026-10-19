@@ -83,6 +83,15 @@ var cone_m: float = 0.0
 var scrape_t: float = 0.0
 var hit_t: float = 0.0
 var plate_t: float = 0.0
+## Buzina e freada forte (T-144): so estado para a apresentacao (som, fumaca, marcas) e para o transito abrir caminho.
+var horn: bool = false                  # buzina segurada neste tick (vem do comando; vai no snapshot)
+var hard_braking: bool = false          # freando forte agora (HardBrake)
+var brake_intensity: float = 0.0        # 0..1: som e fumaca
+var brake_speed0: float = 0.0           # m/s quando apertou o freio
+var brake_lost: float = 0.0             # m/s perdidos nesta freada (o "pssh" do freio a ar ao soltar)
+var brake_held: bool = false
+var hard_brake_started: bool = false    # bordas deste tick (RaceSim vira evento)
+var hard_brake_ended: bool = false
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
@@ -196,6 +205,8 @@ func grip() -> float:
 
 
 func step(dt: float, cmd: Commands, track: Track) -> void:
+	var speed_before: float = speed
+	horn = cmd.horn
 	# 0) curva: quanto acima da velocidade segura (raspa o pneu, desliza ate 0,5 m, escapa acima de +30%)
 	var curve: float = track.curve_at(z)
 	curve_ratio = CurveGrip.ratio(speed, curve, grip())
@@ -241,3 +252,4 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	gear = engine.gear
 	rpm = engine.rpm
 	boost = engine.boost
+	HardBrake.update(self, cmd.brake, speed_before, dt)    # T-144: freada forte (so estado)

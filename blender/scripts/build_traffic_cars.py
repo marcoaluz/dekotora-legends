@@ -1,4 +1,5 @@
-"""Carros de trânsito a partir de modelos de terceiros (T-124): Ascona, Falcon, SUV, Fumi SC e ônibus Jetset.
+"""Carros de trânsito a partir de modelos de terceiros (T-124): Ascona, Falcon, SUV, Fumi SC e ônibus Jetset;
+(T-143) viatura de polícia (Camry, padrão japonês fictício, barra de luzes "beacon") e jipe Suzuki.
 
 Os originais ficam em docs/Modelos Melhorados/ (FORA do Git; licenças e autores em game/assets/LICENCAS.md).
 Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado com cores lisas
@@ -7,7 +8,8 @@ Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado
 Uso:
   blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all \
       [--src-dir "docs/Modelos Melhorados"] [--out game/assets/vehicles/traffic] [--preview <pasta absoluta>]
-  --model: ascona | falcon | suv | fumi | bus | all
+  --model: ascona | falcon | suv | fumi | bus | police | jeep | all
+  (o jipe vem de docs/Novos modelos/, pasta trocável com --new-dir)
 
 Saída: game/assets/vehicles/traffic/car_<modelo>.glb, cada um com:
   - "body": pintura "paint_white" (o Godot troca a cor) + atlas "<tag>_trim" (vidro, cromo, plástico, luzes);
@@ -26,7 +28,9 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import mesh3d as M, scene  # noqa: E402
 from lib import traffic_classify as C  # noqa: E402
+from lib import traffic_jeep as J  # noqa: E402
 from lib import traffic_kit as K  # noqa: E402
+from lib import traffic_police as PO  # noqa: E402
 from lib import traffic_preview as P  # noqa: E402
 
 
@@ -156,6 +160,12 @@ SPECS = {
                  body_tris=4700, wheel_tris=900, paint="#d29a2e", min_wheel_part=0.05),
     "bus": dict(src="BUS+JETSET.fbx", rotz=180, length=13.28, prep=prep_bus, drop=BUS_DROP,
                 body_tris=7800, wheel_tris=1000, paint="#8a3fd0", min_wheel_part=0.08),
+    # T-143: viatura (sem pintura trocável; atlas próprio preto/branco; barra de luzes à parte) e jipe
+    "police": dict(src="nypd_toyota_camry_.blend", importer=PO.import_police, rotz=180, length=4.9, prep=PO.prep_police,
+                   drop=PO.DROP, body_tris=6400, own_wheels=True, cells=PO.POLICE_CELLS, extra_tris={"beacon": 420},
+                   paint="#ffffff"),
+    "jeep": dict(src_new="Carro/obj/obj.obj", importer=J.import_jeep, rotz=0, length=3.95, prep=J.prep_jeep,
+                 body_tris=4600, own_wheels=True, paint="#2c9a5a"),
 }
 
 
@@ -205,12 +215,15 @@ def build(key: str, spec: dict, args) -> None:
     tag = key
     spec["tag"] = tag
     name = "car_" + key
-    src = os.path.join(os.path.abspath(args.src_dir), spec["src"])
+    if "src_new" in spec:
+        src = os.path.join(os.path.abspath(args.new_dir), spec["src_new"])
+    else:
+        src = os.path.join(os.path.abspath(args.src_dir), spec["src"])
     if not os.path.isfile(src):
         raise SystemExit(f"original não encontrado: {src} (fica fora do Git, ver LICENCAS.md)")
     scene.reset_scene()
     C._IMG_CACHE.clear()          # as imagens de cada modelo têm os mesmos nomes (Image_0...)
-    objs = import_meshes(src)
+    objs = spec.get("importer", import_meshes)(src)
     K.unparent_apply(objs)
     drop = spec.get("drop", ())
     if "pick_x" in spec:
@@ -252,16 +265,24 @@ def build(key: str, spec: dict, args) -> None:
             K.decimate(w, spec["wheel_tris"] // 2)
             K.set_pivot(w, axle_pivot(w))
 
-    imgs, uv = K.build_atlas(tag)
+    extras = []
+    for ename, eobjs in spec.get("_extras", {}).items():      # T-143: barra de luzes da viatura ("beacon")
+        e = K.join(eobjs, ename)
+        K.weld(e, 1e-5)
+        K.decimate(e, spec["extra_tris"][ename])
+        PO.finalize_beacon(e, PO.beacon_material(tag))
+        extras.append(e)
+
+    imgs, uv = K.build_atlas(tag, spec.get("cells"))
     m_trim = K.trim_material(tag, imgs)
     m_paint = K.paint_material()
     for o in (body, wf, wr):
         K.finalize(o, m_paint, m_trim, uv)
-    path = K.export(name, body, [wf, wr], args.out)
+    path = K.export(name, body, [wf, wr] + extras, args.out)
     print(f"[{tag}] origem={tris_src} tris, escala={s:.3f}")
-    print(P.stats_line(tag, body, [wf, wr], path))
+    print(P.stats_line(tag, body, [wf, wr] + extras, path))
     if args.preview:
-        P.render_preview([body, wf, wr], os.path.abspath(args.preview), tag, spec["paint"])
+        P.render_preview([body, wf, wr] + extras, os.path.abspath(args.preview), tag, spec["paint"])
 
 
 def main():
@@ -269,6 +290,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="all")
     ap.add_argument("--src-dir", default="docs/Modelos Melhorados")
+    ap.add_argument("--new-dir", default="docs/Novos modelos")
     ap.add_argument("--out", default="game/assets/vehicles/traffic")
     ap.add_argument("--preview", default="", help="pasta ABSOLUTA para os renders de conferência (opcional)")
     args = ap.parse_args(argv)

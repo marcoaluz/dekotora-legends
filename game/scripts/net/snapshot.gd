@@ -6,7 +6,7 @@ extends RefCounted
 ##   u8 gear, u8 boost, u8 flags, u8 passing_charge, u8 draft, u8 lane, u8 signal(0..2 = -1/0/+1 +1),
 ##   u8 signal_time (centesimos de s), u8 tap_prev(0..2), u8 lane_change_time (centesimos),
 ##   u32 ack (ultimo comando aplicado)
-##   · u8 n_cars · por carro: f32 z, f32 x.   flags: bit0 passing, bit1 offroad, bit2 chegou
+##   · u8 n_cars · por carro: f32 z, f32 x.   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144)
 ## O dano completo NAO vai aqui: so quando muda, por evento ("damage").
 
 static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
@@ -23,7 +23,8 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_u16(clampi(roundi(t.rpm), 0, 65535))
 		b.put_u8(clampi(t.gear, 0, 255))
 		b.put_u8(clampi(roundi(t.boost * 255.0), 0, 255))
-		var flags: int = (1 if t.passing_active else 0) | (2 if t.offroad else 0) | (4 if t.finish_position > 0 else 0)
+		var flags: int = (1 if t.passing_active else 0) | (2 if t.offroad else 0) | (4 if t.finish_position > 0 else 0) \
+			| (8 if t.horn else 0) | (16 if t.hard_braking else 0)
 		b.put_u8(flags)
 		b.put_u8(clampi(roundi(t.passing_charge * 255.0), 0, 255))
 		b.put_u8(clampi(roundi(t.draft * 255.0), 0, 255))
@@ -61,6 +62,8 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 		t["passing"] = (flags & 1) != 0
 		t["offroad"] = (flags & 2) != 0
 		t["finished"] = (flags & 4) != 0
+		t["horn"] = (flags & 8) != 0
+		t["hard_braking"] = (flags & 16) != 0
 		t["passing_charge"] = float(b.get_u8()) / 255.0
 		t["draft"] = float(b.get_u8()) / 255.0
 		t["lane"] = b.get_u8()
@@ -102,6 +105,8 @@ static func apply_to(sim: RaceSim, snap: Dictionary, skip_idx: int = -1) -> void
 		ts.boost = float(t["boost"])
 		ts.passing_active = bool(t["passing"])
 		ts.offroad = bool(t["offroad"])
+		ts.horn = bool(t["horn"])
+		ts.hard_braking = bool(t["hard_braking"])
 		ts.passing_charge = float(t["passing_charge"])
 		ts.draft = float(t["draft"])
 		_apply_lane(ts, t)

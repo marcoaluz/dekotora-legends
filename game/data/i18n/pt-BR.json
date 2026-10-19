@@ -358,6 +358,8 @@
  "options.cat_audio": "Áudio",
  "options.cat_account": "Conta",
  "options.lane_hint": "Troca de faixa: toque uma vez no lado para ligar a seta, toque de novo para trocar.",
+ "options.keys_hint": "Teclado: W ou seta para cima acelera · S ou seta para baixo freia · A/D ou setas trocam de faixa · Espaço Passing · H buzina · Esc pausa. Controle: gatilhos aceleram e freiam, A = Passing, X = buzina.",
+ "touch.horn": "BUZINA",
  "options.quality": "Qualidade gráfica",
  "options.quality_low": "Baixa",
  "options.quality_mid": "Média",

@@ -59,6 +59,7 @@ func step(dt: float = FIXED_DT) -> void:
 		trucks[i].step(dt, commands[i], track)
 		if not trucks[i].event_contact.is_empty():
 			_event_hit(i, trucks[i].event_contact)
+		_brake_events(i)
 	if traffic != null and not trucks.is_empty():
 		var lead: float = trucks[0].z
 		var rear: float = trucks[0].z
@@ -103,6 +104,15 @@ func _event_hit(i: int, c: Dictionary) -> void:
 	else:
 		t.cargo_touch()
 	events.append(out)
+
+
+## Freada forte (T-144): eventos de inicio e fim (a apresentacao tambem le o estado direto, inclusive na predicao).
+func _brake_events(i: int) -> void:
+	var t: TruckSim = trucks[i]
+	if t.hard_brake_started:
+		events.append({"type": "hard_brake", "truck": i, "speed": t.brake_speed0, "intensity": t.brake_intensity})
+	elif t.hard_brake_ended:
+		events.append({"type": "brake_release", "truck": i, "lost": t.brake_lost})
 
 
 ## Vacuo: atras de outro caminhao/carro, na mesma linha, a menos de DRAFT_RANGE.

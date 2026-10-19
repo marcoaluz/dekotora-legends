@@ -1,6 +1,7 @@
 class_name TouchControls
 extends Control
-## Botoes na tela para o celular: < > (esquerda), acelerar (grande), frear e Passing (direita).
+## Botoes na tela para o celular: < > (esquerda) com a BUZINA entre eles e acima (como no original: seta · buzina · seta),
+## acelerar (grande), frear e Passing (direita). A buzina fica do lado do polegar esquerdo, porque o direito segura o acelerador.
 ## Multitoque: cada dedo guarda o botao em que comecou. Escreve em um LocalInput.
 ## Tamanho ajustavel por Settings.touch_scale; semitransparente para nao esconder a estrada.
 
@@ -11,7 +12,7 @@ const RING := Color(1, 1, 1, 0.45)
 var target: LocalInput
 var _buttons: Dictionary = {}      # nome -> {center: Vector2, radius: float}
 var _fingers: Dictionary = {}      # indice do dedo -> nome do botao
-var _labels: Dictionary = {"left": "", "right": "", "throttle": "GO", "brake": "FREIO", "passing": "P"}
+var _labels: Dictionary = {"left": "", "right": "", "throttle": "GO", "brake": "FREIO", "passing": "P", "horn": "BUZINA"}
 var _font: Font
 
 
@@ -19,6 +20,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_font = UiTheme.heading_font(true)
+	_labels["horn"] = Tr.t("touch.horn")
 	get_viewport().size_changed.connect(layout)
 	layout()
 
@@ -36,6 +38,7 @@ func layout() -> void:
 		"throttle": {"center": Vector2(w - 55, h - 55), "radius": 40.0 * s},
 		"brake": {"center": Vector2(w - 130, h - 32), "radius": 26.0 * s},
 		"passing": {"center": Vector2(w - 48, h - 135), "radius": 24.0 * s},
+		"horn": {"center": Vector2(99, h - 50 - 70.0 * s), "radius": 22.0 * s},     # T-144: entre e acima das setas
 	}
 	queue_redraw()
 
@@ -79,6 +82,7 @@ func _apply() -> void:
 	target.touch_throttle = 1.0 if "throttle" in held else 0.0
 	target.touch_brake = 1.0 if "brake" in held else 0.0
 	target.touch_passing = "passing" in held
+	target.touch_horn = "horn" in held
 	queue_redraw()
 
 
@@ -89,7 +93,7 @@ func _draw() -> void:
 		var r: float = _buttons[name]["radius"]
 		var on: bool = name in held
 		draw_circle(c, r, BTN_PRESSED if on else BTN_COLOR)
-		var ring: Color = UiTheme.PINK if name == "throttle" else (UiTheme.CYAN if name == "passing" else RING)
+		var ring: Color = UiTheme.PINK if name == "throttle" else (UiTheme.CYAN if name == "passing" else (UiTheme.GOLD if name == "horn" else RING))
 		draw_arc(c, r, 0.0, TAU, 40, ring if not on else Color.WHITE, 1.5 if name == "throttle" else 1.0, true)
 		if name == "left" or name == "right":            # seta desenhada (chevron)
 			var d: float = -1.0 if name == "left" else 1.0
@@ -97,6 +101,6 @@ func _draw() -> void:
 			draw_polyline(PackedVector2Array([c + Vector2(-d * k * 0.6, -k), c + Vector2(d * k * 0.6, 0), c + Vector2(-d * k * 0.6, k)]), Color(1, 1, 1, 0.9), 2.5, true)
 			continue
 		var text: String = _labels[name]
-		var fs: int = 15 if name == "throttle" else 11
+		var fs: int = 15 if name == "throttle" else (8 if name == "horn" else 11)
 		var sz: Vector2 = _font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
 		draw_string(_font, c + Vector2(-sz.x * 0.5, fs * 0.36), text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, 0.92))

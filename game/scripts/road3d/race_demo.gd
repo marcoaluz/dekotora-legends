@@ -3,6 +3,7 @@ extends RefCounted
 ## Ferramenta de depuracao das capturas (nao entra no jogo normal). Argumentos depois de `--`:
 ##   --demo=lanes   o jogador toca a seta/troca sozinho (direita, direita, esquerda, esquerda...)
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
+##   --demo=brake   acelera, buzina (1 a 2,5 s) e da uma freada forte de 4,5 a 7,5 s (T-144; use com --start-speed=28)
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
 ##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
 ##   --cam=top|high|side camera presa ao caminhao do jogador: de cima (30 m), bem alta (75 m) ou alta de lado (T-132)
@@ -198,6 +199,9 @@ func command(race_time: float) -> Commands:
 	for tap in _taps:
 		if race_time >= float(tap[0]) and race_time < float(tap[0]) + 0.12:
 			steer = float(tap[1])
+	if mode == "brake":
+		var braking: bool = race_time >= 4.5 and race_time < 7.5
+		return Commands.make(0.0, 0.0 if braking else 1.0, 1.0 if braking else 0.0, false, race_time >= 1.0 and race_time < 2.5)
 	return Commands.make(steer, 0.85, 0.0)
 
 
@@ -235,6 +239,13 @@ func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 		_queue.append([_clock + 0.05, "troca_a"])
 		_queue.append([_clock + 0.35, "troca_b"])
 		_queue.append([_clock + 0.65, "troca_c"])
+	if player_truck.hard_braking and not _count.has("freada_marcada"):       # T-144: fumaca e marcas
+		_count["freada_marcada"] = true
+		_queue.append([_clock + 0.6, "freada_a"])
+		_queue.append([_clock + 1.4, "freada_b"])
+	if player_truck.horn and not _count.has("buzina_marcada"):
+		_count["buzina_marcada"] = true
+		_queue.append([_clock + 0.3, "buzina"])
 	if player_truck.signal_dir != 0 and not _count.has("seta_%d" % _last_lane_changes):
 		_count["seta_%d" % _last_lane_changes] = true
 		_queue.append([_clock + 0.1, "seta"])

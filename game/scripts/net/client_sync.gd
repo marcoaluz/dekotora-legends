@@ -160,6 +160,9 @@ func interpolate(now_ms: int, dt: float) -> void:
 		ts.boost = float(tb["boost"])
 		ts.passing_active = bool(tb["passing"])
 		ts.offroad = bool(tb["offroad"])
+		ts.horn = bool(tb["horn"])                    # T-144: buzina e freada forte dos outros (som e fumaca)
+		ts.hard_braking = bool(tb["hard_braking"])
+		ts.brake_intensity = 0.7 if ts.hard_braking else 0.0
 		ts.draft = float(tb["draft"])
 		ts.passing_charge = float(tb["passing_charge"])
 		Snapshot._apply_lane(ts, tb)

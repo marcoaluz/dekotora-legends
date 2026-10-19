@@ -39,6 +39,7 @@ const ACCEL: float = 3.0                 # m/s^2 para voltar a velocidade de cru
 const BRAKE: float = 7.0                 # m/s^2 ao alcancar um mais lento
 const CLOSURE_LOOK: float = 220.0        # T-139: m ahead where a car sees a closed lane and moves out of it
 const CLOSURE_STOP_M: float = 6.0        # m kept in front of the closure when it cannot move out (waits for a gap)
+const HORN_RANGE: float = 55.0           # T-144: m a frente do nariz de um caminhao buzinando em que o carro abre caminho
 
 
 class Car:
@@ -59,6 +60,7 @@ class Car:
 var cars: Array[Car] = []
 var density: int = Density.NORMAL
 var hits: int = 0                          # contagem de batidas (debug / testes)
+var honk_yields: int = 0                   # carros que sairam da frente por causa da buzina (testes)
 var events: TrackEvents = null             # eventos de pista (T-139); null = pista livre
 var _rng := RandomNumberGenerator.new()
 
@@ -187,6 +189,17 @@ func _closer(best: Dictionary, gap: float, other_speed: float, my_speed: float) 
 	return best
 
 
+## Algum caminhao buzinando logo atras de `c`, na mesma linha (ate HORN_RANGE da traseira do carro ao nariz dele)?
+func _honked(c: Car, trucks: Array) -> bool:
+	for t in trucks:
+		var tr: TruckSim = t
+		if tr.horn and absf(tr.x - c.x) < (TruckSim.WIDTH_X + c.width_x) * 0.5:
+			var gap: float = c.z - (tr.z + tr.length)
+			if gap > -1.0 and gap < HORN_RANGE:
+				return true
+	return false
+
+
 ## Algum caminhao ocupa a faixa `lane` ao lado de `c` (com folga de 6 m na frente e atras)?
 func _truck_beside(lane: int, c: Car, trucks: Array) -> bool:
 	for t in trucks:
@@ -219,6 +232,14 @@ func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void
 						break
 			if not moved:
 				target_speed = minf(target_speed, float(blk["speed"]))
+		elif absf(c.x - LANES[c.lane]) < 0.05 and _honked(c, trucks):
+			# buzina de um caminhao logo atras (T-144): sai da frente mais cedo, para o lado que estiver livre
+			for nl in [c.lane - 1, c.lane + 1]:
+				if nl >= 0 and nl < LANES.size() and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) \
+						and not _closed(nl, c.z, c.z + CLOSURE_LOOK):
+					c.lane = nl
+					honk_yields += 1
+					break
 		c.speed = move_toward(c.speed, target_speed, (ACCEL if target_speed > c.speed else BRAKE) * dt)
 		c.z += c.speed * dt
 		var target_x: float = LANES[c.lane]
