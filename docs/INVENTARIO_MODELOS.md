@@ -16,11 +16,12 @@ alterado nas pastas originais). Análises anteriores: `docs/NOVOS_MODELOS.md` (T
 | `docs/Modelos Melhorados/JAC+1045+Truck.*` (.blend, .fbx, .glb) | Caminhão leve japonês/chinês: só cabine e chassi | 69 mil | Não (só o emblema JAC, já apagado) | Não | Sim: caminhão base **Canter**, cabines **curta** e **jac** (T-125, T-129), rodas e caixa de ferramentas (T-126) |
 | `docs/Modelos Melhorados/BUS+JETSET.fbx` / `JETSET.dae` | Ônibus rodoviário (Jetset, Indonésia) | 143 mil | Não | Não (sem letreiro de destino) | Sim: tráfego `car_bus.glb` (T-124) |
 | `docs/Modelos Melhorados/kenworth_w990_truck.glb` (+ pasta com `.blend`) | Cavalo mecânico americano Kenworth W990 com carreta | 2,17 milhões | Não | Não | Em parte: cabine **americana** (T-129) e 6 peças (T-126). O resto fica fora (marca, peso) |
-| `docs/Modelos Melhorados/nypd_toyota_camry_.blend` | Viatura de polícia de Nova York (Toyota Camry) | 1,53 milhão | Sim: textura com **foto de uma placa real de Nova York** | Só o giroflex | **Não** (marca, polícia real, peso) |
+| `docs/Modelos Melhorados/nypd_toyota_camry_.blend` | Viatura de polícia de Nova York (Toyota Camry) | 1,53 milhão | Sim: textura com **foto de uma placa real de Nova York** | Só o giroflex | **Sim (T-143)**: viatura `car_police.glb` **só no acidente**, 7,3 mil triângulos, sem NYPD/Toyota/placa/interior, pintura preto/branco genérica e giroflex vermelho nossos |
 | `docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.*` (+ `.usdz`, pastas) | Bonde urbano (CAF Urbos 3), 35 m | 71 mil | Não | Não: **só o vagão**, sem postes, trilhos, plataforma ou placas | **Não** (ver seção 3) |
 | `docs/Novos modelos/Cabine/CF_500_complete.*` (.3dm, .stp, .stl + 3 renders) | Cabine "cara chata" International CF500 | 610 mil | Não | Não | Sim: cabine **chata**, a padrão do jogo (T-119) |
 | `docs/Novos modelos/Van+01/` (FBX, OBJ, .max, texturas, prévias) | Furgão estilo Peugeot Partner | 504 mil | Não (as "Decal" são grafismos de lataria) | Não | Sim: tráfego `car_van01.glb` (T-121) |
-| `docs/Novos modelos/Carro/` (.blend, FBX, OBJ, STL, 198 texturas) | Jipe Suzuki Samurai (Gypsy) | 436 mil | Não | Não | **Ainda não** (pode virar tráfego: precisa apagar "SUZUKI" da grade) |
+| `docs/Novos modelos/Carro/` (.blend, FBX, OBJ, STL, 198 texturas) | Jipe Suzuki Samurai (Gypsy) | 436 mil | Não | Não | **Sim (T-143)**: tráfego `car_jeep.glb` (5,1 mil triângulos, "SUZUKI" apagado, placa fictícia) |
+| `docs/Novas Melhorias/Carro batido/model_download+(24).obj` (T-143) | **Picape com a frente amassada** (malha única sem materiais, UV nem normais) | 80 mil | Não | Não | **Sim (T-143)**: `car_wreck.glb` no acidente (refeita em voxels, 6 mil triângulos, cores lisas) |
 | `docs/Novos modelos/Caminhão/canter.obj` | Mitsubishi Canter antigo com baú | 130 mil | Não | Não | **Não**: extraído de outro jogo (Ninja Ripper), risco legal |
 | `Downloads\Tunnel.obj` + `Tunnel.mtl` (6,6 MB, **fora do projeto**) | **Túnel** redondo de 2 faixas com calçadas, luminárias, tubulação no teto e **3 pórticos de semáforo de faixa** | 105 mil | Não | Sim: os 3 **semáforos de faixa** (textura `stop-light-ge0a8c105d_1920.png`, ausente) | **Não**: licença desconhecida |
 | `Downloads\van.abc` (Alembic, 1,7 MB, **fora do projeto**) | **Não é uma van**: é um **caminhão de carroceria aberta de madeira, 3 eixos (6 rodas)**, estilo Índia/Sudeste Asiático, com chão, estrada e fundo de estúdio | 62 mil (65% são as 6 rodas) | Não | Não | **Não**: licença desconhecida |
@@ -97,4 +98,5 @@ Nenhum dos dois foi copiado para o projeto. Foram só abertos no Blender em segu
    vieram junto (estavam em outro PC).
 2. A pasta `Downloads\Ge\` pode ser apagada por você se quiser liberar 380 MB: é só cópia zipada do que já está em
    `docs/Modelos Melhorados/` (eu não apaguei nada).
-3. O jipe Suzuki (`docs/Novos modelos/Carro/`) ainda pode virar carro do trânsito, se você quiser (1 sessão).
+3. ~~Jipe Suzuki~~ FEITO na T-143 (tráfego), junto com a viatura e o carro batido no acidente. Os três são "Royalty Free
+   License (no AI)", confirmado pelo Marco em 2026-10-19 (`game/assets/LICENCAS.md`).
