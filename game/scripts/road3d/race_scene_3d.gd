@@ -119,6 +119,9 @@ func _ready() -> void:
 	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
 	add_child(signs)
 	signs.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray(), String(route.id) if route != null else "")
+	var kit := KitProps3D.new()                   # T-146: outdoors e muros listrados nas bocas dos tuneis
+	add_child(kit)
+	kit.build(path, scenery, tod, tunnels)
 	var events3d := TrackEvents3D.new()           # T-139: acidente, obras, estreitamento (mesma lista da simulacao)
 	add_child(events3d)
 	events3d.build(path, tod)

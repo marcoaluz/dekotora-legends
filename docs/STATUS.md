@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (240) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (245) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -31,6 +31,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
 | Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
+| Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -146,6 +147,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   **ouvir** os 4 sons novos (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble` em
   `game/assets/audio/sfx/crash/`). Decidir se os bots também buzinam. **Gerar o APK de novo** (protocolo de rede versão 3).
 
+- **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
+  outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as
+  barreiras listradas nas obras/bocas de túnel e os pórticos de treliça. A mureta contínua continua a feita por código (o pacote
+  "Metais" é de barreiras de obra, não de guard-rail).
+
 - **T-139 (eventos de pista):** confirmar a regra das obras (60 km/h; passar rápido na chapa de aço custa carga; alternativas: multa em ¥ ou só visual), a chance de 45% de um evento extra por corrida, as posições dos eventos fixos e se quer viatura de polícia no acidente. **Gerar o APK de novo** (o protocolo de rede passou para a versão 2). Autorizar o gasto no ElevenLabs para os 5 sons novos (`python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`).
 
 - **T-138:** escolher o fundo padrão da tela inicial (A posto à noite, B rodovia; compare `docs/capturas_t138/depois_960x540/menu.png`
@@ -221,6 +227,20 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   Chave "Faíscas, pedaços e fumaça dos pneus" em Opções > Gráficos. Medido (modo médio, litoral, sem vsync limitado a 75):
   corrida normal sem diferença (314–318 chamadas com e sem os efeitos); na batida o máximo do período sobe 336 → 342; na freada
   328 → 334; FPS igual (75). Testes `tests/test_impacts.gd` (15). Capturas `docs/capturas_t141/`.
+
+- **T-146 (2026-10-19): modelos de `docs/Novas Melhorias` (Metais, Placas, Placão) no jogo** (Royalty Free, no AI; inventário
+  em `docs/INVENTARIO_MODELOS.md`, créditos em `game/assets/LICENCAS.md`). Gerador: `blender/scripts/build_roadside_kit.py`
+  (14 .glb em `assets/scenery/kit/`, 60–280 triângulos cada, só geometria + UV; texturas `assets/textures/kit/` 1024/512 px
+  comprimidas na VRAM; determinístico, conferido 2x). Jogo: `road3d/roadside_kit.gd` (materiais pelo nome, malhas em cache,
+  formatos das chapas, artes), `road3d/mesh_batch.gd` (junta peças por bloco de pista e material), `road3d/kit_props_3d.gd`
+  (outdoors + muros das bocas de túnel); `RoadSigns` (chapas e postes do pacote), `RoadFurniture` (pórtico de treliça),
+  `EventProps`/`TrackEvents3D` (barreiras listradas nas obras, cavaletes e destroços no acidente, muro no estreitamento),
+  `RoadMesh` (vidro com moldura na barreira de som), `GlbMesh` (agora mantém as tangentes: mapa de normais). `--no-kit` volta ao
+  visual antigo. Medido (modo médio, sem vsync, `--fps-log`): mesmo quadro parado em 640 m com/sem kit (`measure_roadside_spot.sh`)
+  litoral 425 → 428 chamadas, viaduto 459 → 461, montanha 466 → 470; triângulos +0,2 a +5 mil; textura 42,8 → 46,0 MB (+3,2),
+  vídeo +1,5 a +4 MB; FPS no ruído (258–291). Andando (`measure_roadside.sh`, 300 → 550 m): litoral ~283 → ~297, viaduto ~305 →
+  ~308, montanha ~298 → ~300 (o sorteio de eventos e o trânsito variam entre execuções). Testes `tests/test_roadside_kit.gd` (5).
+  Capturas `docs/capturas_t146/`. Pendências: aprovar visual/artes; medir no celular (APK).
 - **T-139 (2026-10-18): eventos de pista** (acidente, obras, estreitamento 3 → 2 faixas). Simulação: `sim/track_events.gd`
   (dados, intervalo fechado por z, sorteio pela semente, folga do prazo, limite das obras) e `sim/event_contact.gd` (cones, batida
   no veículo parado/barreira, raspada na beirada, parede do fim de faixa, chapas de aço); `TruckSim` recusa trocar para faixa

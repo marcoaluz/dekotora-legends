@@ -190,3 +190,23 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble`).
 - Números em `docs/BALANCEAMENTO.md` (seção "Batidas: força e arremesso").
 
+## 2026-10-19 — T-146: barreiras, placas e "Placão" de `docs/Novas Melhorias` (Royalty Free, no AI)
+
+- **O pacote "Metais" não é guard-rail**: são barreiras de OBRA listradas e cavaletes. Por isso a **mureta contínua** e o
+  guard-rail do litoral continuam os feitos por código (seguem as curvas sem emenda e custam 0 chamada a mais); as barreiras do
+  pacote entram onde fazem sentido: obras (fileira contínua no lugar dos cones espaçados, depois do afunilamento), acidente
+  (cavaletes + destroços), estreitamento (muro onde a faixa acaba) e bocas dos túneis (muro listrado na ponta da mureta, como
+  nas vias expressas japonesas). A simulação não muda: as peças ficam no intervalo fechado que ela já usa.
+- **Placas**: só a geometria do pacote (chapas com borda e poste); as faces continuam as japonesas fictícias da T-130 (a
+  textura do pacote é uma captura de tela de propaganda com placas ocidentais). Octógono, braçadeiras e cintas ficaram de fora
+  (o Japão não usa octógono na via expressa; braçadeiras ficam atrás da placa e eram 70% dos triângulos).
+- **Placão** = pórtico de treliça americano: a treliça substitui as vigas de caixa dos pórticos e vira as pernas dos
+  **outdoors** novos; as placas americanas (I-96, Detroit) não entram. **Outdoors** com arte trocável em PNG (4 artes fictícias
+  nossas: 銀河運輸, 街道ラーメン, 安全運転, デコトラ祭), ~1 a cada 1,15 km, acesos à noite (sem luz por pixel). Proposta: o Marco
+  pode trocar as artes (`game/assets/scenery/billboards/` ou `user://billboards/`).
+- O vidro com moldura do `Grade1.png` (mesmo `.rar`) passou para a barreira de som do viaduto.
+- Materiais feitos no código pelo NOME do material do .glb (`RoadsideKit`); peças pequenas de modelos diferentes juntadas por
+  bloco de pista e por material (`MeshBatch`): 1 chamada por bloco visível. `--no-kit` volta ao visual antigo (comparar/medir).
+- A barreira listrada tem um pouco de brilho próprio (tinta refletiva), mais à noite; a textura original é muito escura no
+  renderizador Compatibility, então a cor foi clareada (×1,3).
+

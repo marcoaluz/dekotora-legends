@@ -8,6 +8,8 @@ extends Node3D
 ##   barricade stripes)  ·  lights (MultiMesh, additive, blinking in the shader: hazards, flares, beacons, LED arrows)
 ##   + accident: 2 stopped cars (traffic .glb with 4 surfaces each).
 ## No per-pixel light (unshaded + day level, like the road signs): cheap on the Compatibility renderer.
+## T-146: + kit (RoadsideKit): striped concrete barriers along the works, metal A-frames and debris at the accident,
+## striped wall + barriers where a lane ends: one more draw call per event (one MeshBatch). --no-kit = old look.
 
 const RANGE_M: float = 700.0           # visibility range of an event group (signs start WARN_M before it)
 const CAR_RANGE_M: float = 330.0
@@ -66,10 +68,13 @@ var lights: Array = []                # [Transform3D, Rect2, Color (a = phase)]
 var solid := SurfaceTool.new()
 var _solid_used: bool = false
 var _root: Node3D
+var _tod: TimeOfDay
+var _kit: MeshBatch                   # kit pieces of the event being built (null = disabled)
 
 
 func build(path_: TrackPath, tod: TimeOfDay) -> void:
 	path = path_
+	_tod = tod
 	events = path.track.events
 	level = AtlasQuads.level_for(tod)
 	if events == null or events.is_empty():
@@ -161,6 +166,19 @@ func _vert(v: Vector3, n: Vector3, col: Color) -> void:
 	_solid_used = true
 
 
+## Kit model (RoadsideKit) at `xf`, in the batch of the event being built. False when the kit is off.
+func kit(model: String, xf: Transform3D) -> bool:
+	if _kit == null:
+		return false
+	_kit.add(RoadsideKit.mesh(model, _tod), xf, 0.0)
+	count("kit_" + model)
+	return true
+
+
+func kit_on() -> bool:
+	return _kit != null
+
+
 ## Traffic car model standing still (accident). `yaw` rad to the left over the road direction.
 func stopped_car(model: String, z: float, lat_m: float, yaw: float, paint_col: Color) -> Node3D:
 	var ps: PackedScene = load("%s%s.glb" % [Traffic3D.DIR, model]) as PackedScene
@@ -196,9 +214,12 @@ func _begin(k: int) -> void:
 	solid = SurfaceTool.new()
 	solid.begin(Mesh.PRIMITIVE_TRIANGLES)
 	_solid_used = false
+	_kit = MeshBatch.new(1.0e9, RANGE_M) if RoadsideKit.enabled() else null
 
 
 func _commit() -> void:
+	if _kit != null:
+		_kit.commit(_root)
 	faces.commit()
 	faces.visibility_range_end = RANGE_M
 	_root.add_child(faces)

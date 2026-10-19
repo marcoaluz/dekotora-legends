@@ -33,6 +33,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-139] Eventos de pista: acidente, obras (limite 60 km/h) e estreitamento 3 → 2 faixas; simulação, rede (servidor sorteia), bots, trânsito, visual (3 chamadas por evento), HUD, sons e prazo (concluída em 2026-10-18, `tests/test_track_events.gd`, `docs/capturas_t139/`)
 - [x] [T-141] Impacto das batidas: força no espírito do Art Truck Battle (empurrão de faixa entre caminhões, carro do trânsito arremessado na simulação), faíscas, clarão, pedaços de cromo/lanterna/vidro, chacoalhada, tremor e sons em camadas (4 sons novos no ElevenLabs) (concluída em 2026-10-19, `tests/test_impacts.gd`, `docs/capturas_t141/`)
 - [x] [T-144] Freada forte (som de freio, "pssh" ao soltar, fumaça dos pneus, marcas no asfalto) e buzina (tecla H / botão X / botão BUZINA, ícones no HUD, trânsito abre caminho, vai pela rede) (concluída em 2026-10-19)
+- [x] [T-146] Modelos de `docs/Novas Melhorias` (Metais, Placas, Placão): barreiras listradas nas obras/acidente/estreitamento e nas bocas dos túneis, chapas e postes reais nas placas, pórticos de treliça, outdoors com arte trocável, vidro com moldura na barreira de som (concluída em 2026-10-19, `tests/test_roadside_kit.gd`, `docs/capturas_t146/`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)
