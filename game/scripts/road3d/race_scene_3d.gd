@@ -87,6 +87,8 @@ func _ready() -> void:
 		player = Net.pending_truck
 	else:
 		var track: Track = route.build_track() if route != null else Track.make_test_track()
+		if "--no-sections" in OS.get_cmdline_user_args():  # T-153 depuracao: pista sem os trechos de 2 faixas (medir custo)
+			track.set_lane_sections([])
 		track.events = RaceDemo.track_events(OS.get_cmdline_user_args(), route, track)   # T-139 (--event=, --no-events)
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 		var fake: Dictionary = RaceDemo.fake_contract(OS.get_cmdline_user_args(), route)
@@ -110,9 +112,17 @@ func _ready() -> void:
 	var scenery: StringName = route.scenery if route != null else &"city"
 	var world: Dictionary = WorldEnv.create(self, false, tod, scenery == &"mountain")
 	var tunnels: Array[Vector2] = route.tunnels if route != null else ([] as Array[Vector2])
+	var bridges: Array[Vector2] = route.bridges if route != null else ([] as Array[Vector2])   # T-153
+	if sim.track.lane_sections.is_empty():
+		bridges = []
 	var road := RoadMesh.new()
 	add_child(road)
+	road.bridges = bridges
 	road.build(path, scenery, tod, tunnels)
+	if not bridges.is_empty():
+		var structures := SectionStructures3D.new()  # T-153: pilares, longarinas e cabeceiras da ponte
+		add_child(structures)
+		structures.build(path, bridges, tod)
 	var furniture := RoadFurniture.new()
 	add_child(furniture)
 	furniture.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray())
@@ -136,6 +146,7 @@ func _ready() -> void:
 	city.build(path, 21, scenery, tod)
 	var side := Roadside3D.new()
 	add_child(side)
+	side.bridges = bridges
 	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)

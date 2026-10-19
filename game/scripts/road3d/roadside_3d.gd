@@ -14,6 +14,7 @@ const POOL := "pool"              # chave dos grupos das pocas de luz
 
 var path: TrackPath
 var tod: TimeOfDay
+var bridges: Array[Vector2] = []  # T-153 (RouteDef.bridges): nada de arvore/pedra em cima do mar
 var _pool_mesh: PlaneMesh
 var _lamp_off: ArrayMesh
 
@@ -30,10 +31,18 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 		var xu: float = float(o["x"])
 		if RoadMesh.in_tunnel(z, tunnels, 6.0):
 			continue                                  # dentro do tunel nao ha postes nem arvores
+		var k: String = String(o["kind"])
+		if RoadMesh.in_tunnel(z, bridges, 12.0) and k != "lamp_post":
+			continue                                  # T-153: ponte (embaixo e o mar)
+		if LaneSections.at(path.track.events, z, 4.0) != null:   # T-153: trecho de 2 faixas
+			if k == "guardrail" or k == "sign_green" or (deck > 0.0 and k != "lamp_post" and absf(xu) * Track.ROAD_HALF_WIDTH_M < RoadMesh.BARRIER_IN + 2.0):
+				continue
+			if k == "lamp_post":                      # o poste vai para cima da mureta que estreitou
+				var p: Vector3 = LaneSections.profile(path.track.events, z)
+				xu = signf(xu) * ((p.x if xu < 0.0 else p.y) + 0.35) / Track.ROAD_HALF_WIDTH_M
 		var outside: bool = absf(xu) * Track.ROAD_HALF_WIDTH_M > RoadMesh.BARRIER_IN
 		var base: Vector3 = path.world_point(z, xu, -deck if outside else 0.0)
 		var yaw: float = path.yaw_at(z)
-		var k: String = String(o["kind"])
 		var model: String = k
 		var b := Basis(Vector3.UP, yaw)
 		match k:
@@ -89,7 +98,7 @@ func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator, d
 		var sc: float = rng.randf_range(0.6, 1.3)
 		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3.ONE * sc)
 		var left: Vector3 = path.world_point(z, -rng.randf_range(14.5, 19.0) / hw, -deck)
-		if RoadMesh.in_tunnel(z, tunnels, 6.0):
+		if RoadMesh.in_tunnel(z, tunnels, 6.0) or RoadMesh.in_tunnel(z, bridges, 14.0):
 			z += 20.0
 			continue
 		_put(groups, "bush" if kind != &"mountain" else "rock", Transform3D(b, left))

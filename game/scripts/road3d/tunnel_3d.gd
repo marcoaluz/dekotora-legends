@@ -12,9 +12,18 @@ const FADE_M: float = 30.0
 const PORTAL_H: float = 16.0
 ## Perfil do arco (lateral m, altura m), do lado direito; espelhado para o esquerdo.
 const ARCH: Array = [[13.6, 0.0], [13.6, 5.0], [11.1, 7.4], [6.0, 8.0], [0.0, 8.2]]
+## T-153: tunel ANTIGO de 2 faixas (dentro de um trecho LaneSections): arco estreito e baixo em volta das muretas do
+## trecho (meia largura e altura relativas), concreto escurecido sem azulejo, lampadas fracas nas paredes a cada
+## OLD_LAMP_EVERY m, boca de pedra com a placa do nome (扁額).
+const OLD_ARCH: Array = [[1.0, 0.0], [1.0, 3.7], [0.88, 5.1], [0.62, 6.0], [0.32, 6.45], [0.0, 6.6]]
+const OLD_LAMP_EVERY: float = 12.0
+const OLD_NAME := "湯坂隧道"                   # nome ficticio (隧道 = jeito antigo de dizer tunel)
+const OLD_STONE := Color(0.36, 0.33, 0.29)
 
 var path: TrackPath
 var tunnels: Array[Vector2] = []
+var narrow: Array[bool] = []           # T-153: tunel antigo de 2 faixas (por indice de `tunnels`)
+var _arch: Array = []                  # perfil completo de cada tunel (esquerda -> direita, [lateral, altura])
 var _prev_amount: float = 0.0
 signal exited                          # o jogador saiu de um tunel (clarao na camera)
 var amount: float = 0.0                 # 0..1: quanto o jogador esta dentro de um tunel (acende as luzes do caminhao)
@@ -43,12 +52,25 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 	var outer := SurfaceTool.new()
 	outer.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var lamps: Array = []
-	for t in tunnels:
-		_tube(inner, t)
-		_portal(portal, t.x, 1.0)
-		_portal(portal, t.x + t.y, -1.0)
+	var stone := SurfaceTool.new()
+	stone.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var has_stone: bool = false
+	for n in tunnels.size():
+		var t: Vector2 = tunnels[n]
+		_arch = _arch_of(t)
+		var old: bool = _is_narrow(t)
+		narrow.append(old)
+		_tube(inner, t, old)
+		_portal(stone if old else portal, t.x, 1.0, old)
+		_portal(stone if old else portal, t.x + t.y, -1.0, old)
+		has_stone = has_stone or old
 		_cover(outer, t, kind)
 		_caps(portal if kind == &"city" else outer, t, kind)
+		if old:
+			_old_lamps(t, lamps)
+			for e in [[t.x, 1.0], [t.x + t.y, -1.0]]:
+				_name_plaque(float(e[0]), float(e[1]))
+			continue
 		var z: float = t.x + 2.0
 		while z < t.x + t.y - 1.0:
 			for side in [-1.0, 1.0]:
@@ -58,6 +80,8 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 			z += LAMP_EVERY
 	_add_mesh(inner, _inner_mat())
 	_add_mesh(portal, _outer_mat(&"city"), false)
+	if has_stone:
+		_add_mesh(stone, _outer_mat(&"stone"), false)
 	_add_mesh(outer, _outer_mat(kind))
 	_add_lamps(lamps)
 	_omni = OmniLight3D.new()
@@ -102,47 +126,133 @@ func _xf(z: float, lat: float, h: float, size: Vector3) -> Transform3D:
 
 
 ## Luz pintada nas paredes: claro perto de cada lampada, escuro entre elas; faixa suja embaixo.
-func _lit(z: float, h: float) -> Color:
-	var lamp: float = 0.5 + 0.5 * cos(fmod(z, LAMP_EVERY) / LAMP_EVERY * TAU)
+## Tunel antigo (T-153): concreto escurecido, lampadas mais espacadas e mais fracas.
+func _lit(z: float, h: float, old: bool = false) -> Color:
+	var every: float = OLD_LAMP_EVERY if old else LAMP_EVERY
+	var lamp: float = 0.5 + 0.5 * cos(fmod(z, every) / every * TAU)
+	if old:
+		var conc := Color(0.4, 0.37, 0.33) if h > 1.0 else Color(0.2, 0.19, 0.18)
+		return conc * (0.32 + 0.5 * lamp) * clampf(1.15 - h / 9.0, 0.4, 1.0)
 	var tile := Color(0.62, 0.52, 0.4) if h > 1.2 else Color(0.3, 0.26, 0.22)
 	var near_top: float = clampf(h / 8.2, 0.3, 1.0)
 	return tile * (0.45 + 0.55 * lamp) * near_top
 
 
-func _tube(st: SurfaceTool, t: Vector2) -> void:
+## Perfil completo do tunel (esquerda -> direita, [lateral m, altura m]): o arco normal espelhado ou, no tunel antigo
+## (T-153), o arco estreito em volta das muretas do trecho de 2 faixas.
+func _arch_of(t: Vector2) -> Array:
+	var out: Array = []
+	if not _is_narrow(t):
+		for k in range(ARCH.size() - 1, -1, -1):
+			out.append([-float(ARCH[k][0]), float(ARCH[k][1])])
+		for k in range(1, ARCH.size()):
+			out.append([float(ARCH[k][0]), float(ARCH[k][1])])
+		return out
+	var p: Vector3 = LaneSections.profile(path.track.events, t.x + t.y * 0.5)
+	var left: float = -(p.x + RoadMesh.BARRIER_W + 0.25)
+	var right: float = p.y + RoadMesh.BARRIER_W + 0.25
+	var c: float = (left + right) * 0.5
+	var half: float = (right - left) * 0.5
+	for k in range(OLD_ARCH.size() - 1, -1, -1):
+		out.append([c - float(OLD_ARCH[k][0]) * half, float(OLD_ARCH[k][1])])
+	for k in range(1, OLD_ARCH.size()):
+		out.append([c + float(OLD_ARCH[k][0]) * half, float(OLD_ARCH[k][1])])
+	return out
+
+
+## T-153: o tunel inteiro fica dentro de um trecho de 2 faixas (mureta da direita no lugar estreito).
+func _is_narrow(t: Vector2) -> bool:
+	for zz in [t.x, t.x + t.y * 0.5, t.x + t.y]:
+		if LaneSections.profile(path.track.events, zz).y > LaneSections.RIGHT_WALL_M + 0.05:
+			return false
+	return true
+
+
+func _tube(st: SurfaceTool, t: Vector2, old: bool = false) -> void:
 	var z: float = t.x
 	var step: float = Track.SEG_LEN
 	while z < t.x + t.y:
 		var z1: float = minf(z + step, t.x + t.y)
-		for side in [-1.0, 1.0]:
-			for k in ARCH.size() - 1:
-				var p0: Array = ARCH[k]
-				var p1: Array = ARCH[k + 1]
-				var a: Vector3 = _edge(z, side * float(p0[0]), float(p0[1]))
-				var b: Vector3 = _edge(z, side * float(p1[0]), float(p1[1]))
-				var c: Vector3 = _edge(z1, side * float(p1[0]), float(p1[1]))
-				var d: Vector3 = _edge(z1, side * float(p0[0]), float(p0[1]))
-				var tri: Array = [a, b, c, a, c, d] if side > 0.0 else [a, c, b, a, d, c]
-				for v in tri:
-					var vz: float = z if (v == a or v == b) else z1
-					st.set_color(_lit(vz, v.y - path.center_at(vz).y))
-					st.add_vertex(v)
+		for k in _arch.size() - 1:
+			var p0: Array = _arch[k]
+			var p1: Array = _arch[k + 1]
+			var a: Vector3 = _edge(z, float(p0[0]), float(p0[1]))
+			var b: Vector3 = _edge(z, float(p1[0]), float(p1[1]))
+			var c: Vector3 = _edge(z1, float(p1[0]), float(p1[1]))
+			var d: Vector3 = _edge(z1, float(p0[0]), float(p0[1]))
+			for v in [a, c, b, a, d, c]:                                  # material sem cull: a ordem nao importa
+				var vz: float = z if (v == a or v == b) else z1
+				st.set_color(_lit(vz, v.y - path.center_at(vz).y, old))
+				st.add_vertex(v)
 		z = z1
 
 
-## Boca do tunel: placa de concreto com o furo do arco. `facing` = 1 na entrada, -1 na saida.
-func _portal(st: SurfaceTool, z: float, facing: float) -> void:
-	var w: float = 30.0
-	var pts: Array = []
-	for side in [-1.0, 1.0]:
-		for k in ARCH.size() - 1:
-			var p0: Array = ARCH[k]
-			var p1: Array = ARCH[k + 1]
-			pts.append([side * float(p0[0]), float(p0[1]), side * float(p1[0]), float(p1[1])])
-	for p in pts:                                                        # do arco ate o topo
-		_face(st, z, facing, [Vector2(p[0], p[1]), Vector2(p[2], p[3]), Vector2(p[2], PORTAL_H), Vector2(p[0], PORTAL_H)])
-	_face(st, z, facing, [Vector2(-w, 0), Vector2(-13.6, 0), Vector2(-13.6, PORTAL_H), Vector2(-w, PORTAL_H)])
-	_face(st, z, facing, [Vector2(13.6, 0), Vector2(w, 0), Vector2(w, PORTAL_H), Vector2(13.6, PORTAL_H)])
+## Boca do tunel: placa de concreto (pedra no tunel antigo) com o furo do arco. `facing` = 1 na entrada, -1 na saida.
+func _portal(st: SurfaceTool, z: float, facing: float, old: bool = false) -> void:
+	var col: Color = OLD_STONE if old else Color(0.3, 0.3, 0.32)
+	var lf: float = float(_arch[0][0])
+	var rf: float = float(_arch[_arch.size() - 1][0])
+	var c: float = (lf + rf) * 0.5
+	var w: float = 30.0 + absf(c)                                       # cobre ate os muros laterais (_caps, em +-30)
+	var top: float = PORTAL_H if not old else 10.5
+	for k in _arch.size() - 1:                                          # do arco ate o topo
+		var p0: Array = _arch[k]
+		var p1: Array = _arch[k + 1]
+		_face(st, z, facing, [Vector2(p0[0], p0[1]), Vector2(p1[0], p1[1]), Vector2(p1[0], top), Vector2(p0[0], top)], col)
+	_face(st, z, facing, [Vector2(c - w, 0), Vector2(lf, 0), Vector2(lf, top), Vector2(c - w, top)], col)
+	_face(st, z, facing, [Vector2(rf, 0), Vector2(c + w, 0), Vector2(c + w, top), Vector2(rf, top)], col)
+	if old and top < PORTAL_H:                                           # o morro por cima da boca baixa de pedra
+		_face(st, z, facing, [Vector2(c - w, top), Vector2(c + w, top), Vector2(c + w, PORTAL_H), Vector2(c - w, PORTAL_H)],
+			Color(0.22, 0.28, 0.2))
+
+
+## Tunel antigo: lampadas fracas nas paredes, alternando os lados; placa verde de emergencia mais rara.
+func _old_lamps(t: Vector2, lamps: Array) -> void:
+	var lf: float = float(_arch[0][0])
+	var rf: float = float(_arch[_arch.size() - 1][0])
+	var z: float = t.x + 4.0
+	var n: int = 0
+	while z < t.x + t.y - 2.0:
+		var side_lat: float = (lf + 0.12) if n % 2 == 0 else (rf - 0.12)
+		lamps.append([_xf(z, side_lat, 4.3, Vector3(0.12, 0.22, 0.9)), Color(0.85, 0.48, 0.16)])
+		if n % 10 == 5:
+			lamps.append([_xf(z + 3.0, lf + 0.08, 2.4, Vector3(0.06, 0.5, 0.8)), Color(0.15, 0.85, 0.35)])
+		z += OLD_LAMP_EVERY * 0.5
+		n += 1
+
+
+## Placa com o nome do tunel antigo em cima da boca (扁額 de pedra clara com letras escuras).
+func _name_plaque(z: float, facing: float) -> void:
+	var lf: float = float(_arch[0][0])
+	var rf: float = float(_arch[_arch.size() - 1][0])
+	var c: float = (lf + rf) * 0.5
+	var turn: float = 0.0 if facing > 0.0 else PI
+	var b := Basis(Vector3.UP, path.yaw_at(z) + turn)
+	var pos: Vector3 = _edge(z, c, 8.2) - path.forward_at(z) * facing * 0.12
+	var bg := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(4.6, 1.3)
+	bg.mesh = q
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color(0.78, 0.74, 0.66)
+	m.roughness = 0.95
+	bg.material_override = m
+	bg.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	bg.visibility_range_end = 320.0
+	bg.transform = Transform3D(b, pos)
+	add_child(bg)
+	var l := Label3D.new()
+	l.text = OLD_NAME
+	l.font = load(RoadFurniture.SIGN_FONT) as Font
+	l.font_size = 96
+	l.pixel_size = 0.0095
+	l.modulate = Color(0.12, 0.1, 0.09)
+	l.outline_size = 0
+	l.shaded = true
+	l.double_sided = false
+	l.visibility_range_end = 320.0
+	l.transform = Transform3D(b, pos - path.forward_at(z) * facing * 0.02)
+	add_child(l)
 
 
 ## Poligono (lateral, altura) no plano da boca; normal virada para fora do tunel (material sem cull).
@@ -216,7 +326,7 @@ func _outer_mat(kind: StringName) -> StandardMaterial3D:
 	m.vertex_color_use_as_albedo = true
 	m.roughness = 0.9
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
-	var tex: String = "res://assets/textures/grass.png" if kind != &"city" else "res://assets/textures/concrete_streaks.png"
+	var tex: String = "res://assets/textures/grass.png" if kind != &"city" and kind != &"stone" else "res://assets/textures/concrete_streaks.png"
 	if ResourceLoader.exists(tex):
 		m.albedo_texture = load(tex) as Texture2D
 	return m

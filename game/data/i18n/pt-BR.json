@@ -89,6 +89,8 @@
  "hud.event.deadline": "PRAZO +%d s",
  "hud.event.refused": "FAIXA FECHADA",
  "hud.event.now": "AGORA",
+ "hud.event.section": "PISTA COM 2 FAIXAS",
+ "hud.event.section_detail": "A FAIXA DA DIREITA ACABA  ·  %d m COM 2 FAIXAS",
  "garage.title": "GARAGEM",
  "garage.parts": "PEÇAS",
  "garage.mechanics": "MECÂNICA",

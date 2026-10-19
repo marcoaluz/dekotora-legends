@@ -10,7 +10,8 @@ extends Control
 signal alert_shown(kind: int)          # a new event entered the warning distance (sound / vibration)
 
 const PANEL_W: float = 224.0
-const KIND_COLORS: Array[Color] = [Color("#ff4b3e"), Color("#ff9a1a"), Color("#f5cc5a")]
+const KIND_COLORS: Array[Color] = [Color("#ff4b3e"), Color("#ff9a1a"), Color("#f5cc5a"), Color("#5ad1f5")]
+const SECTION_SHOW_AFTER_M: float = 40.0   # T-153: the 2-lane warning stays until a little after the section begins
 const BAD_COL := Color("#d1303f")
 
 var sim: RaceSim
@@ -43,6 +44,8 @@ func current_event() -> int:
 	for i in list.size():
 		var ev: TrackEvents.Event = list[i]
 		var until: float = ev.reopen_end() if ev.kind == TrackEvents.Kind.NARROW else ev.end_z()
+		if ev.kind == TrackEvents.Kind.SECTION:
+			until = ev.full_z() + SECTION_SHOW_AFTER_M
 		if t.z <= until and ev.z - nose <= TrackEvents.WARN_M:
 			return i
 	return -1
@@ -54,7 +57,9 @@ func lines(i: int) -> PackedStringArray:
 	var title: String = Tr.t("hud.event." + TrackEvents.KIND_IDS[ev.kind])
 	var lanes: String = Tr.t("hud.event.side.%d" % ev.lo) if ev.lo == ev.hi else Tr.t("hud.event.side.%d%d" % [ev.lo, ev.hi])
 	var detail: String
-	if ev.kind == TrackEvents.Kind.NARROW:
+	if ev.kind == TrackEvents.Kind.SECTION:
+		detail = Tr.t("hud.event.section_detail", [roundi((ev.end_z() - ev.full_z()) / 10.0) * 10])
+	elif ev.kind == TrackEvents.Kind.NARROW:
 		detail = Tr.t("hud.event.lane_ends", [lanes])
 	else:
 		detail = Tr.t("hud.event.lane_closed" if ev.lo == ev.hi else "hud.event.lanes_closed", [lanes])
@@ -113,7 +118,8 @@ func _draw_alert(t: TruckSim, w: float, blink: bool) -> void:
 	_heading(Vector2(r.position.x, r.position.y + 12), dtxt, 11, Color.WHITE, r.size.x - 8, HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(Vector2(r.position.x + 26, r.position.y + 22), lns[1], 8, Color(1, 1, 1, 0.85))
 	if danger:
-		var msg: String = Tr.t("hud.event.merge" if ev.kind == TrackEvents.Kind.NARROW else "hud.event.leave_lane")
+		var merge: bool = ev.kind == TrackEvents.Kind.NARROW or ev.kind == TrackEvents.Kind.SECTION
+		var msg: String = Tr.t("hud.event.merge" if merge else "hud.event.leave_lane")
 		_heading(Vector2(r.position.x, r.position.y + 33), msg, 10, BAD_COL if blink else Color.WHITE, r.size.x, HORIZONTAL_ALIGNMENT_CENTER)
 	var extra: float = ev.allowance()
 	if extra > 0.0 and _shown_t < 5.0 and sim.deadline > 0.0:

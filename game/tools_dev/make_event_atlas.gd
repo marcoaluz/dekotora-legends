@@ -101,6 +101,25 @@ func _draw_all(c: Control) -> void:
 	c.draw_rect(_r("solid_yellow"), YELLOW)
 	c.draw_rect(_r("solid_orange"), Color("#ff6a13"))
 	c.draw_rect(_r("solid_grey"), Color("#8e939a"))
+	_vms(c, _r("vms_lanes2"), "この先 2車線", "追越車線 終わり")          # T-153
+	_lanes_board(c, _r("board_lanes2"))
+
+
+## T-153: blue lane-reduction board: "この先" + three lanes whose right one bends into the middle + "2車線".
+func _lanes_board(c: Control, r: Rect2) -> void:
+	c.draw_rect(r, WHITE)
+	_round_rect(c, r.grow(-5), BLUE, 6)
+	_text(c, "この先", r.position + Vector2(52, 36), 30, WHITE, 90.0, _bold)
+	_text(c, "2車線", r.position + Vector2(52, 88), 34, WHITE, 92.0, _bold)
+	var base: Vector2 = r.position + Vector2(150, 112)
+	for k in 2:                                            # two straight arrows
+		var x: float = base.x + k * 30.0
+		c.draw_line(Vector2(x, base.y), Vector2(x, base.y - 74), WHITE, 7.0, true)
+		c.draw_colored_polygon(PackedVector2Array([Vector2(x - 11, base.y - 70), Vector2(x + 11, base.y - 70), Vector2(x, base.y - 92)]), WHITE)
+	var bend := PackedVector2Array([Vector2(base.x + 66, base.y), Vector2(base.x + 66, base.y - 30), Vector2(base.x + 36, base.y - 58)])
+	c.draw_polyline(bend, WHITE, 7.0, true)                # the right lane bends into the middle one
+	c.draw_colored_polygon(PackedVector2Array([Vector2(base.x + 26, base.y - 48), Vector2(base.x + 42, base.y - 66),
+		Vector2(base.x + 28, base.y - 70)]), WHITE)
 
 
 func _speed(c: Control, r: Rect2, s: String) -> void:

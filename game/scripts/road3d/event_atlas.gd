@@ -6,10 +6,12 @@ extends RefCounted
 ##  y 256..383 : 256 x 128 cells (orange LED information boards)
 ##  y 384..511 : 256 x 64 / 128 x 64 cells (barricade stripes, 工事中 board, distance plates, 車線減少 plate)
 ##  y 512..575 : 64 x 64 cells (solid colours)
+##  y 576..703 : 256 x 128 cells (T-153: LED board "この先 2車線" and the blue lane-reduction board)
 
 const ATLAS := "res://assets/textures/event_atlas.png"
 const W: int = 512
-const H: int = 576
+const H: int = 704
+const SECTION_BOARDS: PackedStringArray = ["vms_lanes2", "board_lanes2"]
 const SMALL: PackedStringArray = ["spd_60", "warn_works", "warn_narrow_r", "warn_narrow_l",
 	"arrow_l", "arrow_r", "triangle", "glow"]
 const WIDE: PackedStringArray = ["vms_accident", "vms_works"]
@@ -34,6 +36,8 @@ static func rects() -> Dictionary:
 	_rects["aux_narrow"] = Rect2i(256, 448, 256, 64)
 	for i in SOLIDS.size():
 		_rects[SOLIDS[i]] = Rect2i(i * 64, 512, 64, 64)
+	for i in SECTION_BOARDS.size():
+		_rects[SECTION_BOARDS[i]] = Rect2i(i * 256, 576, 256, 128)
 	return _rects
 
 
