@@ -218,6 +218,9 @@ func command(race_time: float) -> Commands:
 
 
 func on_event(e: Dictionary, player: int, race_time: float) -> void:
+	if mode != "" and String(e["type"]) == "traffic" and int(e["truck"]) == player:     # T-152: quanto a batida custou
+		print("BATIDA t=%.2f s zona=%s forca=%.1f m/s: %.0f -> %.0f km/h (penalidade %.0f%%)" % [race_time, String(e["zone"]),
+			float(e["force"]), float(e.get("speed_before", 0.0)) * 3.6, float(e.get("speed_after", 0.0)) * 3.6, float(e.get("penalty", 0.0)) * 100.0])
 	if shot_dir != "" and String(e["type"]) == "finish" and int(e["truck"]) == player:
 		_queue.append([_clock + 0.9, "chegada"])
 		return

@@ -248,7 +248,9 @@ func test_bots_avoid_closures_early() -> void:
 		{"kind": "narrow", "z": 1300.0, "length": 420.0, "lanes": [3]},
 	]
 	for ev in cases:
-		var r: Dictionary = _race_with_bots(ev, TrafficSim.Density.NORMAL)
+		# 180 s: a corrida de 3,2 km leva ~135-145 s; desde a T-152 a batida no transito custa velocidade e o caos
+		# do transito pode atrasar um bot medio uns 10 s (o teste e sobre desviar do bloqueio, nao sobre o tempo)
+		var r: Dictionary = _race_with_bots(ev, TrafficSim.Density.NORMAL, 180.0)
 		var sim: RaceSim = r["sim"]
 		var evs: Array[Dictionary] = r["events"]
 		var name: String = "%s %s" % [ev["kind"], ev["lanes"]]

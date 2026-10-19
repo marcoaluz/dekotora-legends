@@ -199,7 +199,8 @@ func _draw_dash(t: TruckSim, w: float) -> void:
 	_bar(Rect2(x0 + 126, y0 + 5, 24, 4), t.passing_charge, PINK if t.passing_active else GOLD)
 	# velocidade
 	var kmh: int = roundi(t.speed * 3.6)
-	_num(Vector2(x0 - 4, y0 + 44), "%d" % kmh, 34, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, 66.0)
+	var kmh_col: Color = BAD_COL if t.jolted() else Color.WHITE      # T-152: vermelho no tranco (a batida custou velocidade)
+	_num(Vector2(x0 - 4, y0 + 44), "%d" % kmh, 34, kmh_col, HORIZONTAL_ALIGNMENT_CENTER, 66.0)
 	_lbl(Vector2(x0 - 4, y0 + 55), "km/h", 8, LABEL, HORIZONTAL_ALIGNMENT_CENTER, 66.0)
 	# marcha
 	_num(Vector2(x0 + 62, y0 + 44), "%d" % t.gear, 30, GOLD, HORIZONTAL_ALIGNMENT_CENTER, 34.0)

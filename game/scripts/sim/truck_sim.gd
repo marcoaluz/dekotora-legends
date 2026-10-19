@@ -95,6 +95,11 @@ var hard_brake_ended: bool = false
 ## Empurrao lateral (T-141): s de fumaca nos pneus de quem foi empurrado para a faixa vizinha (ou quicou).
 var shove_t: float = 0.0
 var shoved: int = 0                     # vezes que foi empurrado para outra faixa (testes/estatistica)
+## Tranco (T-152): s que faltam depois de bater no transito (Collision.JOLT_TIME). Enquanto dura, o acelerador nao
+## tem efeito (o freio funciona) e a apresentacao balanca o caminhao. Vai no snapshot (predicao igual ao servidor).
+var jolt_t: float = 0.0
+var jolt_side: int = 0                  # onde bateu: -1 esquerda, 0 frente, +1 direita (para que lado balanca)
+var jolts: int = 0                      # batidas que custaram velocidade (testes/estatistica)
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
@@ -207,17 +212,24 @@ func grip() -> float:
 	return pow(MASS_REF / mass, 0.3)
 
 
+## Em tranco depois de bater no transito (T-152)? A folga absorve o arredondamento do snapshot.
+func jolted() -> bool:
+	return jolt_t > 0.001
+
+
 func step(dt: float, cmd: Commands, track: Track) -> void:
 	var speed_before: float = speed
 	horn = cmd.horn
 	shove_t = maxf(shove_t - dt, 0.0)
+	var throttle: float = 0.0 if jolted() else cmd.throttle    # T-152: no tranco o motor nao puxa (freio continua)
+	jolt_t = maxf(jolt_t - dt, 0.0)
 	# 0) curva: quanto acima da velocidade segura (raspa o pneu, desliza ate 0,5 m, escapa acima de +30%)
 	var curve: float = track.curve_at(z)
 	curve_ratio = CurveGrip.ratio(speed, curve, grip())
 	skid = CurveGrip.skid(curve_ratio)
 	escaping = curve_ratio > CurveGrip.ESCAPE_RATIO
 	# 1) longitudinal: tracao - arrasto - rolamento - freio - ladeira - atrito do pneu na curva
-	var force: float = engine.step(dt, cmd.throttle, speed, draft * DRAFT_SPEED_BONUS)
+	var force: float = engine.step(dt, throttle, speed, draft * DRAFT_SPEED_BONUS)
 	if force > 0.0:
 		force *= 1.0 + DRAFT_BOOST * draft
 		if cargo_trait == "heavy":

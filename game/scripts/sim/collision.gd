@@ -12,6 +12,11 @@ extends RefCounted
 ##  - caminhao x carro: troca de momento com restituicao; acima de THROW_MIN_DV o carro e ARREMESSADO
 ##    (ThrownCar: sai da linha do caminhao girando, pode quicar); o caminhao perde so a parte do momento
 ##    que o carro leva (12 t contra 1,5 t: ~1,5 m/s numa batida de 10 m/s). Onibus (12 t) segura muito mais.
+##  - T-152, penalidade ARCADE (vale no online: e a sim): a batida no transito tambem custa uma fracao da velocidade
+##    do caminhao, que cresce com a forca: de frente na traseira do carro 25..40%, raspao lateral 8..15%, veiculo
+##    pesado (onibus) x PEN_HEAVY_MULT. O resultado e o MENOR entre a fisica e a penalidade (nao soma). Depois vem o
+##    TRANCO (TruckSim.jolt_t, JOLT_TIME s): acelerador sem efeito e o caminhao balanca. Enquanto dura o tranco, nova
+##    batida nao cobra de novo (uma penalidade por batida, mesmo com contatos em ticks seguidos).
 
 const LEN: float = 12.0
 const RESTITUTION: float = 0.25
@@ -37,6 +42,19 @@ const SHOVE_DV: float = 2.5               # m/s laterais: batida assim empurra o
 const SHOVE_MASS_RATIO: float = 0.75      # quem empurra precisa de 75% da massa do outro; senao quica de volta
 const SHOVE_SMOKE_S: float = 0.9          # s de fumaca nos pneus de quem foi empurrado
 const BOUNCE_LAT_VEL: float = 0.35        # x/s de volta para quem quicou
+# T-152: penalidade arcade do caminhao na batida com o transito (fracao da velocidade antes da batida)
+const PEN_FRONT_MIN: float = 0.25         # de frente na traseira do carro, batida fraca
+const PEN_FRONT_MAX: float = 0.40         # ... batida forte
+const PEN_FRONT_DV_SOFT: float = 2.0      # m/s de diferenca: ate aqui vale a minima
+const PEN_FRONT_DV_HARD: float = 12.0     # m/s: daqui para cima vale a maxima
+const PEN_SIDE_MIN: float = 0.08          # raspao lateral fraco
+const PEN_SIDE_MAX: float = 0.15          # ... forte
+const PEN_SIDE_DV_SOFT: float = 1.5
+const PEN_SIDE_DV_HARD: float = 6.0
+const PEN_HEAVY_MASS: float = THROW_MAX_MASS   # acima disto (onibus, caminhoes do transito) a penalidade e maior
+const PEN_HEAVY_MULT: float = 1.35        # onibus: de frente 34..54%, de lado 11..20%
+const PEN_MAX: float = 0.6                # teto de seguranca da fracao
+const JOLT_TIME: float = 0.6              # s de tranco: acelerador sem efeito, caminhao balanca
 
 var _contacts: Dictionary = {}            # "i:j" -> true enquanto encostados
 var _clock: float = 0.0
@@ -180,6 +198,9 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 		var toward: float = maxf(truck.lateral_vel * side, 0.0)   # x/s do caminhao entrando no carro
 		var dv: float = maxf(truck.speed - c.speed, 0.0) if rear_hit else toward * M_X + 0.2 * absf(truck.speed - c.speed)
 		var thrown: bool = false
+		var speed_before: float = truck.speed
+		var pen: float = 0.0
+		var ev: Dictionary = {}
 		if started and dv > MIN_EVENT_DV:
 			var zone: String = "front" if rear_hit else ("right" if c.x > truck.x else "left")
 			var dmg: float = DamageModel.impact_damage(dv, c.mass)
@@ -187,8 +208,15 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 			truck.cargo_hit(dv)
 			traffic.hits += 1
 			thrown = dv >= THROW_MIN_DV and c.mass <= THROW_MAX_MASS
-			events.append({"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv,
-				"damage": dmg, "broken": broken, "thrown": thrown, "car_kind": c.kind})
+			if not truck.jolted():                      # T-152: uma penalidade por batida (o tranco e a recarga)
+				pen = penalty_fraction(rear_hit, dv, c.mass)
+				truck.jolt_t = JOLT_TIME
+				truck.jolt_side = 0 if rear_hit else (1 if c.x > truck.x else -1)
+				truck.jolts += 1
+			ev = {"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv,
+				"damage": dmg, "broken": broken, "thrown": thrown, "car_kind": c.kind, "penalty": pen,
+				"speed_before": speed_before, "speed_after": speed_before}
+			events.append(ev)
 		var share_car: float = truck.mass / (truck.mass + c.mass)    # quanto do impulso fica no carro
 		var share_truck: float = c.mass / (truck.mass + c.mass)
 		if rear_hit:
@@ -212,7 +240,24 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 				truck.lateral_vel -= side * toward * (1.0 + CAR_RESTITUTION) * share_truck
 			c.x += side * pen_x / M_X * 0.8
 			truck.x -= side * pen_x / M_X * 0.2
+		if pen > 0.0:                                   # T-152: o menor entre a fisica e a penalidade arcade
+			truck.speed = minf(truck.speed, speed_before * (1.0 - pen))
+		if not ev.is_empty():
+			ev["speed_after"] = truck.speed
 	return events
+
+
+## T-152: fracao da velocidade que o caminhao perde na batida com um veiculo do transito de massa `car_mass`.
+## `front` = de frente na traseira dele (senao, raspao lateral); cresce com a forca `dv` (m/s) entre as faixas.
+static func penalty_fraction(front: bool, dv: float, car_mass: float) -> float:
+	var p: float
+	if front:
+		p = lerpf(PEN_FRONT_MIN, PEN_FRONT_MAX, clampf(inverse_lerp(PEN_FRONT_DV_SOFT, PEN_FRONT_DV_HARD, dv), 0.0, 1.0))
+	else:
+		p = lerpf(PEN_SIDE_MIN, PEN_SIDE_MAX, clampf(inverse_lerp(PEN_SIDE_DV_SOFT, PEN_SIDE_DV_HARD, dv), 0.0, 1.0))
+	if car_mass > PEN_HEAVY_MASS:
+		p *= PEN_HEAVY_MULT
+	return minf(p, PEN_MAX)
 
 
 ## Pulo do carro arremessado (m/s para cima): so batida forte e veiculo leve.

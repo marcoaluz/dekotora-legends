@@ -652,6 +652,7 @@ func _update_camera(dt: float) -> void:
 		_cam.global_position += Vector3(randf_range(-s, s), randf_range(-s, s), randf_range(-s, s))
 	_cam.look_at(look, Vector3.UP)
 	_cam.global_position += _cam.global_basis * (ex[2] as Vector3)
+	_cam.global_position += _cam.global_basis * _impact.sway_camera(player)     # T-152: a camera sente o tranco
 	_cam.fov = lerpf(_cam.fov, 56.0 + _speed_fx.fov_extra(t.speed) + t.draft * 6.0, minf(3.0 * dt, 1.0))
 	_speed_fx.update(t.speed, dt)
 	_scrape_sparks(t, dt)

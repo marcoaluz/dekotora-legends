@@ -4,6 +4,10 @@ extends Node3D
 ## e faz so a parte visual: faiscas no ponto de contato, pedacos de cromo/lanterna/vidro voando (pool num
 ## MultiMesh = 1 chamada de desenho), chacoalhada do caminhao atingido e pedido de tremor da camera.
 ## Chave em Opcoes > Graficos ("Faiscas, pedacos e fumaca"); a qualidade grafica corta a quantidade.
+## T-152: o TRANCO da simulacao (TruckSim.jolt_t, depois de bater no transito) balanca o caminhao por ~0,6 s: arfagem
+## (nariz afunda e volta) na batida de frente, rolagem para o lado no raspao. Le so o estado da sim (tambem online,
+## onde o jolt_t vem no snapshot); o balanco corre no relogio da tela, entao fica suave entre snapshots. Nao depende
+## da chave dos efeitos (e o aviso de jogo de que a batida custou velocidade); o tremor da camera depende.
 
 const MAX_SHARDS: int = 64
 const SHARD_LIFE: float = 2.6            # s ate sumir (some encolhendo no fim)
@@ -12,6 +16,12 @@ const SHARD_COLORS: Array[Color] = [Color("#e8edf5"), Color("#e8edf5"), Color("#
 const JOLT_DECAY: float = 7.0            # 1/s
 const JOLT_FREQ: float = 26.0            # rad/s
 const QUALITY_SCALE: Array[float] = [0.4, 0.7, 1.0]
+const SWAY_TAIL: float = 0.3             # s de balanco que sobra depois do tranco (some suave)
+const SWAY_FREQ: float = 15.0            # rad/s (~2,4 balancos por segundo, suspensao de caminhao)
+const SWAY_PITCH: float = 0.014          # rad: arfagem na batida de frente (pivo no meio: ~8 cm nas pontas de 12 m)
+const SWAY_ROLL: float = 0.03            # rad: rolagem no raspao (topo do bau anda ~10 cm)
+const SWAY_FRONT_ROLL: float = 0.012     # rad: na batida de frente tambem rebola um pouco de lado
+const SWAY_CAM: float = 0.22             # m: quanto a camera do jogador acompanha o balanco
 
 var enabled: bool = true
 var amount: float = 1.0                  # fracao de faiscas/pedacos pela qualidade grafica
@@ -26,6 +36,8 @@ var _jolt: Dictionary = {}               # indice do caminhao -> [amplitude rad,
 var _shake: float = 0.0                  # tremor pedido para a camera (a cena le com take_shake)
 var _lengths: Array[float] = []
 var sim: RaceSim                         # velocidade dos caminhoes (os pedacos saem com o embalo do caminhao)
+var _sway: Dictionary = {}               # T-152: indice do caminhao -> [s desde o inicio do tranco, lado -1/0/+1]
+var _prev_jolt: Dictionary = {}          # indice -> jolt_t visto no quadro anterior (detecta tranco novo)
 
 
 func setup(fx_: Fx3D, trucks_: Array[TruckNode], lengths: Array[float], traffic3d_: Traffic3D) -> void:
@@ -188,8 +200,9 @@ func _kick(i: int, force: float, side: float) -> void:
 		_jolt[i] = [amp, 0.0, side]
 
 
-## Transform do caminhao `i` com a chacoalhada (rolagem para o lado do golpe + arfagem).
+## Transform do caminhao `i` com a chacoalhada (rolagem para o lado do golpe + arfagem) e o balanco do tranco (T-152).
 func jolt(i: int, xf: Transform3D) -> Transform3D:
+	xf = _apply_sway(i, xf)
 	var j: Array = _jolt.get(i, [])
 	if j.is_empty():
 		return xf
@@ -203,7 +216,53 @@ func jolt(i: int, xf: Transform3D) -> Transform3D:
 	return Transform3D(xf.basis * rot, xf.origin + xf.basis.y * absf(w) * a * 1.2)
 
 
+## T-152: angulos do balanco do caminhao `i` agora: Vector2(arfagem, rolagem) em rad (0 se nao esta em tranco).
+## Le o jolt_t da sim: subiu = tranco novo (comeca o balanco do zero).
+func sway_angles(i: int) -> Vector2:
+	if sim != null and i < sim.trucks.size():
+		var st: TruckSim = sim.trucks[i]
+		if st.jolt_t > float(_prev_jolt.get(i, 0.0)) + 0.05:
+			_sway[i] = [0.0, float(st.jolt_side)]
+		_prev_jolt[i] = st.jolt_t
+	var w: Array = _sway.get(i, [])
+	if w.is_empty():
+		return Vector2.ZERO
+	var e: float = float(w[0])
+	var total: float = Collision.JOLT_TIME + SWAY_TAIL
+	if e >= total:
+		_sway.erase(i)
+		return Vector2.ZERO
+	var env: float = pow(1.0 - e / total, 1.5) * clampf(e / 0.05, 0.0, 1.0)   # entra rapido, some suave
+	var osc: float = sin(e * SWAY_FREQ)
+	var side: float = float(w[1])
+	if side == 0.0:          # de frente: o nariz afunda primeiro e o corpo rebola um pouco
+		return Vector2(-SWAY_PITCH * env * osc, SWAY_FRONT_ROLL * env * sin(e * SWAY_FREQ * 0.7))
+	return Vector2(-SWAY_PITCH * 0.4 * env * osc, -side * SWAY_ROLL * env * osc)
+
+
+## Balanco do tranco aplicado ao transform: arfagem em volta do meio do caminhao, rolagem em volta da linha no chao.
+func _apply_sway(i: int, xf: Transform3D) -> Transform3D:
+	var a: Vector2 = sway_angles(i)
+	if a == Vector2.ZERO:
+		return xf
+	var len: float = _lengths[i] if i < _lengths.size() else Collision.LEN
+	var pivot := Vector3(0.0, 0.0, -len * 0.5)
+	var rot := Basis(Vector3.RIGHT, a.x) * Basis(Vector3.BACK, a.y)
+	return xf * Transform3D(rot, pivot - rot * pivot)
+
+
+## Deslocamento local da camera do jogador acompanhando o balanco (m): para o lado e para baixo. So com os efeitos ligados.
+func sway_camera(i: int) -> Vector3:
+	var w: Array = _sway.get(i, [])
+	if not enabled or w.is_empty():
+		return Vector3.ZERO
+	var a: Vector2 = sway_angles(i)
+	return Vector3(-a.y * 3.5, a.x * 4.0 - absf(a.x) * 2.0, 0.0) * (SWAY_CAM / 0.1)
+
+
 func _process(delta: float) -> void:
+	for i in _sway:
+		(_sway[i] as Array)[0] = float((_sway[i] as Array)[0]) + delta
 	for i in _jolt:
 		(_jolt[i] as Array)[1] = float((_jolt[i] as Array)[1]) + delta
 	if _shards.is_empty():
