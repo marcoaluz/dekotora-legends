@@ -1,8 +1,8 @@
 """Caminhão 3D (PBR) para o Godot: chassi, baú e decoração NOSSOS + cabine vinda de modelo de arquivo (T-129).
 
 Uso: blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- [--out game/assets/vehicles/dekotora]
-     [--variant base|leve|longo|carreta|canter] [--cab chata|jac|curta|americana] [--cab-src CAMINHO]
-     [--box auto|premium|classic]
+     [--variant base|leve|longo|graneleira|carreta|canter] [--cab chata|jac|curta|americana] [--cab-src CAMINHO]
+     [--box auto|premium|classic] [--body-src CAMINHO]
 Saída: <out>/truck/dekotora_truck_<baú>_<cabine>.glb (a carreta e o Canter não têm sufixo), <out>/source_blend/,
 <out>/previews/truck_<tag>_*.png
 
@@ -16,6 +16,9 @@ As 4 cabines feitas por código (padrao, classica, aero, alta) foram retiradas n
 Baú premium (T-136, `truck3d/box_premium.py`): chapa ondulada de verdade, trilhos, montantes, portas com mapas de
 normal/oclusão gravados da versão alta (`bake_box_premium.py`, rode antes uma vez) e ferragens reais. `--box auto`
 (padrão) = premium no baú médio (base) e o baú antigo nos outros modelos; `premium`/`classic` forçam.
+
+Graneleira (T-145, `truck3d/graneleira.py` + `gran_src.py`): carroceria aberta com lona no chassi do baú médio, a partir
+do modelo "Carroceria_Brasil_Graneleiro.obj" (docs/Novas Melhorias/Carroceria/, Royalty Free, fora do Git; `--body-src`).
 
 Convenções: metros, +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro. As peças usam os pontos
 de montagem (empties MOUNT_*) criados aqui; o glTF os exporta como nós.
@@ -34,6 +37,7 @@ from truck3d.chassis import build_chassis  # noqa: E402
 from truck3d.deco import build_deco  # noqa: E402
 from truck3d.cab_chata import build_cab_chata  # noqa: E402
 from truck3d import canter as canter_mod, jac_cab, jac_src, kw_cab  # noqa: E402
+from truck3d.graneleira import build_graneleira  # noqa: E402
 from mathutils import Vector  # noqa: E402
 from truck3d.dims import BODY_L, CAB_Y1, FRONT_AXLE_Y, MOUNTS, WHEEL_R  # noqa: E402
 from truck3d.variants import LENGTH_DELTA, VARIANTS, apply_variant  # noqa: E402
@@ -113,16 +117,19 @@ def _front_wheel_mounts(mounts, info):
 PREMIUM_VARIANTS = ("base",)                                          # piloto T-136: só o baú médio
 
 
+OPEN_BODIES = ("graneleira",)                                         # carroceria aberta no chassi do baú médio (T-145)
+
+
 def use_premium(box: str, variant: str) -> bool:
     if box == "auto":
         return variant in PREMIUM_VARIANTS
-    if box == "premium" and variant in ("canter", "carreta"):
-        raise SystemExit("ERRO: o baú premium ainda não existe para canter/carreta (use --box classic)")
+    if box == "premium" and variant in ("canter", "carreta") + OPEN_BODIES:
+        raise SystemExit("ERRO: o baú premium ainda não existe para canter/carreta/graneleira (use --box classic)")
     return box == "premium"
 
 
 def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base", cab: str = DEFAULT_CAB, cab_src=None,
-                premium: bool = False):
+                premium: bool = False, body_src=None):
     """Devolve (meshes_estaticas, rodas, empties). `m` = dicionário de materiais (pbr.standard_set; com
     `premium`, também pbr.box_premium_set)."""
     if paint_name != "paint_white":
@@ -137,10 +144,13 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
         parts.append(o)
         return o
 
-    spec = VARIANTS[variant]
+    open_body = variant in OPEN_BODIES
+    chassis = "base" if open_body else variant                 # a graneleira usa o chassi do baú médio
+    spec = VARIANTS[chassis]
     build_chassis(m, add, spec["rear_axles"], spec["tanks"])
     n0 = len(parts)
-    build_body(m, add, shell=not premium)
+    if not open_body:
+        build_body(m, add, shell=not premium)
     body_names = {o.name for o in parts[n0:]}
     info = build_file_cab(m, add, cab, cab_src)
     stacks = [o for o in parts if o.name.startswith("stack_")]
@@ -167,8 +177,8 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
     mounts.update(info.mounts)                     # frente, teto, degraus e lateral mudam com a cabine
     _front_wheel_mounts(mounts, info)
     empties = [M.empty(n, p) for n, p in mounts.items()]
-    apply_variant(variant, m, parts, wheels, empties)
-    dy = VARIANTS[variant]["delta"]
+    apply_variant(chassis, m, parts, wheels, empties)
+    dy = VARIANTS[chassis]["delta"]
     ext = 0.0
     if info.gap is not None:
         front = BODY_L + dy
@@ -193,6 +203,14 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
         def surf(x, z):                                # ponto/normal na casca (fileira de luzes da "sobrancelha")
             p, n = info.surf(x, z)
             return p + Vector((0, dy, 0)), n
+        if open_body:
+            g = build_graneleira(m, add, body_l, cab_z, (CAB_Y1 + dy, info.wz0, surf), body_src)
+            for e in empties:
+                if e.name in g["mounts"]:
+                    e.location = g["mounts"][e.name]
+            print(f"graneleira: {g['tris_src']} triangulos do modelo; tampas ate {g['wall_top']:.2f} m, lona ate {g['tarp_top']:.2f} m")
+            print(f"cabine {cab}: {info.tris} triangulos; carroceria {ext:+.2f} m; eixo dianteiro y={info.front_axle + dy:.2f} r={info.front_r}")
+            return parts, wheels, empties
         build_deco(m, add, body_l, cab_z, (CAB_Y1 + dy, info.wz0, surf), mural_plates=not premium,
                    rear_y=-0.17 if premium else -0.11)
     print(f"cabine {cab}: {info.tris} triangulos; bau {ext:+.2f} m{' (premium)' if premium else ''}; eixo dianteiro y={info.front_axle + dy:.2f} r={info.front_r}")
@@ -212,7 +230,9 @@ def main():
     ap.add_argument("--box", default="auto", choices=("auto", "premium", "classic"),
                     help="auto = premium no baú médio (base), antigo nos outros; premium | classic forçam (T-136)")
     ap.add_argument("--night", action="store_true", help="previas de revisao a noite (luzes acesas)")
-    ap.add_argument("--variant", default="base", choices=list(VARIANTS) + ["canter"], help="base | leve | longo | carreta | canter (cabine do JAC)")
+    ap.add_argument("--variant", default="base", choices=list(VARIANTS) + ["canter"] + list(OPEN_BODIES),
+                    help="base | leve | longo | graneleira | carreta | canter (cabine do JAC)")
+    ap.add_argument("--body-src", default=None, help="graneleira: docs/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj")
     args = ap.parse_args(argv)
     if args.variant == "carreta":
         args.cab = "chata"                           # carreta guardada (fora da garagem): cavalo com a cara chata
@@ -223,7 +243,7 @@ def main():
     premium = use_premium(args.box, args.variant)
     if premium:
         pbr.box_premium_set(m, os.path.join(out, "textures"))
-    parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab, args.cab_src, premium)
+    parts, wheels, empties = build_truck(m, args.paint, args.variant, args.cab, args.cab_src, premium, args.body_src)
     for o in parts:                                  # texturas precisam de UV que cubra cada face
         name = o.active_material.name if o.active_material else ""
         if name in ("paint_white_panel", "plastic_trim"):
@@ -271,7 +291,7 @@ def main():
     if args.no_preview:
         print("OK build_truck_3d ->", glb)
         return
-    d = canter_mod.LENGTH - 11.5 if args.variant == "canter" else LENGTH_DELTA[args.variant]
+    d = canter_mod.LENGTH - 11.5 if args.variant == "canter" else LENGTH_DELTA.get(args.variant, 0.0)
     pdir = os.path.join(out, "previews")
     preview.render_views(os.path.join(pdir, f"truck_{tag}" + ("_night" if args.night else "")), merged + wheel_objs, size=(960, 540), night=args.night,
                          views={"34": (35, 14, 22.0 + d * 1.1, (0, 6.0 + d / 2, 1.6)), "rear": (180, 8, 22.0 + d, (0, 6.0 + d / 2, 1.6)),

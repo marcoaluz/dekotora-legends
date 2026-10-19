@@ -64,19 +64,7 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
         add(M.box(f"mk_rear_h_{k}", (LAMP, 0.03, LAMP), (x, -0.11, kz(3.02)), m["lamp_red"] if k % 2 == 0 else m["lamp_amber"], bevel=0.0, seg=1))
     # --- frente da cabine: fileira de luzes logo abaixo do para-brisa ("sobrancelha")
     if cab_front:
-        yf, wz0 = cab_front[:2]
-        surf = cab_front[2] if len(cab_front) > 2 else None       # (x, z) -> (ponto, normal) na casca curva
-        cab_k = cab_front[3] if len(cab_front) > 3 else 1.0       # cabine mais estreita (Canter): fileira menor
-        for k in range(13):
-            x = (-1.02 + k * 0.17) * cab_k
-            z = wz0 - 0.15
-            if surf is None:
-                add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, z), lamps[k % 2], bevel=0.0, seg=1))
-                continue
-            p, n = surf(x, z)
-            p = p + n * 0.012
-            add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), tuple(p), lamps[k % 2], bevel=0.0, seg=1,
-                      rot=(0, 0, -math.degrees(math.atan2(n.x, n.y)))))
+        cab_brow(m, add, cab_front)
     # --- andons
     z0 = max(BODY_TOP + 0.08, cab_top + 0.04)                     # a frente aparece por cima de qualquer cabine
     _andon(m, add, "andon_f", body_l - 0.25, z0, FRONT_ANDON, front=True, w=2.05 * kx)
@@ -97,6 +85,25 @@ def build_deco(m, add, body_l: float, cab_top: float, cab_front=None, mural=None
             for d in uvl.data:
                 d.uv = (1.0 - d.uv[0], d.uv[1])
         add(o)
+
+
+def cab_brow(m, add, cab_front):
+    """Fileira de luzes logo abaixo do para-brisa ("sobrancelha"). `cab_front` = (Y da frente da cabine, altura da
+    base do para-brisa[, superfície (x, z) -> (ponto, normal)[, fator de largura]])."""
+    lamps = (m["lamp_amber"], m["lamp_yellow"])
+    yf, wz0 = cab_front[:2]
+    surf = cab_front[2] if len(cab_front) > 2 else None       # (x, z) -> (ponto, normal) na casca curva
+    cab_k = cab_front[3] if len(cab_front) > 3 else 1.0       # cabine mais estreita (Canter): fileira menor
+    for k in range(13):
+        x = (-1.02 + k * 0.17) * cab_k
+        z = wz0 - 0.15
+        if surf is None:
+            add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, z), lamps[k % 2], bevel=0.0, seg=1))
+            continue
+        p, n = surf(x, z)
+        p = p + n * 0.012
+        add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), tuple(p), lamps[k % 2], bevel=0.0, seg=1,
+                  rot=(0, 0, -math.degrees(math.atan2(n.x, n.y)))))
 
 
 def _andon(m, add, name, y, z0, text, front: bool, w: float = 2.05):
