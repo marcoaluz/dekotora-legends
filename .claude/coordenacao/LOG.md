@@ -164,3 +164,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: sim/collision.gd, sim/truck_sim.gd, net/{snapshot,protocol,client_sync,bot_client}.gd, road3d/{impact_fx,race_scene_3d,race_demo}.gd, ui/race_hud.gd, tests/test_traffic_penalty.gd (11), docs/capturas_t152/
 - Validação: merge na main sem conflito; 256 testes ok; net_test PASSOU; bots 6 sementes -1,2 a +2,5 s, nenhum travado; capturas 101->61 km/h (carro) e 94->45 km/h (ônibus) conferidas.
 - Decisão pendente: kickdown do câmbio após a batida (40% custa ~10 s; com kickdown ~7,5 s); tranco também entre caminhões/obstáculos de evento; Marco sentir os números. Gerar APK novo (protocolo 4).
+
+## 2026-10-19 · T-153 · especialista · CONCLUÍDA (PRECISA DECISÃO do Marco)
+- Feito: trechos com 2 faixas de verdade (RouteDef.lane_sections; a faixa da direita acaba; muretas, acostamentos, linhas e zebrado estreitam com transição suave; quem fica na faixa raspa e é obrigado a entrar na fila); ponte no litoral (2.440–2.745 m, lombada nova), viaduto antigo (2.270–2.510 m), túnel antigo 湯坂隧道 na montanha (805–1.040 m); placas e HUD; setup online com lane_sections (protocolo 5).
+- Arquivos: sim/{lane_sections,track_events,track,event_contact}.gd, data/routes/*.tres, net/{room,client_sync,protocol}.gd, road3d/{road_mesh_narrow,section_props,section_structures_3d,...}.gd, ui/event_hud.gd, tests/test_lane_sections.gd, docs/capturas_t153/
+- Validação: merge na main sem conflito; 265 testes ok; net_test PASSOU; chamadas iguais (±5), bots +1 a +3 s; capturas olhadas (túnel antigo muito escuro à noite: vai para a F4).
+- Decisão pendente: posições dos trechos, lombada do litoral, nome 湯坂隧道, folga no prazo (hoje nenhuma). Gerar o APK de novo (protocolo 5).
