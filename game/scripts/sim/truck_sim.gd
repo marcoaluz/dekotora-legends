@@ -92,6 +92,9 @@ var brake_lost: float = 0.0             # m/s perdidos nesta freada (o "pssh" do
 var brake_held: bool = false
 var hard_brake_started: bool = false    # bordas deste tick (RaceSim vira evento)
 var hard_brake_ended: bool = false
+## Empurrao lateral (T-141): s de fumaca nos pneus de quem foi empurrado para a faixa vizinha (ou quicou).
+var shove_t: float = 0.0
+var shoved: int = 0                     # vezes que foi empurrado para outra faixa (testes/estatistica)
 
 
 func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
@@ -207,6 +210,7 @@ func grip() -> float:
 func step(dt: float, cmd: Commands, track: Track) -> void:
 	var speed_before: float = speed
 	horn = cmd.horn
+	shove_t = maxf(shove_t - dt, 0.0)
 	# 0) curva: quanto acima da velocidade segura (raspa o pneu, desliza ate 0,5 m, escapa acima de +30%)
 	var curve: float = track.curve_at(z)
 	curve_ratio = CurveGrip.ratio(speed, curve, grip())

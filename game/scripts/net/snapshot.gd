@@ -6,7 +6,8 @@ extends RefCounted
 ##   u8 gear, u8 boost, u8 flags, u8 passing_charge, u8 draft, u8 lane, u8 signal(0..2 = -1/0/+1 +1),
 ##   u8 signal_time (centesimos de s), u8 tap_prev(0..2), u8 lane_change_time (centesimos),
 ##   u32 ack (ultimo comando aplicado)
-##   · u8 n_cars · por carro: f32 z, f32 x.   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144)
+##   · u8 n_cars · por carro: f32 z, f32 x, s16 giro (milirradianos), u8 altura (2 cm; carro arremessado, T-141).
+##   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144), bit5 empurrado (fumaca, T-141)
 ## O dano completo NAO vai aqui: so quando muda, por evento ("damage").
 
 static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
@@ -24,7 +25,7 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_u8(clampi(t.gear, 0, 255))
 		b.put_u8(clampi(roundi(t.boost * 255.0), 0, 255))
 		var flags: int = (1 if t.passing_active else 0) | (2 if t.offroad else 0) | (4 if t.finish_position > 0 else 0) \
-			| (8 if t.horn else 0) | (16 if t.hard_braking else 0)
+			| (8 if t.horn else 0) | (16 if t.hard_braking else 0) | (32 if t.shove_t > 0.0 else 0)
 		b.put_u8(flags)
 		b.put_u8(clampi(roundi(t.passing_charge * 255.0), 0, 255))
 		b.put_u8(clampi(roundi(t.draft * 255.0), 0, 255))
@@ -40,13 +41,15 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		var c: TrafficSim.Car = cars[k]
 		b.put_float(c.z)
 		b.put_float(c.x)
+		b.put_16(clampi(roundi(wrapf(c.yaw, -PI, PI) * 1000.0), -32767, 32767))
+		b.put_u8(clampi(roundi(c.y * 50.0), 0, 255))
 	return b.data_array
 
 
 static func unpack(data: PackedByteArray) -> Dictionary:
 	var b := StreamPeerBuffer.new()
 	b.data_array = data
-	var out: Dictionary = {"tick": b.get_u32(), "trucks": [], "cars": []}
+	var out: Dictionary = {"tick": b.get_u32(), "trucks": [], "cars": [], "cars_spin": []}
 	var n: int = b.get_u8()
 	for i in n:
 		var t: Dictionary = {}
@@ -64,6 +67,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 		t["finished"] = (flags & 4) != 0
 		t["horn"] = (flags & 8) != 0
 		t["hard_braking"] = (flags & 16) != 0
+		t["shoved"] = (flags & 32) != 0
 		t["passing_charge"] = float(b.get_u8()) / 255.0
 		t["draft"] = float(b.get_u8()) / 255.0
 		t["lane"] = b.get_u8()
@@ -76,6 +80,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 	var nc: int = b.get_u8()
 	for k in nc:
 		(out["cars"] as Array).append(Vector2(b.get_float(), b.get_float()))
+		(out["cars_spin"] as Array).append(Vector2(float(b.get_16()) / 1000.0, float(b.get_u8()) / 50.0))
 	return out
 
 
@@ -107,11 +112,16 @@ static func apply_to(sim: RaceSim, snap: Dictionary, skip_idx: int = -1) -> void
 		ts.offroad = bool(t["offroad"])
 		ts.horn = bool(t["horn"])
 		ts.hard_braking = bool(t["hard_braking"])
+		ts.shove_t = Collision.SHOVE_SMOKE_S if bool(t["shoved"]) else 0.0
 		ts.passing_charge = float(t["passing_charge"])
 		ts.draft = float(t["draft"])
 		_apply_lane(ts, t)
 	if sim.traffic != null:
 		var cars: Array = snap["cars"]
+		var spin: Array = snap.get("cars_spin", [])
 		for k in mini(cars.size(), sim.traffic.cars.size()):
 			sim.traffic.cars[k].z = (cars[k] as Vector2).x
 			sim.traffic.cars[k].x = (cars[k] as Vector2).y
+			if k < spin.size():
+				sim.traffic.cars[k].yaw = (spin[k] as Vector2).x
+				sim.traffic.cars[k].y = (spin[k] as Vector2).y

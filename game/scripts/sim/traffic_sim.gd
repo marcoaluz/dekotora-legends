@@ -55,12 +55,20 @@ class Car:
 	var length: float = CAR_LEN
 	var width_x: float = CAR_WIDTH_X
 	var mass: float = 1500.0
+	## Thrown by a truck (T-141): state in the sim, so the server and every client draw the same thing.
+	var out_t: float = 0.0               # s still out of control (AI paused)
+	var vx: float = 0.0                  # x/s lateral slide
+	var yaw: float = 0.0                 # rad body yaw (+ = left), on top of the lane yaw
+	var yaw_rate: float = 0.0            # rad/s
+	var y: float = 0.0                   # m above the road (hop)
+	var vy: float = 0.0                  # m/s
 
 
 var cars: Array[Car] = []
 var density: int = Density.NORMAL
 var hits: int = 0                          # contagem de batidas (debug / testes)
 var honk_yields: int = 0                   # carros que sairam da frente por causa da buzina (testes)
+var throws: int = 0                        # carros arremessados por caminhoes (T-141, testes)
 var events: TrackEvents = null             # eventos de pista (T-139); null = pista livre
 var _rng := RandomNumberGenerator.new()
 
@@ -93,6 +101,8 @@ func _init(seed_: int = 1234, density_: int = Density.NORMAL) -> void:
 ## Giro do corpo (rad, > 0 = esquerda) na troca de faixa: sobe e desce suave, no maximo TruckSim.MAX_BODY_YAW.
 ## Na curva o carro acompanha a pista (mesma regra dos caminhoes, T-132).
 static func body_yaw(c: Car) -> float:
+	if c.out_t > 0.0 or c.yaw != 0.0:
+		return c.yaw                    # arremessado (T-141): o giro da batida manda
 	var rem: float = LANES[c.lane] - c.x
 	if absf(rem) < 0.001:
 		return 0.0
@@ -210,11 +220,37 @@ func _truck_beside(lane: int, c: Car, trucks: Array) -> bool:
 	return false
 
 
+## Arremessa o carro (T-141; chamado pela Collision): nova velocidade para a frente, deslize lateral (x/s),
+## giro (rad/s) e pulo (m/s para cima). Fica fora de controle por `seconds`.
+func throw_car(c: Car, new_speed: float, vx: float, yaw_rate: float, vy: float, seconds: float) -> void:
+	c.speed = maxf(new_speed, 0.0)
+	c.vx = vx
+	c.yaw_rate += yaw_rate
+	if vy > 0.0 and c.y <= 0.0:
+		c.vy = vy
+	c.out_t = maxf(c.out_t, seconds)
+	throws += 1
+
+
+func is_thrown(c: Car) -> bool:
+	return c.out_t > 0.0 or c.y > 0.0
+
+
 func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void:
 	for c in cars:
 		if c.cruise < 0.0:
 			c.cruise = c.speed
+		if is_thrown(c):
+			ThrownCar.step(c, dt)
+			if events != null:
+				EventContact.car(events, c, dt)
+			_respawn_if_behind(c, leader_z, rear_z)
+			continue
 		var target_speed: float = c.cruise
+		if c.yaw != 0.0:                 # voltando para a direcao da pista depois do arremesso (devagar)
+			c.yaw = move_toward(c.yaw, 0.0, ThrownCar.RECOVER_YAW_RATE * dt)
+			if absf(c.yaw) > 0.1:
+				target_speed = minf(target_speed, ThrownCar.RECOVER_SPEED)
 		if events != null:
 			target_speed = minf(target_speed, _avoid_closure(c, trucks))
 			target_speed = minf(target_speed, events.limit_ahead(c.z, c.z + c.length, 120.0, BRAKE * 0.5,
@@ -253,8 +289,18 @@ func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void
 			var nl2: int = c.lane + dir
 			if nl2 >= 0 and nl2 < LANES.size() and _lane_free(nl2, c.z, c) and not _closed(nl2, c.z, c.z + CLOSURE_LOOK):
 				c.lane = nl2
-		if c.z < rear_z - DESPAWN_BEHIND:
-			for attempt in 6:
-				_place(c, leader_z + _rng.randf_range(SPAWN_AHEAD_MIN, SPAWN_AHEAD_MAX))
-				if _lane_free(c.lane, c.z, c):
-					break
+		_respawn_if_behind(c, leader_z, rear_z)
+
+
+func _respawn_if_behind(c: Car, leader_z: float, rear_z: float) -> void:
+	if c.z < rear_z - DESPAWN_BEHIND:
+		c.out_t = 0.0
+		c.vx = 0.0
+		c.yaw = 0.0
+		c.yaw_rate = 0.0
+		c.y = 0.0
+		c.vy = 0.0
+		for attempt in 6:
+			_place(c, leader_z + _rng.randf_range(SPAWN_AHEAD_MIN, SPAWN_AHEAD_MAX))
+			if _lane_free(c.lane, c.z, c):
+				break
