@@ -6,8 +6,8 @@
 GODOT="${GODOT:-/d/DEV/Godot/Godot_v4.7.2-stable_win64.exe}"
 FRAMES="${1:-2400}"
 shift || true
-for SPOT in "kanto_1_coast 300" "kanto_1_coast 640" "kanto_2_viaduct 300" "kanto_2_viaduct 2060" \
-            "kanto_3_mountain 300" "kanto_3_mountain 960"; do
+for SPOT in "kanto_1_coast 300" "kanto_1_coast 2150" "kanto_2_viaduct 300" "kanto_2_viaduct 2060" \
+            "kanto_3_mountain 300" "kanto_3_mountain 560"; do
   set -- $SPOT "$@"
   ROUTE=$1; Z=$2; shift 2
   echo "== $ROUTE start=$Z $*"
