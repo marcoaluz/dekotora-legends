@@ -43,7 +43,7 @@ static func truck(evs: TrackEvents, t: TruckSim, dt: float) -> Dictionary:
 		var ev: TrackEvents.Event = evs.list[k]
 		if nose < ev.z or t.z > ev.reopen_end():
 			continue
-		if ev.kind == TrackEvents.Kind.NARROW:
+		if ev.kind == TrackEvents.Kind.NARROW or ev.kind == TrackEvents.Kind.SECTION:
 			var s: int = ev.side()
 			var lim: float = _wall_limit(evs, ev, t.z, t.length, s)
 			if is_finite(lim):
@@ -57,12 +57,17 @@ static func truck(evs: TrackEvents, t: TruckSim, dt: float) -> Dictionary:
 						t.scrape_t = SCRAPE_EVERY
 						out = {"kind": "scrape", "zone": "right" if s > 0 else "left", "dv": 0.0, "event": k}
 			var iv: Vector2 = evs.interval(ev, nose)
-			if iv.x <= iv.y and Lanes.X[t.lane] >= iv.x and Lanes.X[t.lane] <= iv.y:
+			var body: bool = ev.kind == TrackEvents.Kind.SECTION     # T-153: merge once the truck no longer fits
+			if iv.x <= iv.y and _lane_gone(t.lane, iv, body):
 				var nl: int = t.lane
-				while nl >= Lanes.SHOULDER_L and nl <= Lanes.SHOULDER_R and Lanes.X[nl] >= iv.x and Lanes.X[nl] <= iv.y:
+				while nl >= Lanes.SHOULDER_L and nl <= Lanes.SHOULDER_R and _lane_gone(nl, iv, body):
 					nl -= s
 				t.lane = clampi(nl, Lanes.FIRST, Lanes.LAST)     # the lane is gone: merge into the open one
 				t.signal_dir = 0
+			if body:
+				var c: Dictionary = _left_wall_truck(evs, ev, t, half, dt, k)
+				if not c.is_empty():
+					out = c
 			continue
 		var full: float = ev.full_z()
 		if ev.kind == TrackEvents.Kind.WORKS and nose > full and t.z < ev.end_z():   # steel plates beside the works
@@ -136,6 +141,40 @@ static func _graze(iv: Vector2, t: TruckSim, half: float) -> Dictionary:
 	return {"kind": "scrape", "zone": "right" if exit_left else "left", "dv": 0.0}
 
 
+## Is `lane` gone at this closure? Narrowing (T-139): its centre is inside. Section (T-153, `body`): a truck in it would
+## touch the barrier (the right lane must be left before the barrier closes it).
+static func _lane_gone(lane: int, iv: Vector2, body: bool) -> bool:
+	if body:
+		return Lanes.X[lane] + TrackEvents.BODY_HALF > iv.x
+	return Lanes.X[lane] >= iv.x and Lanes.X[lane] <= iv.y
+
+
+## Left barrier of a 2-lane section (T-153) over the body (rear, middle, nose): highest face x, -INF if open.
+static func _left_limit(evs: TrackEvents, ev: TrackEvents.Event, z: float, length: float) -> float:
+	var lim: float = -INF
+	for zz in [z, z + length * 0.5, z + length]:
+		var f: float = evs.closure(ev, zz)
+		if f > 0.0:
+			lim = maxf(lim, LaneSections.left_x(f))
+	return lim
+
+
+## Truck against the left barrier of a section: pushed back in (scraping), like the lane end on the right.
+static func _left_wall_truck(evs: TrackEvents, ev: TrackEvents.Event, t: TruckSim, half: float, dt: float, k: int) -> Dictionary:
+	var lim: float = _left_limit(evs, ev, t.z, t.length)
+	var over: float = lim - (t.x - half)
+	if not is_finite(lim) or over <= 0.0:
+		return {}
+	t.x += over if over < 0.15 else minf(over, WALL_PUSH * dt)
+	if t.lateral_vel < 0.0:
+		t.lateral_vel = 0.0
+	t.speed = maxf(t.speed - WALL_DECEL * dt, 0.0)
+	if t.scrape_t > 0.0 or t.speed <= 3.0:
+		return {}
+	t.scrape_t = SCRAPE_EVERY
+	return {"kind": "scrape", "zone": "left", "dv": 0.0, "event": k}
+
+
 ## Tightest inner bound of the narrowing over the truck body (rear, middle, nose). INF/-INF if open.
 static func _wall_limit(evs: TrackEvents, ev: TrackEvents.Event, z: float, length: float, s: int) -> float:
 	var lim: float = INF if s > 0 else -INF
@@ -150,15 +189,20 @@ static func _wall_limit(evs: TrackEvents, ev: TrackEvents.Event, z: float, lengt
 ## lane). Small overlaps are removed at once, big ones (shoulder at the taper start) at WALL_PUSH. Returns the new x.
 static func wall_x(evs: TrackEvents, x: float, z: float, length: float, half: float, dt: float) -> float:
 	for ev in evs.list:
-		if ev.kind != TrackEvents.Kind.NARROW or z + length < ev.z or z > ev.reopen_end():
+		var section: bool = ev.kind == TrackEvents.Kind.SECTION
+		if ev.kind != TrackEvents.Kind.NARROW and not section or z + length < ev.z or z > ev.reopen_end():
 			continue
 		var s: int = ev.side()
 		var lim: float = _wall_limit(evs, ev, z, length, s)
-		if not is_finite(lim):
-			continue
-		var over: float = (x + half - lim) if s > 0 else (lim - (x - half))
-		if over > 0.0:
-			x -= (over if over < 0.15 else minf(over, WALL_PUSH * dt)) * float(s)
+		if is_finite(lim):
+			var over: float = (x + half - lim) if s > 0 else (lim - (x - half))
+			if over > 0.0:
+				x -= (over if over < 0.15 else minf(over, WALL_PUSH * dt)) * float(s)
+		if section:                                       # T-153: left barrier of the 2-lane section
+			var ll: float = _left_limit(evs, ev, z, length)
+			var over_l: float = ll - (x - half)
+			if is_finite(ll) and over_l > 0.0:
+				x += over_l if over_l < 0.15 else minf(over_l, WALL_PUSH * dt)
 	return x
 
 
@@ -169,13 +213,17 @@ static func car(evs: TrackEvents, c: TrafficSim.Car, dt: float) -> void:
 	for ev in evs.list:
 		if nose < ev.z or c.z > ev.reopen_end():
 			continue
-		if ev.kind == TrackEvents.Kind.NARROW:
+		if ev.kind == TrackEvents.Kind.NARROW or ev.kind == TrackEvents.Kind.SECTION:
 			var s: int = ev.side()
 			var lim: float = _wall_limit(evs, ev, c.z, c.length, s)
 			if is_finite(lim):
 				var over: float = (c.x + half - lim) if s > 0 else (lim - (c.x - half))
 				if over > 0.0:
 					c.x -= minf(over, WALL_PUSH * dt) * float(s)
+			if ev.kind == TrackEvents.Kind.SECTION:         # T-153: left barrier (a thrown car slides along it)
+				var ll: float = _left_limit(evs, ev, c.z, c.length)
+				if is_finite(ll) and c.x - half < ll:
+					c.x += minf(ll - (c.x - half), WALL_PUSH * dt)
 			continue
 		var full: float = ev.full_z()
 		if nose <= full or c.z >= ev.end_z():

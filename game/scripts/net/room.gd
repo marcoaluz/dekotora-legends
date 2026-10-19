@@ -302,4 +302,4 @@ func race_setup() -> Dictionary:
 		e["paint"] = m.loadout.get("paint", "#e9eef5")
 		e["loadout"] = m.loadout
 	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick,
-		"events": sim.track.events.to_array()}
+		"events": sim.track.events.to_array(), "lane_sections": sim.track.lane_sections}   # T-153: trechos de 2 faixas

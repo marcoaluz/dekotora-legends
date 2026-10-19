@@ -31,6 +31,8 @@ func setup(setup_: Dictionary, my_truck: int) -> void:
 	var rules: Dictionary = setup_["rules"]
 	var route: RouteDef = load("res://data/routes/%s.tres" % rules["route"]) as RouteDef
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
+	if setup_.has("lane_sections"):                           # T-153: trechos de 2 faixas do servidor (a pista dele manda)
+		track.set_lane_sections(setup_["lane_sections"])
 	if setup_.has("events"):                                  # T-139: eventos sorteados pelo servidor
 		track.events = TrackEvents.from_array(setup_["events"])
 	elif route != null:

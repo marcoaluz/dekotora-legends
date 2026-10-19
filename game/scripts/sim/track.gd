@@ -13,8 +13,26 @@ var heights: PackedFloat32Array = PackedFloat32Array()   # altura no INICIO de c
 var length_m: float = 0.0
 ## Objetos de beira de estrada: {z, x, kind}. Ordenados por z (adicione em ordem crescente).
 var objects: Array[Dictionary] = []
-## Eventos de pista (T-139): acidente, obras, estreitamento. Vazio = pista livre (RaceSim.set_events).
-var events: TrackEvents = TrackEvents.new()
+## Trechos com 2 faixas (T-153, RouteDef.lane_sections, formato em LaneSections): fazem parte da PISTA. Toda lista de
+## eventos atribuida a `events` recebe esses trechos (Kind.SECTION), entao `--no-events`, a regra de sala
+## `events: false` e a lista que o servidor manda continuam com a pista estreita.
+var lane_sections: Array[Dictionary] = []
+## Eventos de pista (T-139): acidente, obras, estreitamento (+ os trechos de 2 faixas). Vazio = pista livre.
+var events: TrackEvents = TrackEvents.new():
+	set(v):
+		events = v if v != null else TrackEvents.new()
+		events.set_sections(lane_sections)
+
+
+## Troca os trechos de 2 faixas (rota ou setup da corrida online) e atualiza a lista de eventos.
+func set_lane_sections(a: Array) -> void:
+	lane_sections = LaneSections.sanitize(a)
+	events.set_sections(lane_sections)
+
+
+## Faixas de rolagem abertas em z (3, ou 2 no trecho estreito).
+func lanes_at(z: float) -> int:
+	return LaneSections.lanes_at(events, z)
 
 
 func segment_count() -> int:

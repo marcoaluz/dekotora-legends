@@ -12,12 +12,14 @@ extends RefCounted
 ## Warning signs and the HUD alert start WARN_M before z.
 ## Fixed events come from RouteDef.events; random ones are rolled from the race seed (server rolls online and sends
 ## the list in the race setup, see to_array/from_array).
+## T-153: Kind.SECTION = a road section with 2 lanes (LaneSections): part of the road, added to every list from
+## Track.lane_sections (never sent in `events`, never random). Its taper/reopen lengths come from the data.
 
-enum Kind { ACCIDENT, WORKS, NARROW }
-const KIND_IDS: Array[String] = ["accident", "works", "narrow"]
-const TAPER_M: Array[float] = [45.0, 60.0, 120.0]
-const REOPEN_M: Array[float] = [0.0, 0.0, 80.0]
-const MIN_FULL_M: Array[float] = [50.0, 60.0, 120.0]   # minimum full-closure length after the taper
+enum Kind { ACCIDENT, WORKS, NARROW, SECTION }
+const KIND_IDS: Array[String] = ["accident", "works", "narrow", "section"]
+const TAPER_M: Array[float] = [45.0, 60.0, 120.0, LaneSections.DEFAULT_TAPER_M]
+const REOPEN_M: Array[float] = [0.0, 0.0, 80.0, LaneSections.DEFAULT_TAPER_M]
+const MIN_FULL_M: Array[float] = [50.0, 60.0, 120.0, LaneSections.MIN_LENGTH_M]   # minimum full-closure length after the taper
 const WARN_M: float = 400.0
 const OUTER: float = 2.0                  # beyond the physical limit (|x| <= 1,6): outer closures take the shoulder too
 const EDGE: float = Lanes.ASPHALT_EDGE    # anchor of an outer taper (asphalt edge)
@@ -28,11 +30,12 @@ const RANDOM_MIN_Z: float = 650.0         # after the toll gate and the start
 const RANDOM_END_GAP: float = 350.0       # keep the last metres before the finish free
 const RANDOM_GAP_M: float = 200.0         # free road between one event (end) and the next warning
 const RANDOM_SHARP: float = 1.25          # no random event in the tightest curves (the mountain still gets some)
+const SECTION_GAP_M: float = 120.0        # T-153: free road between a random event and a 2-lane section zone (its signs skip the section)
 # road works: steel plates on the open lanes along the full closure (EventContact.truck)
 const WORKS_LIMIT_KMH: float = 60.0       # posted limit beside the works
 const LIMIT_TOL_KMH: float = 5.0          # above limit + tolerance the plates shake the cargo
 # deadline allowance (s) per event, measured with tools_dev/measure_event_times.gd (mean loss of the HARD bots)
-const ALLOWANCE_S: Array[float] = [3.0, 7.0, 3.0]   # accident (1 lane), works (with the 60 km/h limit), narrow
+const ALLOWANCE_S: Array[float] = [3.0, 7.0, 3.0, 0.0]   # accident (1 lane), works (60 km/h limit), narrow, section (part of the route)
 const ALLOWANCE_TWO_LANES_S: float = 8.0           # accident or works closing 2 lanes
 
 
@@ -44,17 +47,20 @@ class Event:
 	var lo: int = Lanes.LAST              # closed road lanes lo..hi (Lanes indices)
 	var hi: int = Lanes.LAST
 	var fixed: bool = true                # from the route (false = rolled by the seed)
+	var taper: float = 0.0                # m of taper (TAPER_M[kind]; sections: from the data)
+	var reopen: float = 0.0               # m of reopening after end_z (REOPEN_M[kind]; sections: = taper)
+	var look: String = ""                 # sections: visual structure (LaneSections)
 	var block_z: PackedFloat32Array = PackedFloat32Array()   # per lane 0..4: first z where a truck in that lane would touch the closure (INF = never)
 	var clear_z: PackedFloat32Array = PackedFloat32Array()   # per lane: z where it is open again
 
 	func full_z() -> float:
-		return z + TAPER_M[kind]
+		return z + taper
 
 	func end_z() -> float:
 		return z + length
 
 	func reopen_end() -> float:
-		return end_z() + REOPEN_M[kind]
+		return end_z() + reopen
 
 	## Side of the closure: +1 right (touches lane 3), -1 left (touches lane 1), 0 middle lane only.
 	func side() -> int:
@@ -103,10 +109,18 @@ func add(d: Dictionary) -> Event:
 		return null                                   # never all 3 lanes: there is always a way out
 	if kind == Kind.NARROW and lo != hi or kind == Kind.NARROW and lo == Lanes.CENTER:
 		return null                                   # narrowing: one OUTER lane ends
+	if kind == Kind.SECTION and (lo != Lanes.LAST or hi != Lanes.LAST):
+		return null                                   # 2-lane section: the right lane ends (LaneSections)
 	var ev := Event.new()
 	ev.kind = kind
 	ev.z = float(d.get("z", 0.0))
-	ev.length = maxf(float(d.get("length", 0.0)), TAPER_M[kind] + MIN_FULL_M[kind])
+	ev.taper = TAPER_M[kind]
+	ev.reopen = REOPEN_M[kind]
+	if kind == Kind.SECTION:
+		ev.taper = clampf(float(d.get("taper", ev.taper)), LaneSections.MIN_TAPER_M, LaneSections.MAX_TAPER_M)
+		ev.reopen = ev.taper
+		ev.look = String(d.get("look", ""))
+	ev.length = maxf(float(d.get("length", 0.0)), ev.taper + MIN_FULL_M[kind])
 	ev.lo = lo
 	ev.hi = hi
 	ev.fixed = bool(d.get("fixed", true))
@@ -121,10 +135,10 @@ func closure(ev: Event, zz: float) -> float:
 	if zz < ev.z or zz > ev.reopen_end():
 		return 0.0
 	if zz < ev.full_z():
-		return smoothstep(0.0, 1.0, (zz - ev.z) / TAPER_M[ev.kind])
+		return smoothstep(0.0, 1.0, (zz - ev.z) / ev.taper)
 	if zz <= ev.end_z():
 		return 1.0
-	return 1.0 - smoothstep(0.0, 1.0, (zz - ev.end_z()) / maxf(REOPEN_M[ev.kind], 0.001))
+	return 1.0 - smoothstep(0.0, 1.0, (zz - ev.end_z()) / maxf(ev.reopen, 0.001))
 
 
 ## Closed x interval at `zz` (Lanes units). x > y means nothing is closed there.
@@ -132,6 +146,8 @@ func interval(ev: Event, zz: float) -> Vector2:
 	var f: float = closure(ev, zz)
 	if f <= 0.0:
 		return Vector2(1.0, -1.0)
+	if ev.kind == Kind.SECTION:                       # the right barrier moves in (LaneSections)
+		return Vector2(LaneSections.right_x(f), OUTER)
 	var xa: float = -OUTER if ev.lo == Lanes.FIRST else Lanes.X[ev.lo] - Lanes.SPACING * 0.5
 	var xb: float = OUTER if ev.hi == Lanes.LAST else Lanes.X[ev.hi] + Lanes.SPACING * 0.5
 	var s: int = ev.side()
@@ -257,8 +273,30 @@ func _scan(ev: Event) -> void:
 func to_array() -> Array:
 	var out: Array = []
 	for ev in list:
-		out.append(ev.to_dict())
+		if ev.kind != Kind.SECTION:                   # sections go in the setup as `lane_sections` (the road)
+			out.append(ev.to_dict())
 	return out
+
+
+## Replaces the 2-lane sections of this list (T-153: Track.lane_sections, RouteDef format {start, end, lanes, taper}).
+func set_sections(sections: Array) -> void:
+	var keep: Array[Event] = []
+	for ev in list:
+		if ev.kind != Kind.SECTION:
+			keep.append(ev)
+	list = keep
+	for d in sections:
+		var e: Dictionary = LaneSections.to_event(d)
+		if not e.is_empty():
+			add(e)
+
+
+## Only 2-lane sections (or nothing): no warning, cone or works event in the list.
+func only_sections() -> bool:
+	for ev in list:
+		if ev.kind != Kind.SECTION:
+			return false
+	return true
 
 
 static func from_array(a: Array) -> TrackEvents:
@@ -275,6 +313,7 @@ static func from_array(a: Array) -> TrackEvents:
 static func roll(fixed: Array[Dictionary], track: Track, seed_: int, slots: int, chance: float,
 		avoid: Array[Vector2] = []) -> TrackEvents:
 	var evs := TrackEvents.new()
+	evs.set_sections(track.lane_sections)              # T-153: random events never fall on a 2-lane section
 	for d in fixed:
 		evs.add(d)
 	var rng := RandomNumberGenerator.new()
@@ -313,6 +352,10 @@ static func _free_spot(evs: TrackEvents, track: Track, z: float, span: float, av
 		if z + span > t.x - 60.0 and z - 120.0 < t.x + t.y + 60.0:
 			return false
 	for ev in evs.list:
+		if ev.kind == Kind.SECTION:                    # T-153: the road itself; only the zones must not touch
+			if z + span + SECTION_GAP_M > ev.z and z - SECTION_GAP_M < ev.reopen_end():
+				return false
+			continue
 		if z + span + RANDOM_GAP_M > ev.z - WARN_M and from - RANDOM_GAP_M < ev.reopen_end():
 			return false
 	var zz: float = z - 150.0

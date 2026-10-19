@@ -21,6 +21,11 @@ extends Resource
 @export var events: Array[Dictionary] = []
 @export var random_events: int = 1
 @export var random_chance: float = 0.45
+## Trechos com 2 faixas (T-153): {start, end, lanes: 2, taper, look} (formato e regras em LaneSections). A faixa da
+## DIREITA acaba; `look` (tunnel | bridge | old_viaduct) so muda o visual.
+@export var lane_sections: Array[Dictionary] = []
+## Pontes (T-153): (inicio m, comprimento m), so visual (pilares, guarda-corpo, mar embaixo): SectionStructures3D.
+@export var bridges: Array[Vector2] = []
 
 const DEADLINE_REF_SPEED: float = 27.0           # m/s (~97 km/h) de referencia para o prazo
 const DEADLINE_SLACK: float = 1.2                # folga sobre o tempo de referencia
@@ -49,5 +54,6 @@ func build_track(seed_: int = 7) -> Track:
 	var t := Track.new()
 	for s in sections:
 		t.add_section(float(s["length"]), float(s["curve"]), float(s.get("hill", 0.0)))
+	t.set_lane_sections(lane_sections)
 	t.decorate_roadside(seed_)
 	return t

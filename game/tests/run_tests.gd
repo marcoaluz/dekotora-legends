@@ -15,8 +15,14 @@ func _initialize() -> void:
 	var failed := 0
 	var files := DirAccess.get_files_at(TEST_DIR)
 	files.sort()
+	var only: String = ""                       # -- --only=test_lane_sections: roda so os arquivos com esse trecho no nome
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--only="):
+			only = a.substr(7)
 	for file in files:
 		if not (file.begins_with("test_") and file.ends_with(".gd")) or file == "test_case.gd":
+			continue
+		if only != "" and not file.contains(only):
 			continue
 		var script: GDScript = load(TEST_DIR + file)
 		for method in script.get_script_method_list():

@@ -182,7 +182,8 @@ func _gen_rivals_and_routes() -> void:
 		["kanto_1_coast", 20000, "coast", "rival_coast", 0, 0,
 			[{"length": 500.0, "curve": 0.0}, {"length": 350.0, "curve": -0.5}, {"length": 400.0, "curve": 0.0},
 			 {"length": 350.0, "curve": 0.6}, {"length": 300.0, "curve": 0.0, "hill": 0.03}, {"length": 300.0, "curve": 0.0, "hill": -0.03},
-			 {"length": 400.0, "curve": -0.4}, {"length": 400.0, "curve": 0.0}]],
+			 {"length": 200.0, "curve": -0.4}, {"length": 200.0, "curve": -0.4, "hill": 0.03},   # T-153: ponte em 2440-2745 m
+			 {"length": 200.0, "curve": 0.0, "hill": -0.03}, {"length": 200.0, "curve": 0.0}]],
 		["kanto_2_viaduct", 30000, "city", "rival_urban", 1, 20,
 			[{"length": 400.0, "curve": 0.0}, {"length": 300.0, "curve": 0.9}, {"length": 250.0, "curve": -0.9},
 			 {"length": 400.0, "curve": 0.0, "hill": 0.04}, {"length": 300.0, "curve": 1.0}, {"length": 300.0, "curve": -1.1},
