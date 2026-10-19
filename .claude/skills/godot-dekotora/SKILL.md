@@ -121,6 +121,8 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   - `--no-events` deixa a pista livre.
   - `--event-seed=N` fixa a semente do sorteio (repete os mesmos eventos).
   - `--hide-events-3d` esconde só o visual (`track_events_3d.gd`), para medir o custo de desenho.
+  - `--traffic-model=car_jeep` (depuração/capturas): todo carro comum do trânsito vira esse modelo (`traffic_3d.gd`).
+- Acidente (T-143): usa `car_police` (viatura, `EventProps.POLICE_MODEL`) e `car_wreck` (carro batido, `EventProps.WRECK_MODEL`). Nenhum dos dois anda no trânsito comum.
 - Medidores (headless):
   - `godot --headless --path game -s res://tools_dev/measure_event_times.gd -- --seeds=5 --route=ROTA` (`--seeds` e `--route`).
   - `godot --headless --path game -s res://tools_dev/trace_event.gd -- --route=R --event=... --tseed=N --bot=K` (`--route`, `--event`, `--tseed`, `--bot`, `--seed`, `--from`, `--to`).
@@ -134,3 +136,12 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Efeito que sai do nariz do caminhão: a câmera atrás do baú não vê. Prenda as faíscas ao caminhão (`local_coords`) e jogue pedaços para cima/lados com o embalo do caminhão.
 - Em `--quality=1` a escala 3D é 0,6: risco/partícula com menos de ~0,08 m some. Teste o visual com a sonda `tools_dev/fx_probe.gd` (precisa de janela) e na corrida com `--demo=crash|brake`.
 - `--fps-log` mostra `max N no periodo` (pico de chamadas de desenho, ex.: na batida) e `PICO:` para quadros acima de 50 ms; `--no-impact-fx` compara sem os efeitos.
+
+## Kit de beira de estrada (T-146)
+
+- `--no-kit` desliga o kit (`road3d/roadside_kit.gd`) e volta às caixas antigas (vigas dos pórticos, placas, barreiras). Use para comparar antes/depois.
+- Capturas: `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]` (3 rotas, dia e noite; grava `PASTA/<rota>_<cena>_<hora>/t01.png`).
+- Custo: `tools/measure_roadside_spot.sh` mede o MESMO quadro com e sem kit (FPS médio, modo médio, eventos com semente fixa).
+- `MeshBatch` (`road3d/mesh_batch.gd`) junta peças diferentes num único nó por bloco e material: uma chamada de desenho por material e bloco visível. Diferente do MultiMesh, aceita modelos diferentes.
+- `GlbMesh` (`road3d/glb_mesh.gd`) mantém as tangentes do .glb (mapa de normais funciona).
+- As artes dos outdoors saem de `godot --path game -s res://tools_dev/make_billboard_art.gd`. Precisa de janela: rode sem `--headless`.

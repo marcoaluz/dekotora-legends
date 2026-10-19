@@ -127,6 +127,17 @@ Regras que valem para estender aos outros baús:
 - O mural continua trocável (PNG) e é um material por caminhão (cor do rival): o `TruckNode` põe nele as normais/AO
   compartilhadas (`TruckTextures.swap_textures`); `TruckTextures.apply` não mexe no material "mural".
 
+## Kit de beira de estrada (T-146)
+
+Os modelos de terceiros de `docs/Novas Melhorias/` (fora do Git) viram peças reduzidas do jogo:
+
+| Script | Saída |
+| --- | --- |
+| `build_roadside_kit.py` | `game/assets/scenery/kit/*.glb` (só geometria + UV, materiais pelo nome) e `game/assets/textures/kit/*.png` (barreira, metal da placa, treliça) |
+
+Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<pasta>/docs/Novas Melhorias" [--preview]`.
+Depois `godot --headless --path game --import`. Ver `.claude/skills/blender-pixelart/SKILL.md` (seção T-146).
+
 ## Paleta
 
 `blender/palettes/dekotora.json`: 40 cores iniciais (noite, neon, cromo, dourado, pinturas). Pode ser trocada
