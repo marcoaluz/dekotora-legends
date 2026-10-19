@@ -46,6 +46,7 @@ var _pause_root: Control
 var _fps_log: bool = false
 var _fps_t: float = 0.0
 var _fps_n: int = 0
+var _fps_max_calls: int = 0           # --fps-log: maior numero de chamadas de desenho no periodo (batidas, T-141)
 var _fps_age: float = 0.0              # s desde o 1o quadro (--fps-log: picos so depois de carregar)
 var _pause_first: Button
 var _audio: RaceAudio
@@ -442,11 +443,13 @@ func _process(delta: float) -> void:
 		_fps_age += delta
 		if delta > 0.05 and _fps_age > 1.5:
 			print("PICO: quadro de %.0f ms (t=%.1f s)" % [delta * 1000.0, sim.time])
+		_fps_max_calls = maxi(_fps_max_calls, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
 		if _fps_t >= 5.0:
-			print("FPS medio: %.1f  (desenhos: %d, triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+			print("FPS medio: %.1f  (desenhos: %d, max %d no periodo; triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), _fps_max_calls, Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
 					Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0])
 			_fps_t = 0.0
 			_fps_n = 0
+			_fps_max_calls = 0
 	var dt: float = minf(delta, 0.1)
 	if _countdown > 0.0:
 		var before: float = _countdown

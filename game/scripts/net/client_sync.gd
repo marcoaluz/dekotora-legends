@@ -121,6 +121,8 @@ func _copy_state(tr: TruckSim, st: Dictionary) -> void:
 	tr.draft = float(st["draft"])
 	tr.offroad = bool(st["offroad"])
 	tr.passing_active = bool(st["passing"])
+	if bool(st.get("shoved", false)):            # T-141: so o servidor sabe da batida (fumaca de quem foi empurrado)
+		tr.shove_t = maxf(tr.shove_t, Collision.SHOVE_SMOKE_S * 0.5)
 	Snapshot._apply_lane(tr, st)
 	if bool(st["finished"]) and tr.finish_position == 0:
 		tr.finish_position = 1
