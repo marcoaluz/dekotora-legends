@@ -28,6 +28,7 @@ var _countdown: float = 3.0
 var _steer_smooth: float = 0.0
 var _cargo_notice: Array[String] = []
 var _lights_state: bool = true
+var _mural_glow_state: float = -1.0
 var _cinema := RaceCinema.new()         # cortes de camera da largada/chegada e clarao do tunel
 var _final_result: Dictionary = {}     # resultado fixado no instante em que a corrida acaba
 const END_SCREEN_DELAY: float = 2.6    # tempo do corte e do banner de chegada antes da tela de resultado
@@ -282,6 +283,7 @@ func _spawn_field_online() -> void:
 		var i: int = int(entry["idx"])
 		var node := TruckNode.new()
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
+		node.set_mural_glow(tod.mural_glow)                                   # T-155: mural aceso a noite
 		node.body_kind = String(entry["loadout"].get("body", "base"))      # o Canter tem outro tamanho na simulacao
 		node.cab_kind = CabCatalog.normalize(entry["loadout"].get("cab", ""))   # descritor antigo/sem cabine -> padrao
 		node.plates = _plates
@@ -350,8 +352,9 @@ func _spawn_field() -> void:
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else RIVAL_BODIES[i % RIVAL_BODIES.size()]
 		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
+		node.set_mural_glow(tod.mural_glow)                                   # T-155: mural aceso a noite
 		node.plates = _plates
-		if i == 0:                                       # gancho: placa escolhida pelo jogador (ainda sem tela)
+		if i == 0:                                      # gancho: placa escolhida pelo jogador (ainda sem tela)
 			node.plate_cell = int(gs.profile.get("plate_cell", -1))
 		add_child(node)
 		if i == 0:
@@ -709,7 +712,13 @@ func _curve_feedback(t: TruckSim) -> void:
 
 ## Luzinhas e farois: acesos de noite/fim de tarde e quando o jogador esta num tunel (de dia ficam fracos).
 func _update_truck_lights() -> void:
-	var on: bool = tod.headlights or _tunnel.amount > 0.3
+	var inside: bool = _tunnel.amount > 0.3
+	var glow: float = maxf(tod.mural_glow, MuralGlow.TUNNEL) if inside else tod.mural_glow   # T-155: mural no tunel
+	if glow != _mural_glow_state:
+		_mural_glow_state = glow
+		for k in _trucks.size():
+			_trucks[k].set_mural_glow(glow)
+	var on: bool = tod.headlights or inside
 	if on == _lights_state:
 		return
 	_lights_state = on

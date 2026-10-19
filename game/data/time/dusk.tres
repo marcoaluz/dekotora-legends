@@ -34,6 +34,7 @@ neon_energy = 0.9
 pool_energy = 0.45
 road_roughness = 0.6
 line_emission = 0.4
+mural_glow = 0.4
 mountain_color = Color(0.17, 0.11, 0.2, 1)
 land_color = Color(0.06, 0.05, 0.08, 1)
 water_color = Color(0.05, 0.06, 0.14, 1)

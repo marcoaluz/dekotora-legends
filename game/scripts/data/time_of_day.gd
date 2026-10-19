@@ -40,6 +40,8 @@ const DIR := "res://data/time/"
 @export var pool_energy: float = 0.75                 # poca de luz de sodio sob os postes
 @export var lamps_on: bool = true
 @export var headlights: bool = true
+## Luz falsa das luzinhas sobre o mural das laterais (bau e tampas da graneleira; MuralGlow, T-155): 0 = nenhuma.
+@export var mural_glow: float = 0.8
 @export var road_roughness: float = 0.55              # menor = asfalto mais molhado
 @export var line_emission: float = 0.8
 @export var mountain_color: Color = Color("#16143a")
