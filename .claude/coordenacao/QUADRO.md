@@ -5,6 +5,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-146 | Novas Melhorias: barreiras de metal e concreto, pacote de placas de trânsito e placão (docs/Novas Melhorias/Metais, Placas, Placão) na pista | pedido do Marco | difícil | especialista | em andamento | 2026-10-18 | |
+| T-145 | Novas Melhorias: carroceria nova graneleira (docs/Novas Melhorias/Carroceria) como opção de carroceria nas 4 cabines, ao lado dos baús, com regra lógica de carga | pedido do Marco | difícil | especialista | em andamento | 2026-10-18 | |
 | T-113 | Ajuste pós-ATB-1: faixas do asfalto alinhadas com a simulação, caminhão centrado na faixa, troca de faixa mais pesada (jeito do original) | pedido do Marco | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-112 | ATB-2 item 6: largada e chegada com clima (corte de câmera lateral 1–2 s, banner, clarão na saída do túnel) | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-111 | ATB-2 item 5: rivais que recusam por fama e destaque mínimos, com fala curta | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
@@ -13,8 +15,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 | T-108 | ATB-2 item 2: loja em duas abas (Decoração e Mecânica) e prévia dia/noite na garagem | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-107 | ATB-2 item 1: nota de destaque (peças, pintura, mural, adesivo) ao vivo na loja e no resultado | lote ATB-2 | médio | coordenador | concluída | 2026-10-17 | 2026-10-17 |
 | T-106 | Cabine do caminhão mais realista (portas, painéis, vidros, para-lama, detalhes) e texturas melhores da pintura/metal/borracha, via scripts Blender de linha de comando (sem MCP) | pedido do Marco | difícil | especialista | concluída (2 decisões com o Marco: texturas compartilhadas; apagar PNGs antigos) | 2026-10-17 | 2026-10-17 |
-| T-144 | Freada forte em velocidade: som de freio e fumaça dos pneus; botão e tecla de buzina (som, HUD de toque, teclado) | pedido do Marco | difícil | especialista | em andamento (junto com a T-141) | 2026-10-18 | |
-| T-143 | Viatura de polícia (Camry de docs/Modelos Melhorados, sem marcas NYPD/Toyota) no acidente + jipe Suzuki (T-131) e demais carros ainda não usados no tráfego | pedido do Marco (aprovou as regras da T-139) | difícil | especialista | em andamento | 2026-10-18 | |
+| T-144 | Freada forte em velocidade: som de freio e fumaça dos pneus; botão e tecla de buzina (som, HUD de toque, teclado) | pedido do Marco | difícil | especialista | em andamento (retomada em 2026-10-18 a partir do branch wip/t141-t143-t144, junto com a T-141) | 2026-10-18 | |
+| T-143 | Viatura de polícia (Camry de docs/Modelos Melhorados, sem marcas NYPD/Toyota) no acidente + jipe Suzuki (T-131) e demais carros ainda não usados no tráfego + carro batido de docs/Novas Melhorias (retomada) | pedido do Marco (aprovou as regras da T-139) | difícil | especialista | em andamento | 2026-10-18 | |
 | T-142 | Anotar na skill godot-dekotora: ferramentas de captura das telas (T-138) e eventos de pista (T-139) | relatórios T-138/T-139 | fácil | ajudante-rapido | concluída (commit 10f22ce) | 2026-10-18 | |
 | T-141 | E2: impacto das batidas (chacoalhar, faíscas, pedaços de cromo, som em camadas no ElevenLabs, carros do trânsito arremessados na sim) | pedido do Marco (E2) | difícil | especialista | em andamento (agora inclui a força da colisão igual ao jogo original, sons de colisão de caminhões, com a T-144) | 2026-10-18 | |
 | T-140 | APK Android de teste para o celular (JDK 17 + Android SDK, exportar, instalar) | pedido do Marco | médio | coordenador | concluída (APK de teste 84 MB gerado e assinado com chave de debug; falta instalar no celular) | 2026-10-18 | 2026-10-18 |

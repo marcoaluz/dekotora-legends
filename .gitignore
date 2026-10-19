@@ -38,6 +38,7 @@ referencias/
 # Modelos 3D de terceiros em avaliacao (1,1 GB, licenca desconhecida): nunca commitar
 docs/Novos modelos/
 docs/Modelos Melhorados/
+docs/Novas Melhorias/
 
 # Copias isoladas de agentes (git worktree)
 .claude/worktrees/
