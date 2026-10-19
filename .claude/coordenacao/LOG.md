@@ -158,3 +158,9 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-19 · T-148, T-149, T-151 · ajudante-rapido · CONCLUÍDA
 - Feito: notas nas skills blender-pixelart e godot-dekotora (graneleira, trânsito, kit de beira de estrada) e no PIPELINE_ARTE_BLENDER.md (commit 39f5cc7, merge 1c11dbe).
+
+## 2026-10-19 · T-152 · especialista · CONCLUÍDA (com decisões pendentes)
+- Feito: batida no trânsito custa velocidade na sim (frente 25-40% pela força, raspão 8-15%, ônibus x1,35; menor entre física e penalidade) + tranco 0,6 s (acelerador sem efeito, freio ok, balanço do caminhão/câmera, velocímetro vermelho); uma penalidade por batida; tranco no snapshot em ticks (protocolo 4); cliente suaviza o recuo da batida.
+- Arquivos: sim/collision.gd, sim/truck_sim.gd, net/{snapshot,protocol,client_sync,bot_client}.gd, road3d/{impact_fx,race_scene_3d,race_demo}.gd, ui/race_hud.gd, tests/test_traffic_penalty.gd (11), docs/capturas_t152/
+- Validação: merge na main sem conflito; 256 testes ok; net_test PASSOU; bots 6 sementes -1,2 a +2,5 s, nenhum travado; capturas 101->61 km/h (carro) e 94->45 km/h (ônibus) conferidas.
+- Decisão pendente: kickdown do câmbio após a batida (40% custa ~10 s; com kickdown ~7,5 s); tranco também entre caminhões/obstáculos de evento; Marco sentir os números. Gerar APK novo (protocolo 4).
