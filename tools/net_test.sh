@@ -25,6 +25,6 @@ wait $ANA; RA=$?
 wait $BETO; RB=$?
 kill $SERVER 2>/dev/null
 echo "--- servidor"; grep -E "^\[servidor\]" "$LOGDIR/server.log" | head -20
-echo "--- Ana (saida $RA)"; grep -E "RESULTADO|erro_pred|erro do servidor|desconectado" "$LOGDIR/ana.log" | tail -8
-echo "--- Beto (saida $RB)"; grep -E "RESULTADO|erro_pred|erro do servidor|desconectado" "$LOGDIR/beto.log" | tail -8
+echo "--- Ana (saida $RA)"; grep -E "RESULTADO|PRED:|erro_pred|erro do servidor|desconectado" "$LOGDIR/ana.log" | tail -9
+echo "--- Beto (saida $RB)"; grep -E "RESULTADO|PRED:|erro_pred|erro do servidor|desconectado" "$LOGDIR/beto.log" | tail -9
 if grep -q BOTCLIENT_DONE "$LOGDIR/ana.log" && grep -q BOTCLIENT_DONE "$LOGDIR/beto.log"; then echo "NET_TEST: PASSOU"; exit 0; else echo "NET_TEST: FALHOU (logs em $LOGDIR)"; exit 1; fi

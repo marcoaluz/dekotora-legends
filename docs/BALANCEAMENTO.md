@@ -320,3 +320,41 @@ Constantes em `game/scripts/sim/collision.gd`, `thrown_car.gd`, `hard_brake.gd` 
 Medido com 4 bots, sem eventos (`tools_dev/measure_impacts.gd`, 4 sementes): por corrida, 0–0,8 batida entre caminhões,
 0–0,3 empurrão de faixa, 2–3 batidas no trânsito, 0,3–0,8 carro arremessado; bots difíceis chegam em 117–133 s.
 
+## Batida no trânsito: penalidade e tranco (T-152)
+
+Pedido do Marco: a batida no carro do trânsito tem que custar velocidade (só a troca de momento dava ~1,5 m/s numa batida
+de 10 m/s e não se sentia). Constantes em `game/scripts/sim/collision.gd` (`PEN_*`, `JOLT_TIME`); vale para jogador, bots e
+servidor (é a simulação). O caminhão fica com o **menor** entre o resultado da física e `velocidade_antes × (1 − penalidade)`
+(não soma: no ônibus a física já tira bastante). O carro continua sendo arremessado igual (T-141).
+
+| Regra | Valor |
+| --- | --- |
+| De frente na traseira do carro | 25% com Δv ≤ 2 m/s → 40% com Δv ≥ 12 m/s (linear entre os dois) |
+| Raspão lateral | 8% com Δv ≤ 1,5 m/s → 15% com Δv ≥ 6 m/s (Δv lateral = entrada na faixa × 7,2 m + 0,2 × diferença de velocidade) |
+| Veículo pesado (> 3 t: ônibus; futuros caminhões do trânsito) | × 1,35 → de frente 34–54%, de lado 11–20% (teto 60%) |
+| Esportivo e carros comuns (1,4–1,5 t) | sem multiplicador |
+| Tranco | 0,6 s (18 ticks): acelerador sem efeito (freio funciona; o freio-motor entra como ao soltar o pé) |
+| Uma penalidade por batida | durante o tranco, contato novo (até com outro carro) não cobra de novo |
+| Abaixo de 1 m/s de diferença | encostar não é batida: sem dano e sem penalidade |
+
+Por que ônibus × 1,35: o ônibus tem 12 t (igual ao caminhão); com o mesmo multiplicador do carro, numa batida de 10 m/s
+a física (29%) já ficaria perto da penalidade do carro (37%) e "maior que carro" quase não apareceria. Com × 1,35 o ônibus
+custa ~50% de frente contra ~37% do carro na mesma batida.
+
+Quanto custa em tempo (reta, 100 km/h, acelerando, comparado a não bater; o câmbio automático fica na 6ª e recupera devagar):
+
+| Perda | 8% | 15% | 25% | 40% | 54% (ônibus) |
+| --- | --- | --- | --- | --- | --- |
+| Tempo perdido | ~1,7 s | ~3,0 s | ~5,4 s | ~10 s | ~11 s |
+
+Bots (4 bots sem eventos, 6 sementes, `measure_impacts.gd`; antes → depois): quase todas as batidas deles são raspões
+(perda média 13–15%, 1,3–3,7 por corrida). Chegada (difícil, difícil, médio, fácil):
+
+| Rota | Antes | Depois |
+| --- | --- | --- |
+| Litoral | 116,6 / 116,0 / 117,3 / 127,7 s | 115,4 / 117,1 / 117,2 / 129,5 s |
+| Viaduto | 116,2 / 117,9 / 119,4 / 129,1 s | 116,0 / 117,5 / 121,9 / 129,8 s |
+| Montanha | 130,1 / 131,8 / 136,0 / 141,4 s | 130,4 / 132,0 / 136,4 / 141,4 s |
+
+Nenhum bot deixou de chegar; diferença de −1,2 a +2,5 s (o trânsito muda a cada batida, então parte é sorte).
+

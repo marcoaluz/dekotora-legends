@@ -141,7 +141,9 @@ func test_rear_hit_throws_the_car_out_of_the_truck_line() -> void:
 	var c: TrafficSim.Car = sim.traffic.cars[0]
 	check(sim.traffic.is_thrown(c) and c.out_t > 1.0, "carro fora de controle")
 	check(c.speed > t.speed, "o carro sai mais rapido que o caminhao")
-	check(t.speed > 30.0 - 3.0 and t.speed < 30.0 - 0.5, "o caminhao de 12 t perde pouco (%.2f m/s)" % (30.0 - t.speed))
+	# T-152: alem da troca de momento (~1,5 m/s), a penalidade arcade de frente: 25..40% da velocidade
+	var lost: float = (30.0 - t.speed) / 30.0
+	check(lost >= Collision.PEN_FRONT_MIN - 0.01 and lost <= Collision.PEN_FRONT_MAX + 0.01, "batida de frente custa 25-40%% (%.0f%%)" % (lost * 100.0))
 	check(c.vx < 0.0, "sai para o lado oposto ao do caminhao (o caminhao esta a direita)")
 	check(c.yaw_rate != 0.0, "gira")
 	for k in 30:

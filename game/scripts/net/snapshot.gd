@@ -5,9 +5,10 @@ extends RefCounted
 ##   u32 tick · u8 n_trucks · por caminhao: u8 idx, f32 z, f32 x, f32 speed, f32 lateral_vel, u16 rpm,
 ##   u8 gear, u8 boost, u8 flags, u8 passing_charge, u8 draft, u8 lane, u8 signal(0..2 = -1/0/+1 +1),
 ##   u8 signal_time (centesimos de s), u8 tap_prev(0..2), u8 lane_change_time (centesimos),
-##   u32 ack (ultimo comando aplicado)
+##   u8 jolt (ticks de tranco que faltam, T-152), u32 ack (ultimo comando aplicado)
 ##   · u8 n_cars · por carro: f32 z, f32 x, s16 giro (milirradianos), u8 altura (2 cm; carro arremessado, T-141).
-##   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144), bit5 empurrado (fumaca, T-141)
+##   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144), bit5 empurrado (fumaca, T-141),
+##   bit6/bit7 tranco batido do lado esquerdo/direito (nenhum = de frente; T-152)
 ## O dano completo NAO vai aqui: so quando muda, por evento ("damage").
 
 static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
@@ -25,7 +26,7 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_u8(clampi(t.gear, 0, 255))
 		b.put_u8(clampi(roundi(t.boost * 255.0), 0, 255))
 		var flags: int = (1 if t.passing_active else 0) | (2 if t.offroad else 0) | (4 if t.finish_position > 0 else 0) \
-			| (8 if t.horn else 0) | (16 if t.hard_braking else 0) | (32 if t.shove_t > 0.0 else 0)
+			| (8 if t.horn else 0) | (16 if t.hard_braking else 0) | (32 if t.shove_t > 0.0 else 0) 			| (64 if t.jolt_side < 0 else 0) | (128 if t.jolt_side > 0 else 0)
 		b.put_u8(flags)
 		b.put_u8(clampi(roundi(t.passing_charge * 255.0), 0, 255))
 		b.put_u8(clampi(roundi(t.draft * 255.0), 0, 255))
@@ -34,6 +35,7 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_u8(clampi(roundi(t.signal_time * 100.0), 0, 255))
 		b.put_u8(t.tap_prev + 1)
 		b.put_u8(clampi(roundi(t.lane_change_time * 100.0), 0, 255))
+		b.put_u8(clampi(roundi(t.jolt_t / RaceSim.FIXED_DT), 0, 255))     # em ticks: a predicao bloqueia o mesmo numero de ticks
 		b.put_u32(int(acks[i]) if i < acks.size() else 0)
 	var cars: Array = sim.traffic.cars if sim.traffic != null else []
 	b.put_u8(mini(cars.size(), 255))
@@ -68,6 +70,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 		t["horn"] = (flags & 8) != 0
 		t["hard_braking"] = (flags & 16) != 0
 		t["shoved"] = (flags & 32) != 0
+		t["jolt_side"] = -1 if (flags & 64) != 0 else (1 if (flags & 128) != 0 else 0)
 		t["passing_charge"] = float(b.get_u8()) / 255.0
 		t["draft"] = float(b.get_u8()) / 255.0
 		t["lane"] = b.get_u8()
@@ -75,6 +78,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 		t["signal_time"] = float(b.get_u8()) / 100.0
 		t["tap_prev"] = int(b.get_u8()) - 1
 		t["lane_change_time"] = float(b.get_u8()) / 100.0
+		t["jolt_t"] = float(b.get_u8()) * RaceSim.FIXED_DT
 		t["ack"] = b.get_u32()
 		(out["trucks"] as Array).append(t)
 	var nc: int = b.get_u8()
@@ -91,6 +95,8 @@ static func _apply_lane(ts: TruckSim, t: Dictionary) -> void:
 	ts.signal_time = float(t["signal_time"])
 	ts.tap_prev = int(t["tap_prev"])
 	ts.lane_change_time = float(t["lane_change_time"])
+	ts.jolt_t = float(t.get("jolt_t", 0.0))          # T-152: tranco (acelerador sem efeito) igual ao servidor
+	ts.jolt_side = int(t.get("jolt_side", 0))
 
 
 ## Aplica um snapshot desempacotado a um RaceSim espelho (cliente). Nao mexe no caminhao `skip_idx`
