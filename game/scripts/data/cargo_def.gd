@@ -12,3 +12,6 @@ extends Resource
 @export var fragility: float = 1.0
 ## fragile = perde mais prêmio por batida · heavy = acelera menos · perishable = prazo 20% menor · normal
 @export var trait_kind: StringName = &"normal"
+## Carroceria que a carga exige (T-145): &"any" = qualquer uma; &"box" = bau fechado (eletronicos, refrigerados, louca);
+## &"open" = carroceria aberta/graneleira (granel: graos, brita). Ver BodyDef.cargo_kind e docs/DECISOES.md.
+@export var needs: StringName = &"any"

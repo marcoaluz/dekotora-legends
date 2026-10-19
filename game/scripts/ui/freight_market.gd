@@ -106,6 +106,9 @@ func _contract_row(list: VBoxContainer, c: Dictionary) -> Button:
 		title.add_child(UiKit.heading("  " + Tr.t("market." + trait_kind), 15, UiTheme.WARN))
 	elif float(c.get("fragility", 1.0)) >= 1.5:
 		title.add_child(UiKit.heading("  " + Tr.t("market.fragile"), 15, UiTheme.WARN))
+	var need: StringName = Contracts.needs_of(c)                 # T-145: so bau / so graneleira
+	if need != &"any":
+		title.add_child(UiKit.heading("  " + Tr.t("market.needs." + String(need)), 15, UiTheme.CYAN))
 	info.add_child(title)
 	info.add_child(UiTheme.label("%s  →  %s" % [String(c["origin"]), String(c["destination"])], 16, UiTheme.TEXT))
 	info.add_child(UiTheme.label("%s  ·  %s" % [Tr.t("route." + String(c["route"])), Tr.t("scenery." + String(r.scenery))], 13, UiTheme.TEXT_DIM))

@@ -12,3 +12,4 @@ weight_max_t = 10.0
 pay_mult = 1.15
 fragility = 1.2
 trait_kind = &"perishable"
+needs = &"box"

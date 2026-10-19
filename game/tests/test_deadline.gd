@@ -27,7 +27,8 @@ func test_contracts_carry_the_deadline() -> void:
 	var routes: Array[RouteDef] = [load("res://data/routes/kanto_1_coast.tres") as RouteDef]
 	var board: Array[Dictionary] = Contracts.generate(5, routes, func(_r: RouteDef) -> bool: return true, "base")
 	check(not board.is_empty(), "quadro gerado")
-	check_near(float(board[0]["deadline_s"]), routes[0].deadline(), 0.01, "o contrato traz o prazo do trecho")
+	var k: float = Contracts.PERISHABLE_DEADLINE if String(board[0]["trait"]) == "perishable" else 1.0   # a carga sorteada pode ser perecivel
+	check_near(float(board[0]["deadline_s"]), roundf(routes[0].deadline() * k), 0.01, "o contrato traz o prazo do trecho")
 
 
 func test_time_left_counts_down() -> void:

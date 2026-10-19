@@ -87,15 +87,28 @@ func load_profile() -> void:
 
 
 ## Ajusta um perfil salvo por uma versao anterior do jogo (sem mudar `rev`): a cabine guardada pode ser uma das
-## 4 feitas por codigo retiradas na T-129 (padrao, classica, aero, alta) -> a nova mais parecida (CabCatalog).
+## 4 feitas por codigo retiradas na T-129 (padrao, classica, aero, alta) -> a nova mais parecida (CabCatalog);
+## o modelo guardado pode nao existir nesta versao (perfil de um jogo mais novo, id errado) -> baú medio; um contrato
+## pendente salvo antes da T-145 ganha o campo "needs" (tipo de carroceria) a partir da carga.
 ## Devolve true se mudou algo. Chamado ao carregar o perfil e quando o servidor adota o perfil de um cliente.
 func migrate_profile() -> bool:
+	var changed: bool = false
 	var old: Variant = profile.get("cab", null)
 	var cab: String = CabCatalog.normalize(old)
-	if old is String and String(old) == cab:
-		return false
-	profile["cab"] = cab
-	return true
+	if not (old is String and String(old) == cab):
+		profile["cab"] = cab
+		changed = true
+	var body: String = String(profile.get("body", "base"))
+	if BodyDef.find(body) == null:
+		profile["body"] = "base"
+		changed = true
+	var st: Variant = profile.get("contracts", null)
+	if st is Dictionary and (st as Dictionary).get("list", null) is Array:
+		for c in (st as Dictionary)["list"]:
+			if c is Dictionary and not (c as Dictionary).has("needs"):
+				(c as Dictionary)["needs"] = String(Contracts.needs_of(c))
+				changed = true
+	return changed
 
 
 ## Escrita atomica: grava num arquivo temporario e renomeia (nao corrompe se o app fechar no meio).
@@ -668,12 +681,26 @@ func contracts_state() -> Dictionary:
 	return profile["contracts"]
 
 
-## Quadro atual (gera se estiver vazio).
+## Quadro atual (gera se estiver vazio ou se nao tiver nenhum frete que o modelo atual possa levar em algum trecho
+## liberado: trocar de bau para graneleira na garagem, por exemplo, sorteia um quadro novo; T-145).
 func contract_board() -> Array:
 	var st: Dictionary = contracts_state()
-	if (st["list"] as Array).is_empty():
+	if (st["list"] as Array).is_empty() or not board_serves_body(st["list"]):
 		refresh_contracts(false)
 	return st["list"]
+
+
+## Todo trecho que aparece no quadro tem pelo menos um contrato que o modelo atual leva (peso e tipo de carroceria)?
+func board_serves_body(list: Array) -> bool:
+	var body: String = String(profile.get("body", "base"))
+	var routes: Dictionary = {}
+	for c in list:
+		var rid: String = String((c as Dictionary).get("route", ""))
+		routes[rid] = bool(routes.get(rid, false)) or Contracts.fits(c, body)
+	for rid in routes:
+		if not bool(routes[rid]):
+			return false
+	return true
 
 
 ## Sorteia um quadro novo (nova semente). `save` = gravar ja.
@@ -692,8 +719,11 @@ func capacity_t() -> float:
 
 ## Motivo para nao poder aceitar ("" = pode).
 func contract_block_reason(c: Dictionary) -> String:
+	var missing: StringName = Contracts.missing_body(c, String(profile.get("body", "base")))
+	if missing != &"":
+		return Tr.t("reason.needs_" + String(missing))          # PRECISA DE BAÚ / PRECISA DE GRANELEIRA
 	if float(c["weight_t"]) > capacity_t():
-		return Tr.t("reason.small_box")
+		return Tr.t("reason.small_open" if Contracts.body_kind(String(profile.get("body", "base"))) == &"open" else "reason.small_box")
 	if not bool(rival_refusal(String(c.get("route", ""))).get("ok", true)):
 		return Tr.t("reason.rival_refuses")
 	return ""

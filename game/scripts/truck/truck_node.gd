@@ -12,6 +12,7 @@ const MODEL_PATHS: Dictionary = {
 	"longo": "res://assets/vehicles/dekotora/truck/dekotora_truck_longo_chata.glb",
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
+	"graneleira": "res://assets/vehicles/dekotora/truck/dekotora_truck_graneleira_chata.glb",   # T-145: aberta com lona
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Cabines que existem em .glb (T-129: so de modelos de arquivo; ids antigos caem em CabCatalog.normalize).
@@ -21,14 +22,15 @@ const CAB_FRONT_DELTA: Dictionary = {"jac": 0.17, "americana": 0.09}
 ## Modelos com cabine fixa (nao combinam com as outras cabines).
 const FIXED_CAB: Dictionary = {"canter": "canter"}
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
-const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6}
+const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0}
 const WHEEL_RADIUS: float = 0.52
 const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## Mural das laterais do bau: troque este PNG (proporcao ~4:1) pela arte que quiser; um
 ## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
 const MURAL_PATH := "res://assets/vehicles/dekotora/murals/mural_side.png"
 const MURAL_USER := "user://mural_side.png"
-## Modelo: "base" (bau medio), "leve" (bau curto), "longo", "canter" ou "carreta" (guardada). Definir antes de add_child.
+## Modelo: "base" (bau medio), "leve" (bau curto), "longo", "canter", "graneleira" (aberta com lona, chassi do bau medio;
+## T-145) ou "carreta" (guardada). Definir antes de add_child.
 var body_kind: String = "base"
 ## Cabine: um id de CabCatalog.IDS ("chata", "jac", "curta", "americana"); ids antigos viram o mais parecido.
 ## Definir antes de add_child.

@@ -1,7 +1,7 @@
 class_name BodyDef
 extends Resource
 ## Modelo de caminhao (carroceria) para a simulacao: massa vazia, capacidade do bau, comprimento (hitbox), agilidade
-## na troca de faixa e torque do motor. Arquivos em data/bodies/<id>.tres (leve, base, longo, canter).
+## na troca de faixa e torque do motor. Arquivos em data/bodies/<id>.tres (leve, base, longo, canter, graneleira).
 ## O baú leve/medio/longo ainda usam os mesmos numeros do caminhao padrao (so a capacidade muda: decisao pendente).
 
 @export var id: StringName
@@ -13,6 +13,9 @@ extends Resource
 @export var torque_mult: float = 1.0              # motor menor (Canter: 4 cilindros)
 ## Cabine fixa do modelo ("" = escolhe na garagem). O Canter so tem a cabine curta do JAC.
 @export var fixed_cab: String = ""
+## Tipo de carroceria para os contratos (T-145): &"box" = bau fechado; &"open" = aberta com lona (graneleira).
+## A carga diz o que precisa em CargoDef.needs; Contracts.body_kind/needs_body aplicam a regra.
+@export var cargo_kind: StringName = &"box"
 
 const DIR := "res://data/bodies/"
 

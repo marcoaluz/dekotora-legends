@@ -12,3 +12,4 @@ weight_max_t = 8.0
 pay_mult = 1.35
 fragility = 1.8
 trait_kind = &"fragile"
+needs = &"box"

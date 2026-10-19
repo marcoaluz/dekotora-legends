@@ -9,7 +9,7 @@ const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.d
 		["mech", "garage.mechanics", "cog"], ["repair", "garage.repair", "hammer"]]
 const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "view.rear"],
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
-const BODIES: Array = ["canter", "leve", "base", "longo"]
+const BODIES: Array = ["canter", "leve", "base", "longo", "graneleira"]
 const CABS: Array = TruckNode.CABS
 const PANEL_W: float = 284.0
 
