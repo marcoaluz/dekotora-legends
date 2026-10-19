@@ -210,3 +210,23 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - A barreira listrada tem um pouco de brilho próprio (tinta refletiva), mais à noite; a textura original é muito escura no
   renderizador Compatibility, então a cor foi clareada (×1,3).
 
+## 2026-10-19 — T-152: batida no trânsito custa velocidade (pedido do Marco, F1)
+
+- **Penalidade arcade na simulação** (`sim/collision.gd`, vale offline, bots e online): além da troca de momento da T-141,
+  o caminhão fica com no máximo `velocidade_antes × (1 − penalidade)`. De frente na traseira do carro **25–40%** (cresce
+  com a força entre 2 e 12 m/s de diferença), **raspão lateral 8–15%** (entre 1,5 e 6 m/s), veículo de mais de 3 t
+  (**ônibus**; vale para futuros caminhões do trânsito) **× 1,35**. Não existe caminhão/van grande no trânsito hoje (a "van"
+  é do tipo carro, 1,5 t). Números em `docs/BALANCEAMENTO.md`.
+- **Tranco de 0,6 s** (`TruckSim.jolt_t`): acelerador sem efeito (o motor não puxa; o freio funciona; o freio-motor entra
+  como ao soltar o pé), o caminhão **balança** (arfagem na batida de frente, rolagem no raspão; `road3d/impact_fx.gd`, no
+  relógio da tela, não depende da chave de efeitos) e a câmera acompanha um pouco (depende da chave). **Velocímetro
+  vermelho** enquanto dura (`ui/race_hud.gd`). O tranco também é a recarga: **uma penalidade por batida**, mesmo com
+  contatos em ticks seguidos (ou outro carro dentro dos 0,6 s).
+- **Online**: o tranco vai no snapshot em ticks (+1 byte e 2 bits por caminhão) → **protocolo 4** (gere o APK de novo).
+  O cliente suaviza o recuo do 1º snapshot com a batida (até 6 m) em vez de teleportar.
+- Só batida com o **trânsito**. Batida caminhão × caminhão e veículos parados dos eventos continuam como antes
+  (**confirmar com o Marco** se quer o tranco também nelas).
+- **Efeito colateral a decidir**: o câmbio automático não reduz marcha depois da batida (fica na 6ª a ~60 km/h e
+  recupera devagar), então uma batida de frente de 40% a 100 km/h custa ~10 s numa reta (raspão ~2–3 s). Com redução
+  automática ("kickdown") custaria ~7,5 s. Não mexi no câmbio sem o Marco decidir.
+

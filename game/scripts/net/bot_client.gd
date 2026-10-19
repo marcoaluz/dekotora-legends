@@ -22,6 +22,10 @@ var _body: String = ""
 var _max_runtime: float = 300.0
 var _log_acc: float = 0.0
 var _name: String = "Bot"
+var _err_max: float = 0.0               # T-152: maior erro da predicao (m, ao longo da pista) na corrida
+var _err_sum: float = 0.0
+var _err_n: int = 0
+var _err_big: int = 0                   # snapshots com erro acima de 1 m
 
 
 func _ready() -> void:
@@ -70,7 +74,13 @@ func _ready() -> void:
 	Net.race_setup_received.connect(_on_setup)
 	Net.snapshot_received.connect(func(d: PackedByteArray) -> void:
 		if sync != null:
-			sync.on_snapshot(d, Time.get_ticks_msec()))
+			sync.on_snapshot(d, Time.get_ticks_msec())
+			if racing:
+				var e: float = absf(sync.last_error.x)
+				_err_max = maxf(_err_max, e)
+				_err_sum += e
+				_err_n += 1
+				_err_big += 1 if e > 1.0 else 0)
 	Net.damage_received.connect(func(d: Dictionary) -> void:
 		if sync != null:
 			sync.apply_damage(d))
@@ -136,6 +146,8 @@ func _on_events(events: Array) -> void:
 
 
 func _on_end(result: Dictionary) -> void:
+	print("[botclient %s] PRED: erro maximo %.2f m, medio %.3f m, acima de 1 m em %d de %d snapshots" % [
+		_name, _err_max, _err_sum / maxf(float(_err_n), 1.0), _err_big, _err_n])
 	print("[botclient %s] RESULTADO posicao=%d pagamento=%d fama=%d carga=%.2f tempo=%.1f" % [
 		_name, int(result["position"]), int(result["pay"]), int(result["fame"]), float(result["cargo"]), float(result["time"])])
 	print("[botclient %s] BOTCLIENT_DONE" % _name)

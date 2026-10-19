@@ -135,6 +135,7 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Efeitos só na apresentação (`road3d/impact_fx.gd`, `road3d/brake_fx.gd`), todos atrás de `Settings.fx_impact` e cortados por `Settings.quality`. Shader novo de efeito: aqueça no 1º quadro (`warmup`, desenhado embaixo do asfalto) para não soluçar na 1ª batida.
 - Efeito que sai do nariz do caminhão: a câmera atrás do baú não vê. Prenda as faíscas ao caminhão (`local_coords`) e jogue pedaços para cima/lados com o embalo do caminhão.
 - Em `--quality=1` a escala 3D é 0,6: risco/partícula com menos de ~0,08 m some. Teste o visual com a sonda `tools_dev/fx_probe.gd` (precisa de janela) e na corrida com `--demo=crash|brake`.
+- Batida no trânsito custa velocidade (T-152): `Collision.penalty_fraction` + tranco `TruckSim.jolt_t` (acelerador sem efeito; testar o estado com `jolted()`). Estado novo que a predição do cliente usa vai no snapshot EM TICKS (não em centésimos), senão cliente e servidor discordam por 1 tick. Teste: `tests/test_traffic_penalty.gd`; erro de predição online: linha `PRED:` do `tools/net_test.sh`.
 - `--fps-log` mostra `max N no periodo` (pico de chamadas de desenho, ex.: na batida) e `PICO:` para quadros acima de 50 ms; `--no-impact-fx` compara sem os efeitos.
 
 ## Kit de beira de estrada (T-146)

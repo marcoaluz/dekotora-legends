@@ -2,7 +2,7 @@ class_name Protocol
 extends RefCounted
 ## Constantes do protocolo de rede (docs/MULTIPLAYER.md).
 
-const VERSION: int = 3                    # 2 = T-139: eventos de pista no setup; 3 = T-144/T-141: buzina no comando, buzina/freada/empurrao e carro arremessado no snapshot
+const VERSION: int = 4                    # 2 = T-139: eventos de pista no setup; 3 = T-144/T-141: buzina no comando, buzina/freada/empurrao e carro arremessado no snapshot; 4 = T-152: tranco da batida no snapshot
 const DEFAULT_PORT: int = 24600
 const MAX_PLAYERS: int = 4
 const COMMAND_RATE: float = 30.0          # comandos por segundo (cliente -> servidor)
