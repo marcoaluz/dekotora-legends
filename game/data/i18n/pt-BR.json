@@ -31,6 +31,7 @@
  "options.fx_reflections": "Reflexo das luzes no asfalto",
  "options.fx_trails": "Rastro das lanternas",
  "options.fx_rain": "Chuva",
+ "options.fx_impact": "Faíscas, pedaços e fumaça dos pneus",
  "options.fx_hint": "Reflexos e rastros só aparecem à noite e no fim de tarde. Valem na próxima corrida.",
  "market.fragile": "FRÁGIL",
  "market.refresh": "ATUALIZAR",

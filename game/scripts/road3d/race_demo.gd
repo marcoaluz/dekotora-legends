@@ -4,6 +4,7 @@ extends RefCounted
 ##   --demo=lanes   o jogador toca a seta/troca sozinho (direita, direita, esquerda, esquerda...)
 ##   --demo=close   o rival comeca ao lado do jogador na faixa da direita; o jogador tenta ir para la
 ##   --demo=brake   acelera, buzina (1 a 2,5 s) e da uma freada forte de 4,5 a 7,5 s (T-144; use com --start-speed=28)
+##   --demo=crash   carros do transito lentos na faixa do jogador; ele acelera e bate (T-141: arremesso, faiscas, pedacos)
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
 ##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
 ##   --cam=top|high|side camera presa ao caminhao do jogador: de cima (30 m), bem alta (75 m) ou alta de lado (T-132)
@@ -186,6 +187,17 @@ func active() -> bool:
 
 ## Prepara o grid: no modo "close" o rival (indice 1) comeca ao lado do jogador, na faixa da direita.
 func setup(sim: RaceSim) -> void:
+	if mode == "crash" and sim.traffic != null and sim.traffic.cars.size() >= 3:
+		var p: TruckSim = sim.trucks[0]
+		var lane_t: int = clampi(p.lane - 1, 0, 2)             # faixa do jogador no indice do transito
+		for k in 3:
+			var c: TrafficSim.Car = sim.traffic.cars[k]
+			c.z = p.z + p.length + 70.0 + k * 140.0
+			c.lane = lane_t
+			c.x = TrafficSim.LANES[lane_t]
+			c.cruise = 9.0 if k != 1 else 6.0
+			c.speed = c.cruise
+			c.timer = 999.0
 	if mode == "close" and sim.trucks.size() > 1:
 		var r: TruckSim = sim.trucks[1]
 		r.z = sim.trucks[0].z - 2.0
@@ -208,6 +220,12 @@ func command(race_time: float) -> Commands:
 func on_event(e: Dictionary, player: int, race_time: float) -> void:
 	if shot_dir != "" and String(e["type"]) == "finish" and int(e["truck"]) == player:
 		_queue.append([_clock + 0.9, "chegada"])
+		return
+	if shot_dir != "" and String(e["type"]) == "traffic" and int(e["truck"]) == player and race_time - _last_close >= 2.0:
+		_last_close = race_time
+		_queue.append([_clock + 0.03, "batida_a"])
+		_queue.append([_clock + 0.22, "batida_b"])
+		_queue.append([_clock + 0.6, "batida_c"])
 		return
 	if shot_dir == "" or String(e["type"]) != "truck":
 		return

@@ -18,6 +18,7 @@ var fx_speed: bool = true               # linhas de velocidade, tremor, FOV e cl
 var fx_reflections: bool = true         # reflexo falso das luzes no asfalto (noite/fim de tarde)
 var fx_trails: bool = true              # rastro das lanternas traseiras
 var fx_rain: bool = false               # chuva (opcional)
+var fx_impact: bool = true              # faiscas, pedacos de cromo, chacoalhada e fumaca/marcas dos pneus (T-141/T-144)
 var menu_bg: String = "a"               # fundo da tela inicial: "a" posto a noite, "b" rodovia (T-138; MenuBackdrop)
 
 
@@ -28,6 +29,8 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():          # depuracao: --quality=0|1|2 (nao grava)
 		if a.begins_with("--quality="):
 			quality = clampi(int(a.substr(10)), 0, 2)
+		elif a == "--no-impact-fx":                   # depuracao: mede o custo das faiscas/fumaca (nao grava)
+			fx_impact = false
 
 
 func load_settings() -> void:
@@ -48,6 +51,7 @@ func load_settings() -> void:
 	fx_reflections = bool(cfg.get_value("graphics", "fx_reflections", fx_reflections))
 	fx_trails = bool(cfg.get_value("graphics", "fx_trails", fx_trails))
 	fx_rain = bool(cfg.get_value("graphics", "fx_rain", fx_rain))
+	fx_impact = bool(cfg.get_value("graphics", "fx_impact", fx_impact))
 	menu_bg = String(cfg.get_value("graphics", "menu_bg", menu_bg))
 
 
@@ -67,6 +71,7 @@ func save_settings() -> void:
 	cfg.set_value("graphics", "fx_reflections", fx_reflections)
 	cfg.set_value("graphics", "fx_trails", fx_trails)
 	cfg.set_value("graphics", "fx_rain", fx_rain)
+	cfg.set_value("graphics", "fx_impact", fx_impact)
 	cfg.set_value("graphics", "menu_bg", menu_bg)
 	cfg.save(PATH)
 

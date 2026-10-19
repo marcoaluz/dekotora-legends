@@ -1,0 +1,215 @@
+class_name ImpactFx
+extends Node3D
+## Impacto das batidas na corrida 3D (T-141). Le os eventos da simulacao ("truck", "traffic", "event_obstacle")
+## e faz so a parte visual: faiscas no ponto de contato, pedacos de cromo/lanterna/vidro voando (pool num
+## MultiMesh = 1 chamada de desenho), chacoalhada do caminhao atingido e pedido de tremor da camera.
+## Chave em Opcoes > Graficos ("Faiscas, pedacos e fumaca"); a qualidade grafica corta a quantidade.
+
+const MAX_SHARDS: int = 64
+const SHARD_LIFE: float = 2.6            # s ate sumir (some encolhendo no fim)
+const SHARD_COLORS: Array[Color] = [Color("#e8edf5"), Color("#e8edf5"), Color("#cfd6e2"), Color("#ff3b2f"), Color("#ffb21e"),
+	Color(0.75, 0.9, 1.0)]               # cromo, cromo, aco, lanterna, pisca, vidro
+const JOLT_DECAY: float = 7.0            # 1/s
+const JOLT_FREQ: float = 26.0            # rad/s
+const QUALITY_SCALE: Array[float] = [0.4, 0.7, 1.0]
+
+var enabled: bool = true
+var amount: float = 1.0                  # fracao de faiscas/pedacos pela qualidade grafica
+var fx: Fx3D
+var trucks: Array[TruckNode] = []
+var traffic3d: Traffic3D
+var _mm: MultiMesh
+var _mmi: MultiMeshInstance3D
+var _shards: Array[Dictionary] = []      # {pos, vel, rot, spin, ttl, ground, size, slot}
+var _free: Array[int] = []
+var _jolt: Dictionary = {}               # indice do caminhao -> [amplitude rad, tempo, lado]
+var _shake: float = 0.0                  # tremor pedido para a camera (a cena le com take_shake)
+var _lengths: Array[float] = []
+
+
+func setup(fx_: Fx3D, trucks_: Array[TruckNode], lengths: Array[float], traffic3d_: Traffic3D) -> void:
+	fx = fx_
+	trucks = trucks_
+	_lengths = lengths
+	traffic3d = traffic3d_
+	var s: Node = get_node("/root/Settings")
+	enabled = bool(s.fx_impact)
+	amount = QUALITY_SCALE[clampi(int(s.quality), 0, 2)]
+	_mm = MultiMesh.new()
+	_mm.transform_format = MultiMesh.TRANSFORM_3D
+	_mm.use_colors = true
+	_mm.instance_count = MAX_SHARDS
+	_mm.visible_instance_count = MAX_SHARDS
+	var bm := BoxMesh.new()
+	bm.size = Vector3(1.0, 0.12, 0.6)    # lasca chata (escala por pedaco)
+	_mm.mesh = bm
+	var mat := StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.metallic = 0.7
+	mat.roughness = 0.18
+	mat.emission_enabled = true          # aparece tambem a noite (o cromo de verdade e por matcap no caminhao)
+	mat.emission = Color(0.35, 0.36, 0.4)
+	mat.emission_energy_multiplier = 0.9
+	_mmi = MultiMeshInstance3D.new()
+	_mmi.multimesh = _mm
+	_mmi.material_override = mat
+	_mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_mmi.visible = false
+	add_child(_mmi)
+	for k in MAX_SHARDS:
+		_mm.set_instance_transform(k, Transform3D(Basis().scaled(Vector3.ZERO), Vector3.ZERO))
+		_free.append(k)
+
+
+## Desenha uma faisca e um pedaco escondidos (embaixo do asfalto, na frente da camera) no 1o quadro: o shader
+## e compilado na largada, e nao no meio da 1a batida (evita o soluco, principalmente no celular).
+func warmup(hidden_pos: Vector3) -> void:
+	if not enabled:
+		return
+	if fx != null:
+		fx.sparks(hidden_pos, 1.0, 0.1)
+		fx.debris(hidden_pos, Vector3.ZERO, Vector3(0.1, 0.1, 0.1), 0.3)
+	var slot: int = _free.pop_back()
+	_shards.append({"pos": hidden_pos, "vel": Vector3.ZERO, "rot": Basis(), "spin": Vector3.ZERO, "ttl": 0.3,
+		"ground": hidden_pos.y - 5.0, "size": 0.2, "slot": slot})
+	_mm.set_instance_color(slot, SHARD_COLORS[0])
+	_mmi.visible = true
+
+
+## Tremor da camera pedido pelas batidas desde a ultima leitura (0..1).
+func take_shake() -> float:
+	var s: float = _shake
+	_shake = 0.0
+	return s
+
+
+func on_event(e: Dictionary, player: int) -> void:
+	match String(e["type"]):
+		"truck":
+			var f: float = float(e["force"])
+			var ia: int = int(e["a"])
+			var ib: int = int(e["b"])
+			var pa: Vector3 = zone_point(ia, String(e["zone_a"]))
+			var pb: Vector3 = zone_point(ib, String(e["zone_b"]))
+			var contact: Vector3 = (pa + pb) * 0.5
+			_sparks(contact, f)
+			_burst(contact, Vector3.UP, f, ia, ib, String(e["zone_a"]))
+			var side: float = -1.0 if String(e["zone_a"]) == "left" else 1.0
+			_kick(ia, f, side)
+			_kick(ib, f, -side)
+			if ia == player or ib == player:
+				_shake = maxf(_shake, clampf(f / 10.0, 0.18, 1.0))
+		"traffic", "event_obstacle":
+			var ti: int = int(e["truck"])
+			var f2: float = float(e["force"])
+			var p: Vector3 = zone_point(ti, String(e["zone"]))
+			_sparks(p, f2 * 0.8)
+			_burst(p, Vector3.UP, f2 * (1.2 if bool(e.get("thrown", false)) else 0.7), ti, -1, String(e["zone"]))
+			_kick(ti, f2 * 0.5, -1.0 if String(e["zone"]) == "left" else 1.0)
+			if ti == player:
+				_shake = maxf(_shake, clampf(f2 / 14.0, 0.12, 0.8))
+
+
+## Ponto da zona na carroceria do caminhao `i` (usa o comprimento real: o Canter tem 7 m).
+func zone_point(i: int, zone: String) -> Vector3:
+	var len: float = _lengths[i] if i < _lengths.size() else Collision.LEN
+	var off := Vector3(0, 1.0, -len * 0.5)
+	match zone:
+		"front": off = Vector3(0, 0.9, -len + 0.4)
+		"rear": off = Vector3(0, 0.9, -0.1)
+		"left": off = Vector3(-1.25, 1.0, -len * 0.55)
+		"right": off = Vector3(1.25, 1.0, -len * 0.55)
+	return trucks[i].global_transform * off
+
+
+func _sparks(pos: Vector3, force: float) -> void:
+	if enabled and fx != null:
+		fx.sparks(pos, force, amount)
+
+
+## Pedacos voando: quantos pela forca (e pela qualidade). Saem do ponto, para cima e para o lado da zona.
+func _burst(pos: Vector3, up: Vector3, force: float, ia: int, ib: int, zone: String) -> void:
+	if not enabled or force < 3.0:
+		return
+	var n: int = clampi(int((force - 2.0) * 1.5 * amount), 2, 24)
+	var node: Node3D = trucks[ia]
+	var basis: Basis = node.global_transform.basis
+	var out: Vector3 = basis * Vector3(-1.0 if zone == "left" else (1.0 if zone == "right" else 0.0), 0.0, -1.0 if zone == "front" else 0.0)
+	var fwd: Vector3 = -basis.z
+	var ground: float = node.global_position.y
+	for k in n:
+		if _free.is_empty():
+			_recycle_oldest()
+		var slot: int = _free.pop_back()
+		var dir: Vector3 = (up * randf_range(0.6, 1.4) + out * randf_range(0.3, 1.2) + Vector3(randf_range(-0.6, 0.6), 0, randf_range(-0.6, 0.6))).normalized()
+		var v: Vector3 = dir * randf_range(3.5, 6.0 + force * 0.4) + fwd * randf_range(0.0, 4.0)
+		var size: float = randf_range(0.16, 0.42)
+		_shards.append({"pos": pos, "vel": v, "rot": Basis.from_euler(Vector3(randf() * TAU, randf() * TAU, 0)),
+			"spin": Vector3(randf_range(-14, 14), randf_range(-14, 14), randf_range(-14, 14)), "ttl": SHARD_LIFE,
+			"ground": ground + 0.02, "size": size, "slot": slot})
+		_mm.set_instance_color(slot, SHARD_COLORS[randi() % SHARD_COLORS.size()])
+	_mmi.visible = true
+
+
+func _recycle_oldest() -> void:
+	var d: Dictionary = _shards.pop_front()
+	_free.append(int(d["slot"]))
+
+
+## Chacoalhada do caminhao `i`: balanco que some rapido (aplicado em jolt()).
+func _kick(i: int, force: float, side: float) -> void:
+	if not enabled or i < 0:
+		return
+	var amp: float = clampf(force * 0.006, 0.01, 0.07)
+	var cur: Array = _jolt.get(i, [0.0, 0.0, side])
+	if amp >= float(cur[0]) * exp(-JOLT_DECAY * float(cur[1])):
+		_jolt[i] = [amp, 0.0, side]
+
+
+## Transform do caminhao `i` com a chacoalhada (rolagem para o lado do golpe + arfagem).
+func jolt(i: int, xf: Transform3D) -> Transform3D:
+	var j: Array = _jolt.get(i, [])
+	if j.is_empty():
+		return xf
+	var t: float = float(j[1])
+	var a: float = float(j[0]) * exp(-JOLT_DECAY * t)
+	if a < 0.001:
+		_jolt.erase(i)
+		return xf
+	var w: float = sin(t * JOLT_FREQ)
+	var rot := Basis(Vector3.BACK, a * w * float(j[2])) * Basis(Vector3.RIGHT, a * 0.5 * cos(t * JOLT_FREQ * 0.8))
+	return Transform3D(xf.basis * rot, xf.origin + xf.basis.y * absf(w) * a * 1.2)
+
+
+func _process(delta: float) -> void:
+	for i in _jolt:
+		(_jolt[i] as Array)[1] = float((_jolt[i] as Array)[1]) + delta
+	if _shards.is_empty():
+		if _mmi != null and _mmi.visible:
+			_mmi.visible = false
+		return
+	var keep: Array[Dictionary] = []
+	for d in _shards:
+		var v: Vector3 = d["vel"]
+		var p: Vector3 = d["pos"]
+		v.y -= 16.0 * delta
+		p += v * delta
+		var rolling: bool = true
+		if p.y < float(d["ground"]):
+			p.y = float(d["ground"])
+			v = Vector3(v.x * 0.55, absf(v.y) * 0.3 if absf(v.y) > 1.5 else 0.0, v.z * 0.55)
+			rolling = v.length() > 0.4
+		d["vel"] = v
+		d["pos"] = p
+		if rolling:
+			d["rot"] = (d["rot"] as Basis) * Basis.from_euler((d["spin"] as Vector3) * delta)
+		d["ttl"] = float(d["ttl"]) - delta
+		var slot: int = d["slot"]
+		if float(d["ttl"]) <= 0.0:
+			_mm.set_instance_transform(slot, Transform3D(Basis().scaled(Vector3.ZERO), Vector3.ZERO))
+			_free.append(slot)
+			continue
+		var sc: float = float(d["size"]) * clampf(float(d["ttl"]) / 0.4, 0.0, 1.0)
+		_mm.set_instance_transform(slot, Transform3D((d["rot"] as Basis).scaled(Vector3.ONE * sc), p))
+		keep.append(d)
+	_shards = keep

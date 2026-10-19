@@ -251,6 +251,28 @@ func _draw_lane_signal(t: TruckSim, cx: float, y: float) -> void:
 		var lc := Vector2(cx - 12.0 + i * 6.0, y)
 		var cur: bool = i == t.lane
 		draw_circle(lc, 2.2 if cur else 1.4, Color.WHITE if cur else Color(1, 1, 1, 0.3))
+	_draw_horn_icon(Vector2(cx - 31.0, y), t.horn)
+	_draw_brake_icon(Vector2(cx + 31.0, y), t.hard_braking)
+
+
+## Buzina (T-144, como no original: seta · buzina · seta): corneta que acende em dourado com ondas de som.
+func _draw_horn_icon(c: Vector2, on: bool) -> void:
+	var col: Color = GOLD if on else Color(1, 1, 1, 0.22)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-4, -1.5), c + Vector2(2.5, -4.5), c + Vector2(2.5, 4.5), c + Vector2(-4, 1.5)]), col)
+	draw_rect(Rect2(c + Vector2(-6.5, -1.2), Vector2(2.5, 2.4)), col)
+	if on:
+		for k in 2:
+			draw_arc(c + Vector2(3.0, 0), 3.5 + k * 2.5, -0.9, 0.9, 8, Color(GOLD, 0.85 - k * 0.3), 1.0, true)
+
+
+## Freada forte (T-144): circulo com "!" que acende em vermelho.
+func _draw_brake_icon(c: Vector2, on: bool) -> void:
+	var col: Color = BAD_COL if on else Color(1, 1, 1, 0.22)
+	draw_arc(c, 4.5, 0.0, TAU, 16, col, 1.2, true)
+	draw_arc(c, 6.5, 2.4, 3.9, 6, col, 1.0, true)
+	draw_arc(c, 6.5, -0.75, 0.75, 6, col, 1.0, true)
+	draw_line(c + Vector2(0, -2.6), c + Vector2(0, 0.8), col, 1.3)
+	draw_circle(c + Vector2(0, 2.3), 0.7, col)
 
 
 ## Caminhao visto de cima, com as 4 zonas coloridas pelo dano + motor (M) e direcao (D).

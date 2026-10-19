@@ -6,6 +6,11 @@ extends Node3D
 ##    escondido quando a fumaca some (sem chamada de desenho parado). Puff redondo de gradiente (sem textura em disco).
 ##  - marcas: UM MultiMesh com MARK_COUNT tracos reaproveitados em anel (1 chamada de desenho).
 ## Tudo junto: no maximo 1 + caminhoes freando ao mesmo tempo (<= 5 chamadas).
+## T-141: o mesmo puff sai dos pneus de quem foi EMPURRADO de faixa por outro caminhao (TruckSim.shove_t; ATB:
+## "fumaca/poeira branca nas rodas de quem raspa"). Chave "Faiscas, pedacos e fumaca" em Opcoes > Graficos;
+## a qualidade grafica corta a quantidade de puffs (baixa 10, media 18, alta 26).
+
+const SMOKE_AMOUNT: Array[int] = [10, 18, 26]
 
 const MARK_COUNT: int = 360
 const MARK_EVERY: float = 0.07           # s entre tracos
@@ -23,9 +28,14 @@ var _mark_t: Dictionary = {}             # indice -> s ate o proximo traco
 var _last_wheel: Dictionary = {}         # indice -> [pos roda esq., pos roda dir.]
 var _puff_mat: StandardMaterial3D
 var _puff_mesh: QuadMesh
+var enabled: bool = true
+var _amount: int = 26
 
 
 func _ready() -> void:
+	var st: Node = get_node("/root/Settings")
+	enabled = bool(st.fx_impact)
+	_amount = SMOKE_AMOUNT[clampi(int(st.quality), 0, 2)]
 	_mm = MultiMesh.new()
 	_mm.transform_format = MultiMesh.TRANSFORM_3D
 	_mm.instance_count = MARK_COUNT
@@ -65,10 +75,29 @@ func _ready() -> void:
 	_puff_mesh.size = Vector2(1.0, 1.0)
 
 
+## Compila os shaders da fumaca e das marcas na largada (desenhados escondidos embaixo do asfalto, ver ImpactFx.warmup).
+func warmup(hidden_pos: Vector3) -> void:
+	if not enabled:
+		return
+	var p: CPUParticles3D = _make_smoke()
+	p.global_position = hidden_pos
+	p.emitting = true
+	_add_mark(hidden_pos, hidden_pos + Vector3(0, 0, 1))
+	get_tree().create_timer(0.4).timeout.connect(func() -> void:
+		p.queue_free()
+		if _next == 1 and _mm.visible_instance_count == 1:      # ninguem freou ainda: apaga a marca de aquecimento
+			_next = 0
+			_mm.visible_instance_count = 0
+			_marks.visible = false)
+
+
 ## `night`: a fumaca fica mais escura/acinzentada (sem brilhar no escuro).
 func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: float, night: bool) -> void:
+	if not enabled:
+		return
 	var near: bool = node.global_position.distance_to(cam_pos) < MAX_DIST
-	var on: bool = t.hard_braking and near and t.brake_intensity > 0.05
+	var braking: bool = t.hard_braking and t.brake_intensity > 0.05
+	var on: bool = near and (braking or t.shove_t > 0.0)
 	var rear: float = -t.length * TrackPath.REAR_AXLE
 	var p: CPUParticles3D = _smoke.get(index)
 	if on and p == null:
@@ -79,7 +108,7 @@ func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: f
 			p.visible = true
 			p.emitting = true
 			_smoke_off_t[index] = 0.0
-			var k: float = t.brake_intensity
+			var k: float = t.brake_intensity if braking else 0.55      # empurrao: puff medio
 			var shade: float = 0.62 if night else 0.88
 			p.color = Color(shade, shade, shade * 1.02, 0.25 + 0.45 * k)
 			p.scale_amount_min = 0.7 + 0.6 * k
@@ -98,7 +127,7 @@ func _make_smoke() -> CPUParticles3D:
 	var p := CPUParticles3D.new()
 	p.mesh = _puff_mesh
 	p.material_override = _puff_mat
-	p.amount = 26
+	p.amount = _amount
 	p.lifetime = SMOKE_LIFE
 	p.local_coords = false
 	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_POINTS

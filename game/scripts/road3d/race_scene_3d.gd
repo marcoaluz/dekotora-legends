@@ -46,6 +46,7 @@ var _pause_root: Control
 var _fps_log: bool = false
 var _fps_t: float = 0.0
 var _fps_n: int = 0
+var _fps_age: float = 0.0              # s desde o 1o quadro (--fps-log: picos so depois de carregar)
 var _pause_first: Button
 var _audio: RaceAudio
 var _rival_audio: Array[EngineAudio] = []
@@ -63,6 +64,7 @@ var _brake_fx: BrakeFx                  # T-144: fumaca dos pneus e marcas no as
 var _truck_sfx: Array[TruckSfx] = []    # T-144: buzina e freio de cada caminhao (os outros com volume pela distancia)
 var _horns: Array[String] = []          # som de buzina de cada caminhao (peca instalada ou a basica)
 var _was_hard_braking: bool = false
+var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
 
 
 func _ready() -> void:
@@ -144,6 +146,12 @@ func _ready() -> void:
 		_connect_net()
 	else:
 		_spawn_field()
+	_impact = ImpactFx.new()
+	add_child(_impact)
+	var lens: Array[float] = []
+	for t in sim.trucks:
+		lens.append(t.length)
+	_impact.setup(_fx, _trucks, lens, _traffic3d)
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2
@@ -208,6 +216,9 @@ func _ready() -> void:
 	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
+	var hidden: Vector3 = path.world_point(_player_z() + 22.0, _player_x(), -1.2)   # embaixo do asfalto, na frente da camera
+	_impact.warmup(hidden)
+	_brake_fx.warmup(hidden)
 	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
 
 
@@ -222,6 +233,7 @@ func _resolve_time_of_day() -> TimeOfDay:
 
 func _setup_audio() -> void:
 	_audio = RaceAudio.new()
+	_audio.sim = sim                             # T-141: volume das batidas dos outros pela distancia
 	add_child(_audio)
 	var sets: Dictionary = {"eng_i6_std": "i6_std", "eng_i6_tuned": "i6_tuned", "eng_v8": "v8"}
 	var eng_id: String = String(gs.profile["engine"])
@@ -426,6 +438,9 @@ func _process(delta: float) -> void:
 	if _fps_log:                                 # depuracao: media de FPS a cada 5 s no terminal
 		_fps_t += delta
 		_fps_n += 1
+		_fps_age += delta
+		if delta > 0.05 and _fps_age > 1.5:
+			print("PICO: quadro de %.0f ms (t=%.1f s)" % [delta * 1000.0, sim.time])
 		if _fps_t >= 5.0:
 			print("FPS medio: %.1f  (desenhos: %d, triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
 					Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0])
@@ -550,33 +565,30 @@ func _handle_events(events: Array[Dictionary]) -> void:
 			"timeout":
 				if int(e["truck"]) == player:
 					_hud.show_banner(Tr.t("hud.timeout"), 3.0)
-			"truck":
-				var f: float = float(e["force"])
-				var ia: int = int(e["a"])
-				var ib: int = int(e["b"])
-				_fx.sparks(_fx.zone_point(_trucks[ia], String(e["zone_a"])), f)
-				_fx.sparks(_fx.zone_point(_trucks[ib], String(e["zone_b"])), f)
-				_spawn_debris(ia, e["broken_a"], String(e["zone_a"]))
-				_spawn_debris(ib, e["broken_b"], String(e["zone_b"]))
-				if ia == player or ib == player:
-					_shake = maxf(_shake, clampf(f / 12.0, 0.15, 1.0))
-			"traffic":
-				var ti: int = int(e["truck"])
-				_fx.sparks(_fx.zone_point(_trucks[ti], String(e["zone"])), float(e["force"]))
-				_spawn_debris(ti, e["broken"], String(e["zone"]))
-				if ti == player:
-					_shake = maxf(_shake, clampf(float(e["force"]) / 12.0, 0.15, 1.0))
+			"truck":                                      # T-141: faiscas, pedacos e chacoalhada no ImpactFx
+				_impact.on_event(e, player)
+				_spawn_debris(int(e["a"]), e["broken_a"], String(e["zone_a"]))
+				_spawn_debris(int(e["b"]), e["broken_b"], String(e["zone_b"]))
+				if int(e["a"]) == player or int(e["b"]) == player:
+					Input.vibrate_handheld(int(clampf(40.0 + float(e["force"]) * 10.0, 40.0, 160.0)))
+			"traffic", "event_obstacle":
+				_impact.on_event(e, player)
+				_spawn_debris(int(e["truck"]), e["broken"], String(e["zone"]))
+				if int(e["truck"]) == player:
+					Input.vibrate_handheld(int(clampf(30.0 + float(e["force"]) * 8.0, 30.0, 140.0)))
 			"passing_scare":
 				if int(e["to"]) == player:
 					_shake = maxf(_shake, 0.4)
 
 
 func _spawn_debris(truck_index: int, broken: Array, zone: String) -> void:
+	if not _impact.enabled:
+		return
 	for id in broken:
 		var node: TruckNode = _trucks[truck_index]
 		var side: float = -1.0 if zone == "left" else (1.0 if zone == "right" else 0.0)
 		var vel: Vector3 = node.global_transform.basis * Vector3(side * 3.0, 0.0, -2.0)
-		_fx.debris(_fx.zone_point(node, zone), vel)
+		_fx.debris(_impact.zone_point(truck_index, zone), vel)
 
 
 func _update_visuals(alpha: float, dt: float) -> void:
@@ -588,7 +600,7 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11)
+		node.transform = _impact.jolt(k, path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11))
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 		if _cam != null:
@@ -625,6 +637,7 @@ func _update_camera(dt: float) -> void:
 	_cam.global_position = _cam.global_position.lerp(c[0] + right * float(ex[0]), k)
 	var look: Vector3 = c[1] + right * float(ex[1])
 	_shake = maxf(_shake - dt * 2.5, 0.0)
+	_shake = maxf(_shake, _impact.take_shake())
 	var s: float = _shake * 0.25
 	if s > 0.0:
 		_cam.global_position += Vector3(randf_range(-s, s), randf_range(-s, s), randf_range(-s, s))
@@ -641,7 +654,8 @@ func _scrape_sparks(t: TruckSim, dt: float) -> void:
 	if absf(t.x) < 1.58 or t.speed < 8.0 or _scrape_t > 0.0:
 		return
 	_scrape_t = 0.06
-	_fx.sparks(_fx.zone_point(_trucks[player], "left" if t.x < 0.0 else "right"), 6.0)
+	if _impact.enabled:
+		_fx.sparks(_impact.zone_point(player, "left" if t.x < 0.0 else "right"), 6.0, _impact.amount)
 
 
 func _update_hud() -> void:
@@ -663,7 +677,8 @@ func _curve_feedback(t: TruckSim) -> void:
 	if t.escaping:
 		_shake = maxf(_shake, 0.25)
 	if t.hard_braking:                         # T-144: freada forte treme de leve (e vibra no comeco)
-		_shake = maxf(_shake, 0.1 + 0.18 * t.brake_intensity)
+		if _impact.enabled:
+			_shake = maxf(_shake, 0.1 + 0.18 * t.brake_intensity)
 		if not _was_hard_braking:
 			Input.vibrate_handheld(int(30.0 + 50.0 * t.brake_intensity))
 	_was_hard_braking = t.hard_braking

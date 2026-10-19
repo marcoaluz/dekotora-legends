@@ -13,6 +13,8 @@ var _crash_idx: int = 0
 var _countdown_last: int = 4
 var _scrape: AudioStreamPlayer
 var _works_loop: AudioStreamPlayer     # T-139: ruido das obras (so se o arquivo existir)
+var sim: RaceSim                       # T-141: para o volume das batidas dos outros pela distancia (null = so as do jogador)
+const CRASH_HEAR_M: float = 150.0      # m: batida de outro caminhao mais longe que isto nao se ouve
 ## T-139: sons dos eventos de pista. Os nomes novos (docs/AUDIO_ELEVENLABS.md) entram quando o arquivo existir;
 ## ate la toca o som de reserva que ja existe.
 const EVENT_SOUNDS: Dictionary = {
@@ -91,21 +93,16 @@ func on_event(e: Dictionary, me: int) -> void:
 	var audio: Node = get_node("/root/AudioBus")
 	match String(e["type"]):
 		"truck":
-			if int(e["a"]) != me and int(e["b"]) != me:
+			var db: float = maxf(_dist_db(int(e["a"]), me), _dist_db(int(e["b"]), me))
+			if db <= -60.0:
 				return
-			var f: float = float(e["force"])
-			_crash_sound(f)
-			if not (e["broken_a"] as Array).is_empty() or not (e["broken_b"] as Array).is_empty():
-				audio.play_sfx("chrome_part_break", -2.0)
-				audio.play_sfx("lights_shatter", -6.0)
+			var broken: bool = not (e["broken_a"] as Array).is_empty() or not (e["broken_b"] as Array).is_empty()
+			_truck_crash(float(e["force"]), db, String(e["zone_a"]) in ["left", "right"], broken)
 		"traffic":
-			if int(e["truck"]) != me:
+			var db2: float = _dist_db(int(e["truck"]), me)
+			if db2 <= -60.0:
 				return
-			audio.play_sfx("car_hit", -2.0)
-			if float(e["force"]) > 8.0:
-				_crash_sound(float(e["force"]))
-			if not (e["broken"] as Array).is_empty():
-				audio.play_sfx("chrome_part_break", -2.0)
+			_traffic_crash(e, db2)
 		"overtake":
 			if int(e["truck"]) == me:
 				audio.play_sfx("fame_up", -8.0)
@@ -163,14 +160,70 @@ func update_events(evs: TrackEvents, z: float) -> void:
 	_works_loop.volume_db = (linear_to_db(wgt) - 6.0) if wgt > 0.01 else -80.0
 
 
-func _crash_sound(force: float) -> void:
+## Volume extra (dB) de um som que vem do caminhao `idx`: 0 para o jogador; os outros caem com a distancia.
+func _dist_db(idx: int, me: int) -> float:
+	if idx == me:
+		return 0.0
+	if sim == null or idx < 0 or idx >= sim.trucks.size() or me < 0 or me >= sim.trucks.size():
+		return -100.0
+	var d: float = absf(sim.trucks[idx].z - sim.trucks[me].z)
+	return -100.0 if d > CRASH_HEAR_M else -6.0 - d / 10.0
+
+
+## Batida entre caminhoes em camadas (T-141): pancada (leve ou pesada), estrondo grave de lataria nas fortes,
+## lata com lata na lateral (empurrao), pedacos espalhando no asfalto e peca quebrando.
+func _truck_crash(f: float, db: float, lateral: bool, broken: bool) -> void:
+	var audio: Node = get_node("/root/AudioBus")
+	_crash_sound(f, db)
+	if f >= 7.0:
+		_sfx("truck_body_slam", "crash_heavy_2", db - 1.0, randf_range(0.92, 1.05))
+	if lateral and f >= Collision.SHOVE_DV:
+		_sfx("truck_side_bang", "bump_light_2", db - 1.0, randf_range(0.95, 1.06))
+	if f >= 5.0:
+		_later(0.16, "chrome_debris_scatter", "chrome_part_break", db - 7.0 + minf(f - 5.0, 6.0))
+	if broken:
+		audio.play_sfx("chrome_part_break", db - 2.0)
+		audio.play_sfx("lights_shatter", db - 6.0)
+
+
+## Caminhao contra carro: lata fina amassando; arremessado = carro capotando + vidro; onibus = pancada pesada.
+func _traffic_crash(e: Dictionary, db: float) -> void:
+	var audio: Node = get_node("/root/AudioBus")
+	var f: float = float(e["force"])
+	audio.play_sfx("car_hit", db - 2.0, randf_range(0.94, 1.06))
+	if int(e.get("car_kind", 0)) == TrafficSim.Kind.BUS:
+		_crash_sound(maxf(f, 4.0), db)
+		if f >= 6.0:
+			_sfx("truck_body_slam", "crash_heavy_1", db - 2.0, 1.08)
+	elif bool(e.get("thrown", false)):
+		if f >= 9.0:
+			_later(0.08, "car_tumble", "crash_heavy_1", db - 2.0)
+		if f >= 12.0:
+			audio.play_sfx("glass_break", db - 6.0)
+		_later(0.25, "chrome_debris_scatter", "chrome_part_break", db - 9.0)
+	elif f > 8.0:
+		_crash_sound(f, db)
+	if not (e["broken"] as Array).is_empty():
+		audio.play_sfx("chrome_part_break", db - 2.0)
+
+
+## Toca `name` (ou `fallback` enquanto o arquivo nao existe).
+func _sfx(name: String, fallback: String, db: float, pitch: float = 1.0) -> void:
+	get_node("/root/AudioBus").play_sfx(name if has_sound(name) else fallback, db, pitch)
+
+
+func _later(delay: float, name: String, fallback: String, db: float) -> void:
+	get_tree().create_timer(delay).timeout.connect(func() -> void: _sfx(name, fallback, db))
+
+
+func _crash_sound(force: float, db: float = 0.0) -> void:
 	var audio: Node = get_node("/root/AudioBus")
 	if force < 4.0:
 		_bump_idx = 1 - _bump_idx
-		audio.play_sfx("bump_light_%d" % (_bump_idx + 1), -2.0)
+		audio.play_sfx("bump_light_%d" % (_bump_idx + 1), db - 2.0)
 	else:
 		_crash_idx = 1 - _crash_idx
-		audio.play_sfx("crash_heavy_%d" % (_crash_idx + 1), 0.0)
+		audio.play_sfx("crash_heavy_%d" % (_crash_idx + 1), db)
 
 
 ## Botao Passing apertado: farol alto + buzina (a da peca instalada, se houver).

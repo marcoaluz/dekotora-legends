@@ -84,6 +84,10 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `car_hit.wav` | 1 s | Big truck hitting a small car, crunch of thin metal |
 | `cone_hit.wav` | 1 s | Big truck knocking over a plastic traffic cone, hollow plastic thump and clatter on asphalt |
 | `barrier_scrape.wav` | 1 s | Truck side scraping along plastic road barriers at a lane closure, short rough plastic scrape |
+| `truck_body_slam.wav` | 1,5 s | Two heavy steel trucks slamming into each other, deep low boom with crunching metal body panels, short |
+| `truck_side_bang.wav` | 1 s | Two big trucks banging side to side at highway speed, heavy hollow metal clang followed by a short scraping screech |
+| `chrome_debris_scatter.wav` | 1,5 s | Small chrome metal pieces and plastic light fragments scattering and bouncing on asphalt after a crash |
+| `car_tumble.wav` | 1,5 s | Small car flipping and tumbling on a highway after being hit by a big truck, thin metal crunching and glass cracking |
 
 ## 4. Ambiente (`game/assets/audio/sfx/ambient/`)
 

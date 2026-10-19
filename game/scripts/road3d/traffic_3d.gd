@@ -124,7 +124,11 @@ func car_transforms() -> Array[Transform3D]:
 func refresh() -> void:
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
-		_nodes[i].transform = path.vehicle_transform(c.z, c.x, c.length, TrafficSim.body_yaw(c))
+		var xf: Transform3D = path.vehicle_transform(c.z, c.x, c.length, TrafficSim.body_yaw(c))
+		if c.y > 0.0 or c.out_t > 0.0:            # arremessado (T-141): pulo e rolagem pela velocidade lateral/pulo
+			var roll: float = clampf(-c.vx * 0.35, -0.5, 0.5) + clampf(c.vy * 0.06, -0.25, 0.25) * signf(c.yaw_rate)
+			xf = Transform3D(xf.basis * Basis(Vector3.BACK, roll), xf.origin + xf.basis.y * c.y)
+		_nodes[i].transform = xf
 		var ws: Array = _wheels[i]
 		for k in ws.size():
 			var w: Node3D = ws[k]

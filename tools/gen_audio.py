@@ -27,9 +27,20 @@ FOLDERS = {1: "engines", 2: "sfx/truck", 3: "sfx/crash", 4: "sfx/ambient", 5: "s
 API = "https://api.elevenlabs.io"
 
 
+def key_file():
+    """.chaves.env na raiz do projeto; numa worktree (.claude/worktrees/...) procura nas pastas acima."""
+    d = ROOT
+    for _ in range(6):
+        p = os.path.join(d, ".chaves.env")
+        if os.path.exists(p):
+            return p
+        d = os.path.dirname(d)
+    return os.path.join(ROOT, ".chaves.env")
+
+
 def load_key():
     env = {}
-    with open(os.path.join(ROOT, ".chaves.env"), encoding="utf-8") as f:
+    with open(key_file(), encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if "=" in line and not line.startswith("#"):

@@ -9,19 +9,17 @@ const ZONE_OFFSETS: Dictionary = {
 	"left": Vector3(-1.25, 0.9, -6.0), "right": Vector3(1.25, 0.9, -6.0), "roof": Vector3(0, 3.2, -10.0),
 }
 
-var _spark_mesh: SphereMesh
+var _spark_mesh: BoxMesh
 var _spark_mat: StandardMaterial3D
 var _smoke_mat: StandardMaterial3D
 var _debris: Array[Dictionary] = []     # {node, vel, spin, ttl}
 var _smoke: Dictionary = {}             # indice do caminhao -> CPUParticles3D
+var _debris_mat: StandardMaterial3D
 
 
 func _ready() -> void:
-	_spark_mesh = SphereMesh.new()
-	_spark_mesh.radius = 0.07
-	_spark_mesh.height = 0.14
-	_spark_mesh.radial_segments = 6
-	_spark_mesh.rings = 3
+	_spark_mesh = BoxMesh.new()                # risco fino alinhado a velocidade (T-141: faisca riscando, nao bolinha)
+	_spark_mesh.size = Vector3(0.045, 0.42, 0.045)
 	_spark_mat = StandardMaterial3D.new()
 	_spark_mat.albedo_color = Color("#fff35c")
 	_spark_mat.emission_enabled = true
@@ -39,22 +37,28 @@ func zone_point(truck: Node3D, zone: String) -> Vector3:
 	return truck.global_transform * (ZONE_OFFSETS.get(zone, Vector3(0, 1, -6)) as Vector3)
 
 
-## Rajada de faiscas; `force` 1..15 (m/s de impacto) define a quantidade.
-func sparks(world_pos: Vector3, force: float) -> void:
+## Rajada de faiscas; `force` 1..15 (m/s de impacto) define a quantidade; `scale` corta pela qualidade grafica.
+func sparks(world_pos: Vector3, force: float, scale: float = 1.0) -> void:
 	var p := CPUParticles3D.new()
 	p.one_shot = true
 	p.explosiveness = 1.0
-	p.amount = clampi(int(8.0 + force * 3.0), 8, 60)
-	p.lifetime = 0.6
+	p.amount = maxi(int(clampi(int(8.0 + force * 3.0), 8, 60) * scale), 4)
+	p.lifetime = 0.55
 	p.mesh = _spark_mesh
 	p.material_override = _spark_mat
+	p.particle_flag_align_y = true
 	p.direction = Vector3.UP
-	p.spread = 70.0
-	p.initial_velocity_min = 3.0
-	p.initial_velocity_max = 8.0 + force * 0.4
-	p.gravity = Vector3(0, -14, 0)
-	p.scale_amount_min = 0.5
-	p.scale_amount_max = 1.2
+	p.spread = 80.0
+	p.initial_velocity_min = 4.0
+	p.initial_velocity_max = 10.0 + force * 0.5
+	p.gravity = Vector3(0, -12, 0)
+	p.scale_amount_min = 0.6
+	p.scale_amount_max = 1.5
+	var fade := Curve.new()                     # encolhe no fim
+	fade.add_point(Vector2(0.0, 1.0))
+	fade.add_point(Vector2(1.0, 0.15))
+	p.scale_amount_curve = fade
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(p)
 	p.global_position = world_pos
 	p.emitting = true
@@ -62,19 +66,20 @@ func sparks(world_pos: Vector3, force: float) -> void:
 
 
 ## Peca quebrada: um bloco cromado que cai e fica na pista (o caminhao segue em frente).
-func debris(world_pos: Vector3, vel: Vector3, size: Vector3 = Vector3(0.9, 0.4, 0.5)) -> void:
+func debris(world_pos: Vector3, vel: Vector3, size: Vector3 = Vector3(0.9, 0.4, 0.5), ttl: float = 8.0) -> void:
 	var mi := MeshInstance3D.new()
 	var bm := BoxMesh.new()
 	bm.size = size
 	mi.mesh = bm
-	var m := StandardMaterial3D.new()
-	m.albedo_color = Color("#d8dee8")
-	m.metallic = 1.0
-	m.roughness = 0.12
-	mi.material_override = m
+	if _debris_mat == null:                 # um material so (o shader compila uma vez; ImpactFx.warmup aquece na largada)
+		_debris_mat = StandardMaterial3D.new()
+		_debris_mat.albedo_color = Color("#d8dee8")
+		_debris_mat.metallic = 1.0
+		_debris_mat.roughness = 0.12
+	mi.material_override = _debris_mat
 	add_child(mi)
 	mi.global_position = world_pos
-	_debris.append({"node": mi, "vel": vel + Vector3(randf_range(-2, 2), randf_range(2, 5), 0), "spin": Vector3(randf_range(-6, 6), randf_range(-6, 6), randf_range(-6, 6)), "ttl": 8.0, "ground": world_pos.y})
+	_debris.append({"node": mi, "vel": vel + Vector3(randf_range(-2, 2), randf_range(2, 5), 0), "spin": Vector3(randf_range(-6, 6), randf_range(-6, 6), randf_range(-6, 6)), "ttl": ttl, "ground": world_pos.y})
 
 
 ## Fumaca continua no capo; `level` 0 (nada) .. 1 (muita).
