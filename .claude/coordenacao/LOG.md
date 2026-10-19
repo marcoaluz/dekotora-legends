@@ -170,3 +170,6 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: sim/{lane_sections,track_events,track,event_contact}.gd, data/routes/*.tres, net/{room,client_sync,protocol}.gd, road3d/{road_mesh_narrow,section_props,section_structures_3d,...}.gd, ui/event_hud.gd, tests/test_lane_sections.gd, docs/capturas_t153/
 - Validação: merge na main sem conflito; 265 testes ok; net_test PASSOU; chamadas iguais (±5), bots +1 a +3 s; capturas olhadas (túnel antigo muito escuro à noite: vai para a F4).
 - Decisão pendente: posições dos trechos, lombada do litoral, nome 湯坂隧道, folga no prazo (hoje nenhuma). Gerar o APK de novo (protocolo 5).
+
+## 2026-10-19 · T-157 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Trechos de 2 faixas (T-153)" na skill godot-dekotora (dados, sim, visual, flags, capturas, protocolo 5), nomes conferidos no código (commit 88694d7).
