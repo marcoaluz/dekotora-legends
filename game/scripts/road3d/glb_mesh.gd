@@ -41,7 +41,17 @@ static func _collect(node: Node, parent_xf: Transform3D, out: ArrayMesh) -> void
 				arrays[Mesh.ARRAY_VERTEX] = verts
 				if norms.size() > 0:
 					arrays[Mesh.ARRAY_NORMAL] = norms
-				arrays[Mesh.ARRAY_TANGENT] = null
+				var tans: Variant = arrays[Mesh.ARRAY_TANGENT]
+				if tans is PackedFloat32Array and (tans as PackedFloat32Array).size() == verts.size() * 4:
+					var t4: PackedFloat32Array = tans
+					for i in verts.size():                      # tangentes giradas junto (mapa de normais, T-146)
+						var t: Vector3 = (xf.basis * Vector3(t4[i * 4], t4[i * 4 + 1], t4[i * 4 + 2])).normalized()
+						t4[i * 4] = t.x
+						t4[i * 4 + 1] = t.y
+						t4[i * 4 + 2] = t.z
+					arrays[Mesh.ARRAY_TANGENT] = t4
+				else:
+					arrays[Mesh.ARRAY_TANGENT] = null
 				out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 				var mat: Material = mi.get_active_material(s)
 				out.surface_set_material(out.get_surface_count() - 1, mat)

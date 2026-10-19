@@ -34,5 +34,7 @@ func test_signs_on_every_route_two_draws() -> void:
 		var geo: int = 0
 		for g in signs.find_children("*", "GeometryInstance3D", true, false):
 			geo += 1
-		check_eq(geo, 2, rid + ": sinalizacao inteira em 2 chamadas de desenho")
+		# T-146: faces (1) + caixas da placa do tunel (0 ou 1) + chapas/postes do kit (1 malha por bloco de 400 m)
+		var blocks: int = ceili(path.track.length_m / 400.0)
+		check(geo >= 2 and geo <= 2 + blocks, rid + ": sinalizacao em poucas chamadas de desenho (%d)" % geo)
 		signs.free()

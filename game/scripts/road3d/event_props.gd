@@ -8,6 +8,9 @@ extends RefCounted
 ##    small works truck with an LED arrow board and beacons, steel plates on the open lane beside the works.
 ##  - narrow: lane reduction diamond + 車線減少 plate, painted merge arrows, the lane-end line, zebra hatching on the
 ##    lane that ends, delineator posts and an LED arrow board.
+## T-146 kit (RoadsideKit, only when TrackEvents3D.kit_on()): works = striped concrete barriers along the closed edge
+## after the taper (instead of the sparse cones); accident = metal A-frames across the closure + debris; narrow =
+## striped wall where the lane ends and barriers along it.
 ## Signs stand on the right (median side), on the paved strip just inside the barrier: they never sit on the regular
 ## signs of RoadSigns (left side) and never cross the viaduct sound walls (BARRIER_IN + 0,45).
 
@@ -32,11 +35,14 @@ static func build(b: TrackEvents3D, ev: TrackEvents.Event, k: int) -> void:
 		TrackEvents.Kind.ACCIDENT:
 			_cones(b, ev)
 			_accident(b, ev, k)
+			_kit_accident(b, ev)
 		TrackEvents.Kind.WORKS:
 			_cones(b, ev)
 			_works(b, ev, k)
+			_barrier_line(b, ev, ev.full_z() + 0.8, ev.end_z() - 1.0)
 		TrackEvents.Kind.NARROW:
 			_narrow(b, ev, k)
+			_kit_narrow(b, ev)
 	b.count(TrackEvents.KIND_IDS[ev.kind])
 
 
@@ -74,7 +80,10 @@ static func _cones(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
 	var full: float = ev.full_z()
 	var zz: float = ev.z + 1.5
 	var n: int = 0
+	var walled: bool = ev.kind == TrackEvents.Kind.WORKS and b.kit_on()   # concrete barriers instead (_barrier_line)
 	while zz <= ev.end_z():
+		if walled and zz > full + 0.5:
+			break
 		for e in _edges(b, ev, zz):
 			b.cone(zz, float(e[0]) + float(e[1]) * 0.18)
 			if zz < full and n % 2 == 0 and ev.kind == TrackEvents.Kind.ACCIDENT:   # red flares along the taper
@@ -222,6 +231,50 @@ static func _works(b: TrackEvents3D, ev: TrackEvents.Event, k: int) -> void:
 			b.paint_quad(zz, c2 - 1.55, c2 + 1.55, zz + 3.0, c2 - 1.55, c2 + 1.55, STEEL * tint, 0.025)
 			zz += 3.15
 			j += 1
+
+
+# ---------------------------------------------------------------- kit (T-146)
+## Striped concrete barriers end to end along the closed edge(s), from z0 to z1 (face on the edge, inside the closure).
+static func _barrier_line(b: TrackEvents3D, ev: TrackEvents.Event, z0: float, z1: float) -> void:
+	if not b.kit_on():
+		return
+	var step: float = RoadsideKit.JERSEY_LEN + 0.04
+	var zz: float = z0 + step * 0.5
+	var n: int = 0
+	while zz < z1:
+		for e in _edges(b, ev, zz):
+			var lat: float = float(e[0]) + float(e[1]) * (RoadsideKit.JERSEY_W * 0.5 + 0.08)
+			var model: String = "barrier_jersey_fence" if n % 5 == 2 else "barrier_jersey"
+			b.kit(model, Transform3D(b.basis(zz), b.pt(zz, lat, 0.0)))
+		zz += step
+		n += 1
+
+
+## Row of pieces across the closed span at zz (long axis across the road).
+static func _across(b: TrackEvents3D, ev: TrackEvents.Event, zz: float, model: String, length: float) -> void:
+	var sp: Vector2 = _span(b, ev, zz)
+	var n: int = maxi(1, int((sp.y - sp.x - 0.4) / (length + 0.15)))
+	var bs: Basis = b.basis(zz, PI * 0.5)
+	for i in n:
+		b.kit(model, Transform3D(bs, b.pt(zz, lerpf(sp.x, sp.y, (i + 0.5) / n), 0.0)))
+
+
+static func _kit_accident(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
+	if not b.kit_on():
+		return
+	var full: float = ev.full_z()
+	_across(b, ev, full - 6.5, "barrier_aframe", RoadsideKit.AFRAME_LEN)
+	var lat: float = Lanes.X[_front_lane(ev)] * M
+	for d in [[full + 6.5, 1.3, 0.4], [full + 11.0, -1.1, 2.1]]:               # metal debris around the cars
+		b.kit("debris_metal", Transform3D(b.basis(float(d[0]), float(d[2])), b.pt(float(d[0]), lat + float(d[1]), 0.0)))
+
+
+static func _kit_narrow(b: TrackEvents3D, ev: TrackEvents.Event) -> void:
+	if not b.kit_on():
+		return
+	var full: float = ev.full_z()
+	_across(b, ev, full + 1.5, "barrier_wall", RoadsideKit.JERSEY_LEN)
+	_barrier_line(b, ev, full + 3.0, minf(full + 45.0, ev.reopen_end() - 4.0))
 
 
 # ---------------------------------------------------------------- narrowing (one outer lane ends)

@@ -7,6 +7,9 @@ extends Node3D
 ## Custo: 2 chamadas de desenho para a rota inteira (faces: AtlasQuads com o atlas SignAtlas; postes e costas:
 ## MultiMesh de caixas). Sem luz por pixel: claridade pela hora do dia (AtlasQuads.level_for), igual as placas.
 ## No Japao a mao e inglesa: as placas ficam a ESQUERDA (x negativo), em cima da mureta.
+## T-146: chapas de verdade (redonda, losango, triangulo, retangulo, com borda) e postes redondos com base, do pacote
+## "ROAD SIGNS" (RoadsideKit), juntados por bloco de 400 m (MeshBatch: +1 chamada por bloco visivel). --no-kit volta
+## as caixas antigas.
 
 const SIDE_LAT: float = -(RoadMesh.BARRIER_IN + 0.3)   # em cima da mureta esquerda
 const SHARP: float = 0.9                                # curva forte (= RoadFurniture.SHARP_CURVE): chevrons
@@ -37,11 +40,15 @@ var faces: AtlasQuads
 var counts: Dictionary = {}                 # tipo -> quantas (testes e depuracao)
 var _boxes: Array = []                      # [Transform3D, Color]
 var _taken: Array[float] = []               # z ja usados do lado esquerdo
+var _kit: MeshBatch                          # chapas e postes do kit (null = caixas)
+var _tod: TimeOfDay
 
 
 func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Vector2], places: PackedStringArray,
 		route_id: String = "") -> void:
 	path = path_
+	_tod = tod
+	_kit = MeshBatch.new(400.0, 560.0) if RoadsideKit.enabled() else null
 	faces = AtlasQuads.new()
 	add_child(faces)
 	faces.setup(load(SignAtlas.ATLAS) as Texture2D, AtlasQuads.level_for(tod))
@@ -59,8 +66,11 @@ func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Ve
 	_toll()
 	faces.commit()
 	_commit_boxes(AtlasQuads.level_for(tod))
+	var blocks: int = _kit.commit(self) if _kit != null else 0
 	if "--fps-log" in OS.get_cmdline_user_args():
 		print("SINALIZACAO: ", counts, "  quads=", faces.quad_count(), "  caixas=", _boxes.size(), "  z=", _taken)
+		if _kit != null:
+			print("KIT: placas  blocos=", blocks, "  triangulos=", _kit.tris)
 
 
 # ---------------------------------------------------------------- regras de colocacao
@@ -180,9 +190,9 @@ func _panel(z: float, places: PackedStringArray, k: int, L: float) -> void:
 	var c: Vector3 = _at(z, lat, 3.6)
 	_face(b, c, Vector2(3.9, 2.3), "solid_white")                 # borda branca
 	_face(b, c + b.z * LAYER, Vector2(3.75, 2.15), "solid_green")
-	_back(b, c, Vector2(3.9, 2.3))
+	_back(b, c, Vector2(3.9, 2.3), 1.0, "solid_white", z)
 	for sx in [-1.2, 1.2]:
-		_post(_at(z, lat + sx, 0.0), 3.6 - 1.1)
+		_post(_at(z, lat + sx, 0.0), 3.6 - 1.1, z)
 	for row in 2:
 		var place: String = String(places[(k + row + 1) % places.size()])
 		if not SignAtlas.has("place_" + place):
@@ -248,12 +258,20 @@ func _face(b: Basis, c: Vector3, size: Vector2, id: String) -> void:
 	faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(size.x, size.y, 1.0)), c), SignAtlas.uv(id))
 
 
-## Costas cinza da placa (`inset` < 1 para placas redondas/losango nao mostrarem canto).
-func _back(b: Basis, c: Vector3, size: Vector2, inset: float = 1.0) -> void:
+## Costas da placa: a chapa do kit no formato da face `id` (ou, sem o kit, uma caixa cinza; `inset` < 1 para
+## placas redondas/losango nao mostrarem canto).
+func _back(b: Basis, c: Vector3, size: Vector2, inset: float = 1.0, id: String = "", z: float = 0.0) -> void:
+	if _kit != null:
+		var p: Array = RoadsideKit.plate_xform(b, c, size, id)
+		_kit.add(RoadsideKit.mesh(String(p[0]), _tod), p[1], z)
+		return
 	_boxes.append([Transform3D(b * Basis.from_scale(Vector3(size.x * inset, size.y * inset, 0.05)), c - b.z * 0.035), POST])
 
 
-func _post(base: Vector3, h: float) -> void:
+func _post(base: Vector3, h: float, z: float = 0.0) -> void:
+	if _kit != null:
+		_kit.add(RoadsideKit.mesh("sign_post", _tod), RoadsideKit.post_xform(base, h), z)
+		return
 	_boxes.append([Transform3D(Basis.from_scale(Vector3(0.11, h, 0.11)), base + Vector3.UP * h * 0.5), POST])
 
 
@@ -263,14 +281,14 @@ func _sign(z: float, lat: float, h: float, size: Vector2, id: String, posts: int
 	var b: Basis = _basis(z, turn)
 	var c: Vector3 = _at(z, lat, h)
 	_face(b, c, size, id)
-	_back(b, c, size, inset)
+	_back(b, c, size, inset, id, z)
 	if posts == 1:
-		_post(_at(z, lat, 0.0) - b.z * 0.06, h)
+		_post(_at(z, lat, 0.0) - b.z * 0.06, h, z)
 	elif posts == 2:
 		for sx in [-0.8, 0.8]:
-			_post(_at(z, lat, 0.0) + b.x * sx * size.x * 0.5 - b.z * 0.06, h - size.y * 0.4)
+			_post(_at(z, lat, 0.0) + b.x * sx * size.x * 0.5 - b.z * 0.06, h - size.y * 0.4, z)
 	elif posts == -1:
-		_post(_at(z, lat, 0.8) - b.z * 0.06, h - 0.8 - size.y * 0.3)
+		_post(_at(z, lat, 0.8) - b.z * 0.06, h - 0.8 - size.y * 0.3, z)
 
 
 func _commit_boxes(level: float) -> void:

@@ -7,6 +7,8 @@ extends Node3D
 ## - viaduto (cidade): pilares de concreto sob o tabuleiro e montantes das barreiras de som;
 ## - marcacoes pintadas no asfalto (Label3D deitado): "80" e 速度落とせ antes das curvas fortes, setas nas faixas.
 ## Caixas num MultiMesh por bloco de pista (cor por instancia; alfa = forca do brilho): poucos draw calls.
+## T-146: a estrutura dos porticos e a trelica do "Placao" (RoadsideKit.gantry_truss, 1 chamada por portico visivel);
+## --no-kit volta as vigas de caixa.
 
 const BLOCK_M: float = 150.0
 const SIGN_FONT := "res://assets/fonts/NotoSansJP.ttf"
@@ -34,12 +36,14 @@ var path: TrackPath
 var tod: TimeOfDay
 var _blocks: Dictionary = {}            # indice do bloco -> Array [Transform3D, Color]
 var _font: Font
+var _kit: MeshBatch                     # porticos de trelica (null = caixas)
 
 
 func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[Vector2], places: PackedStringArray) -> void:
 	path = path_
 	tod = tod_
 	_font = load(SIGN_FONT) as Font
+	_kit = MeshBatch.new(650.0, 700.0) if RoadsideKit.enabled() and RoadsideKit.mesh("gantry_truss", tod) != null else null
 	var L: float = path.track.length_m
 	var bar: float = RoadMesh.BARRIER_IN + 0.3
 	var edge: float = Track.ROAD_HALF_WIDTH_M - 0.35
@@ -66,6 +70,8 @@ func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[V
 		gz += 650.0
 	_markings(L, tunnels)
 	_commit()
+	if _kit != null:
+		_kit.commit(self)
 
 
 ## Uma caixa (MultiMesh unitario) em (z, lateral em metros, altura) alinhada com a pista.
@@ -96,10 +102,17 @@ func _viaduct(L: float, deck: float) -> void:
 func _gantry(z: float, places: PackedStringArray, k: int, L: float) -> void:
 	var span: float = RoadMesh.BARRIER_IN + 0.5
 	var steel := Color("#7d838d", 0.0)
-	for side in [-1.0, 1.0]:
-		_box(z, side * span, 3.8, Vector3(0.45, 7.6, 0.45), steel)
-	_box(z, 0.0, 7.25, Vector3(span * 2.0, 0.45, 0.45), steel)
-	_box(z, 0.0, 4.95, Vector3(span * 2.0, 0.25, 0.25), steel)
+	var dz: float = 0.0                                                   # recuo das placas (viga de trelica e mais funda)
+	if _kit != null:
+		var xf := Transform3D(Basis(Vector3.UP, path.yaw_at(z)), path.world_point(z, 0.0, 0.0))
+		_kit.add(RoadsideKit.mesh("gantry_truss", tod), xf, z)
+		dz = RoadsideKit.GANTRY_BEAM_FRONT - 0.25
+	else:
+		for side in [-1.0, 1.0]:
+			_box(z, side * span, 3.8, Vector3(0.45, 7.6, 0.45), steel)
+		_box(z, 0.0, 7.25, Vector3(span * 2.0, 0.45, 0.45), steel)
+		_box(z, 0.0, 4.95, Vector3(span * 2.0, 0.25, 0.25), steel)
+	z -= dz
 	var n: int = maxi(places.size(), 1)
 	var km: float = maxf((L - z) / 1000.0, 0.5)
 	for b in 2:
