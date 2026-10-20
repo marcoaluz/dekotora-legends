@@ -192,3 +192,18 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Folha lado a lado (funciona sem tela), sempre com caminho absoluto em `--out` e nos PNGs:
   `godot --headless --path game -s res://tools_dev/make_compare_sheet.gd -- --out=ABS.png A.png B.png ...`
   Opções `--cols=2` e `--w=640`. Ordem: esquerda para a direita, de cima para baixo (antes, depois, antes, depois...).
+
+## Abertura frente a frente (T-156)
+
+- Flags da corrida (depois de `--`):
+  - `--intro=full|short|none` força a versão: `full` = cena cheia (~9,4 s), `short` = só a contagem (3 s), `none` = nenhuma.
+  - `--no-intro` tira a abertura. `--start=` e `--demo=` também desligam a abertura, de propósito: as capturas e medições antigas continuam iguais.
+- Quem decide a versão é `race_scene_3d.gd` (`_setup_intro`). Os tempos, a versão e o relógio online ficam em `road3d/duel_plan.gd`; o controle, os sons e as luzes em `road3d/duel_intro.gd`; o cenário em `road3d/duel_stage.gd`.
+- Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`. Referência em `docs/capturas_t156/`.
+- Custo: `GODOT=... bash tools/measure_t156.sh` mede o modo médio nas 3 rotas. Para comparar: `MEASURE_EXTRA="--intro=none" bash tools/measure_t156.sh`.
+- Duelo sem tela: `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6 --route=ROTA --player=2]`.
+- Regras de jogo: a campanha é **1 contra 1** (jogador × rival da rota). A corrida rápida é 4 caminhões com a versão curta. A revanche é curta.
+- Online: 2 jogadores = versão cheia; **3–4 jogadores = "comboio"**: versão curta e trânsito um nível mais leve (`DuelPlan.convoy_traffic`, `rules.convoy` no setup).
+- **Protocolo 6** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total`. Cada cliente toca a abertura pelo **relógio comum** do servidor: setup + ping/2 (`DuelPlan.online_elapsed`). Cliente e servidor precisam da mesma versão: gere o APK de novo.
+- Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo. O executor `tests/run_tests.gd` roda esses testes no 1º quadro, quando a árvore de cena já existe. Hoje: `tests/test_duel_scene_flow.gd`.
+- Regra para texto que cresce na tela (nome, fala, banner VS): desenhe em tamanho de fonte **fixo** e escale com `draw_set_transform` (ver `ui/duel_band.gd`). Cada tamanho de fonte novo cria um cache de textura; o VS chegou a criar +58 MB de memória de textura antes dessa correção.
