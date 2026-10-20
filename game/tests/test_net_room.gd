@@ -63,7 +63,7 @@ func test_race_runs_server_side_and_finishes_with_results() -> void:
 	for p in r.order:
 		r.set_ready(p, true)
 	r.try_start(100, 5)
-	r.advance(Protocol.COUNTDOWN_SECONDS + 0.01)
+	r.advance(r.countdown + 0.01)
 	check_eq(r.state, Protocol.RoomState.RACING, "largou")
 	var steps: int = 0
 	var human_drivers: Dictionary = {}
@@ -97,7 +97,7 @@ func test_race_only_damage_mode_does_not_persist() -> void:
 	r.set_rules(100, {"damage": Protocol.DamageMode.RACE_ONLY, "bots": 0})
 	r.set_ready(100, true)
 	r.try_start(100, 3)
-	r.advance(4.0)
+	r.advance(r.countdown + 0.01)
 	r.sim.trucks[0].z = r.sim.finish_z - 1.0
 	r.sim.trucks[0].speed = 30.0
 	for n in 60:
@@ -112,7 +112,7 @@ func test_disconnect_mid_race_turns_truck_into_bot() -> void:
 	for p in r.order:
 		r.set_ready(p, true)
 	r.try_start(100, 9)
-	r.advance(4.0)
+	r.advance(r.countdown + 0.01)
 	var idx: int = (r.members[101] as Room.Member).truck_idx
 	r.remove_member(101)
 	check(r.sim.trucks[idx].is_bot, "bot assumiu o caminhao")
@@ -127,7 +127,7 @@ func test_commands_ack_and_old_commands_ignored() -> void:
 	var r: Room = _room_with(1)
 	r.set_ready(100, true)
 	r.try_start(100, 1)
-	r.advance(4.0)
+	r.advance(r.countdown + 0.01)
 	r.apply_command(100, 10, 0.5, 1.0, 0.0, false)
 	r.apply_command(100, 5, -1.0, 0.0, 1.0, false)        # antigo: ignorado
 	r.step_tick()
@@ -141,7 +141,7 @@ func test_snapshot_roundtrip() -> void:
 	r.set_ready(100, true)
 	r.set_ready(101, true)
 	r.try_start(100, 4)
-	r.advance(4.0)
+	r.advance(r.countdown + 0.01)
 	for n in 90:
 		r.apply_command(100, n, 0.0, 1.0, 0.0, false)
 		r.step_tick()
@@ -169,7 +169,7 @@ func test_damage_update_and_events_reach_clients() -> void:
 	for p in r.order:
 		r.set_ready(p, true)
 	r.try_start(100, 8)
-	r.advance(4.0)
+	r.advance(r.countdown + 0.01)
 	# coloca os dois lado a lado e em rota de colisao
 	r.sim.trucks[0].z = 100.0
 	r.sim.trucks[1].z = 100.0

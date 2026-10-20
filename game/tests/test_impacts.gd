@@ -116,7 +116,7 @@ func test_horn_goes_through_room_command() -> void:
 	r.set_rules(100, {"bots": 0, "traffic": 0, "events": false})
 	r.set_ready(100, true)
 	r.try_start(100, 3)
-	r.advance(Protocol.COUNTDOWN_SECONDS + 0.01)
+	r.advance(r.countdown + 0.01)
 	r.apply_command(100, 1, 0.0, 1.0, 0.0, false, true)
 	r.step_tick()
 	var idx: int = (r.members[100] as Room.Member).truck_idx

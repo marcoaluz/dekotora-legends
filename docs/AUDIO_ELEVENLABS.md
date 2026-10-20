@@ -119,11 +119,17 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `lose_jingle.wav` | 3 s | Short sad retro arcade game over jingle |
 | `fame_up.wav` | 1 s | Sparkly shimmering chime, reward pickup |
 | `event_alert_chime.wav` | 1 s | Japanese highway information board alert chime, clear two-tone electronic ding dong |
+| `vs_taiko_hit.wav` | 1,5 s | Single powerful Japanese taiko drum hit with a deep boom and a short reverb tail, dramatic showdown intro stinger, no music |
 
 > **T-139 (eventos de pista):** `cone_hit`, `barrier_scrape`, `steel_plate_clank`, `event_alert_chime` e `roadworks_loop` ainda
 > **não foram gerados**. Enquanto não existem, o jogo toca sons de reserva (batida leve / bip da contagem) e o ruído das obras fica
 > mudo. Para gerar: `python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`
 > e ouvir antes de aceitar.
+
+> **T-156 (abertura frente a frente):** `vs_taiko_hit` (tambor no banner VS) foi gerado com `tools/gen_audio.py`
+> (conta em ~61.100 de 131.000 créditos). Os outros sons da cena já existiam: motor acelerando parado = as camadas
+> do motor (`i6_*`/`v8_*`) com o giro subindo e descendo; buzina de provocação do rival = `horn_musical_1` (ou a
+> buzina musical das peças dele). Marco: ouvir e pedir regeração se quiser (`python tools/gen_audio.py --only vs_taiko_hit --force`).
 
 ## 6. Multiplayer (`game/assets/audio/sfx/net/`)
 

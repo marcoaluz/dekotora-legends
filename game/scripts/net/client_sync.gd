@@ -44,7 +44,8 @@ func setup(setup_: Dictionary, my_truck: int) -> void:
 	var grid: Array = setup_["grid"]
 	for entry in grid:
 		var i: int = int(entry["idx"])
-		var idx: int = sim.add_truck(-float(i) * Room.GRID_GAP, Room.GRID_X[i % 4])
+		var g: Vector2 = StartGrid.slot(i, grid.size())          # T-156: o mesmo grid do servidor (lado a lado)
+		var idx: int = sim.add_truck(g.x, g.y)
 		sim.trucks[idx].is_bot = bool(entry["bot"])
 		TruckConfig.apply(sim.trucks[idx], entry["loadout"])
 	tick = 0

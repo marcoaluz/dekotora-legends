@@ -70,6 +70,9 @@ var _horns: Array[String] = []          # som de buzina de cada caminhao (peca i
 var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
 var _rail: Railway3D                    # T-154: ferrovia e trens
+var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
+var _nohud: bool = false
+var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 
 
 func _ready() -> void:
@@ -214,7 +217,8 @@ func _ready() -> void:
 	for a in args:
 		if a.begins_with("--start-speed="):            # depuracao: velocidade inicial com --start (m/s)
 			v0 = float(a.substr(14))
-	if "--nohud" in args:
+	_nohud = "--nohud" in args
+	if _nohud:
 		layer.visible = false
 	for a in args:
 		if a.begins_with("--start="):
@@ -240,6 +244,7 @@ func _ready() -> void:
 	_setup_audio()
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
+	_setup_intro(args)
 	var hidden: Vector3 = path.world_point(_player_z() + 22.0, _player_x(), -1.2)   # embaixo do asfalto, na frente da camera
 	_impact.warmup(hidden)
 	_brake_fx.warmup(hidden)
@@ -321,7 +326,11 @@ func _connect_net() -> void:
 		_handle_events(typed))
 	Net.race_state_changed.connect(func(st: int) -> void:
 		if st == Protocol.RoomState.RACING:
+			_net_racing = true
+			if _intro != null and _intro.running():      # T-156: atrasado em relacao ao servidor: larga junto
+				_intro.finish_now()
 			_countdown = 0.0)
+	_net_racing = Net.room_state == Protocol.RoomState.RACING
 	Net.race_ended.connect(_on_net_end)
 	Net.disconnected_from_server.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	for a in OS.get_cmdline_user_args():
@@ -342,15 +351,15 @@ func _on_net_end(result: Dictionary) -> void:
 	_open_result(result, "res://scenes/lobby/lobby.tscn")
 
 
-## Grid de largada: jogador + rival da rota + 2 bots; cada um com pecas e acessorios proprios.
+## Grid de largada, lado a lado (StartGrid). Campanha (rota com rival) = SEMPRE 1 contra 1: jogador + rival da rota
+## (decisao do Marco, T-156). Corrida rapida (sem rota) = jogador + 3 bots. Cada um com pecas e acessorios proprios.
 func _spawn_field() -> void:
-	var xs: Array[float] = Room.GRID_X
-	var rival: RivalDef = null
-	if route != null:
-		rival = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
+	var rival: RivalDef = _route_rival()
 	var base_diff: int = rival.difficulty if rival != null else BotDriver.Difficulty.NORMAL
-	for i in 4:
-		var idx: int = sim.add_truck(-float(i) * 14.0, xs[i])
+	var n: int = StartGrid.CAMPAIGN_TRUCKS if rival != null else StartGrid.QUICK_TRUCKS
+	for i in n:
+		var g: Vector2 = StartGrid.slot(i, n)
+		var idx: int = sim.add_truck(g.x, g.y)
 		var t: TruckSim = sim.trucks[idx]
 		t.is_bot = i != 0
 		var node := TruckNode.new()
@@ -389,7 +398,7 @@ func _spawn_field() -> void:
 			node.set_paint_color(paint)
 			_horns.resize(i + 1)
 			_horns[i] = _horn_of(defs)
-			_bots.append(BotDriver.new(diff, 100 + i, xs[i], i == 1 and rival != null))
+			_bots.append(BotDriver.new(diff, 100 + i, g.y, i == 1 and rival != null))
 		node.set_headlights(tod.headlights)
 		node.set_light_pattern(String(gs.profile.get("light_pattern", "steady")) if i == 0 else LightPatterns.IDS[i % LightPatterns.IDS.size()])
 		_trucks.append(node)
@@ -446,7 +455,7 @@ func _toggle_pause() -> void:
 		return
 	get_tree().paused = not get_tree().paused
 	_pause_layer.visible = get_tree().paused
-	_hud_layer.visible = not get_tree().paused
+	_hud_layer.visible = not get_tree().paused and not _nohud and not (_intro != null and _intro.running() and _intro.kind == DuelPlan.FULL)
 	if _pause_layer.visible and _pause_first != null:
 		_pause_first.grab_focus()
 	if _pause_layer.visible and _demo.shot_dir != "":
@@ -468,16 +477,26 @@ func _process(delta: float) -> void:
 		if delta > 0.05 and _fps_age > 1.5:
 			print("PICO: quadro de %.0f ms (t=%.1f s)" % [delta * 1000.0, sim.time])
 		_fps_max_calls = maxi(_fps_max_calls, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
-		if _fps_t >= 5.0:
-			print("FPS medio: %.1f  (desenhos: %d, max %d no periodo; triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), _fps_max_calls, Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+		var in_intro: bool = _intro != null and _intro.running()      # T-156: periodos de 2 s durante a abertura
+		if _fps_t >= (2.0 if in_intro else 5.0):
+			print(("[abertura %s] " % _intro.band.phase if in_intro else "") + "FPS medio: %.1f  (desenhos: %d, max %d no periodo; triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), _fps_max_calls, Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
 					Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0])
 			_fps_t = 0.0
 			_fps_n = 0
 			_fps_max_calls = 0
 	var dt: float = minf(delta, 0.1)
+	if _intro != null and _intro.running():          # T-156: abertura frente a frente (a corrida espera na largada)
+		_intro.update_to(_net_elapsed() if online else _intro.t + dt, dt, _cam)
+		if _intro.running():
+			_intro_frame(dt)
+			return
 	if _countdown > 0.0:
 		var before: float = _countdown
 		_countdown -= dt
+		if online and float(Net.pending_setup.get("countdown_total", 0.0)) > 0.0 and not _net_racing:
+			var left: float = float(Net.pending_setup["countdown_total"]) - _net_elapsed()   # mesmo relogio do servidor
+			_countdown = maxf(left, 0.0001) if left > -0.4 else 0.0     # espera o "largou" do servidor (ou 0,4 s a mais)
+		_intro_count_shots(before)
 		if before > RaceCinema.START_CUT_BEFORE and _countdown <= RaceCinema.START_CUT_BEFORE:
 			_cinema.start_cut("start", RaceCinema.START_CUT_S, _cut_side())      # corte lateral na largada
 		if before > 0.0 and _countdown <= 0.0:
@@ -628,7 +647,10 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
-		node.transform = _impact.jolt(k, path.vehicle_transform(z, x, t.length, t.body_yaw(), t.lean() * 0.11))
+		var al: Vector2 = Vector2.ZERO                  # T-156: manobra de alinhamento no comeco da contagem
+		if _intro != null and _intro.kind != DuelPlan.NONE and _countdown > 0.0:
+			al = DuelShots.align_offset(t.x, DuelShots.align_progress(_countdown))
+		node.transform = _impact.jolt(k, path.vehicle_transform(z, x + al.x, t.length, t.body_yaw() + al.y, t.lean() * 0.11))
 		node.animate(t.speed, dt, t.lean())
 		node.set_signal(t.signal_dir)
 		if _cam != null:
@@ -655,6 +677,8 @@ func _snap_camera() -> void:
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	if _demo.camera(_cam, path, _player_z(), _player_x(), t.length):
+		return
+	if _align_camera():
 		return
 	if _cinema.apply_cut(dt, _cam, _trucks[player]):
 		_speed_fx.update(t.speed, dt)
@@ -777,6 +801,117 @@ func _open_result(res: Dictionary, next_scene: String) -> void:
 	layer.add_child(screen)
 	screen.show_result(res)
 	screen.continue_pressed.connect(func() -> void: SceneFader.go(get_tree(), next_scene))
+
+
+func _route_rival() -> RivalDef:
+	if route == null or String(route.rival_id) == "":
+		return null
+	return load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
+
+
+# ---------------------------------------------------------------- T-156: abertura "frente a frente"
+
+## Decide a versao (cheia, curta, nenhuma) e monta a abertura. Depuracao: --intro=full|short|none, --no-intro;
+## --start= e --demo= desligam (as capturas e medicoes antigas continuam iguais).
+func _setup_intro(args: PackedStringArray) -> void:
+	var forced: String = ""
+	for a in args:
+		if a.begins_with("--intro="):
+			forced = a.substr(8)
+	var pair: Array[int] = [player, -1]
+	var cards: Array[Dictionary] = []
+	var kind: String = DuelPlan.NONE
+	if online:
+		kind = String(Net.pending_setup.get("intro", DuelPlan.NONE)) if forced == "" else forced
+		pair = DuelPlan.online_pair(Net.pending_setup["grid"], player)
+		for k in pair:
+			for e in Net.pending_setup["grid"]:
+				if int(e["idx"]) == k:
+					cards.append(DuelCards.online(e, sim.trucks[k], int(Net.pending_setup["seed"])))
+		if _net_racing:
+			kind = DuelPlan.NONE
+	else:
+		var rv: RivalDef = _route_rival()
+		var key: String = "%s:%s" % [route.id, rv.id] if rv != null else ""
+		var rematch: bool = key != "" and String(gs.last_duel_key) == key
+		if rv != null:
+			pair = [player, 1]
+			cards = [DuelCards.player(gs, hash(key)), DuelCards.rival(rv, sim.trucks[1])]
+		var debug_off: bool = _countdown <= 0.0 or _demo.active() or "--no-intro" in args
+		kind = DuelPlan.pick_offline(rv != null, sim.trucks.size(), rematch, forced if forced != "" else (DuelPlan.NONE if debug_off else ""))
+		if kind != DuelPlan.NONE:
+			gs.last_duel_key = key
+	if kind == DuelPlan.FULL and (pair[1] < 0 or cards.size() < 2):
+		kind = DuelPlan.SHORT
+	_intro = DuelIntro.new()
+	add_child(_intro)
+	_intro.online = online
+	_intro.demo = _demo
+	_intro.audio = _audio
+	if pair[1] >= 0:
+		var j: int = pair[1] if pair[1] < player else pair[1] - 1        # _rival_audio: os outros caminhoes em ordem
+		_intro.rival_engine = _rival_audio[j] if j < _rival_audio.size() else null
+		var h: String = _horns[pair[1]] if pair[1] < _horns.size() else ""
+		_intro.rival_horn = h if h.begins_with("horn_musical") else "horn_musical_1"
+	_intro.finished.connect(_on_intro_finished)
+	_intro.setup(kind, tod, _trucks, pair, cards, DuelCards.place_of(route))
+	if _intro.running():
+		_hud_layer.visible = false
+		print("ABERTURA: %s (%.1f s antes da contagem)" % [kind, DuelPlan.intro_seconds(kind)])
+
+
+func _on_intro_finished() -> void:
+	_hud_layer.visible = not _nohud and not get_tree().paused
+	_lights_state = not (tod.headlights or _tunnel.amount > 0.3)    # reaplica as luzes da hora do dia
+	_update_truck_lights()
+	if not online:
+		_countdown = Protocol.COUNTDOWN_SECONDS
+	_update_visuals(1.0, 0.0)
+	_snap_camera()
+
+
+## Quadro da abertura: a simulacao nao anda; o resto do mundo segue vivo (transito parado, trens, capturas).
+func _intro_frame(dt: float) -> void:
+	_cinema.update_flash(dt)
+	_traffic3d.refresh()
+	_demo.update(get_viewport(), sim.trucks[player], dt)
+	if _intro.skipped:                     # online depois de pular: espera na largada, na tomada do alinhamento
+		_update_visuals(1.0, dt)
+		_align_camera()
+
+
+## Online: segundos desde que o servidor comecou a contagem (setup + ping; igual em todos os clientes).
+func _net_elapsed() -> float:
+	var total: float = float(Net.pending_setup.get("countdown_total", Protocol.COUNTDOWN_SECONDS))
+	return DuelPlan.online_elapsed(total, float(Net.pending_setup.get("countdown", total)), Net.pending_setup_msec,
+		Time.get_ticks_msec(), Net.ping_ms)
+
+
+## Tomada do alinhamento (comeco da contagem): alto atras do grid, descendo ate a camera da corrida.
+func _align_camera() -> bool:
+	if _intro == null or _intro.kind == DuelPlan.NONE or _countdown <= 0.0:
+		return false
+	var pr: float = DuelShots.align_progress(_countdown)
+	if pr < 0.0:
+		return false
+	var zf: float = -INF
+	var xm: float = 0.0
+	for t in sim.trucks:
+		zf = maxf(zf, t.z)
+		xm += t.x
+	var c: Array[Vector3] = _cam_target(_player_z(), _player_x())
+	DuelShots.align_camera(_cam, path, zf, xm / float(sim.trucks.size()), pr, c[0], c[1])
+	return true
+
+
+## Capturas (--shots=) do alinhamento e da contagem.
+func _intro_count_shots(before: float) -> void:
+	if _intro == null or _intro.kind == DuelPlan.NONE:
+		return
+	if before > 2.4 and _countdown <= 2.4:
+		_demo.queue_shot("duelo_5_alinhamento", 0.0)
+	if before > 1.0 and _countdown <= 1.0:
+		_demo.queue_shot("duelo_6_contagem", 0.0)
 
 
 ## Depuracao (--fps-log): quantas superficies (≈ chamadas de desenho) cada parte da cena tem.

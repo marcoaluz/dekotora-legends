@@ -11,4 +11,6 @@ part_ids = PackedStringArray("fb_chrome_steps", "skirt_chrome", "rb_chrome")
 taunt_key = "rival.rival_mountain.taunt"
 min_fame = 40
 min_destaque = 90
+truck_key = "rival.rival_mountain.truck"
+crest = "月"
 refuse_key = "rival.rival_mountain.refuse"

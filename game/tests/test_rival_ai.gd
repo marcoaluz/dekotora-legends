@@ -91,6 +91,7 @@ func test_rival_rides_alongside_and_pushes() -> void:
 
 func test_rival_mirrors_the_players_turn_signal() -> void:
 	var sim := _straight()
+	sim.time = BotDriver.DUEL_START_GRACE + 0.1        # T-156: depois da carencia da largada
 	var h := _human(sim, 20.0, Lanes.FIRST, 30.0)
 	var bot := sim.add_truck(0.0, Lanes.X[Lanes.LAST])      # 20 m atras (ainda fora do duelo, ja dentro do alcance da seta)
 	sim.trucks[bot].is_bot = true

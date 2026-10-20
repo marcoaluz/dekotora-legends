@@ -4,8 +4,8 @@ extends RefCounted
 ## o servidor (server_main.gd) entrega comandos e le snapshots/eventos. Isso permite testar tudo
 ## sem abrir portas (tests/test_net_room.gd).
 
-const GRID_X: Array[float] = [0.0, -0.5, 0.5, 0.0]   # faixas do grid (centro, esq., dir., centro)
-const GRID_GAP: float = 14.0
+const GRID_X: Array[float] = [0.0, -0.5, 0.5, 0.0]   # faixas do grid (centro, esq., dir., centro); posicoes: StartGrid
+const GRID_GAP: float = 14.0                         # (antes da T-156: um atras do outro; agora lado a lado, StartGrid)
 const END_AFTER_FIRST_FINISH: float = 30.0     # s para os outros chegarem depois do primeiro humano
 
 
@@ -37,6 +37,12 @@ var countdown: float = 0.0
 var end_timer: float = -1.0
 var results: Dictionary = {}                    # peer_id -> resultado final
 var bot_names: Dictionary = {}                  # truck_idx -> nome do bot
+var intro: String = DuelPlan.SHORT              # T-156: abertura "frente a frente" (full) ou curta; o countdown inclui ela
+var countdown_total: float = Protocol.COUNTDOWN_SECONDS
+var race_rules: Dictionary = {}                 # regras usadas nesta corrida (comboio: transito mais leve)
+## O servidor liga depois de mandar o setup: o quadro que montou a corrida (lento) nao entra na contagem (T-156).
+var hold_first_frame: bool = false
+var _last_race_sig: String = ""                 # mesma rota e mesmas pessoas da corrida anterior = revanche (versao curta)
 var _acc: float = 0.0
 var _prev_damage: Dictionary = {}               # truck_idx -> assinatura do dano
 
@@ -77,7 +83,7 @@ func remove_member(peer: int) -> void:
 	elif sim != null and m.truck_idx >= 0:
 		# jogador saiu no meio da corrida: um bot assume o caminhao ate o fim
 		sim.trucks[m.truck_idx].is_bot = true
-		drivers[m.truck_idx] = BotDriver.new(BotDriver.Difficulty.NORMAL, 900 + peer, GRID_X[m.truck_idx % 4], false, true)
+		drivers[m.truck_idx] = BotDriver.new(BotDriver.Difficulty.NORMAL, 900 + peer, StartGrid.lane_x(m.truck_idx), false, true)
 		sim.set_command(m.truck_idx, Commands.new())
 
 
@@ -143,7 +149,13 @@ func try_start(peer: int, seed_: int) -> String:
 		return "nem todos estão prontos"
 	_build_race(seed_)
 	state = Protocol.RoomState.COUNTDOWN
-	countdown = Protocol.COUNTDOWN_SECONDS
+	# T-156: 2 jogadores = abertura frente a frente; 3-4 ou revanche = curta. O servidor espera a abertura inteira
+	# antes de largar, e todos os clientes tocam a cena pelo mesmo relogio (setup + ping): ninguem larga atrasado.
+	var sig: String = "%s|%s" % [rules["route"], ",".join(PackedStringArray(order.map(func(p: int) -> String: return (members[p] as Member).player_code)))]
+	intro = DuelPlan.pick_online(order.size(), sim.trucks.size(), sig == _last_race_sig)
+	_last_race_sig = sig
+	countdown_total = DuelPlan.total_seconds(intro)
+	countdown = countdown_total
 	return ""
 
 
@@ -153,25 +165,31 @@ func _build_race(seed_: int) -> void:
 	var track: Track = route.build_track() if route != null else Track.make_test_track()
 	if route != null and bool(rules.get("events", true)):
 		track.events = route.build_events(track, seed_)       # T-139: o servidor sorteia e manda no setup
-	sim = RaceSim.new(track, int(rules["traffic"]), seed_)
+	race_rules = rules.duplicate()
+	race_rules["traffic"] = DuelPlan.convoy_traffic(int(rules["traffic"]), order.size())   # T-156: comboio (3-4) = mais leve
+	race_rules["convoy"] = order.size() >= 3
+	sim = RaceSim.new(track, int(race_rules["traffic"]), seed_)
 	sim.freight = route.freight if route != null else 25000
 	sim.deadline = (route.deadline() + track.events.time_allowance()) if route != null else 0.0   # T-139: folga dos eventos
 	drivers.clear()
+	var bots: int = mini(int(rules["bots"]), Protocol.MAX_PLAYERS - order.size())
+	var n: int = order.size() + bots
 	var slot: int = 0
 	for p in order:
 		var m: Member = members[p]
-		var idx: int = sim.add_truck(-float(slot) * GRID_GAP, GRID_X[slot % 4])
+		var g: Vector2 = StartGrid.slot(slot, n)                # T-156: lado a lado (ate 3 por fileira)
+		var idx: int = sim.add_truck(g.x, g.y)
 		m.truck_idx = idx
 		TruckConfig.apply(sim.trucks[idx], m.loadout)
 		slot += 1
-	var bots: int = mini(int(rules["bots"]), Protocol.MAX_PLAYERS - order.size())
 	var names: Array[String] = ["Trovão Rosa", "Dragão de Aço", "Lua Cromada"]
 	for b in bots:
-		var idx2: int = sim.add_truck(-float(slot) * GRID_GAP, GRID_X[slot % 4])
+		var g2: Vector2 = StartGrid.slot(slot, n)
+		var idx2: int = sim.add_truck(g2.x, g2.y)
 		var t: TruckSim = sim.trucks[idx2]
 		t.is_bot = true
 		TruckConfig.apply(t, TruckConfig.basic_descriptor())
-		drivers[idx2] = BotDriver.new(clampi(b, 0, 2), seed_ + 10 + b, GRID_X[slot % 4])
+		drivers[idx2] = BotDriver.new(clampi(b, 0, 2), seed_ + 10 + b, g2.y)
 		bot_names[idx2] = names[b % names.size()]
 		slot += 1
 
@@ -189,6 +207,9 @@ func apply_command(peer: int, tick: int, steer: float, throttle: float, brake: f
 ## Avanca a sala em tempo real (chamado todo frame pelo servidor).
 func advance(delta: float) -> void:
 	if state == Protocol.RoomState.COUNTDOWN:
+		if hold_first_frame:            # T-156: os clientes contam a partir do setup; o servidor, do quadro seguinte
+			hold_first_frame = false
+			return
 		countdown -= delta
 		if countdown <= 0.0:
 			state = Protocol.RoomState.RACING
@@ -301,5 +322,6 @@ func race_setup() -> Dictionary:
 		e["name"] = m.name
 		e["paint"] = m.loadout.get("paint", "#e9eef5")
 		e["loadout"] = m.loadout
-	return {"seed": seed_value, "rules": rules, "grid": grid, "countdown": countdown, "tick": sim.tick,
-		"events": sim.track.events.to_array(), "lane_sections": sim.track.lane_sections}   # T-153: trechos de 2 faixas
+	return {"seed": seed_value, "rules": race_rules if not race_rules.is_empty() else rules, "grid": grid, "countdown": countdown,
+		"tick": sim.tick, "events": sim.track.events.to_array(), "lane_sections": sim.track.lane_sections,   # T-153: trechos de 2 faixas
+		"intro": intro, "countdown_total": countdown_total}                      # T-156: abertura e relogio da largada

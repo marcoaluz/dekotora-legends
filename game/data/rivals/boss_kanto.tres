@@ -13,4 +13,6 @@ boss = true
 taunt_key = "rival.boss_kanto.taunt"
 min_fame = 60
 min_destaque = 140
+truck_key = "rival.boss_kanto.truck"
+crest = "王"
 refuse_key = "rival.boss_kanto.refuse"

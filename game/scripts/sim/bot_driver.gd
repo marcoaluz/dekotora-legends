@@ -22,6 +22,11 @@ const DUEL_SEEK_M: float = 70.0                             # distancia em que e
 const DUEL_TIME: Vector2 = Vector2(5.0, 9.0)                # s de duelo (emparelhado)
 const PRESS_EVERY: Vector2 = Vector2(1.6, 3.2)              # s entre uma "fechada" e outra
 const PRESS_TIME: float = 1.4                               # s mirando a faixa do jogador
+## T-156 (largada lado a lado, 1 contra 1): o rival nao abre duelo nos primeiros segundos, nao segura o jogador no
+## acostamento (deixa ele voltar) e nunca anda abaixo de 80% do proprio ritmo so para ficar ao lado (sem "borracha":
+## antes ele podia andar a 50 km/h ao lado de quem foi empurrado para o acostamento e os dois estouravam o prazo).
+const DUEL_START_GRACE: float = 8.0                         # s depois da largada sem duelo
+const DUEL_MIN_PACE: float = 0.8                            # fracao da velocidade desejada que o duelo respeita
 const CLOSURE_LOOK: float = 260.0                           # T-139: m a frente em que enxerga uma faixa fechada (sai cedo dela)
 const OVERTAKE_LOOK: float = 120.0                          # m: para ultrapassar, a faixa so precisa estar aberta ate aqui
 const MUST_MOVE_M: float = 110.0                            # m: daqui em diante sai da faixa fechada mesmo atras de um lento
@@ -264,6 +269,11 @@ func _duel(sim: RaceSim, me: TruckSim, index: int, dt: float, desired: float, ob
 		return desired
 	var prey: TruckSim = sim.trucks[pi]
 	var dz: float = prey.z - me.z                    # > 0: o jogador esta a frente
+	if sim.time < DUEL_START_GRACE or not Lanes.is_road_lane(prey.lane):   # T-156: largada limpa; acostamento: deixa voltar
+		_duel_t = 0.0
+		_pressing_t = 0.0
+		_closing_lane = -1
+		return desired
 	# 1) espelha a seta do jogador: vai para a faixa que ele quer, depois do tempo de reacao
 	if prey.signal_dir != 0 and absf(dz) < DUEL_RANGE_M * 1.5:
 		if _seen_signal != prey.signal_dir:
@@ -295,7 +305,7 @@ func _duel(sim: RaceSim, me: TruckSim, index: int, dt: float, desired: float, ob
 		return desired
 	# 3) fica ao lado: mesma velocidade, ajustada pela diferenca de posicao
 	var v_keep: float = prey.speed + clampf(dz * 0.3, -6.0, 6.0)
-	var out: float = minf(desired, maxf(v_keep, 0.0))
+	var out: float = minf(desired, maxf(v_keep, desired * DUEL_MIN_PACE))
 	# 4) faixa: vizinha do jogador; de vez em quando mira a faixa dele para empurrar
 	if _pressing_t > 0.0:
 		_pressing_t -= dt

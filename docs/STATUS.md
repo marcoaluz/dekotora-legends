@@ -25,7 +25,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (282) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
+| Testes automáticos (292) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -152,6 +153,15 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-156 (abertura frente a frente, campanha 1 contra 1):** jogar um frete e ver a cena (um toque pula); olhar
+  `docs/capturas_t156/` (`dia` = praça de pedágio, `noite`/`tarde` = área de descanso, `curta` = revanche, `comboio` =
+  4 caminhões) e dizer: (1) se gosta do cenário, da faixa, das falas (texto em `game/data/i18n/pt-BR.json`,
+  `rival.*.taunt` e `intro.player_line.*`) e dos nomes dos caminhões dos rivais (Sakura-maru, Tetsuryū-maru,
+  Gekkō-maru, Kaidō-Ō); (2) não existe retrato de motorista: a faixa usa um brasão com kanji (dá para trocar por
+  retratos se você mandar); (3) **o rival ficou um pouco mais forte** no 1 contra 1 (tabela em `docs/BALANCEAMENTO.md`):
+  jogar e dizer se precisa aliviar; (4) a corrida rápida continua com 4 caminhões (manter?); (5) ouvir
+  `game/assets/audio/sfx/ui/vs_taiko_hit.mp3`. **Gerar o APK de novo** (protocolo de rede 6).
 
 - **T-155 (acabamento F4):** olhar `docs/capturas_t155/` (folhas `item1_*`, `item2_ficha`, `item3_*`; esquerda = antes,
   direita = depois) e dizer se o mural à noite está na força certa (noite 0,8; dá para subir/descer em
@@ -292,6 +302,22 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   vídeo +1,5 a +4 MB; FPS no ruído (258–291). Andando (`measure_roadside.sh`, 300 → 550 m): litoral ~283 → ~297, viaduto ~305 →
   ~308, montanha ~298 → ~300 (o sorteio de eventos e o trânsito variam entre execuções). Testes `tests/test_roadside_kit.gd` (5).
   Capturas `docs/capturas_t146/`. Pendências: aprovar visual/artes; medir no celular (APK).
+- **T-156 (2026-10-20): abertura "frente a frente" e campanha 1 contra 1 (G1).** Campanha = jogador × rival da rota
+  (`StartGrid`, `race_scene_3d._spawn_field`); corrida rápida 4; online 2–4 com comboio (3–4 = trânsito mais leve).
+  Abertura só visual: `road3d/duel_plan.gd` (tempos, versão, relógio online), `duel_intro.gd` (controle, pular, sons,
+  luzes), `duel_stage.gd` (área de descanso / praça de pedágio a 400 m abaixo do mundo, caixas juntas por material),
+  `duel_shots.gd` (câmeras e alinhamento), `duel_cards.gd` (dados da faixa), `ui/duel_band.gd` (faixa, VS, letreiro).
+  Os caminhões de verdade da corrida vão ao cenário e voltam. Grid lado a lado a 30 m da pista; rival sem duelo nos 8 s
+  iniciais e sem prender no acostamento (`BotDriver`). Online: protocolo 6, servidor espera a abertura
+  (`countdown_total`) e todos tocam pelo mesmo relógio; `net_test` imprime `LARGADA:` (os dois clientes previram a
+  largada com 4 ms de diferença entre si; o servidor largou ~40 ms antes da previsão e o aviso RACING acerta). Som:
+  `vs_taiko_hit` (novo), motor acelerando = camadas do motor, buzina = `horn_musical_1`. Custo (modo médio, sem vsync,
+  `tools/measure_t156.sh`): na abertura 89–238 chamadas (pico 286) e 53–151 mil triângulos, contra ~450–500 chamadas e
+  ~240 mil na corrida; FPS 380–500 na cena (corrida ~250–300); textura +0,2 a +3 MB na cena e +~5 MB na corrida
+  depois dela (cache das letras japonesas). Corrigido no caminho: o VS mudava o tamanho da fonte a cada quadro e
+  criava +58 MB de textura. Testes `tests/test_duel_intro.gd` (8) e `tests/test_duel_scene_flow.gd` (2, montam a
+  corrida de verdade; `run_tests.gd` agora roda arquivos com `const IN_TREE := true` no 1º quadro). Capturas
+  `docs/capturas_t156/`.
 - **T-155 (2026-10-19): acabamento visual (F4).** (1) **Mural aceso à noite**: o material do mural (baú e tampas da
   graneleira) ganhou emissão com a própria arte, mais clara perto da saia de LED e da fileira do teto (`truck/mural_glow.gd`,
   textura 512x128 feita uma vez e compartilhada); força pela hora do dia `TimeOfDay.mural_glow` (noite 0,8, fim de tarde

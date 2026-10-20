@@ -383,3 +383,30 @@ Bots (4 bots sem eventos, 6 sementes, `measure_impacts.gd`; antes → depois): q
 
 Nenhum bot deixou de chegar; diferença de −1,2 a +2,5 s (o trânsito muda a cada batida, então parte é sorte).
 
+## Campanha 1 contra 1, grid lado a lado e rival na largada (T-156)
+
+- **Campanha = 2 caminhões** (jogador × rival da rota; antes + 2 bots). Pagamento não mudou: vitória = 1º e no prazo
+  (frete × carga + 50% de bônus de posição + Fama); 2º = derrota, 0 ¥. Com 1 contra 1 o "1º lugar" é só vencer o
+  rival (antes um bot comum que chegasse na frente também dava derrota). Menos caminhões = menos ultrapassagens para
+  somar Fama (2 por ultrapassagem). HUD de posição mostra "/ 2". Corrida rápida segue com 4.
+- **Grid** (`StartGrid`): largada a **30 m** do começo da pista (todos; a corrida ficou 30 m mais curta, ~1 s).
+  Duelo: jogador na faixa da **direita**, rival na da **esquerda**, mesma linha, faixa do meio livre. 3–4 caminhões:
+  três lado a lado (centro, esquerda, direita) e o 4º 14 m atrás. Antes: um atrás do outro a cada 14 m.
+- **Rival na largada** (`BotDriver`): não abre duelo nos **8 s** iniciais (`DUEL_START_GRACE`), não duela/fecha
+  quem está no **acostamento** (deixa voltar) e nunca anda abaixo de **80%** da própria velocidade desejada só para
+  ficar ao lado (`DUEL_MIN_PACE`). Sem isso, lado a lado desde a largada, o rival empurrava o jogador para o
+  acostamento e andava a ~50 km/h ao lado dele: **nas 3 rotas, 4 de 4 corridas estouravam o prazo**.
+- Medido (`tools_dev/measure_duel.gd`, 6 sementes, "jogador" = bot difícil que não fecha ninguém, eventos sorteados):
+
+| Rota | Antes (4 caminhões, rival 14 m atrás) | Agora (1 contra 1, lado a lado) |
+| --- | --- | --- |
+| Litoral | jogador 122,6 s, rival 122,6 s; venceu 5/6; fora do prazo 0 | 123,5 s / 122,2 s; venceu 3/6; fora do prazo 1 |
+| Viaduto | 123,6 s / 123,7 s; venceu 4/6; fora do prazo 1 | 126,7 s / 122,3 s; venceu 2/6; fora do prazo 1 |
+| Montanha | 148,0 s / 142,7 s; venceu 1/6; fora do prazo 0 | 141,2 s / 138,8 s; venceu 2/6; fora do prazo 0 |
+
+  Leitura: o rival ficou um pouco mais forte (larga junto em vez de 14 m atrás e ninguém o atrapalha); o bot-jogador
+  venceu 7 de 18 (antes 10 de 18). Um humano que fecha o rival e usa o vácuo tende a se sair melhor que este bot.
+  **Marco: jogar e dizer** se o rival está difícil demais; ajustes possíveis: rival largando meio caminhão atrás,
+  carência maior ou prazo do litoral/viaduto +3 s.
+- **Comboio online** (3–4 jogadores): trânsito um nível mais leve que a regra da sala (normal → leve).
+

@@ -257,6 +257,8 @@ func _on_lobby(state: Dictionary) -> void:
 	_start_btn.visible = _is_host()
 	_start_btn.disabled = not all_ready
 	_build_rules(state["rules"], _is_host())
+	if (state["members"] as Array).size() >= 3:              # T-156: 3-4 jogadores = comboio (transito mais leve)
+		_rules_box.add_child(UiTheme.label(Tr.t("lobby.convoy"), 13, UiTheme.GOLD))
 
 
 func _build_rules(rules: Dictionary, editable: bool) -> void:

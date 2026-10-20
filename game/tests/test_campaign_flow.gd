@@ -1,5 +1,6 @@
 extends TestCase
-## Fluxo da campanha sem tela: perfil -> rota -> corrida (4 caminhoes dirigidos por bots) -> resultado -> perfil.
+## Fluxo da campanha sem tela: perfil -> rota -> corrida 1 contra 1 (jogador x rival, dirigidos por bots; T-156)
+## -> resultado -> perfil. Antes da T-156 eram 4 caminhoes (jogador + rival + 2 bots).
 
 
 func _run_route(route_id: String) -> Dictionary:
@@ -9,19 +10,20 @@ func _run_route(route_id: String) -> Dictionary:
 	sim.freight = route.freight
 	sim.deadline = route.deadline()
 	var drivers: Array[BotDriver] = []
-	var xs: Array[float] = Room.GRID_X
-	for i in 4:
-		sim.add_truck(-float(i) * 14.0, xs[i])
+	var n: int = StartGrid.CAMPAIGN_TRUCKS
+	for i in n:
+		var g: Vector2 = StartGrid.slot(i, n)
+		sim.add_truck(g.x, g.y)
 		var t: TruckSim = sim.trucks[i]
 		if i == 0:
 			gs.configure_truck(t)
 		else:
 			t.is_bot = true
 			t.set_loadout([DamageModel.make_part("fb_basic", ["front"], 120.0, 80.0, 5)])
-		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, xs[i], false, i == 0))
+		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, g.y, false, i == 0))   # testa o fluxo (o duelo do rival: test_rival_ai)
 	var steps: int = 0
 	while not sim.is_over() and steps < 30 * 400:
-		for i in 4:
+		for i in n:
 			if i == 0 or sim.trucks[i].is_bot:
 				sim.set_command(i, drivers[i].command_for(sim, i, RaceSim.FIXED_DT))
 		sim.step()
