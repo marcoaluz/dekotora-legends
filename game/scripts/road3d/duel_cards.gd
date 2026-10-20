@@ -11,8 +11,9 @@ const HUMAN_CRESTS: Array[String] = ["銀", "嵐", "星", "龍"]
 
 ## Card of the player (offline): name from the options, truck name, paint, destaque of the garage.
 static func player(gs: Node, line_seed: int) -> Dictionary:
-	var s: Node = gs.get_node("/root/Settings")
-	var name: String = String(s.player_name) if s != null and String(s.player_name).strip_edges() != "" else Tr.t("lobby.default_name")
+	var name: String = String(Settings.player_name).strip_edges()
+	if name == "":
+		name = Tr.t("lobby.default_name")
 	return {"driver": name, "truck": String(gs.profile.get("truck_name", Tr.t("intro.player_truck"))), "crest": PLAYER_CREST,
 		"color": Color(String(gs.profile.get("paint", "#e9eef5"))), "destaque": int(gs.destaque()),
 		"line": Tr.t("intro.player_line.%d" % (posmod(line_seed, PLAYER_LINES) + 1))}

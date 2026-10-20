@@ -10,6 +10,8 @@ const ROW: Array[float] = [0.0, -0.5, 0.5]     # lane x of each slot in a row (c
 const PER_ROW: int = 3
 const GAP: float = 14.0                         # metres between rows (a truck is 7-12 m long)
 const START_Z: float = 30.0                     # rear of the last row (m from the start of the road)
+const CAMPAIGN_TRUCKS: int = 2                  # campaign = always 1x1 (player x route rival), Marco T-156
+const QUICK_TRUCKS: int = 4                     # quick race = player + 3 bots
 
 
 ## (z, x) of slot `i` in a grid of `n` trucks.

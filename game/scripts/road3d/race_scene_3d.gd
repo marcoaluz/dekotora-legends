@@ -354,7 +354,7 @@ func _on_net_end(result: Dictionary) -> void:
 func _spawn_field() -> void:
 	var rival: RivalDef = _route_rival()
 	var base_diff: int = rival.difficulty if rival != null else BotDriver.Difficulty.NORMAL
-	var n: int = 2 if rival != null else 4
+	var n: int = StartGrid.CAMPAIGN_TRUCKS if rival != null else StartGrid.QUICK_TRUCKS
 	for i in n:
 		var g: Vector2 = StartGrid.slot(i, n)
 		var idx: int = sim.add_truck(g.x, g.y)
