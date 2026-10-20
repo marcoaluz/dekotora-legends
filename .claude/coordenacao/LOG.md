@@ -188,3 +188,6 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: truck/mural_glow.gd, road3d/{tunnel_3d,tunnel_light_pools,kit_props_3d,roadside_kit}.gd, ui/garage_info_panel.gd, blender/scripts/lib/traffic_wreck.py, tests/{test_mural_glow,test_tunnel_portals}.gd, docs/capturas_t155/
 - Validação: merge na main sem conflito; 282 testes ok; modo médio +0 a +3 chamadas; folhas antes/depois conferidas pelo coordenador.
 - Decisão pendente: força do mural à noite, ficha compacta (aviso de potência como dica), tamanho dos muros das bocas. APK novo.
+
+## 2026-10-20 · T-160 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Acabamento (T-155)" na skill godot-dekotora e item (g) do carro batido na blender-pixelart (commit 493abb6).
