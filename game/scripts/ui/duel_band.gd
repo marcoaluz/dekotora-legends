@@ -157,15 +157,18 @@ func _vs(p: float, w: float, h: float) -> void:
 	for s in 6:                                                                      # ink drops
 		var a2: float = float(s) * 1.07 + 0.4
 		draw_circle(c + Vector2(cos(a2), sin(a2) * 0.8) * 62.0 * k, (3.0 + float(s % 3)) * k, Color(INK.r, INK.g, INK.b, 0.85 * fade))
-	var vs_size: int = int(54.0 * k)
+	# texts at FIXED font sizes, scaled by the transform (a font size per frame would create a glyph cache per size:
+	# +58 MB of texture memory measured before this fix)
+	draw_set_transform(c, 0.0, Vector2(k, k))
 	for o in [Vector2(-1.5, 0), Vector2(1.5, 0), Vector2(0, -1.5), Vector2(0, 1.5)]:
-		_text(_hf, c + Vector2(-60.0, 18.0 * k) + o, "VS", vs_size, Color(0, 0, 0, fade), HORIZONTAL_ALIGNMENT_CENTER, 120.0)
-	_text(_hf, c + Vector2(-60.0, 18.0 * k), "VS", vs_size, Color(GOLD.r, GOLD.g, GOLD.b, fade), HORIZONTAL_ALIGNMENT_CENTER, 120.0)
+		_text(_hf, Vector2(-60.0, 18.0) + o, "VS", 54, Color(0, 0, 0, fade), HORIZONTAL_ALIGNMENT_CENTER, 120.0)
+	_text(_hf, Vector2(-60.0, 18.0), "VS", 54, Color(GOLD.r, GOLD.g, GOLD.b, fade), HORIZONTAL_ALIGNMENT_CENTER, 120.0)
 	for ch in 2:                                                                     # 対決 ("showdown"), vertical, left of VS
-		var cp: Vector2 = c + Vector2(-66.0 * k, -10.0 + 22.0 * float(ch) * k)
+		var cp: Vector2 = Vector2(-66.0, -10.0 + 22.0 * float(ch))
 		for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
-			_text(_jf, cp + o, "対決"[ch], int(18.0 * k), Color(0, 0, 0, fade))
-		_text(_jf, cp, "対決"[ch], int(18.0 * k), Color(1, 1, 1, fade))
+			_text(_jf, cp + o, "対決"[ch], 18, Color(0, 0, 0, fade))
+		_text(_jf, cp, "対決"[ch], 18, Color(1, 1, 1, fade))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if hit < 1.0:
 		draw_rect(Rect2(0, 0, w, h), Color(1, 1, 1, 0.35 * (1.0 - hit)))             # flash on the drum hit
 	if cards.size() >= 2:

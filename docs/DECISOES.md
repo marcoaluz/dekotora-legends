@@ -265,3 +265,26 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   linhas e os viadutos, a frequência dos trens e a pintura do trem de carga; **som** do trem (não existe; proposta de 2 sons
   no ElevenLabs: passagem de trem de carga e apito japonês curto — não gerados).
 
+## 2026-10-20 — T-156: abertura "frente a frente", campanha 1 contra 1 e comboio (pedido do Marco, G1)
+
+- **Decisão do Marco**: campanha sempre 1 contra 1; amigos 2 a 4, com 3–4 no modo **comboio** (trânsito mais leve).
+  Corrida rápida ficou com 4 caminhões (não citada; confirmar).
+- **Onde é a cena**: um cenário pequeno montado 400 m abaixo do mundo da corrida (`DuelStage.ORIGIN`), com o céu, a
+  névoa e o sol da rota; os 2 caminhões DE VERDADE (mesmos nós da corrida) são levados para lá e voltam para a pista no
+  fim. Noite e fim de tarde (`TimeOfDay.headlights`) = área de descanso; dia = praça de pedágio. Nada de modelo novo:
+  caixas juntas por material (MeshBatch), `toll_gate.glb`, pinheiros, barreiras e outdoor do kit da T-146.
+- **Tempos** (`DuelPlan`): frente a frente 1,4 s · jogador 1,8 s (para-choque, viseira/andon, mural) · rival 2,0 s
+  (viseira/andon, para-choque, mural; buzina de provocação) · VS 1,2 s (tambor) · contagem 3 s (alinhamento 1,4 s +
+  corte lateral de sempre). Total 9,4 s. Pular = vai direto para a contagem.
+- **Revanche** = mesma rota e mesmo rival da última abertura mostrada (guardado só na memória: fechar o jogo zera).
+  Online a sala não volta ao lobby depois da corrida, então a regra "mesma dupla e mesma rota" do servidor fica pronta
+  mas ainda não acontece.
+- **Grid**: largada lado a lado a 30 m do começo da pista. 1 contra 1 com a faixa do meio livre (jogador à direita,
+  rival à esquerda); 3–4 = três lado a lado + 1 atrás. Antes os caminhões de trás (−14, −28, −42 m) eram desenhados todos
+  em z = 0, um em cima do outro, e a câmera da contagem ficava em cima do baú do jogador.
+- **Rival**: 8 s sem duelo depois da largada, não fecha quem está no acostamento e não anda abaixo de 80% do ritmo
+  dele para ficar ao lado (antes, lado a lado, os dois estouravam o prazo em todas as rotas). Ver `BALANCEAMENTO.md`.
+- **Faixa**: brasão com 1 kanji na cor do caminhão no lugar do retrato (não há retratos); nome do motorista (Opções >
+  nome do jogador; online o nome da sala), nome do caminhão (jogador: Ginga-maru 銀河丸, o andon dele; rivais: nomes
+  novos), destaque calculado das peças e uma fala curta original em pt-BR.
+

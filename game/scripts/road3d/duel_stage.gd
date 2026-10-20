@@ -126,9 +126,9 @@ func _rest_area() -> void:
 		_box(Vector3(4.7, 0.1, 0.1), tower + Vector3(0, 12.0, 0.28) + e, UiTheme.PINK, 4.0)
 	for e2 in [Vector3(2.32, 0, 0), Vector3(-2.32, 0, 0)]:
 		_box(Vector3(0.1, 2.3, 0.1), tower + Vector3(0, 12.0, 0.28) + e2, UiTheme.PINK, 4.0)
-	MenuBackdrop.neon(self, "爆走", tower + Vector3(0, 12.0, 0.32), UiTheme.GOLD, 0.02, 96, 0.0)
-	MenuBackdrop.neon(self, "ドライブイン 街道", Vector3(-7.0, 7.2, fz + 0.4), UiTheme.PINK, 0.03, 96, 0.0)
-	MenuBackdrop.neon(self, "24H", Vector3(12.0, 7.2, fz + 0.4), UiTheme.CYAN, 0.026, 72, 0.0)
+	MenuBackdrop.neon(self, "爆走", tower + Vector3(0, 12.0, 0.32), UiTheme.GOLD, 0.04, 48, 0.0)
+	MenuBackdrop.neon(self, "ドライブイン 街道", Vector3(-7.0, 7.2, fz + 0.4), UiTheme.PINK, 0.06, 48, 0.0)
+	MenuBackdrop.neon(self, "24H", Vector3(12.0, 7.2, fz + 0.4), UiTheme.CYAN, 0.052, 36, 0.0)
 	_billboard(Vector3(-30.0, 0.0, -10.0), 2)
 	for i in 11:                                                                      # barrier far behind the camera
 		_glb_jersey(Vector3(-17.5 + float(i) * 3.5, 0.0, 30.0))
@@ -174,7 +174,7 @@ func _toll_plaza(tod: TimeOfDay) -> void:
 
 ## White painted text of a road sign (daylight: no glow, no outline).
 func _day_text(text: String, pos: Vector3, px: float) -> void:
-	var t: Label3D = MenuBackdrop.neon(self, text, pos, Color.WHITE, px, 96, 0.0)
+	var t: Label3D = MenuBackdrop.neon(self, text, pos, Color.WHITE, px * 2.0, 48, 0.0)
 	t.modulate = Color(0.95, 0.95, 0.95)
 	t.outline_size = 0
 
