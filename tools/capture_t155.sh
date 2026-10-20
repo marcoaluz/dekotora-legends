@@ -24,7 +24,7 @@ still() {  # nome, rota, z, hora, camera, extras: caminhao parado, camera fixa
 	local dir="$OUT/tmp_$name"
 	"$GODOT" --path game --resolution 1280x720 --quit-after 330 res://scenes/race/race3d.tscn -- \
 		--route="$route" --start="$z" --start-speed=0 --time="$tod" --nohud --shots="$dir" --snap-every=3.5 \
-		--event-seed=7 --cam="$cam" "$@" 2>&1 | grep -E "SCRIPT ERROR|Parse Error" || true
+		--event-seed=7 --cam="$cam" "$@" 2>&1 | grep -E "SCRIPT ERROR|Parse Error|CAPTURA" || true
 	[ -f "$dir/t01_1.png" ] && cp "$dir/t01_1.png" "$OUT/$name.png"
 	rm -rf "${dir:?}"
 	echo "$name"
@@ -59,8 +59,8 @@ for g in $GROUPS_; do
 		;;
 	batido)
 		for T in day night; do
-			still "batido_perto_$T" kanto_2_viaduct 1990 "$T" "4,-1,2.6,19,6,0.6" --event=accident:2-3@1990
-			still "batido_alto_$T" kanto_2_viaduct 1990 "10,-3,5.5,19,6,0.4" --event=accident:2-3@1990
+			still "batido_perto_$T" kanto_2_viaduct 1880 "$T" "72,-1.5,2.4,82,4.5,0.6" --event=accident:2-3@1900
+			still "batido_alto_$T" kanto_2_viaduct 1880 "$T" "92,0.5,4,82,4.5,0.5" --event=accident:2-3@1900
 		done
 		;;
 	tunel)

@@ -14,6 +14,7 @@ Não há marca, texto nem placa no arquivo (conferido nas vistas). Parado no aci
 """
 from __future__ import annotations
 
+import math
 import os
 from collections import Counter
 
@@ -131,6 +132,35 @@ def majority(o, cls: np.ndarray, passes: int = 2) -> np.ndarray:
     return cls
 
 
+def _cut_wheels(o, half_w: float, wheels: list, tire_w: float, hem_z: float) -> None:
+    """T-155: apaga o pneu/aro do original (na redução virava uma estrela de pontas) na faixa de fora de cada roda
+    (um pouco DENTRO do raio: a borda serrilhada fica atrás do pneu novo) e as lascas penduradas embaixo da soleira
+    (abaixo de `hem_z`), que viravam pontas escuras de lado."""
+    ctr = K.face_data(o)[0]
+    x, y, z = ctr[:, 0], ctr[:, 1], ctr[:, 2]
+    cut = np.zeros(len(ctr), bool)
+    near_wheel = np.zeros(len(ctr), bool)
+    for yc, r in wheels:
+        d = np.hypot(y - yc, z - r)
+        cut |= (d < r * 0.96) & (np.abs(x) > half_w - tire_w - 0.06)
+        near_wheel |= d < r * 1.25
+    cut |= (z < hem_z) & ~near_wheel
+    K.delete_faces(o, cut)
+
+
+def _round_wheels(half_w: float, wheels: list, tire_w: float, seg: int) -> list:
+    """Rodas redondas nossas (pneu + aro) no lugar das originais; a da frente esterçada (batida)."""
+    out = []
+    for k, (yc, r) in enumerate(wheels):
+        w = K.make_wheel_axle(f"wreck_wheel_{k}", yc, r, half_w - 0.02, tire_w, seg)
+        if k == 1:                                   # eixo da frente: esterçado depois da batida
+            w.rotation_euler = (0.0, 0.0, math.radians(-9.0))
+        K.select_only([w])
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        out.append(w)
+    return out
+
+
 def prep_wreck(spec, objs, dims, _to_final):
     L, W, H = dims
     o = K.join(objs, "body")
@@ -145,8 +175,13 @@ def prep_wreck(spec, objs, dims, _to_final):
     half_w = float(np.abs(ctr[ctr[:, 2] < 0.8, 0]).max())      # meia largura sem os retrovisores
     wheels = _wheels(ctr, half_w, L)
     print(f"[{spec['tag']}] meia largura={half_w:.2f} rodas (y, r): {[(round(a, 2), round(b, 2)) for a, b in wheels]}")
+    tire_w = spec.get("tire_w", 0.0)
+    if tire_w:
+        _cut_wheels(o, half_w, wheels, tire_w, spec.get("hem_z", 0.0))
     cab_y = (L * spec.get("cab_from", 0.40), L * spec.get("cab_to", 0.74))
-    cls = overlay_small(o, majority(o, classify_base(o, dims, half_w, cab_y)), half_w, wheels)
+    base = majority(o, classify_base(o, dims, half_w, cab_y), spec.get("majority", 2))
+    cls = overlay_small(o, base, half_w, [] if tire_w else wheels)
     K.assign_classes(o, list(cls))
     print(f"[{spec['tag']}] classes: {dict(Counter(cls))}")
-    return [o], []
+    extra = _round_wheels(half_w, wheels, tire_w, spec.get("wheel_seg", 20)) if tire_w else []
+    return [o], extra

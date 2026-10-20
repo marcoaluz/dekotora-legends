@@ -170,7 +170,8 @@ SPECS = {
                  body_tris=4600, own_wheels=True, paint="#2c9a5a"),
     # T-143: carro batido (parado no acidente): rodas no corpo, só pintura + atlas
     "wreck": dict(src_wreck="Carro batido/model_download+(24).obj", importer=WR.import_wreck, rotz=-90, length=4.75,
-                  prep=WR.prep_wreck, body_tris=6000, voxel=0.03, smooth=4, static=True, paint="#d8dce2"),
+                  prep=WR.prep_wreck, body_tris=5400, voxel=0.03, smooth=8, tire_w=0.24, hem_z=0.34, majority=3, static=True,
+                  paint="#d8dce2"),
 }
 
 
@@ -250,6 +251,8 @@ def build(key: str, spec: dict, args) -> None:
     K.weld(body, 1e-5)
     K.decimate(body, spec["body_tris"], spec.get("border_weight", 0.0))
     if spec.get("static"):                     # parado (carro batido): sem rodas separadas
+        if wheels:                             # T-155: rodas redondas nossas entram no corpo (sem reduzir)
+            body = K.join([body] + list(wheels), "body")
         imgs, uv = K.build_atlas(tag, spec.get("cells"))
         K.finalize(body, K.paint_material(), K.trim_material(tag, imgs), uv)
         path = K.export(name, body, [], args.out)
