@@ -40,6 +40,8 @@ var bot_names: Dictionary = {}                  # truck_idx -> nome do bot
 var intro: String = DuelPlan.SHORT              # T-156: abertura "frente a frente" (full) ou curta; o countdown inclui ela
 var countdown_total: float = Protocol.COUNTDOWN_SECONDS
 var race_rules: Dictionary = {}                 # regras usadas nesta corrida (comboio: transito mais leve)
+## O servidor liga depois de mandar o setup: o quadro que montou a corrida (lento) nao entra na contagem (T-156).
+var hold_first_frame: bool = false
 var _last_race_sig: String = ""                 # mesma rota e mesmas pessoas da corrida anterior = revanche (versao curta)
 var _acc: float = 0.0
 var _prev_damage: Dictionary = {}               # truck_idx -> assinatura do dano
@@ -205,6 +207,9 @@ func apply_command(peer: int, tick: int, steer: float, throttle: float, brake: f
 ## Avanca a sala em tempo real (chamado todo frame pelo servidor).
 func advance(delta: float) -> void:
 	if state == Protocol.RoomState.COUNTDOWN:
+		if hold_first_frame:            # T-156: os clientes contam a partir do setup; o servidor, do quadro seguinte
+			hold_first_frame = false
+			return
 		countdown -= delta
 		if countdown <= 0.0:
 			state = Protocol.RoomState.RACING

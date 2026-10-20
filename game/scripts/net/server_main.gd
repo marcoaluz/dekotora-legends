@@ -183,6 +183,7 @@ func on_start_race(peer: int) -> void:
 	for p in room.order:
 		if (room.members[p] as Room.Member).connected:
 			net().rpc_id(p, "s_race_setup", setup, (room.members[p] as Room.Member).truck_idx)
+	room.hold_first_frame = true          # T-156: o tempo gasto montando a corrida nao conta (mesmo relogio dos clientes)
 	_broadcast_lobby(room)
 
 

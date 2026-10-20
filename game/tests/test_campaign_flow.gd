@@ -20,7 +20,7 @@ func _run_route(route_id: String) -> Dictionary:
 		else:
 			t.is_bot = true
 			t.set_loadout([DamageModel.make_part("fb_basic", ["front"], 120.0, 80.0, 5)])
-		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, g.y, i == 1, i == 0))
+		drivers.append(BotDriver.new(BotDriver.Difficulty.HARD if i == 0 else BotDriver.Difficulty.EASY, 50 + i, g.y, false, i == 0))   # testa o fluxo (o duelo do rival: test_rival_ai)
 	var steps: int = 0
 	while not sim.is_over() and steps < 30 * 400:
 		for i in n:
