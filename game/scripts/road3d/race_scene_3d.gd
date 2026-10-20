@@ -477,8 +477,9 @@ func _process(delta: float) -> void:
 		if delta > 0.05 and _fps_age > 1.5:
 			print("PICO: quadro de %.0f ms (t=%.1f s)" % [delta * 1000.0, sim.time])
 		_fps_max_calls = maxi(_fps_max_calls, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
-		if _fps_t >= 5.0:
-			print("FPS medio: %.1f  (desenhos: %d, max %d no periodo; triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), _fps_max_calls, Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+		var in_intro: bool = _intro != null and _intro.running()      # T-156: periodos de 2 s durante a abertura
+		if _fps_t >= (2.0 if in_intro else 5.0):
+			print(("[abertura %s] " % _intro.band.phase if in_intro else "") + "FPS medio: %.1f  (desenhos: %d, max %d no periodo; triangulos: %d, texturas: %.1f MB, video: %.1f MB)" % [_fps_n / _fps_t, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), _fps_max_calls, Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
 					Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0])
 			_fps_t = 0.0
 			_fps_n = 0

@@ -17,7 +17,8 @@ amigos no multiplayer e gasta o que ganha para consertar e decorar o caminhão.
 | Gênero | Corrida arcade com batidas + customização, no espírito de Bakusou Dekotora Densetsu (PS1) |
 | Plataformas | Android (foco) e PC Windows, jogo cruzado |
 | Câmera | Plano A: estrada pseudo-3D vista de trás. Plano B: 3D low-poly estilo PS1 |
-| Multiplayer | Online, 2 a 4 jogadores, sala privada por código; bots completam vagas |
+| Multiplayer | Online, 2 a 4 jogadores, sala privada por código; bots completam vagas; 3–4 = "comboio" (trânsito mais leve) |
+| Campanha | Sempre 1 contra 1: jogador × rival da rota (decisão do Marco, T-156) |
 | Motor | Godot 4 (GDScript) |
 | Arte | Blender por scripts Python → pixel art |
 | Áudio | ElevenLabs |
@@ -94,10 +95,17 @@ Pagamento = frete × integridade da carga + bônus de posição + bônus de Fama
 ## 4. Modos e multiplayer
 | Modo | Jogadores | Quando |
 | --- | --- | --- |
-| Corrida com amigos (sala por código) | 2–4 + bots | MVP |
-| Campanha de Kanto (3 trechos + chefe) | 1 + bots | MVP |
+| Corrida com amigos (sala por código) | 2–4 + bots; com 3–4 é o **comboio** (trânsito mais leve) | MVP |
+| Campanha de Kanto (3 trechos + chefe) | **sempre 1 contra 1** (jogador × rival da rota) | MVP |
+| Corrida rápida (sem rota) | 1 + 3 bots | MVP |
 | Garagem | 1 | MVP |
 | Corrida pública, Duelo de Rival, Frete Livre | — | Pós-MVP |
+
+**Abertura "frente a frente" (T-156):** antes do duelo da campanha (e online com 2 jogadores), ~6 s de cena numa
+área de descanso (noite/fim de tarde) ou praça de pedágio (dia): os dois caminhões estacionados de frente, luzes
+piscando, a câmera passeia pelos detalhes com a faixa de cada motorista (nome, caminhão, destaque, provocação), banner
+VS com tambor; depois os caminhões alinham lado a lado na pista e vem a contagem. Um toque pula. Revanche, corrida
+rápida e online com 3–4 jogadores: versão curta (só alinhamento e contagem, 3 s).
 
 Partida online: criar sala → código de 6 letras → amigos entram (celular ou PC) → cada um com o caminhão da
 própria garagem → servidor decide colisões e dano → pagamento e dano ficam no perfil.

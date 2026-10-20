@@ -9,7 +9,7 @@ Objetivo: Marco e 1 a 3 amigos correm juntos, no celular ou no PC, batendo camin
 | Modelo | **Servidor dedicado autoritativo** | Todos veem a mesma batida e o mesmo dano; ninguém "trapaceia" o dano |
 | Servidor | O próprio projeto Godot exportado headless (`--server`) | Um só código para jogo e servidor |
 | Transporte | ENet (UDP) do Godot | Baixo atraso, já embutido |
-| Jogadores por sala | 2 a 4 humanos; bots completam até 4 | Escopo do MVP |
+| Jogadores por sala | 2 a 4 humanos; bots completam até 4; 3–4 humanos = "comboio" (trânsito mais leve, T-156) | Escopo do MVP; campanha offline é 1 contra 1 |
 | Entrada na sala | Código de 6 letras | Simples para amigos |
 | Jogo cruzado | Android ↔ Windows | Mesmo protocolo |
 | Perfis | Guardados no servidor, um arquivo JSON por jogador (o Godot não traz SQLite; se crescer, usar o addon godot-sqlite) | Mesmo caminhão no celular e no PC |
@@ -40,6 +40,21 @@ Regra da sala `events: false` = pista livre.
 (`{start, end, lanes, taper, look}`, os da rota). O cliente usa a lista do servidor no lugar da rota dele; os trechos não
 vão em `events` e continuam com `events: false` (são a pista, não um evento).
 
+**Protocolo versão 6** (T-156): o `race_setup` leva `intro` (`full` = abertura frente a frente, `short` = só a contagem)
+e `countdown_total` (segundos da contagem do servidor = abertura + 3 s: 9,4 s ou 3 s). O servidor fica em COUNTDOWN
+esse tempo todo e só então larga (RACING). Cada cliente toca a abertura pelo **relógio do servidor**: segundos desde o
+começo da contagem = (`countdown_total` − `countdown` do setup) + (agora − hora em que o setup chegou) + ping/2
+(`DuelPlan.online_elapsed`); por isso quem carregou a cena mais devagar entra na abertura já adiantada e todos largam
+juntos. O número da contagem segue o mesmo relógio e fica em "1" até chegar o RACING do servidor (ou 0,4 s depois da
+hora prevista, se o aviso se perdeu); se o RACING chega antes do fim da abertura, ela acaba na hora. Pular a abertura
+online deixa o jogador esperando na largada ("LARGADA EM N"). Quem decide a versão é o servidor: **2 jogadores** (ou 1
+jogador contra 1 bot) = cheia, os dois humanos frente a frente; **3–4 jogadores** = curta, todos lado a lado (até 3 por
+fileira, o 4º atrás) e **comboio**: trânsito um nível mais leve que a regra da sala (vai em `rules.traffic` do setup,
+com `rules.convoy = true`). Mesma rota e mesmas pessoas da corrida anterior = curta (pronto para quando a sala voltar ao
+lobby; hoje a sala acaba no fim da corrida). **Grid** (`StartGrid`, igual no servidor e na predição): lado a lado a
+30 m do começo da pista. Medido no `tools/net_test.sh` (linha `LARGADA:`): o servidor larga X ms depois da hora que o
+cliente previu (ver STATUS, T-156).
+
 **Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool),
 `horn` (bool, buzina segurada, T-144). Cerca de 13 bytes.
 
@@ -48,7 +63,7 @@ vão em `events` e continuam com `events: false` (são a pista, não um evento).
 tranco** — 2 bits, T-152), **tranco** (u8, ticks que faltam, T-152), mais
 **eventos** do tick (colisão com zona e força, peça quebrada, Passing, carro arremessado, freada). Cada carro do trânsito
 leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
-(T-141). O dano completo só vai quando muda. **Protocolo versão 5** (4 = T-152, 5 = T-153; cliente e servidor precisam da mesma versão: gere o APK de novo).
+(T-141). O dano completo só vai quando muda. **Protocolo versão 6** (4 = T-152, 5 = T-153, 6 = T-156; cliente e servidor precisam da mesma versão: gere o APK de novo).
 
 ## Suavidade no cliente
 
