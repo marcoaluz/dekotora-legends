@@ -1,5 +1,5 @@
 """Caminhão leve "Canter" e cabine curta (T-125): importa a malha de terceiros (JAC 1045 Truck, CGTrader, Royalty
-Free) já na escala e na orientação do jogo. O arquivo original NUNCA vai para o Git (`docs/Modelos Melhorados/`
+Free) já na escala e na orientação do jogo. O arquivo original NUNCA vai para o Git (`docs/Modelos/Modelos Melhorados/`
 está no .gitignore); só o .glb reduzido e re-texturizado entra no jogo.
 
 O .blend do JAC está em metros, frente em +Y (para-choque em y = -0,06), traseira do chassi em y = -9,36, chão em
@@ -23,8 +23,10 @@ from dataclasses import dataclass
 import bpy
 import numpy as np
 
-DEFAULT_SRC = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "Modelos Melhorados",
-                                            "JAC+1045+Truck.blend"))
+_DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs"))
+_NOVO = os.path.join(_DOCS, "Modelos", "Modelos Melhorados")   # T-162: pasta nova; volta para a antiga se não existir
+DEFAULT_SRC = os.path.join(_NOVO if os.path.isdir(_NOVO) else os.path.join(_DOCS, "Modelos Melhorados"),
+                           "JAC+1045+Truck.blend")
 Y_FRONT_SRC = -0.059     # frente do para-choque no original
 Y_REAR_SRC = -9.36       # traseira do chassi no original (barra das lanternas)
 # peças repetidas no original (mesma malha duas vezes, uma por cima da outra)

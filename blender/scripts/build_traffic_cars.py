@@ -2,15 +2,15 @@
 (T-143) viatura de polícia (Camry, padrão japonês fictício, barra de luzes "beacon"), jipe (Samurai) e o carro
 batido do acidente (picape amassada, parada: sem nós de roda).
 
-Os originais ficam em docs/Modelos Melhorados/ (FORA do Git; licenças e autores em game/assets/LICENCAS.md).
+Os originais ficam em docs/Modelos/Modelos Melhorados/ (FORA do Git; licenças e autores em game/assets/LICENCAS.md).
 Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado com cores lisas
 (nenhuma textura/logotipo do autor vai para o jogo; emblemas soltos são apagados).
 
 Uso:
   blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all \
-      [--src-dir "docs/Modelos Melhorados"] [--out game/assets/vehicles/traffic] [--preview <pasta absoluta>]
+      [--src-dir "docs/Modelos/Modelos Melhorados"] [--out game/assets/vehicles/traffic] [--preview <pasta absoluta>]
   --model: ascona | falcon | suv | fumi | bus | police | jeep | wreck | all
-  (o jipe vem de docs/Novos modelos/ (--new-dir); o carro batido de docs/Novas Melhorias/ (--wreck-dir))
+  (o jipe vem de docs/Modelos/Novos modelos/ (--new-dir); o carro batido de docs/Modelos/Novas Melhorias/ (--wreck-dir))
 
 Saída: game/assets/vehicles/traffic/car_<modelo>.glb, cada um com:
   - "body": pintura "paint_white" (o Godot troca a cor) + atlas "<tag>_trim" (vidro, cromo, plástico, luzes);
@@ -306,11 +306,14 @@ def build(key: str, spec: dict, args) -> None:
 
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    def _pasta(nome):   # T-162: pasta nova docs/Modelos/<nome>; volta para docs/<nome> se a nova não existir
+        novo = f"docs/Modelos/{nome}"
+        return novo if os.path.isdir(novo) else f"docs/{nome}"
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="all")
-    ap.add_argument("--src-dir", default="docs/Modelos Melhorados")
-    ap.add_argument("--new-dir", default="docs/Novos modelos")
-    ap.add_argument("--wreck-dir", default="docs/Novas Melhorias")
+    ap.add_argument("--src-dir", default=_pasta("Modelos Melhorados"))
+    ap.add_argument("--new-dir", default=_pasta("Novos modelos"))
+    ap.add_argument("--wreck-dir", default=_pasta("Novas Melhorias"))
     ap.add_argument("--out", default="game/assets/vehicles/traffic")
     ap.add_argument("--preview", default="", help="pasta ABSOLUTA para os renders de conferência (opcional)")
     args = ap.parse_args(argv)

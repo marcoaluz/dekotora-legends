@@ -9,13 +9,13 @@ Feito POR CODIGO (nenhum arquivo de terceiros):
   textures/rail/rail_atlas.png (+ _emit)  atlas 512 de cores (8x8 celulas) dos modelos acima
   textures/rail/rail_bed.png              1024: lastro + dormentes (via dupla), concreto, trilho, fio (repete na pista)
 
-Do Marco (docs/Modelos Melhorados, fora do Git, licenca "SKETCHFAB Standard" = royalty free sem credito obrigatorio):
+Do Marco (docs/Modelos/Modelos Melhorados, fora do Git, licenca "SKETCHFAB Standard" = royalty free sem credito obrigatorio):
   train_lrt.glb        bonde CAF Urbos 3 (35 m): 71 mil -> ~7 mil triangulos, SEM o interior, pintura nova amarela
                        (o verde da linha de Kaohsiung vira amarelo) e os logotipos (CAF, Kaohsiung) apagados.
                        Texturas textures/rail/lrt_body.png (1024) e lrt_door.png (512).
 
 Uso: blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- [--lrt-src ARQUIVO.glb] [--no-lrt] [--preview]
-Em worktree passe --lrt-src com o caminho absoluto da pasta principal (a pasta docs/Modelos Melhorados fica fora do Git).
+Em worktree passe --lrt-src com o caminho absoluto da pasta principal (a pasta docs/Modelos/Modelos Melhorados fica fora do Git).
 Determinístico: mesma entrada -> mesmos arquivos.
 """
 from __future__ import annotations
@@ -37,7 +37,9 @@ from lib import export as EX  # noqa: E402
 OUT_GLB = os.path.join(ROOT, "game", "assets", "scenery", "rail")
 OUT_TEX = os.path.join(ROOT, "game", "assets", "textures", "rail")
 WORK = os.path.join(ROOT, "blender", "renders", "t154")
-LRT_DEFAULT = os.path.join(ROOT, "docs", "Modelos Melhorados", "kaohsiung_circular_light_rail_caf_urbos_3.glb")
+_NOVO = os.path.join(ROOT, "docs", "Modelos", "Modelos Melhorados")   # T-162: pasta nova; volta para a antiga se não existir
+LRT_DEFAULT = os.path.join(_NOVO if os.path.isdir(_NOVO) else os.path.join(ROOT, "docs", "Modelos Melhorados"),
+                           "kaohsiung_circular_light_rail_caf_urbos_3.glb")
 
 # ---------------------------------------------------------------- atlas 512 (8 x 8 celulas de 64 px)
 CELL = {
