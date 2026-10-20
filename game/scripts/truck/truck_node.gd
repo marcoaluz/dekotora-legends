@@ -54,6 +54,7 @@ var tint: Color = Color.WHITE
 var _acc_nodes: Dictionary = {}        # id da peca -> Array[Node3D] (pode ter lado L e R)
 var _acc_state: Dictionary = {}        # id da peca -> "ok" | "dent" | "broken"
 var _mural_mat: StandardMaterial3D
+var _mural_glow: float = 0.0           # T-155: forca da luz falsa no mural (MuralGlow)
 var _decal_nodes: Array[Node3D] = []
 const LIGHTS_OFF_LEVEL: float = 0.12
 var _lamp_mats: Dictionary = {}              # nome do material de luz -> ShaderMaterial animado (um por caminhao)
@@ -121,6 +122,18 @@ func set_lights_on(on: bool, day_preview: bool = false) -> void:
 	_lights_level = (0.4 if day_preview else 1.0) if on else LIGHTS_OFF_LEVEL
 	for m in _lamp_mats.values():
 		(m as ShaderMaterial).set_shader_parameter("level", _lights_level)
+
+
+## Luz falsa no mural das laterais (bau e tampas da graneleira; T-155): 0 = sem luz (dia), ~0,5 = noite.
+## Corrida: TimeOfDay.mural_glow (e MuralGlow.TUNNEL dentro de tunel). Pode ser chamado antes ou depois de add_child.
+func set_mural_glow(energy: float) -> void:
+	_mural_glow = maxf(energy, 0.0)
+	if _mural_mat != null:
+		MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
+
+
+func mural_glow() -> float:
+	return _mural_glow
 
 
 ## Padrao de pisca: "steady" (fixas), "sequential" (onda correndo), "alternate" (grupos alternando) ou "breathing".
@@ -210,6 +223,7 @@ func set_paint_color(c: Color) -> void:
 		return
 	if _mural_mat != null:
 		_mural_mat.albedo_color = c.lerp(Color.WHITE, 0.45)          # rivais: mural levemente tingido
+		MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
 		if String(m.name).contains("paint_white"):
@@ -240,6 +254,8 @@ func _apply_mural() -> void:
 					_mural_mat.albedo_texture = tex
 					TruckTextures.swap_textures(_mural_mat)      # bau premium: normais/oclusao da chapa (T-136)
 					_mural_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+					MuralGlow.setup(_mural_mat, tex)             # T-155: luz falsa das luzinhas (forca 0 ate set_mural_glow)
+					MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
 				m.set_surface_override_material(s, _mural_mat)
 
 

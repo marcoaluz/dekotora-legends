@@ -34,6 +34,7 @@ neon_energy = 0.15
 pool_energy = 0.0
 lamps_on = false
 headlights = false
+mural_glow = 0.0
 road_roughness = 0.9
 line_emission = 0.0
 mountain_color = Color(0.1, 0.15, 0.14, 1)

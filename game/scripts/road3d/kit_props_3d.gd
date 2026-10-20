@@ -79,17 +79,25 @@ func _art(b: Basis, c: Vector3, i: int, level: float) -> void:
 	add_child(mi)
 
 
-## Dois muros listrados em fila na ponta da mureta, antes da boca de cada tunel.
+## Muro listrado na ponta da mureta, antes da boca de cada tunel (T-155: maior e na frente da mureta; antes eram 2
+## pecas de 1,3 m em cima da mureta de 0,85 m, quase escondidas): 4 pecas em fila, a da boca mais alta (2,3 m),
+## descendo ate a altura de uma barreira, mais largas e com a face listrada um pouco para dentro da pista.
+const PORTAL_STEPS: Array[float] = [1.75, 1.5, 1.25, 1.0]    # altura de cada peca (x 1,3 m), da boca para fora
+const PORTAL_WIDE: float = 1.3                               # largura x 0,51 m
+const PORTAL_OUT: float = 0.15                               # face da peca alem da face da mureta (m, para a pista)
+
+
 func _portals(path: TrackPath, tod: TimeOfDay, tunnels: Array[Vector2]) -> void:
 	var mesh: ArrayMesh = RoadsideKit.mesh("barrier_wall", tod)
 	if mesh == null:
 		return
+	var half_w: float = RoadsideKit.WALL_W * PORTAL_WIDE * 0.5
 	for t in tunnels:
-		for n in 2:
+		for n in PORTAL_STEPS.size():
 			var z: float = t.x - RoadsideKit.JERSEY_LEN * (n + 0.5) - 0.2
-			var b := Basis(Vector3.UP, path.yaw_at(z))
+			var b := Basis(Vector3.UP, path.yaw_at(z)) * Basis.from_scale(Vector3(PORTAL_WIDE, PORTAL_STEPS[n], 1.0))
 			var p: Vector3 = LaneSections.profile(path.track.events, z)      # T-153: tunel antigo, muretas do trecho
 			for side in [-1.0, 1.0]:
-				var lat: float = (p.x if side < 0.0 else p.y) + RoadsideKit.JERSEY_W * 0.5
+				var lat: float = (p.x if side < 0.0 else p.y) - PORTAL_OUT + half_w
 				_walls.add(mesh, Transform3D(b, path.world_point(z, side * lat / Track.ROAD_HALF_WIDTH_M, 0.0)), z)
 				counts["portal_wall"] = int(counts.get("portal_wall", 0)) + 1

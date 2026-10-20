@@ -10,7 +10,13 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 - Blender 5.2.2 LTS: `D:\Blender\blender.exe` (fora do PATH). `bpy` + numpy OK.
 - No bash: `source tools/env.sh` define `$GODOT` e `$BLENDER`.
 - Projeto em `D:\DEV\dekotora-legends\dekotora-legends` (git local; **sem remoto GitHub** ainda; LFS ativo para mp3/ttf/blend).
-- Android SDK / JDK 17: **não instalados** (bloqueia APK). Python do sistema não tem numpy/Pillow (use o Python do Blender, ver `tools/image_resize.py`).
+- **Android: JÁ INSTALADO, não instale de novo.** Em `D:\DEV\android-tools\` (sem administrador): JDK 17 Temurin
+  (`jdk\jdk-17.0.20.1+1`), Android SDK (`sdk`: Platform 36, Build-Tools 36.0.0, Platform-Tools, command-line tools).
+  O APK de teste já é gerado: `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk`
+  (105 MB em 2026-10-19, chave de debug), usando uma **cópia temporária** do `export_presets.cfg` com "Min SDK"/"Target SDK"
+  vazios (Gradle desligado) e restaurando depois; passo a passo em `docs/RELEASE_ANDROID.md`. Instalar no celular:
+  `D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk`.
+- Python do sistema não tem numpy/Pillow (use o Python do Blender, ver `tools/image_resize.py`).
 - Chave da API de áudio: `.chaves.env` (ignorado pelo git; variáveis `ELEVENLABS_API_KEY`, `PIXELLAB_API_KEY`). Nunca imprimir o valor.
 - **Ferramenta Bash do Claude Code**: comandos grandes com heredocs/aspas às vezes falham ("unexpected EOF"). Crie arquivos com a
   ferramenta Write e rode patches Python por arquivo. `rm -rf $VAR/*` é bloqueado: use `"${VAR:?}"/*`.
@@ -19,7 +25,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (275) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (282) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -34,6 +40,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Trechos de 2 faixas (T-153) | corrida: `-- --route=kanto_1_coast --start=2200` (ponte), `--route=kanto_2_viaduct --start=2100` (viaduto antigo), `--route=kanto_3_mountain --start=560` (túnel antigo); `--no-sections` tira os trechos (comparar); capturas `bash tools/capture_t153.sh PASTA [filtro]`; custo `bash tools/measure_t153.sh [quadros] [--no-sections]`; sem tela: `tools_dev/trace_section.gd -- --route=R [--human] [--log]` e `tools_dev/measure_section_times.gd`; só estes testes: `-s res://tests/run_tests.gd -- --only=lane_sections` |
 | Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
 | Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
+| Acabamento F4 (T-155) | capturas antes/depois `bash tools/capture_t155.sh PASTA [mural\|ficha\|batido\|tunel]` e folhas `bash tools/sheet_t155.sh` (em `docs/capturas_t155/`); custo `bash tools/measure_t155.sh`; carro batido `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model wreck --wreck-dir "<pasta principal>/docs/Novas Melhorias"` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -146,6 +153,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-155 (acabamento F4):** olhar `docs/capturas_t155/` (folhas `item1_*`, `item2_ficha`, `item3_*`; esquerda = antes,
+  direita = depois) e dizer se o mural à noite está na força certa (noite 0,8; dá para subir/descer em
+  `game/data/time/*.tres`, campo `mural_glow`), se a ficha compacta ficou boa e se os muros listrados das bocas estão no
+  tamanho certo. **Gerar o APK de novo** para ver o mural aceso no celular.
+
 - **T-141 + T-144 (batidas, freada, buzina):** jogar e dizer se a força está boa (empurrão de faixa, inclusive para o
   acostamento; carro voando; ônibus só empurrado), se a fumaça/faíscas/pedaços estão no tamanho certo (`docs/capturas_t141/`) e
   **ouvir** os 4 sons novos (`truck_body_slam`, `truck_side_bang`, `chrome_debris_scatter`, `car_tumble` em
@@ -180,7 +192,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo; na T-154
   a pasta Downloads estava vazia, os dois arquivos não estão mais no PC); olhar
   `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.
-- Instalar **Android SDK + JDK 17** e gerar/testar o APK no celular (P02, P22, P65, P70, P72). Sem isso o Android não foi testado.
+- ~~Instalar Android SDK + JDK 17~~ FEITO (ver "Ambiente" no topo; o APK de teste já sai). Falta **instalar e testar o APK no
+  celular** (P02, P22, P65, P70, P72): o Android ainda não foi testado num aparelho.
 - **Olhar** as imagens (previews em `game/assets/vehicles/dekotora/previews/`, capturas em `docs/store/`) e **aprovar o visual** / escolher plano A ou B.
 - **Ouvir** os áudios e pedir regeração dos ruins: `python tools/gen_audio.py --only nome --force` (lista: `python tools/gen_audio.py --list`).
 - Jogar e ajustar equilíbrio (0–100 do caminhão padrão é 22 s; V8+turbo duplo 14 s; ver `docs/BALANCEAMENTO.md`).
@@ -279,6 +292,19 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   vídeo +1,5 a +4 MB; FPS no ruído (258–291). Andando (`measure_roadside.sh`, 300 → 550 m): litoral ~283 → ~297, viaduto ~305 →
   ~308, montanha ~298 → ~300 (o sorteio de eventos e o trânsito variam entre execuções). Testes `tests/test_roadside_kit.gd` (5).
   Capturas `docs/capturas_t146/`. Pendências: aprovar visual/artes; medir no celular (APK).
+- **T-155 (2026-10-19): acabamento visual (F4).** (1) **Mural aceso à noite**: o material do mural (baú e tampas da
+  graneleira) ganhou emissão com a própria arte, mais clara perto da saia de LED e da fileira do teto (`truck/mural_glow.gd`,
+  textura 512x128 feita uma vez e compartilhada); força pela hora do dia `TimeOfDay.mural_glow` (noite 0,8, fim de tarde
+  0,4, dia 0) e 0,75 dentro de túnel; garagem e menu não mudam. A lona preta da graneleira continua escura (é lona).
+  (2) **Ficha técnica da garagem** cabe inteira em 960x540 e 2400x1080 (linhas compactas `UiKit.stat_line`; o aviso de
+  potência/tanque virou dica do título). (3) **Carro batido** (`lib/traffic_wreck.py`): rodas redondas nossas no lugar do
+  pneu esculpido (estrela), lascas abaixo da soleira cortadas, alisamento 8. **Túneis**: corrigida regressão da T-153 —
+  o perfil do arco começava no topo, então uma chapa inclinada atravessava o túnel, as **bocas ficavam fechadas** e as
+  lâmpadas do túnel antigo iam para o meio da pista; agora bocas abertas, **muros listrados** maiores (4 peças de 1,3 a
+  2,3 m na frente da mureta), túnel antigo um pouco mais claro com lâmpadas nas paredes e poças de luz no asfalto
+  (`road3d/tunnel_light_pools.gd`, 1 chamada). Também sumiu o erro antigo de normal na malha do morro. (4) Topo deste
+  arquivo corrigido (Android já instalado). Custo (modo médio, `tools/measure_t155.sh`): chamadas +0 a +3, triângulos +0,4 mil,
+  textura +0,3 MB, FPS no ruído. Testes `test_mural_glow.gd` (4), `test_tunnel_portals.gd` (3). Capturas `docs/capturas_t155/`.
 - **T-154 (2026-10-19): ferrovia ao lado da rodovia, trens e viadutos de trem (F3).** Não havia peças de ferrovia de
   terceiros no PC (busca em `docs/` e Downloads, que agora está vazia; ver `docs/INVENTARIO_MODELOS.md`): via dupla, trilhos,
   muro, catenária, viaduto, pilares, bocas de túnel, locomotiva e vagões são **por código** (`blender/scripts/build_railway_kit.py`,
@@ -337,7 +363,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   6 mil tri (picape amassada), jipe `car_jeep.glb` 5,1 mil tri ("SUZUKI" apagado; tipo CARRO do trânsito). Acidente
   (`event_props.gd`): viatura primeiro, batido depois; superfícies do evento 11 → 9, chamadas e FPS iguais (modo médio).
   Teste `tests/test_accident_cars.gd` (4). Capturas `docs/capturas_t143/`. Depuração: `--traffic-model=car_jeep`.
-  Pendências: os carros parados do acidente não têm placa; o carro batido é uma malha "esculpida" (bordas irregulares).
+  Pendências: os carros parados do acidente não têm placa; o carro batido é uma malha "esculpida" (T-155: rodas redondas e sem lascas embaixo; o amassado continua irregular de propósito).
 - **T-115 (2026-10-17): análise de modelos de terceiros em `docs/NOVOS_MODELOS.md`**; nenhum entra sem o Marco confirmar a licença; Canter descartado (extraído de outro jogo). Aguardando o Marco informar origem/licença.
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).
@@ -362,7 +388,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   **perda de carga 0–40%** do prêmio por contato/batida e tipos de carga (frágil, pesada, perecível; `CargoDef.trait_kind`), aviso na contagem regressiva; **rival de verdade** (`BotDriver`: trava no trânsito, duelo lado a lado, espelha a seta, empurra, sem borracha);
   **pausa** Continuar/Revanche/Desistir sem escurecer e barra de progresso com marcador do jogador e do rival. Números em `docs/BALANCEAMENTO.md`; capturas em `docs/capturas_atb1/`.
   Depuração das capturas: `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --demo=close --shots=PASTA` (`--demo=lanes|close`, `--contract=ceramica`, `--paused`; ver `race_demo.gd`).
-  Pendências: erro antigo de malha no túnel da rota de Hakone (`tunnel_3d.gd:151`, `set_normal`: aparece no console, não trava); falta jogar para ajustar prazo, empurrão e a regra "derrota paga 0".
+  Pendências: ~~erro antigo de malha no túnel~~ (corrigido na T-155); falta jogar para ajustar prazo, empurrão e a regra "derrota paga 0".
 - Opcional: contratar VPS (`server/README.md`), chave de assinatura Android (`docs/RELEASE_ANDROID.md`), conta Play Console / itch.io.
 
 ## Problemas conhecidos / ideias

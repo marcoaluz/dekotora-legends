@@ -141,6 +141,27 @@ static func stat_row(icon_name: String, label_text: String, value: String, value
 	return h
 
 
+## Linha compacta da ficha tecnica (T-155): icone, rotulo pequeno a esquerda e valor a direita, numa linha so
+## (a ficha inteira cabe na altura de 540 sem cortar a ultima linha).
+static func stat_line(icon_name: String, label_text: String, value: String, value_color: Color = UiTheme.TEXT) -> HBoxContainer:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 8)
+	var ic: TextureRect = _icon_rect(icon_name, 16, Color(1, 1, 1, 0.7))
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(ic)
+	var l: Label = UiTheme.label(label_text, 13, UiTheme.TEXT_DIM)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.clip_text = true
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	h.add_child(l)
+	var v: Label = heading(value, 16, value_color, false)
+	v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	v.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	h.add_child(v)
+	return h
+
+
 ## Painel de vidro escuro com margens (base de todas as caixas).
 static func glass_panel(alpha: float = 0.86) -> PanelContainer:
 	var p := PanelContainer.new()
