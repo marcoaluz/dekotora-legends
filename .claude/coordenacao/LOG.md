@@ -197,3 +197,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: road3d/duel_{plan,intro,stage,shots,cards}.gd, ui/duel_band.gd, sim/start_grid.gd, sim/bot_driver.gd, net/*, race_scene_3d.gd, tests/test_duel_*.gd, docs/capturas_t156/
 - Validação: merge na main sem conflito; 292 testes ok; net_test 0 ms e 150 ms + 2% PASSOU (coordenador rodou de novo depois do merge); capturas conferidas.
 - Decisão pendente: dificuldade do rival no 1x1 (bot-jogador venceu 7/18, antes 10/18), corrida rápida com 4, falas/nomes/brasão, ouvir vs_taiko_hit. APK novo (protocolo 6).
+
+## 2026-10-20 · T-161 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Abertura frente a frente (T-156)" na skill godot-dekotora e linha da T-156 no ROADMAP (commit 57543aa).
+
+## 2026-10-20 · T-150b · coordenador · CONCLUÍDA
+- Feito: APK de teste gerado de novo depois das T-152..T-156 (protocolo 6): builds/kaido-bakuso-debug.apk, 108 MB, chave de debug; preset restaurado.
