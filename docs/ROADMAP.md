@@ -34,6 +34,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-141] Impacto das batidas: força no espírito do Art Truck Battle (empurrão de faixa entre caminhões, carro do trânsito arremessado na simulação), faíscas, clarão, pedaços de cromo/lanterna/vidro, chacoalhada, tremor e sons em camadas (4 sons novos no ElevenLabs) (concluída em 2026-10-19, `tests/test_impacts.gd`, `docs/capturas_t141/`)
 - [x] [T-144] Freada forte (som de freio, "pssh" ao soltar, fumaça dos pneus, marcas no asfalto) e buzina (tecla H / botão X / botão BUZINA, ícones no HUD, trânsito abre caminho, vai pela rede) (concluída em 2026-10-19)
 - [x] [T-146] Modelos de `docs/Novas Melhorias` (Metais, Placas, Placão): barreiras listradas nas obras/acidente/estreitamento e nas bocas dos túneis, chapas e postes reais nas placas, pórticos de treliça, outdoors com arte trocável, vidro com moldura na barreira de som (concluída em 2026-10-19, `tests/test_roadside_kit.gd`, `docs/capturas_t146/`)
+- [x] [T-155] (F4) Acabamento visual: mural aceso à noite (baú e graneleira), ficha da garagem sem corte, carro batido com rodas redondas, bocas de túnel abertas com muros listrados maiores, túnel antigo mais claro, STATUS do Android corrigido (concluída em 2026-10-19, `tests/test_mural_glow.gd`, `tests/test_tunnel_portals.gd`, `docs/capturas_t155/`)
+- [x] [T-154] (F3) Ferrovia ao lado da rodovia: trem de carga, bonde amarelo, viadutos de trem e bocas de túnel; só visual, sem sim nem rede (concluída em 2026-10-19, `tests/test_railway.gd`, `docs/capturas_t154/`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)

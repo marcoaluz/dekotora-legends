@@ -17,6 +17,7 @@ const MODELS: Array[String] = ["barrier_jersey", "barrier_jersey_fence", "barrie
 ## Medidas (m) dos modelos: comprimento no sentido da pista (barreiras) / poste: altura 1 (o jogo estica).
 const JERSEY_LEN: float = 1.74
 const JERSEY_W: float = 0.67
+const WALL_W: float = 0.51               # muro listrado (barrier_wall): 0,51 x 1,30 m de altura x 1,74 m
 const AFRAME_LEN: float = 2.78
 const GANTRY_HALF: float = 13.5
 const GANTRY_BEAM_FRONT: float = 0.43    # meia secao da viga: as placas do portico ficam na frente disto

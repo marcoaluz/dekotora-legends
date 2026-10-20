@@ -45,7 +45,7 @@ func test_billboards_and_tunnel_walls_on_every_route() -> void:
 		var kit := KitProps3D.new()
 		kit.build(path, route.scenery, TimeOfDay.by_id(route.time_of_day), route.tunnels)
 		check(int(kit.counts.get("billboard", 0)) >= 2, rid + ": outdoors na beira da estrada")
-		check_eq(int(kit.counts.get("portal_wall", 0)), route.tunnels.size() * 4, rid + ": muros listrados nas bocas")
+		check_eq(int(kit.counts.get("portal_wall", 0)), route.tunnels.size() * 2 * KitProps3D.PORTAL_STEPS.size(), rid + ": muros listrados nas bocas (T-155: 4 pecas de cada lado)")
 		kit.free()
 
 

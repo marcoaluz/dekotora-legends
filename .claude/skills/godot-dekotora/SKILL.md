@@ -162,3 +162,18 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   - Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=lane_sections` (o filtro é um trecho do nome do arquivo de teste).
 - Capturas: `bash tools/capture_t153.sh PASTA [filtro]` (na raiz do projeto, Git Bash). O filtro é um trecho do nome (ex.: `coast`, `tunel`, `night`; `all` = tudo). Grava `PASTA/<rota>_<cena>_<hora>/t01.png`. O script já converte caminho relativo em absoluto, porque o jogo roda com `--path game`. `GODOT=...` troca o executável do Godot.
 - Setup online: leva `lane_sections` (protocolo 5, `scripts/net/protocol.gd`). O cliente usa a pista do servidor.
+
+## Ferrovia (T-154)
+
+- Flags da corrida (depois de `--`):
+  - `--no-rail` tira a ferrovia (`road3d/rail_kit.gd` lê a flag). Use para comparar antes/depois.
+  - `--train=freight|lrt` força o tipo de trem (carga ou bonde amarelo) em `road3d/railway_3d.gd` / `rail_traffic.gd`.
+  - `--train-dir=same|opposite` força o sentido do trem (mesmo sentido do caminhão ou contrário).
+- Capturas: `GODOT=... bash tools/capture_t154.sh PASTA [cenas]` (na raiz do projeto, Git Bash). Sem lista de cenas, tira todas.
+  Cenas: `litoral_trem litoral_boca cidade_trem cidade_cruzamento montanha_cruzamento montanha_boca montanha_trem`.
+  Para comparar: `CAPTURE_EXTRA="--no-rail" bash tools/capture_t154.sh PASTA`. As capturas de referência estão em `docs/capturas_t154/`.
+- Custo: `GODOT=... bash tools/measure_railway.sh` mede o modo médio nas 3 rotas, com e sem `--no-rail`.
+- Onde ficam as linhas: `game/scripts/road3d/railway_layout.gd` (um trecho `match` por rota). Se mudar trechos de 2 faixas da T-153
+  ou túneis, ajuste ali. O teste `tests/test_railway.gd` avisa se a linha invadir a pista, um túnel ou um trecho de 2 faixas.
+  Na cidade a linha é elevada a 40 m e o teste ignora os trechos estreitos de lá.
+- A ferrovia é só visual (sem sim nem rede): cada jogador vê os próprios trens.

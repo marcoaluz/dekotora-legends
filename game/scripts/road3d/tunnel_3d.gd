@@ -19,6 +19,8 @@ const OLD_ARCH: Array = [[1.0, 0.0], [1.0, 3.7], [0.88, 5.1], [0.62, 6.0], [0.32
 const OLD_LAMP_EVERY: float = 12.0
 const OLD_NAME := "湯坂隧道"                   # nome ficticio (隧道 = jeito antigo de dizer tunel)
 const OLD_STONE := Color(0.36, 0.33, 0.29)
+const OLD_LAMP := Color(1.0, 0.64, 0.28)       # T-155: lampada amarelada do tunel antigo (antes 0,9/0,5/0,16, apagada)
+var _pools: Array[Transform3D] = []             # T-155: pocas de luz no asfalto do tunel antigo (TunnelLightPools)
 
 var path: TrackPath
 var tunnels: Array[Vector2] = []
@@ -84,6 +86,7 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 		_add_mesh(stone, _outer_mat(&"stone"), false)
 	_add_mesh(outer, _outer_mat(kind))
 	_add_lamps(lamps)
+	TunnelLightPools.build(self, _pools)
 	_omni = OmniLight3D.new()
 	_omni.light_color = Color(1.0, 0.6, 0.25)
 	_omni.omni_range = 20.0
@@ -130,9 +133,9 @@ func _xf(z: float, lat: float, h: float, size: Vector3) -> Transform3D:
 func _lit(z: float, h: float, old: bool = false) -> Color:
 	var every: float = OLD_LAMP_EVERY if old else LAMP_EVERY
 	var lamp: float = 0.5 + 0.5 * cos(fmod(z, every) / every * TAU)
-	if old:
-		var conc := Color(0.4, 0.37, 0.33) if h > 1.0 else Color(0.2, 0.19, 0.18)
-		return conc * (0.3 + 0.7 * lamp * lamp) * clampf(1.2 - h / 9.0, 0.45, 1.0)
+	if old:   # T-155: um pouco mais claro (antes 0,3 + 0,7 x lampada; quase preto entre as lampadas)
+		var conc := Color(0.45, 0.41, 0.36) if h > 1.0 else Color(0.24, 0.22, 0.2)
+		return conc * (0.42 + 0.78 * lamp * lamp) * clampf(1.25 - h / 9.0, 0.5, 1.0)
 	var tile := Color(0.62, 0.52, 0.4) if h > 1.2 else Color(0.3, 0.26, 0.22)
 	var near_top: float = clampf(h / 8.2, 0.3, 1.0)
 	return tile * (0.45 + 0.55 * lamp) * near_top
@@ -140,23 +143,24 @@ func _lit(z: float, h: float, old: bool = false) -> Color:
 
 ## Perfil completo do tunel (esquerda -> direita, [lateral m, altura m]): o arco normal espelhado ou, no tunel antigo
 ## (T-153), o arco estreito em volta das muretas do trecho de 2 faixas.
+## T-155: ARCH/OLD_ARCH vao do PE ao TOPO; o perfil sobe pela esquerda e desce pela direita (antes comecava no topo,
+## descia pela esquerda e pulava do pe esquerdo para a parede direita a meia altura: uma chapa inclinada atravessava o
+## tunel, a boca ficava fechada (pe = topo = centro) e as lampadas do tunel antigo iam para o meio da pista).
 func _arch_of(t: Vector2) -> Array:
 	var out: Array = []
-	if not _is_narrow(t):
-		for k in range(ARCH.size() - 1, -1, -1):
-			out.append([-float(ARCH[k][0]), float(ARCH[k][1])])
-		for k in range(1, ARCH.size()):
-			out.append([float(ARCH[k][0]), float(ARCH[k][1])])
-		return out
-	var p: Vector3 = LaneSections.profile(path.track.events, t.x + t.y * 0.5)
-	var left: float = -(p.x + RoadMesh.BARRIER_W + 0.25)
-	var right: float = p.y + RoadMesh.BARRIER_W + 0.25
-	var c: float = (left + right) * 0.5
-	var half: float = (right - left) * 0.5
-	for k in range(OLD_ARCH.size() - 1, -1, -1):
-		out.append([c - float(OLD_ARCH[k][0]) * half, float(OLD_ARCH[k][1])])
-	for k in range(1, OLD_ARCH.size()):
-		out.append([c + float(OLD_ARCH[k][0]) * half, float(OLD_ARCH[k][1])])
+	var prof: Array = OLD_ARCH if _is_narrow(t) else ARCH
+	var c: float = 0.0
+	var half: float = 1.0
+	if _is_narrow(t):
+		var p: Vector3 = LaneSections.profile(path.track.events, t.x + t.y * 0.5)
+		var left: float = -(p.x + RoadMesh.BARRIER_W + 0.25)
+		var right: float = p.y + RoadMesh.BARRIER_W + 0.25
+		c = (left + right) * 0.5
+		half = (right - left) * 0.5
+	for k in prof.size():                                            # esquerda: pe -> topo
+		out.append([c - float(prof[k][0]) * half, float(prof[k][1])])
+	for k in range(prof.size() - 2, -1, -1):                         # direita: topo -> pe (sem repetir o topo)
+		out.append([c + float(prof[k][0]) * half, float(prof[k][1])])
 	return out
 
 
@@ -221,7 +225,10 @@ func _old_lamps(t: Vector2, lamps: Array) -> void:
 	var n: int = 0
 	while z < t.x + t.y - 2.0:
 		var side_lat: float = (lf + 0.12) if n % 2 == 0 else (rf - 0.12)
-		lamps.append([_xf(z, side_lat + (0.1 if n % 2 == 0 else -0.1), 3.4, Vector3(0.16, 0.24, 1.0)), Color(0.9, 0.5, 0.16)])
+		var inward: float = 1.0 if n % 2 == 0 else -1.0
+		# T-155: lampada maior e mais clara (antes quase nao aparecia) + poca de luz fraca no asfalto embaixo dela
+		lamps.append([_xf(z, side_lat + 0.12 * inward, 3.4, Vector3(0.2, 0.3, 1.3)), OLD_LAMP])
+		_pools.append(Transform3D(Basis(Vector3.UP, path.yaw_at(z)), _edge(z, side_lat + 2.4 * inward, 0.05)))
 		if n % 10 == 5:
 			lamps.append([_xf(z + 3.0, lf + 0.08, 2.4, Vector3(0.06, 0.5, 0.8)), Color(0.15, 0.85, 0.35)])
 		z += OLD_LAMP_EVERY * 0.5
@@ -314,6 +321,7 @@ func _cover(st: SurfaceTool, t: Vector2, kind: StringName) -> void:
 			var c: Vector3 = _edge(z1, seg[2], seg[3])
 			var d: Vector3 = _edge(z1, seg[0], seg[1])
 			for v in [a, c, b, a, d, c]:
+				st.set_normal(Vector3.UP)          # T-155: os muros (_caps) poem normal na mesma malha; generate_normals refaz
 				st.set_color(col)
 				st.set_uv(Vector2(v.x, v.z) / 8.0)
 				st.add_vertex(v)
