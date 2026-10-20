@@ -68,6 +68,7 @@ var _truck_sfx: Array[TruckSfx] = []    # T-144: buzina e freio de cada caminhao
 var _horns: Array[String] = []          # som de buzina de cada caminhao (peca instalada ou a basica)
 var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
+var _rail: Railway3D                    # T-154: ferrovia e trens
 
 
 func _ready() -> void:
@@ -141,7 +142,11 @@ func _ready() -> void:
 	_tunnel.exited.connect(func() -> void:
 		_cinema.tunnel_flash(tod.day_amount)
 		_demo.queue_shot("saida_tunel", 0.12))
+	_rail = Railway3D.new()                        # T-154: ferrovia ao lado da pista, viadutos e trens (so visual)
+	add_child(_rail)
+	_rail.build(path, String(route.id) if route != null else "", scenery, tod)
 	var city := CityBuilder.new()
+	city.keep_out = RailwayLayout.keep_out(_rail.lines)
 	add_child(city)
 	city.build(path, 21, scenery, tod)
 	var side := Roadside3D.new()
@@ -626,6 +631,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		if _cam != null:
 			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights)
 	_traffic3d.refresh()
+	if _cam != null:
+		_rail.update(dt, _player_z(), sim.trucks[player].speed, _cam.global_position)
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:

@@ -89,6 +89,7 @@ const SIGN_COLORS: Array = [Color("#ff2e88"), Color("#21e6ff"), Color("#ffb347")
 var path: TrackPath
 var tod: TimeOfDay
 var _deck: float = 0.0
+var keep_out: Array = []          # T-154: corredores da ferrovia sem predio ([a, b, meia_largura], RailwayLayout.keep_out)
 
 
 func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
@@ -145,6 +146,7 @@ func _building(rng: RandomNumberGenerator, z: float, yaw: float, side: float, di
 	var wall: Color = Color.from_hsv(rng.randf_range(0.55, 0.75), rng.randf_range(0.15, 0.45), rng.randf_range(0.06, 0.16))
 	wall.a = rng.randf()                                             # estilo das janelas (shader)
 	var by := Basis(Vector3.UP, yaw)
+	var n0: Vector3i = Vector3i(blds.size(), lights.size(), signs.size())
 	var sink: float = 4.0 + _deck                                     # base enterrada (abaixo do chao/viaduto)
 	blds.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), c + Vector3.UP * (h * 0.5 - sink)), wall])
 	var top: float = h - sink
@@ -160,7 +162,20 @@ func _building(rng: RandomNumberGenerator, z: float, yaw: float, side: float, di
 		var face: Vector3 = c - path.right_at(z) * side * (w * 0.5 + 0.3)
 		var col: Color = SIGN_COLORS[rng.randi() % SIGN_COLORS.size()]
 		signs.append([Transform3D(by * Basis.from_scale(Vector3(0.3, sh, sw)), face + Vector3.UP * rng.randf_range(sh * 0.6, maxf(h - sh, sh * 0.7))), col])
+	if _blocked(c, maxf(w, d) * 0.6):              # T-154: em cima da ferrovia -> tira (o sorteio dos outros nao muda)
+		blds.resize(n0.x)
+		lights.resize(n0.y)
+		signs.resize(n0.z)
 	return h
+
+
+## T-154: o ponto (com raio r) cai num corredor de `keep_out` ([a, b, meia_largura] no plano XZ)?
+func _blocked(c: Vector3, r: float) -> bool:
+	var p := Vector2(c.x, c.z)
+	for k in keep_out:
+		if Geometry2D.get_closest_point_to_segment(p, k[0], k[1]).distance_to(p) < float(k[2]) + r:
+			return true
+	return false
 
 
 func _box() -> BoxMesh:
