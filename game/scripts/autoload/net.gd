@@ -31,6 +31,8 @@ var ping_ms: int = 0
 var player_name: String = "Jogador"
 var pending_setup: Dictionary = {}          # corrida online a montar (preenchido em s_race_setup)
 var pending_truck: int = -1
+var pending_setup_msec: int = 0             # T-156: when the setup arrived (clock of the face-to-face opening)
+var room_state: int = Protocol.RoomState.LOBBY   # last state sent by the server (s_state)
 
 # --- depuracao de rede (P62): simula latencia e perda de pacotes
 var debug_latency_ms: int = 0
@@ -284,11 +286,14 @@ func s_lobby(state: Dictionary) -> void:
 func s_race_setup(setup: Dictionary, my_truck: int) -> void:
 	pending_setup = setup
 	pending_truck = my_truck
+	pending_setup_msec = Time.get_ticks_msec()
+	room_state = Protocol.RoomState.COUNTDOWN
 	race_setup_received.emit(setup, my_truck)
 
 
 @rpc("authority", "reliable")
 func s_state(state: int) -> void:
+	room_state = state
 	race_state_changed.emit(state)
 
 

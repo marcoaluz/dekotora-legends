@@ -26,6 +26,7 @@ var _err_max: float = 0.0               # T-152: maior erro da predicao (m, ao l
 var _err_sum: float = 0.0
 var _err_n: int = 0
 var _err_big: int = 0                   # snapshots com erro acima de 1 m
+var _start_predicted_msec: int = 0      # T-156: hora da largada pelo relogio da abertura (setup + ping)
 
 
 func _ready() -> void:
@@ -87,6 +88,8 @@ func _ready() -> void:
 	Net.events_received.connect(_on_events)
 	Net.race_state_changed.connect(func(s: int) -> void:
 		print("[botclient %s] estado da sala: %d" % [_name, s])
+		if s == Protocol.RoomState.RACING and _start_predicted_msec > 0:
+			print("[botclient %s] LARGADA: o servidor largou %d ms depois da hora prevista pelo relogio da abertura" % [_name, Time.get_ticks_msec() - _start_predicted_msec])
 		racing = s == Protocol.RoomState.RACING)
 	Net.race_ended.connect(_on_end)
 	Net.disconnected_from_server.connect(func() -> void:
@@ -135,7 +138,12 @@ func _on_setup(setup: Dictionary, my_truck: int) -> void:
 	sync = ClientSync.new()
 	sync.predict = not ("--nopredict" in OS.get_cmdline_user_args())
 	sync.setup(setup, my_truck)
-	driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 7 + my_truck, Room.GRID_X[my_truck % 4], false, true)
+	driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 7 + my_truck, StartGrid.lane_x(my_truck), false, true)
+	# T-156: relogio da abertura/largada como o cliente de verdade calcula (setup + ping) para conferir a coerencia
+	var total: float = float(setup.get("countdown_total", Protocol.COUNTDOWN_SECONDS))
+	var left0: float = total - DuelPlan.online_elapsed(total, float(setup["countdown"]), Net.pending_setup_msec, Time.get_ticks_msec(), Net.ping_ms)
+	_start_predicted_msec = Time.get_ticks_msec() + int(left0 * 1000.0)
+	print("[botclient %s] abertura %s, contagem total %.1f s, largada prevista em %d ms" % [_name, String(setup.get("intro", "?")), total, int(left0 * 1000.0)])
 	print("[botclient %s] corrida montada: %d caminhoes, meu indice %d, predicao %s" % [_name, sync.sim.trucks.size(), my_truck, sync.predict])
 
 

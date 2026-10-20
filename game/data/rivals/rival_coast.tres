@@ -12,4 +12,6 @@ part_ids = PackedStringArray("fb_basic", "rb_basic")
 taunt_key = "rival.rival_coast.taunt"
 min_fame = 0
 min_destaque = 0
+truck_key = "rival.rival_coast.truck"
+crest = "桜"
 refuse_key = "rival.rival_coast.refuse"

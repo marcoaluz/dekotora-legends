@@ -28,6 +28,8 @@ var save_path: String = SAVE_PATH               # o servidor usa user://profiles
 var pending_route: RouteDef = null
 var pending_contract: Dictionary = {}          # contrato aceito no Mercado (vazio = corrida sem contrato)
 var last_result: Dictionary = {}
+## Last face-to-face opening shown ("route:rival", T-156): the same duel again = rematch = short version (memory only).
+var last_duel_key: String = ""
 
 var _part_cache: Dictionary = {}
 

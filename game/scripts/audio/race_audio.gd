@@ -81,6 +81,13 @@ func update(dt: float, t: TruckSim, countdown: float) -> void:
 		get_node("/root/AudioBus").play_sfx("countdown_go")
 
 
+## Face-to-face opening (T-156): the parked player's engine revving (rpm 0..1 given by DuelIntro), no road noise.
+func intro_engine(dt: float, rpm01: float, throttle: float) -> void:
+	player_engine.update(dt, rpm01, throttle, 0.0, 1.0, 0.0)
+	for n in _loops:
+		_set_loop(String(n), 0.0, 0.0)
+
+
 func _set_loop(name: String, weight: float, gain_db: float) -> void:
 	var p: AudioStreamPlayer = _loops.get(name)
 	if p == null or p.stream == null:
