@@ -203,3 +203,9 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-20 · T-150b · coordenador · CONCLUÍDA
 - Feito: APK de teste gerado de novo depois das T-152..T-156 (protocolo 6): builds/kaido-bakuso-debug.apk, 108 MB, chave de debug; preset restaurado.
+
+## 2026-10-20 · T-159 · especialista · PRECISA DECISÃO
+- Feito: análise dos 5 modelos de docs/Modelos/Road_pontes (só análise, nada no jogo): Outdor = pórtico de placas dos EUA com fotos de placas reais (não usar); Ponte A = viaduto de concreto 2 faixas (usar o pilar em "T"; talvez viaduto cruzando por cima); Ponte B = pênsil europeia de 1 faixa (não usar); road = kit CGTrader (guard-rail em W + poste com fios); Túnel = o mesmo Tunnel.obj da T-130 (referência para semáforos de faixa e calçada por código).
+- Arquivos: docs/ANALISE_ROAD_PONTES.md, docs/INVENTARIO_MODELOS.md, docs/STATUS.md, docs/capturas_t159/, blender/scripts/inspect_model.py
+- Validação: merge na main sem conflito; folhas conferidas pelo coordenador.
+- Decisão pendente: licença do túnel e demais; postes com fios; viaduto cruzando por cima; semáforo do túnel ligado aos eventos ou só enfeite. Aviso: pastas de terceiros movidas para docs/Modelos/ (T-162 corrige os caminhos).
