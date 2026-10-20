@@ -108,6 +108,7 @@ um problema visual não puder ser entendido pelos renders.
 - (d) `traffic_kit.decimate(o, n, border_weight=50)` preserva as divisas entre classes de material (a linha preto/branco da viatura fica reta); serve para pintura de duas cores como a viatura. Não usar em malhas com muitas classes: o jipe se desfaz.
 - (e) Malha sem materiais ou "esculpida" (carro batido): refazer em voxels (REMESH VOXEL 0,03) e alisar (SMOOTH 4 passadas) antes de reduzir. Código em `lib/traffic_wreck.py` (`_remesh`, `_smooth`).
 - (f) Em worktree, passe `--src-dir`, `--new-dir` e `--wreck-dir` com caminho absoluto da pasta principal, por exemplo `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model police,jeep,wreck --src-dir "<pasta principal>/docs/Modelos Melhorados" --new-dir "<pasta principal>/docs/Novos modelos" --wreck-dir "<pasta principal>/docs/Novas Melhorias"`. Os originais ficam fora do Git.
+- (g) Carro batido com `tire_w` (`blender/scripts/lib/traffic_wreck.py`): `_cut_wheels` apaga o pneu e o aro esculpidos do original (faixa de fora de cada roda) e `_round_wheels` põe rodas redondas nossas no lugar (a da frente sai esterçada em -9° depois da batida). `hem_z` corta as lascas penduradas abaixo da soleira, exceto perto das rodas. Os valores do carro batido estão em `build_traffic_cars.py` (`tire_w=0.24`, `hem_z=0.34`).
 
 ## Bake alta → leve (T-136, baú premium)
 
