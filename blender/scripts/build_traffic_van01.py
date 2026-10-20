@@ -5,7 +5,7 @@ O arquivo original NÃO vai para o Git; este script lê o FBX de fora e grava s�
 
 Uso:
   blender -b --factory-startup -P blender/scripts/build_traffic_van01.py -- \
-      --src "docs/Novos modelos/Van+01/Export File/van.FBX" [--out game/assets/vehicles/traffic] [--preview <pasta>]
+      --src "docs/Modelos/Novos modelos/Van+01/Export File/van.FBX" [--out game/assets/vehicles/traffic] [--preview <pasta>]
 
 O que faz (determinístico: mesma entrada, mesmo .glb):
   1. importa o FBX, descarta pneus (235 mil triângulos cada), aros, eixos, faróis internos de um lado só
@@ -251,8 +251,10 @@ def make_wheel_axle(name, y, z, r, x_out, mat, uv):
 
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    novos = "docs/Modelos/Novos modelos"   # T-162: pasta nova; volta para docs/Novos modelos se a nova não existir
+    novos = novos if os.path.isdir(novos) else "docs/Novos modelos"
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", default="docs/Novos modelos/Van+01/Export File/van.FBX")
+    ap.add_argument("--src", default=f"{novos}/Van+01/Export File/van.FBX")
     ap.add_argument("--out", default="game/assets/vehicles/traffic")
     ap.add_argument("--preview", default="", help="pasta para o render de conferência (opcional)")
     args = ap.parse_args(argv)

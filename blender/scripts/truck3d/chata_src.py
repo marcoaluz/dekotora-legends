@@ -4,7 +4,7 @@ Royalty Free) e separa as peças soltas, já na escala e na orientação do jogo
 Coordenada LOCAL da cabine (usada nas regras de `chata_parts.py`): metros, frente +Y, centro X = 0, chão Z = 0
 (base dos pneus originais), Y = 0 no eixo da roda dianteira original. Para levar ao caminhão: y += FRONT_AXLE_Y.
 
-O arquivo original NUNCA vai para o Git (pasta `docs/Novos modelos/` no .gitignore); só o .glb reduzido e
+O arquivo original NUNCA vai para o Git (pasta `docs/Modelos/Novos modelos/` no .gitignore); só o .glb reduzido e
 re-texturizado entra no jogo. Se o arquivo não existir, `load()` para com uma mensagem clara.
 """
 from __future__ import annotations
@@ -15,8 +15,10 @@ import bmesh
 import bpy
 import numpy as np
 
-DEFAULT_SRC = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "Novos modelos",
-                                            "Cabine", "CF_500_complete.stl"))
+_DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs"))
+_NOVO = os.path.join(_DOCS, "Modelos", "Novos modelos")   # T-162: pasta nova; volta para a antiga se não existir
+DEFAULT_SRC = os.path.join(_NOVO if os.path.isdir(_NOVO) else os.path.join(_DOCS, "Novos modelos"),
+                           "Cabine", "CF_500_complete.stl")
 SCALE = 0.09479          # largura da casca = 2,4 m (CAB_W); medido na T-115 sem os retrovisores
 WELD = 1e-4              # solda de vértices (m, já na escala)
 

@@ -39,9 +39,9 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` (T-152: chegada de cada bot e quanto as batidas custaram) |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
 | Trechos de 2 faixas (T-153) | corrida: `-- --route=kanto_1_coast --start=2200` (ponte), `--route=kanto_2_viaduct --start=2100` (viaduto antigo), `--route=kanto_3_mountain --start=560` (túnel antigo); `--no-sections` tira os trechos (comparar); capturas `bash tools/capture_t153.sh PASTA [filtro]`; custo `bash tools/measure_t153.sh [quadros] [--no-sections]`; sem tela: `tools_dev/trace_section.gd -- --route=R [--human] [--log]` e `tools_dev/measure_section_times.gd`; só estes testes: `-s res://tests/run_tests.gd -- --only=lane_sections` |
-| Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
-| Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
-| Acabamento F4 (T-155) | capturas antes/depois `bash tools/capture_t155.sh PASTA [mural\|ficha\|batido\|tunel]` e folhas `bash tools/sheet_t155.sh` (em `docs/capturas_t155/`); custo `bash tools/measure_t155.sh`; carro batido `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model wreck --wreck-dir "<pasta principal>/docs/Novas Melhorias"` |
+| Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Modelos/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
+| Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
+| Acabamento F4 (T-155) | capturas antes/depois `bash tools/capture_t155.sh PASTA [mural\|ficha\|batido\|tunel]` e folhas `bash tools/sheet_t155.sh` (em `docs/capturas_t155/`); custo `bash tools/measure_t155.sh`; carro batido `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model wreck --wreck-dir "<pasta principal>/docs/Modelos/Novas Melhorias"` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -79,7 +79,7 @@ Contexto: o Marco baixa os modelos só com a licença **Royalty Free License (no
 crédito ao autor, ele avisa quem é; todos os já usados estão em `game/assets/LICENCAS.md`. Tunnel.obj e van.abc (Downloads)
 continuam fora até ele informar link/licença. Nenhuma das tarefas abaixo foi iniciada (só registradas).
 
-1. **T-131 FEITA na T-143 (2026-10-19)**: jipe no trânsito (`car_jeep.glb`, ver T-143 abaixo). Texto original: **T-131, Jipe Suzuki no tráfego** (autorizado pelo Marco). Fonte: `docs/Novos modelos/Carro/` (OBJ/FBX, 436 mil triângulos,
+1. **T-131 FEITA na T-143 (2026-10-19)**: jipe no trânsito (`car_jeep.glb`, ver T-143 abaixo). Texto original: **T-131, Jipe Suzuki no tráfego** (autorizado pelo Marco). Fonte: `docs/Modelos/Novos modelos/Carro/` (OBJ/FBX, 436 mil triângulos,
    50 texturas 4K, escala ×0,742 para ~3,95 m, "SUZUKI" na grade para apagar; ver `docs/NOVOS_MODELOS.md` e
    `docs/INVENTARIO_MODELOS.md`). Seguir o padrão da T-124: `blender/scripts/build_traffic_cars.py -- --model ...`,
    3 a 6 mil triângulos, `paint_white` trocável, rodas `wheel_f*`/`wheel_r*`, entrar em `traffic_3d.gd` (`MODELS_BY_KIND`),
@@ -157,8 +157,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer
   os postes de energia com fios e o viaduto cruzando por cima da pista; o semáforo de faixa do túnel deve acompanhar os
-  eventos? Atenção: as pastas de terceiros agora estão em `docs/Modelos/`; os scripts de geração ainda procuram em
-  `docs/Modelos Melhorados`, `docs/Novas Melhorias` e `docs/Novos modelos` (passe o caminho novo nos argumentos).
+  eventos? Atenção: as pastas de terceiros agora estão em `docs/Modelos/`; os scripts de geração já procuram lá
+  (`docs/Modelos/Modelos Melhorados`, `docs/Modelos/Novas Melhorias`, `docs/Modelos/Novos modelos`) e voltam para as pastas antigas se a nova não existir (T-162).
 
 - **T-156 (abertura frente a frente, campanha 1 contra 1):** jogar um frete e ver a cena (um toque pula); olhar
   `docs/capturas_t156/` (`dia` = praça de pedágio, `noite`/`tarde` = área de descanso, `curta` = revanche, `comboio` =
@@ -192,7 +192,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   `kaohsiung_circular_light_rail_caf_urbos_3` pode ser usado (licença Sketchfab Standard) e se gosta do amarelo; (2) se os
   lugares das linhas e dos 2 viadutos de trem estão bons; (3) a frequência (1º trem ~10 s, depois a cada 22–40 s); (4) se quer
   som de trem (2 sons no ElevenLabs, ainda não gerados). Se você baixou um pacote de ferrovia, ele não está no PC: coloque em
-  `docs/Novas Melhorias/` e avise.
+  `docs/Modelos/Novas Melhorias/` e avise.
 
 - **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
   outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as
@@ -236,7 +236,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   Pendências: (3) sem interior (bancos/painel) atrás do vidro escuro; (4) flocos metálicos e reflexo real no vidro dependem de luz do
   jogo, não da textura. (Os PNGs antigos foram apagados na T-117.)
 - **T-125 (2026-10-18): caminhão base Canter + 6ª cabine "curta"** a partir do JAC 1045 (Royalty Free; emblema apagado; créditos em
-  `game/assets/LICENCAS.md`). Código: `blender/scripts/truck3d/jac_src.py` (importa o .blend de `docs/Modelos Melhorados/`, que fica fora
+  `game/assets/LICENCAS.md`). Código: `blender/scripts/truck3d/jac_src.py` (importa o .blend de `docs/Modelos/Modelos Melhorados/`, que fica fora
   do Git), `jac_parts.py` (material/teto de triângulos por peça, pelo nome), `jac_cab.py` (cabine + montagens), `canter.py` (baú 2,3 x 5 m,
   rodas, decoração); `body.py`/`deco.py` aceitam medidas de baú (`BoxDims`). Modelos: `dekotora_truck_canter.glb` (48 mil tri) e
   `dekotora_truck_{base,leve,longo}_curta.glb` (61/49/73 mil; o baú cresce 1,22 m para a frente). No jogo: `BodyDef` (`data/bodies/`)
@@ -295,7 +295,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   `RoadFurniture`/`RoadSigns`/`KitProps3D`/`Roadside3D`/`EventProps`. HUD "PISTA COM 2 FAIXAS". Trechos: litoral
   2.400–2.760 m (ponte; lombada nova de 3%), viaduto 2.270–2.510 m, montanha 780–1.060 m (túnel 805–1.040). Testes
   `tests/test_lane_sections.gd` (9). Custo: chamadas iguais (±5), FPS no ruído. Capturas `docs/capturas_t153/`.
-- **T-146 (2026-10-19): modelos de `docs/Novas Melhorias` (Metais, Placas, Placão) no jogo** (Royalty Free, no AI; inventário
+- **T-146 (2026-10-19): modelos de `docs/Modelos/Novas Melhorias` (Metais, Placas, Placão) no jogo** (Royalty Free, no AI; inventário
   em `docs/INVENTARIO_MODELOS.md`, créditos em `game/assets/LICENCAS.md`). Gerador: `blender/scripts/build_roadside_kit.py`
   (14 .glb em `assets/scenery/kit/`, 60–280 triângulos cada, só geometria + UV; texturas `assets/textures/kit/` 1024/512 px
   comprimidas na VRAM; determinístico, conferido 2x). Jogo: `road3d/roadside_kit.gd` (materiais pelo nome, malhas em cache,
@@ -340,7 +340,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-154 (2026-10-19): ferrovia ao lado da rodovia, trens e viadutos de trem (F3).** Não havia peças de ferrovia de
   terceiros no PC (busca em `docs/` e Downloads, que agora está vazia; ver `docs/INVENTARIO_MODELOS.md`): via dupla, trilhos,
   muro, catenária, viaduto, pilares, bocas de túnel, locomotiva e vagões são **por código** (`blender/scripts/build_railway_kit.py`,
-  determinístico, conferido 2x); o **bonde amarelo** é o CAF Urbos 3 do Marco (`docs/Modelos Melhorados/`, Sketchfab Standard)
+  determinístico, conferido 2x); o **bonde amarelo** é o CAF Urbos 3 do Marco (`docs/Modelos/Modelos Melhorados/`, Sketchfab Standard)
   sem interior, 71 mil → 6,9 mil triângulos, repintado e sem logotipos. Jogo: `road3d/railway_layout.gd` (onde fica em cada rota),
   `rail_line.gd` (geometria da linha), `rail_traffic.gd` (quando passa cada trem; só visual, relógio próprio, determinístico),
   `railway_3d.gd` (via + peças num bloco de 300 m com UMA textura), `trains_3d.gd` (MultiMesh por modelo), `rail_kit.gd`,
@@ -370,7 +370,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   visual). Pendências: confirmar com o Marco a regra das chapas e a frequência; gerar os 5 sons; carros batidos ficam escuros à noite
   (só o pisca-alerta aparece bem).
 - **T-145 (2026-10-19): carroceria graneleira + regra carga x carroceria.** Modelo "Carroceria_Brasil_Graneleiro" (pasta
-  `docs/Novas Melhorias/Carroceria/`, fora do Git, Royalty Free (no AI)) reduzido 81 mil → 7,8 mil triângulos por
+  `docs/Modelos/Novas Melhorias/Carroceria/`, fora do Git, Royalty Free (no AI)) reduzido 81 mil → 7,8 mil triângulos por
   `blender/scripts/truck3d/gran_src.py` (piso, fueiros, lona preta, lanternas e para-choque do original; 64 trincos de 964
   triângulos viram caixinhas; parafusos somem) + `truck3d/graneleira.py` (tampas com o mural repetido 3x, cabeceira "torii"
   cromada com o andon da frente, armação traseira com o andon de trás, luzes, placa, neon; pontos de montagem do teto/painel
@@ -389,7 +389,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   carga, o tamanho único (médio), a lona preta, 14 t/7.500 kg e se a graneleira deve custar algo (ver `docs/DECISOES.md`).
 - **T-143 (2026-10-19): viatura + carro batido no acidente, jipe no trânsito** (Royalty Free (no AI), confirmado pelo Marco).
   Blender: `build_traffic_cars.py -- --model police,jeep,wreck` (+ `lib/traffic_police.py`, `traffic_jeep.py`, `traffic_wreck.py`;
-  lê `docs/Modelos Melhorados/`, `docs/Novos modelos/` (`--new-dir`) e `docs/Novas Melhorias/` (`--wreck-dir`), fora do Git;
+  lê `docs/Modelos/Modelos Melhorados/`, `docs/Modelos/Novos modelos/` (`--new-dir`) e `docs/Modelos/Novas Melhorias/` (`--wreck-dir`), fora do Git;
   num worktree passe os caminhos absolutos da pasta principal). Viatura `car_police.glb` 7,3 mil tri (preto/branco japonês
   genérico, sem NYPD/Toyota/placa, giroflex vermelho animado por `road3d/police_beacon.gd`), carro batido `car_wreck.glb`
   6 mil tri (picape amassada), jipe `car_jeep.glb` 5,1 mil tri ("SUZUKI" apagado; tipo CARRO do trânsito). Acidente
@@ -400,7 +400,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-121 + T-124 (2026-10-18): 6 carros novos no trânsito** a partir dos modelos de terceiros (licença confirmada pelo Marco):
   Van 01, Ascona, Falcon, SUV (tipo carro), **Fumi SC** (esportivo raro, 104–122 km/h) e **ônibus Jetset** (13,3 m, lento, 12 t).
   Scripts: `blender/scripts/build_traffic_van01.py` e `build_traffic_cars.py -- --model all` (+ `lib/traffic_kit.py`,
-  `traffic_classify.py`, `traffic_preview.py`; lêem `docs/Novos modelos/` e `docs/Modelos Melhorados/`, fora do Git). Cada carro:
+  `traffic_classify.py`, `traffic_preview.py`; lêem `docs/Modelos/Novos modelos/` e `docs/Modelos/Modelos Melhorados/`, fora do Git). Cada carro:
   2 materiais (`paint_white` + atlas de cores lisas), rodas `wheel_f`/`wheel_r` que giram, 4,7–6,1 mil triângulos (ônibus 8,8 mil).
   Simulação: `TrafficSim.Kind` (tamanho, velocidade, massa por tipo; fila/ultrapassagem atrás de quem é mais lento), hitbox por tipo
   em `Collision.resolve_traffic`; `Traffic3D.MODELS_BY_KIND`. Medido (kanto_2, 14 veículos, qualidade média): superfícies do

@@ -1,5 +1,5 @@
 """Carroceria graneleira (T-145): importa o modelo de terceiros "Carroceria_Brasil_Graneleiro.obj" (pasta
-`docs/Novas Melhorias/Carroceria/`, Royalty Free License (no AI), confirmado pelo Marco; fica FORA do Git) e devolve as
+`docs/Modelos/Novas Melhorias/Carroceria/`, Royalty Free License (no AI), confirmado pelo Marco; fica FORA do Git) e devolve as
 peças já no espaço do caminhão, reduzidas e com os NOSSOS materiais.
 
 Original (depois do importador OBJ: metros, Z para cima, traseira em -Y): piso 2,0 x 6,0 m a 1,31 m do chão, tampas
@@ -24,8 +24,10 @@ import numpy as np
 
 from lib import extract
 
-DEFAULT_SRC = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "Novas Melhorias",
-                                            "Carroceria", "Carroceria_Brasil_Graneleiro.obj"))
+_DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs"))
+_NOVO = os.path.join(_DOCS, "Modelos", "Novas Melhorias")   # T-162: pasta nova; volta para a antiga se não existir
+DEFAULT_SRC = os.path.join(_NOVO if os.path.isdir(_NOVO) else os.path.join(_DOCS, "Novas Melhorias"),
+                           "Carroceria", "Carroceria_Brasil_Graneleiro.obj")
 S = 1.25                 # largura das tampas 2,0 m -> 2,5 m (BODY_W); a altura acompanha
 FLOOR_SRC = 1.31         # base do piso no original
 Y0_SRC, LEN_SRC = -3.01, 6.017      # traseira e comprimento do piso no original
@@ -68,7 +70,7 @@ def _load(path: str):
     path = os.path.abspath(path or DEFAULT_SRC)
     if not os.path.isfile(path):
         raise SystemExit(f"ERRO graneleira: modelo nao encontrado: {path}\n"
-                         "  Coloque Carroceria_Brasil_Graneleiro.obj em docs/Novas Melhorias/Carroceria/ ou passe --body-src CAMINHO.")
+                         "  Coloque Carroceria_Brasil_Graneleiro.obj em docs/Modelos/Novas Melhorias/Carroceria/ ou passe --body-src CAMINHO.")
     before = set(bpy.data.objects)
     bpy.ops.wm.obj_import(filepath=path)
     bpy.context.view_layer.update()

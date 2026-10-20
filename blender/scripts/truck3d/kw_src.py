@@ -1,6 +1,6 @@
 """Cabine "americana" de bico longo (T-129): importa a cabine, o capô e a grade do Kenworth W990 (Sketchfab, Henry S,
 Royalty Free confirmado pelo Marco em 2026-10-18) e leva para o quadro do jogo. O .glb original (80 MB, 2,2 milhões de
-triângulos) NUNCA vai para o Git (`docs/Modelos Melhorados/` está no .gitignore); só a cabine reduzida e
+triângulos) NUNCA vai para o Git (`docs/Modelos/Modelos Melhorados/` está no .gitignore); só a cabine reduzida e
 re-texturizada entra no jogo.
 
 O original olha para -Y, em metros, chão em z = 0: para-choque em y = -2,09, eixo dianteiro em y = -1,16 (pneu de raio
@@ -20,8 +20,10 @@ import numpy as np
 
 from lib import extract
 
-DEFAULT_SRC = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "Modelos Melhorados",
-                                            "kenworth_w990_truck.glb"))
+_DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs"))
+_NOVO = os.path.join(_DOCS, "Modelos", "Modelos Melhorados")   # T-162: pasta nova; volta para a antiga se não existir
+DEFAULT_SRC = os.path.join(_NOVO if os.path.isdir(_NOVO) else os.path.join(_DOCS, "Modelos Melhorados"),
+                           "kenworth_w990_truck.glb")
 SCALE = 1.0
 CUT_SRC = 1.05            # costas da cabine "dia" no original (atrás da porta; o dormitório começa aqui)
 FRONT_SRC = -2.09         # frente do para-choque
@@ -74,7 +76,7 @@ def load(src: str | None, y_back: float) -> list:
     path = os.path.abspath(src or DEFAULT_SRC)
     if not os.path.isfile(path):
         raise SystemExit(f"ERRO cabine americana: arquivo do Kenworth W990 nao encontrado: {path}\n"
-                         "  Coloque o kenworth_w990_truck.glb (Sketchfab, Royalty Free) em docs/Modelos Melhorados/ "
+                         "  Coloque o kenworth_w990_truck.glb (Sketchfab, Royalty Free) em docs/Modelos/Modelos Melhorados/"
                          "ou passe --cab-src CAMINHO.")
     import bpy
     before = set(bpy.data.objects)

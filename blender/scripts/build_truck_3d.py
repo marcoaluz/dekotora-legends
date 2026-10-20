@@ -18,7 +18,7 @@ normal/oclusão gravados da versão alta (`bake_box_premium.py`, rode antes uma 
 (padrão) = premium no baú médio (base) e o baú antigo nos outros modelos; `premium`/`classic` forçam.
 
 Graneleira (T-145, `truck3d/graneleira.py` + `gran_src.py`): carroceria aberta com lona no chassi do baú médio, a partir
-do modelo "Carroceria_Brasil_Graneleiro.obj" (docs/Novas Melhorias/Carroceria/, Royalty Free, fora do Git; `--body-src`).
+do modelo "Carroceria_Brasil_Graneleiro.obj" (docs/Modelos/Novas Melhorias/Carroceria/, Royalty Free, fora do Git; `--body-src`).
 
 Convenções: metros, +Y frente, Z cima, traseira do baú em Y=0, X=0 no centro. As peças usam os pontos
 de montagem (empties MOUNT_*) criados aqui; o glTF os exporta como nós.
@@ -223,16 +223,16 @@ def main():
     ap.add_argument("--out", default="game/assets/vehicles/dekotora")
     ap.add_argument("--paint", default="paint_white")
     ap.add_argument("--cab", default=DEFAULT_CAB, choices=list(CABS), help="chata | jac | curta | americana")
-    ap.add_argument("--cab-src", default=None, help="malha de terceiros: STL da chata (docs/Novos modelos/Cabine/CF_500_complete.stl), "
-                    ".blend do JAC 1045 para jac/curta/canter (docs/Modelos Melhorados/JAC+1045+Truck.blend) ou "
-                    ".glb do Kenworth W990 para americana (docs/Modelos Melhorados/kenworth_w990_truck.glb)")
+    ap.add_argument("--cab-src", default=None, help="malha de terceiros: STL da chata (docs/Modelos/Novos modelos/Cabine/CF_500_complete.stl), "
+                    ".blend do JAC 1045 para jac/curta/canter (docs/Modelos/Modelos Melhorados/JAC+1045+Truck.blend) ou "
+                    ".glb do Kenworth W990 para americana (docs/Modelos/Modelos Melhorados/kenworth_w990_truck.glb)")
     ap.add_argument("--no-preview", action="store_true")
     ap.add_argument("--box", default="auto", choices=("auto", "premium", "classic"),
                     help="auto = premium no baú médio (base), antigo nos outros; premium | classic forçam (T-136)")
     ap.add_argument("--night", action="store_true", help="previas de revisao a noite (luzes acesas)")
     ap.add_argument("--variant", default="base", choices=list(VARIANTS) + ["canter"] + list(OPEN_BODIES),
                     help="base | leve | longo | graneleira | carreta | canter (cabine do JAC)")
-    ap.add_argument("--body-src", default=None, help="graneleira: docs/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj")
+    ap.add_argument("--body-src", default=None, help="graneleira: docs/Modelos/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj")
     args = ap.parse_args(argv)
     if args.variant == "carreta":
         args.cab = "chata"                           # carreta guardada (fora da garagem): cavalo com a cara chata

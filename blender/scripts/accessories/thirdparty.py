@@ -1,6 +1,6 @@
 """Peças tiradas de modelos de terceiros (T-126), todos Royalty Free (confirmado pelo Marco em 2026-10-18):
 Kenworth W990 (Sketchfab, Henry S), Fumi SC (Sketchfab, T3STAR) e JAC 1045 (CGTrader). Os arquivos originais ficam em
-`docs/Modelos Melhorados/` (fora do Git); aqui só copiamos ILHAS de malha escolhidas por caixas (`lib/extract.py`),
+`docs/Modelos/Modelos Melhorados/` (fora do Git); aqui só copiamos ILHAS de malha escolhidas por caixas (`lib/extract.py`),
 trocamos os materiais pelos NOSSOS, apagamos letreiros/emblemas (ilhas pequenas ou caixas de exclusão), reduzimos e
 levamos para a convenção dos acessórios (origem = ponto de montagem, +Y frente, +X para fora no lado direito, metros).
 
@@ -16,7 +16,9 @@ import bpy
 
 from lib import extract
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "Modelos Melhorados"))
+_DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs"))
+_NOVO = os.path.join(_DOCS, "Modelos", "Modelos Melhorados")   # T-162: pasta nova; volta para a antiga se não existir
+ROOT = _NOVO if os.path.isdir(_NOVO) else os.path.join(_DOCS, "Modelos Melhorados")
 KW = os.path.join(ROOT, "kenworth_w990_truck.glb")
 FUMI = os.path.join(ROOT, "2025_fumi_sc.glb")
 JAC = os.path.join(ROOT, "JAC+1045+Truck.blend")
@@ -31,7 +33,7 @@ CHROMES = ["chrome", "steel", "paint_gold"]
 def _need(path):
     if not os.path.isfile(path):
         raise SystemExit(f"ERRO peca de terceiros: arquivo nao encontrado: {path}\n"
-                         "  Os modelos originais ficam em docs/Modelos Melhorados/ (fora do Git; baixados pelo Marco).")
+                         "  Os modelos originais ficam em docs/Modelos/Modelos Melhorados/ (fora do Git; baixados pelo Marco).")
 
 
 def _finish(m, objs, budget):

@@ -96,7 +96,7 @@ um problema visual não puder ser entendido pelos renders.
 
 ## Graneleira (T-145)
 
-- Comando: `blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- --variant graneleira --cab chata|jac|curta|americana --body-src "docs/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj"`
+- Comando: `blender -b --factory-startup -P blender/scripts/build_truck_3d.py -- --variant graneleira --cab chata|jac|curta|americana --body-src "docs/Modelos/Novas Melhorias/Carroceria/Carroceria_Brasil_Graneleiro.obj"`
 - Em worktree, o `--body-src` não acha a pasta (ela é ignorada pelo Git e só existe na pasta principal): passe o caminho absoluto da pasta principal.
 - Armadilha: os 64 trincos do original têm 964 triângulos cada; `gran_src._boxify` troca cada um por uma caixa (12 triângulos). Os parafusos de 1–2 cm são descartados de propósito (somem a 10 m).
 
@@ -107,7 +107,7 @@ um problema visual não puder ser entendido pelos renders.
 - (c) Armadilha: limpar o cache de imagens entre modelos (`C._IMG_CACHE.clear()`), porque os `.glb` do Sketchfab repetem os nomes `Image_0...`.
 - (d) `traffic_kit.decimate(o, n, border_weight=50)` preserva as divisas entre classes de material (a linha preto/branco da viatura fica reta); serve para pintura de duas cores como a viatura. Não usar em malhas com muitas classes: o jipe se desfaz.
 - (e) Malha sem materiais ou "esculpida" (carro batido): refazer em voxels (REMESH VOXEL 0,03) e alisar (SMOOTH 4 passadas) antes de reduzir. Código em `lib/traffic_wreck.py` (`_remesh`, `_smooth`).
-- (f) Em worktree, passe `--src-dir`, `--new-dir` e `--wreck-dir` com caminho absoluto da pasta principal, por exemplo `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model police,jeep,wreck --src-dir "<pasta principal>/docs/Modelos Melhorados" --new-dir "<pasta principal>/docs/Novos modelos" --wreck-dir "<pasta principal>/docs/Novas Melhorias"`. Os originais ficam fora do Git.
+- (f) Em worktree, passe `--src-dir`, `--new-dir` e `--wreck-dir` com caminho absoluto da pasta principal, por exemplo `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model police,jeep,wreck --src-dir "<pasta principal>/docs/Modelos/Modelos Melhorados" --new-dir "<pasta principal>/docs/Modelos/Novos modelos" --wreck-dir "<pasta principal>/docs/Modelos/Novas Melhorias"`. Os originais ficam fora do Git.
 - (g) Carro batido com `tire_w` (`blender/scripts/lib/traffic_wreck.py`): `_cut_wheels` apaga o pneu e o aro esculpidos do original (faixa de fora de cada roda) e `_round_wheels` põe rodas redondas nossas no lugar (a da frente sai esterçada em -9° depois da batida). `hem_z` corta as lascas penduradas abaixo da soleira, exceto perto das rodas. Os valores do carro batido estão em `build_traffic_cars.py` (`tire_w=0.24`, `hem_z=0.34`).
 
 ## Bake alta → leve (T-136, baú premium)
@@ -120,7 +120,7 @@ um problema visual não puder ser entendido pelos renders.
 
 ## Kit de beira de estrada (T-146)
 
-- Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<repo principal>/docs/Novas Melhorias" [--preview]`. Em worktree passe `--src` (o padrão aponta para `<raiz>/docs/Novas Melhorias`, pasta que a worktree não tem, pois fica fora do Git).
+- Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<repo principal>/docs/Modelos/Novas Melhorias" [--preview]`. Em worktree passe `--src` (o padrão aponta para `<raiz>/docs/Modelos/Novas Melhorias`, pasta que a worktree não tem, pois fica fora do Git).
 - Saídas: `game/assets/scenery/kit/*.glb` (só geometria + UV) e `game/assets/textures/kit/*.png`.
 - Os .glb saem sem textura (`export_image_format="NONE"`) e o Godot cria os materiais pelo nome (`RoadsideKit.material`).
 - Textura nova em `textures/kit/`: conferir no `.import` `compress/mode=2`, senão ocupa 4× mais memória.
@@ -128,9 +128,9 @@ um problema visual não puder ser entendido pelos renders.
 
 ## Ferrovia (T-154)
 
-- Comando: `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "<pasta principal>/docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview] [--no-lrt]`.
+- Comando: `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "<pasta principal>/docs/Modelos/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview] [--no-lrt]`.
   - `--preview` gera a folha de contato; `--no-lrt` gera sem o bonde (não precisa do .glb).
-- Em worktree, passe `--lrt-src` com o caminho absoluto da pasta principal (a pasta `docs/Modelos Melhorados` fica fora do Git).
+- Em worktree, passe `--lrt-src` com o caminho absoluto da pasta principal (a pasta `docs/Modelos/Modelos Melhorados` fica fora do Git).
 - Armadilha: ao importar um .glb (`import_scene.gltf`) numa cena que já tem objetos, filtre só os objetos novos
   (conjunto de objetos antes × depois) antes de apagar qualquer coisa. Apagar "tudo que não é do script" pode levar junto os objetos que já estavam na cena.
 

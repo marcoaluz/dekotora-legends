@@ -1,4 +1,4 @@
-"""T-146: kit de beira de estrada a partir dos modelos que o Marco colocou em `docs/Novas Melhorias/`
+"""T-146: kit de beira de estrada a partir dos modelos que o Marco colocou em `docs/Modelos/Novas Melhorias/`
 (Royalty Free License, no AI; a pasta fica FORA do Git, so o resultado reduzido entra no jogo).
 
   Metais/  "Metal and Concrete Barriers"  -> barreiras de concreto listradas (New Jersey, com grade, muro alto),
@@ -16,8 +16,8 @@ Saida (determinística):
   game/assets/textures/kit/*.png      barreira 1024 (cor) + 512 (ORM, normal), metal da placa 512, trelica 1024
   blender/renders/t146/contact_sheet.png  folha de conferencia (com --preview)
 
-Uso: blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- [--src "PASTA/Novas Melhorias"] [--preview]
-A pasta padrao e <raiz>/docs/Novas Melhorias. O .rar precisa do 7-Zip (C:/Program Files/7-Zip/7z.exe ou no PATH);
+Uso: blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- [--src "PASTA/Modelos/Novas Melhorias"] [--preview]
+A pasta padrao e <raiz>/docs/Modelos/Novas Melhorias (ou docs/Novas Melhorias, se a nova nao existir). O .rar precisa do 7-Zip (C:/Program Files/7-Zip/7z.exe ou no PATH);
 sem ele a trelica sai com uma textura desenhada aqui (mesmo formato).
 """
 from __future__ import annotations
@@ -55,7 +55,9 @@ BILL_W, BILL_H = 9.6, 3.6     # painel do outdoor (arte 1024 x 384)
 # ---------------------------------------------------------------- argumentos
 def args() -> dict:
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"src": os.path.join(ROOT, "docs", "Novas Melhorias"), "preview": "--preview" in a}
+    _novo = os.path.join(ROOT, "docs", "Modelos", "Novas Melhorias")   # T-162: pasta nova; volta para a antiga se não existir
+    src = _novo if os.path.isdir(_novo) else os.path.join(ROOT, "docs", "Novas Melhorias")
+    out = {"src": src, "preview": "--preview" in a}
     if "--src" in a:
         out["src"] = a[a.index("--src") + 1]
     return out
