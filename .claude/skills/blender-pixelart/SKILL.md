@@ -125,3 +125,11 @@ um problema visual não puder ser entendido pelos renders.
 - Textura nova em `textures/kit/`: conferir no `.import` `compress/mode=2`, senão ocupa 4× mais memória.
 - `.rar` (pacote do Placão, `tex.rar`) abre com o 7-Zip em `C:/Program Files/7-Zip/7z.exe`.
 
+## Ferrovia (T-154)
+
+- Comando: `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "<pasta principal>/docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview] [--no-lrt]`.
+  - `--preview` gera a folha de contato; `--no-lrt` gera sem o bonde (não precisa do .glb).
+- Em worktree, passe `--lrt-src` com o caminho absoluto da pasta principal (a pasta `docs/Modelos Melhorados` fica fora do Git).
+- Armadilha: ao importar um .glb (`import_scene.gltf`) numa cena que já tem objetos, filtre só os objetos novos
+  (conjunto de objetos antes × depois) antes de apagar qualquer coisa. Apagar "tudo que não é do script" pode levar junto os objetos que já estavam na cena.
+

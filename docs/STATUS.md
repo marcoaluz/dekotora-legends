@@ -19,7 +19,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Testes automáticos (265) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (275) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -33,6 +33,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
 | Trechos de 2 faixas (T-153) | corrida: `-- --route=kanto_1_coast --start=2200` (ponte), `--route=kanto_2_viaduct --start=2100` (viaduto antigo), `--route=kanto_3_mountain --start=560` (túnel antigo); `--no-sections` tira os trechos (comparar); capturas `bash tools/capture_t153.sh PASTA [filtro]`; custo `bash tools/measure_t153.sh [quadros] [--no-sections]`; sem tela: `tools_dev/trace_section.gd -- --route=R [--human] [--log]` e `tools_dev/measure_section_times.gd`; só estes testes: `-s res://tests/run_tests.gd -- --only=lane_sections` |
 | Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
+| Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -159,6 +160,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   litoral no fim da rota, viaduto antigo logo depois do acidente, túnel antigo nas curvas do começo da montanha), a
   lombada nova do litoral (para a ponte ficar alta), o nome fictício 湯坂隧道 e se o trecho deve esticar o prazo (hoje não:
   os bots perdem 1 a 3 s). **Gerar o APK de novo** (protocolo de rede 5).
+- **T-154 (ferrovia):** olhar `docs/capturas_t154/` (`antes_depois.png` primeiro) e dizer: (1) se o bonde do arquivo
+  `kaohsiung_circular_light_rail_caf_urbos_3` pode ser usado (licença Sketchfab Standard) e se gosta do amarelo; (2) se os
+  lugares das linhas e dos 2 viadutos de trem estão bons; (3) a frequência (1º trem ~10 s, depois a cada 22–40 s); (4) se quer
+  som de trem (2 sons no ElevenLabs, ainda não gerados). Se você baixou um pacote de ferrovia, ele não está no PC: coloque em
+  `docs/Novas Melhorias/` e avise.
 
 - **T-146 (barreiras, placas, outdoors):** olhar `docs/capturas_t146/` (`antes_depois_dia.png` primeiro) e dizer se aprova os
   outdoors (quantidade, lugar, as 4 artes fictícias; troque por artes suas em `game/assets/scenery/billboards/ad_0N.png`), as
@@ -171,7 +177,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   e `menu_fundo_b.png`) e dizer se a câmera da garagem ficou perto o bastante.
 
 - **T-136:** olhar `docs/capturas_t136/comparacao_antes_depois.png` e dizer se o baú premium fica (e se vale estender aos baús leve/longo e ao Canter); conferir a chapa ondulada no celular (APK).
-- **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo); olhar
+- **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo; na T-154
+  a pasta Downloads estava vazia, os dois arquivos não estão mais no PC); olhar
   `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.
 - Instalar **Android SDK + JDK 17** e gerar/testar o APK no celular (P02, P22, P65, P70, P72). Sem isso o Android não foi testado.
 - **Olhar** as imagens (previews em `game/assets/vehicles/dekotora/previews/`, capturas em `docs/store/`) e **aprovar o visual** / escolher plano A ou B.
@@ -272,6 +279,21 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   vídeo +1,5 a +4 MB; FPS no ruído (258–291). Andando (`measure_roadside.sh`, 300 → 550 m): litoral ~283 → ~297, viaduto ~305 →
   ~308, montanha ~298 → ~300 (o sorteio de eventos e o trânsito variam entre execuções). Testes `tests/test_roadside_kit.gd` (5).
   Capturas `docs/capturas_t146/`. Pendências: aprovar visual/artes; medir no celular (APK).
+- **T-154 (2026-10-19): ferrovia ao lado da rodovia, trens e viadutos de trem (F3).** Não havia peças de ferrovia de
+  terceiros no PC (busca em `docs/` e Downloads, que agora está vazia; ver `docs/INVENTARIO_MODELOS.md`): via dupla, trilhos,
+  muro, catenária, viaduto, pilares, bocas de túnel, locomotiva e vagões são **por código** (`blender/scripts/build_railway_kit.py`,
+  determinístico, conferido 2x); o **bonde amarelo** é o CAF Urbos 3 do Marco (`docs/Modelos Melhorados/`, Sketchfab Standard)
+  sem interior, 71 mil → 6,9 mil triângulos, repintado e sem logotipos. Jogo: `road3d/railway_layout.gd` (onde fica em cada rota),
+  `rail_line.gd` (geometria da linha), `rail_traffic.gd` (quando passa cada trem; só visual, relógio próprio, determinístico),
+  `railway_3d.gd` (via + peças num bloco de 300 m com UMA textura), `trains_3d.gd` (MultiMesh por modelo), `rail_kit.gd`,
+  `rail_mound.gd`; `race_scene_3d.gd` (+6 linhas) e `CityBuilder.keep_out` (sem prédio em cima do viaduto de trem). Litoral
+  0–2.150 m (boca de túnel nas pontas), cidade a rota inteira elevada + viaduto sobre a pista em 1.500 m, montanha viaduto sobre a
+  pista em 240 m + 1.240–2.080 m e 2.380 m–fim (entra e sai do morro do túnel); livre nos trechos de 2 faixas da T-153. 1º trem
+  ~10 s depois da largada, depois a cada 22–40 s. Medido (modo médio, sem vsync, `tools/measure_railway.sh`, andando de 300 m):
+  litoral 280–284 → 288–291 chamadas, viaduto 307–311 → 314–318, montanha (sem ferrovia nesse trecho) 301–302 → 302; triângulos
+  +9 a +27 mil com trem à vista (o bonde duplo tem 14 mil); textura +1,8 a +1,9 MB; FPS no ruído do PC (183–232 com e sem).
+  Testes `tests/test_railway.gd` (10). Capturas `docs/capturas_t154/` (cada cena: dia em cima, noite embaixo; `antes_depois.png`,
+  `modelos_ferrovia.png`). Pendências: confirmar o bonde e a pintura, aprovar lugares e frequência, som do trem (não existe).
 - **T-139 (2026-10-18): eventos de pista** (acidente, obras, estreitamento 3 → 2 faixas). Simulação: `sim/track_events.gd`
   (dados, intervalo fechado por z, sorteio pela semente, folga do prazo, limite das obras) e `sim/event_contact.gd` (cones, batida
   no veículo parado/barreira, raspada na beirada, parede do fim de faixa, chapas de aço); `TruckSim` recusa trocar para faixa

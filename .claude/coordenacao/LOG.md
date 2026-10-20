@@ -170,3 +170,15 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: sim/{lane_sections,track_events,track,event_contact}.gd, data/routes/*.tres, net/{room,client_sync,protocol}.gd, road3d/{road_mesh_narrow,section_props,section_structures_3d,...}.gd, ui/event_hud.gd, tests/test_lane_sections.gd, docs/capturas_t153/
 - Validação: merge na main sem conflito; 265 testes ok; net_test PASSOU; chamadas iguais (±5), bots +1 a +3 s; capturas olhadas (túnel antigo muito escuro à noite: vai para a F4).
 - Decisão pendente: posições dos trechos, lombada do litoral, nome 湯坂隧道, folga no prazo (hoje nenhuma). Gerar o APK de novo (protocolo 5).
+
+## 2026-10-19 · T-157 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Trechos de 2 faixas (T-153)" na skill godot-dekotora (dados, sim, visual, flags, capturas, protocolo 5), nomes conferidos no código (commit 88694d7).
+
+## 2026-10-19 · T-154 · especialista · CONCLUÍDA (PRECISA DECISÃO do Marco)
+- Feito: ferrovia só visual nas 3 rotas (via dupla, muro, catenária, viaduto, bocas de túnel; litoral 0–2.150 m, cidade inteira elevada + viaduto de trem sobre a pista em 1.500 m, montanha 1.240–2.080 e 2.380–fim + viaduto em 240 m), trem de carga por código e bonde amarelo (Urbos do Marco 71k→6,9k tri, sem logos); trens cruzam o jogador (1º ~10 s, depois 22–40 s), luzes à noite. Nenhuma peça de ferrovia de terceiros encontrada no PC.
+- Arquivos: road3d/{railway_3d,railway_layout,rail_line,rail_traffic,trains_3d,rail_kit,rail_mound}.gd, blender/scripts/build_railway_kit.py, assets/scenery/rail, textures/rail, tests/test_railway.gd, docs/capturas_t154/
+- Validação: merge na main com 2 conflitos aditivos de docs; 1 teste falhou após juntar com a T-153 (linha elevada da cidade × viaduto antigo): conferido em captura que não há sobreposição (linha a 40 m, no próprio viaduto) e o teste passou a ignorar a cidade, como já fazia com o túnel da cidade; 275 testes ok; modo médio +3 a +8 chamadas.
+- Decisão pendente: bonde (Sketchfab Standard) e pintura amarela; lugares e frequência dos trens; som do trem (2 sons ElevenLabs propostos).
+
+## 2026-10-19 · T-158 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Ferrovia (T-154)" nas skills godot-dekotora e blender-pixelart (nomes conferidos no código) e linha da T-154 no ROADMAP (commit 2be16ef).
