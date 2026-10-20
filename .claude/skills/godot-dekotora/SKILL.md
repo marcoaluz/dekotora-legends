@@ -177,3 +177,18 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   ou túneis, ajuste ali. O teste `tests/test_railway.gd` avisa se a linha invadir a pista, um túnel ou um trecho de 2 faixas.
   Na cidade a linha é elevada a 40 m e o teste ignora os trechos estreitos de lá.
 - A ferrovia é só visual (sem sim nem rede): cada jogador vê os próprios trens.
+
+## Acabamento (T-155)
+
+- Mural aceso à noite (`game/scripts/truck/mural_glow.gd`, classe `MuralGlow`):
+  - A força vem da hora do dia, `TimeOfDay.mural_glow` (em `game/data/time/*.tres`): dia `0.0` (nada muda), entardecer `0.4`.
+    `night.tres` não traz a chave, então a noite usa o padrão `0.8` de `scripts/data/time_of_day.gd`.
+  - Dentro de túnel o mural usa no mínimo `MuralGlow.TUNNEL` (0,75), mesmo de dia (`race_scene_3d.gd`).
+  - A corrida chama `TruckNode.set_mural_glow(energia)` ao criar cada caminhão e de novo só quando a força muda (entrada/saída de túnel, em `_update_truck_lights` de `race_scene_3d.gd`).
+  - A emissão fica **sempre ligada** no material (`MuralGlow.setup`); só a força muda (`set_level`). Não ligue/desligue a emissão no meio da corrida: isso recompila o shader e dá soluço.
+  - Teste: `game/tests/test_mural_glow.gd`.
+- Armadilha: `Tunnel3D._arch_of(t)` (`scripts/road3d/tunnel_3d.gd`) precisa ir do pé esquerdo ao topo e descer até o pé direito, sem repetir o topo e com x só crescendo. Se o perfil começar no topo, a boca fica fechada e uma chapa atravessa o túnel. Coberto por `tests/test_tunnel_portals.gd`.
+- Capturas (precisam de janela, então não use `--headless`): `bash tools/capture_t155.sh PASTA [mural|ficha|batido|tunel]` (na raiz do projeto, Git Bash). Sem grupo, tira todos. Use caminho absoluto para PASTA. `GODOT=...` troca o executável.
+- Folha lado a lado (funciona sem tela), sempre com caminho absoluto em `--out` e nos PNGs:
+  `godot --headless --path game -s res://tools_dev/make_compare_sheet.gd -- --out=ABS.png A.png B.png ...`
+  Opções `--cols=2` e `--w=640`. Ordem: esquerda para a direita, de cima para baixo (antes, depois, antes, depois...).
