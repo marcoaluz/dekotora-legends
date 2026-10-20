@@ -39,6 +39,7 @@ referencias/
 docs/Novos modelos/
 docs/Modelos Melhorados/
 docs/Novas Melhorias/
+docs/Modelos/
 
 # Copias isoladas de agentes (git worktree)
 .claude/worktrees/
