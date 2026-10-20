@@ -182,3 +182,9 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-19 · T-158 · ajudante-rapido · CONCLUÍDA
 - Feito: seção "Ferrovia (T-154)" nas skills godot-dekotora e blender-pixelart (nomes conferidos no código) e linha da T-154 no ROADMAP (commit 2be16ef).
+
+## 2026-10-20 · T-155 · especialista · CONCLUÍDA
+- Feito: mural do baú/graneleira aceso à noite (emissão por TimeOfDay.mural_glow: noite 0,8, tarde 0,4, dia 0); ficha da garagem cabe inteira (960x540 e 2400x1080); carro batido com rodas redondas e sem lascas; bocas de túnel abertas (regressão da T-153 no perfil do arco, com teste novo) e muros listrados maiores; túnel antigo mais claro (lâmpadas nas paredes + poças de luz, 1 chamada); STATUS: Android já instalado.
+- Arquivos: truck/mural_glow.gd, road3d/{tunnel_3d,tunnel_light_pools,kit_props_3d,roadside_kit}.gd, ui/garage_info_panel.gd, blender/scripts/lib/traffic_wreck.py, tests/{test_mural_glow,test_tunnel_portals}.gd, docs/capturas_t155/
+- Validação: merge na main sem conflito; 282 testes ok; modo médio +0 a +3 chamadas; folhas antes/depois conferidas pelo coordenador.
+- Decisão pendente: força do mural à noite, ficha compacta (aviso de potência como dica), tamanho dos muros das bocas. APK novo.
