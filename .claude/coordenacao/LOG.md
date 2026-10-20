@@ -173,3 +173,9 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-19 · T-157 · ajudante-rapido · CONCLUÍDA
 - Feito: seção "Trechos de 2 faixas (T-153)" na skill godot-dekotora (dados, sim, visual, flags, capturas, protocolo 5), nomes conferidos no código (commit 88694d7).
+
+## 2026-10-19 · T-154 · especialista · CONCLUÍDA (PRECISA DECISÃO do Marco)
+- Feito: ferrovia só visual nas 3 rotas (via dupla, muro, catenária, viaduto, bocas de túnel; litoral 0–2.150 m, cidade inteira elevada + viaduto de trem sobre a pista em 1.500 m, montanha 1.240–2.080 e 2.380–fim + viaduto em 240 m), trem de carga por código e bonde amarelo (Urbos do Marco 71k→6,9k tri, sem logos); trens cruzam o jogador (1º ~10 s, depois 22–40 s), luzes à noite. Nenhuma peça de ferrovia de terceiros encontrada no PC.
+- Arquivos: road3d/{railway_3d,railway_layout,rail_line,rail_traffic,trains_3d,rail_kit,rail_mound}.gd, blender/scripts/build_railway_kit.py, assets/scenery/rail, textures/rail, tests/test_railway.gd, docs/capturas_t154/
+- Validação: merge na main com 2 conflitos aditivos de docs; 1 teste falhou após juntar com a T-153 (linha elevada da cidade × viaduto antigo): conferido em captura que não há sobreposição (linha a 40 m, no próprio viaduto) e o teste passou a ignorar a cidade, como já fazia com o túnel da cidade; 275 testes ok; modo médio +3 a +8 chamadas.
+- Decisão pendente: bonde (Sketchfab Standard) e pintura amarela; lugares e frequência dos trens; som do trem (2 sons ElevenLabs propostos).
