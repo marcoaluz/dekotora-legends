@@ -209,3 +209,7 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: docs/ANALISE_ROAD_PONTES.md, docs/INVENTARIO_MODELOS.md, docs/STATUS.md, docs/capturas_t159/, blender/scripts/inspect_model.py
 - Validação: merge na main sem conflito; folhas conferidas pelo coordenador.
 - Decisão pendente: licença do túnel e demais; postes com fios; viaduto cruzando por cima; semáforo do túnel ligado aos eventos ou só enfeite. Aviso: pastas de terceiros movidas para docs/Modelos/ (T-162 corrige os caminhos).
+
+## 2026-10-20 · T-162 · ajudante-rapido · CONCLUÍDA
+- Feito: caminhos padrão de 12 scripts (Blender e tools) apontam para docs/Modelos/<pasta>, com volta ao caminho antigo se o novo não existir; STATUS e skill blender-pixelart atualizados; coordenador corrigiu o exemplo em PIPELINE_ARTE_BLENDER.md (commit 8db8af6).
+- Validação: py_compile e bash -n ok; arquivos esperados existem em docs/Modelos/. Docs históricos (DECISOES, INVENTARIO, LICENCAS) mantêm o caminho antigo como registro.

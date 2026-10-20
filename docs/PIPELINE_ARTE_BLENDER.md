@@ -135,7 +135,7 @@ Os modelos de terceiros de `docs/Novas Melhorias/` (fora do Git) viram peças re
 | --- | --- |
 | `build_roadside_kit.py` | `game/assets/scenery/kit/*.glb` (só geometria + UV, materiais pelo nome) e `game/assets/textures/kit/*.png` (barreira, metal da placa, treliça) |
 
-Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<pasta>/docs/Novas Melhorias" [--preview]`.
+Comando: `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "<pasta>/docs/Modelos/Novas Melhorias" [--preview]`.
 Depois `godot --headless --path game --import`. Ver `.claude/skills/blender-pixelart/SKILL.md` (seção T-146).
 
 ## Paleta
