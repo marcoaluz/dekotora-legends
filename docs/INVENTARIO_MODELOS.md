@@ -190,3 +190,27 @@ Todas as texturas novas são comprimidas na VRAM (S3TC no PC, ETC2/ASTC no Andro
 | Carreta do Kenworth W990 | Pode virar uma carreta no trânsito lento (pesada: precisa reduzir muito) |
 | Bonde no menu | O fundo "B rodovia" da tela inicial pode ganhar a ferrovia com o bonde passando (falta o Marco escolher o fundo do menu, T-138) |
 | Trem na garagem/posto | Não faz sentido (não há trilho perto da garagem); fica só na estrada |
+
+
+---
+
+# T-159 (2026-10-20): `docs/Modelos/Road_pontes/` (ponte, "outdoor", rodovia e túnel) — só análise
+
+Pedido do Marco: "analise estes novos modelos que podemos implementar no jogo, como ponte, outdoor, rodovia e túnel".
+**Nada entrou no jogo.** Análise completa, folhas de prévia e a tabela "O que fazer" em **`docs/ANALISE_ROAD_PONTES.md`**
+(folhas em `docs/capturas_t159/`). Medido com o script novo `blender/scripts/inspect_model.py` (só lê o original).
+
+**Mudança de lugar:** as pastas de terceiros agora ficam todas em **`docs/Modelos/`** (`Modelos Melhorados`, `Novas
+Melhorias`, `Novos modelos` e `Road_pontes`). A pasta continua fora do Git (`.gitignore`: `docs/Modelos/`).
+
+| Pasta / arquivo | O que é de verdade | Triângulos | Texturas | Textos/marcas reais? | Recomendação |
+| --- | --- | --- | --- | --- | --- |
+| `Outdor/Highway+sign.fbx` | **Pórtico de placas** de rodovia dos EUA (não é outdoor de propaganda): 2 colunas, treliça de 8,8 m de vão com passarela, 3 placas e 4 luminárias; só ~3,9 m livres embaixo | 177 mil | embutidas: 3 placas (até 643 px) + metal Textures.com 1024 | **Sim**: fotos de placas reais da Califórnia (I-5, US-99, CA-134, Los Angeles, Pasadena) | Não usar (já temos pórticos e outdoors da T-146) |
+| `Ponte/bridge_model.*` (FBX certo; OBJ 10x menor) | **Viaduto de concreto** curvo de 560 m, pista simples de 2 faixas de mão dupla, 15 pilares únicos em "T", mureta com corrimão, 14 postes; projeto vietnamita ("Cau Vinh") | 414 mil (328 mil nos postinhos do corrimão; pilar 694 cada) | embutidas no FBX: asfalto/tijolo 1024, concreto 512, ladrilho 225 | Não | **Pilar em "T"** nas pontes/viadutos (alta); ponte inteira como viaduto cruzando por cima da pista (média, decisão do Marco) |
+| `Outra ponte/Bridge.*` (FBX, OBJ, ABC iguais; DAE não abre) | **Ponte pênsil** europeia antiga de 155 m, tabuleiro de 4,8 m (1 faixa), torres de ferro e lampiões | 636 mil | 10 soltas de 2048 px (não ligadas ao modelo), origem não identificada | Não | Não usar |
+| `road/` (CGTrader, "Trim Sheet") | **Kit de beira de estrada**: poste de energia de madeira de 11 m com isoladores e 3 fios, 2 guard-rails em "W" de 4,36 m, 3 placas do Reino Unido, piso e terra | 14 mil | 21 de 2048 px (PBR) + sujeira 8192 px | Placas estilo Reino Unido ("30"), sem nomes | **Guard-rail em "W"** com a textura (alta); **postes com fios** pintados de concreto (média, decisão do Marco) |
+| `Tunel/` (.blend, .fbx, .obj, .stl iguais) | **O mesmo `Tunnel.obj` da T-130** (mesmos 104.814 triângulos, 13 objetos, 19 materiais, mesmo tamanho de arquivo): túnel reto de 2 faixas, 193 x 10,9 x 7,5 m, calçadas com corrimão, eletrocalha, 3 pórticos de semáforo de faixa. O `.blend` agora traz as texturas | 105 mil | concreto ambientCG 2048 (CC0), asfalto Textures.com 1024, foto Pixabay do semáforo | Não | Só como referência: **semáforos de faixa** e calçada com corrimão feitos por código no nosso túnel curvo (média) |
+
+**Licença:** nenhuma pasta tem arquivo de licença; só o `road` traz o nome da CGTrader. Nada contradiz "Royalty Free
+License (no AI)" nem pede crédito. Texturas de terceiros que vieram dentro (Textures.com, Pixabay) **não** devem ser
+copiadas; as propostas usam as nossas. **Falta o Marco confirmar** a licença do túnel (ficou fora na T-130) e dos outros.
