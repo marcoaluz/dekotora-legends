@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Folhas lado a lado da T-155 (antes | depois) a partir de docs/capturas_t155/antes e depois.
 # Uso (raiz do projeto): bash tools/sheet_t155.sh [DESTINO] [antes|depois|par]
+# Precisa de todas as capturas: gere antes com tools/capture_t155.sh (no repositorio ficam so as folhas e 10 por lado).
 #   par (padrao) = antes | depois em cada linha; antes/depois = so uma pasta, 2 por linha.
 GODOT="${GODOT:-/d/DEV/Godot/Godot_v4.7.2-stable_win64.exe}"
 ROOT="$(pwd)/docs/capturas_t155"
 DST="${1:-$ROOT}"
+case "$DST" in /*|?:*) ;; *) DST="$(pwd)/$DST" ;; esac   # o Godot roda com --path game: caminho absoluto
 MODE="${2:-par}"
 mkdir -p "$DST"
 sheet() {  # nome, largura, imagens...
