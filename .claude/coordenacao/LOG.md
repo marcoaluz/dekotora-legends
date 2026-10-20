@@ -191,3 +191,9 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-20 · T-160 · ajudante-rapido · CONCLUÍDA
 - Feito: seção "Acabamento (T-155)" na skill godot-dekotora e item (g) do carro batido na blender-pixelart (commit 493abb6).
+
+## 2026-10-20 · T-156 · especialista · CONCLUÍDA (PRECISA DECISÃO do Marco)
+- Feito: abertura "frente a frente" antes da largada (área de descanso/pedágio pela hora do dia, caminhões reais, detalhes + faixa, VS com tambor, alinhamento, pular, revanche curta); campanha 1x1; grid lado a lado a 30 m; comboio online (3–4 = trânsito mais leve); protocolo 6 com relógio comum; rival não prende no acostamento.
+- Arquivos: road3d/duel_{plan,intro,stage,shots,cards}.gd, ui/duel_band.gd, sim/start_grid.gd, sim/bot_driver.gd, net/*, race_scene_3d.gd, tests/test_duel_*.gd, docs/capturas_t156/
+- Validação: merge na main sem conflito; 292 testes ok; net_test 0 ms e 150 ms + 2% PASSOU (coordenador rodou de novo depois do merge); capturas conferidas.
+- Decisão pendente: dificuldade do rival no 1x1 (bot-jogador venceu 7/18, antes 10/18), corrida rápida com 4, falas/nomes/brasão, ouvir vs_taiko_hit. APK novo (protocolo 6).
