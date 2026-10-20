@@ -154,6 +154,12 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
+  em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer
+  os postes de energia com fios e o viaduto cruzando por cima da pista; o semáforo de faixa do túnel deve acompanhar os
+  eventos? Atenção: as pastas de terceiros agora estão em `docs/Modelos/`; os scripts de geração ainda procuram em
+  `docs/Modelos Melhorados`, `docs/Novas Melhorias` e `docs/Novos modelos` (passe o caminho novo nos argumentos).
+
 - **T-156 (abertura frente a frente, campanha 1 contra 1):** jogar um frete e ver a cena (um toque pula); olhar
   `docs/capturas_t156/` (`dia` = praça de pedágio, `noite`/`tarde` = área de descanso, `curta` = revanche, `comboio` =
   4 caminhões) e dizer: (1) se gosta do cenário, da faixa, das falas (texto em `game/data/i18n/pt-BR.json`,
