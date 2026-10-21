@@ -21,7 +21,9 @@ Saida (deterministica): game/assets/scenery/kit/*.glb, game/assets/textures/kit/
 blender/renders/t163/contact_sheet.png (com --preview). Os numeros que o jogo precisa (altura do leque, pontos dos
 fios) sao impressos no fim e ficam como constantes em game/scripts/road3d/pier_t.gd e power_lines_3d.gd.
 
-Uso: blender -b --factory-startup -P blender/scripts/build_road_pontes_kit.py -- [--src "PASTA/docs/Modelos/Road_pontes"] [--preview]
+Uso: blender -b --factory-startup -P blender/scripts/build_road_pontes_kit.py -- [--src "PASTA/docs/Modelos/Road_pontes"]
+     [--pole-src "PASTA/docs/Modelos/poste/Utility_pole.blend"] [--preview]
+T-169: com o poste novo (`docs/Modelos/poste/`), a coluna usa o perfil dele e ganha a caixa e o suporte em U dele.
 """
 from __future__ import annotations
 
@@ -60,9 +62,12 @@ POLE_R0, POLE_R1 = 0.21, 0.13   # raio no pe e no topo (concreto conico)
 # ---------------------------------------------------------------- argumentos
 def args() -> dict:
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"src": os.path.join(ROOT, "docs", "Modelos", "Road_pontes"), "preview": "--preview" in a}
+    out = {"src": os.path.join(ROOT, "docs", "Modelos", "Road_pontes"), "preview": "--preview" in a,
+           "pole_src": os.path.join(ROOT, "docs", "Modelos", "poste", "Utility_pole.blend")}
     if "--src" in a:
         out["src"] = a[a.index("--src") + 1]
+    if "--pole-src" in a:                       # T-169: poste de concreto novo (coluna, caixa e suporte em U)
+        out["pole_src"] = a[a.index("--pole-src") + 1]
     return out
 
 
@@ -328,7 +333,90 @@ def _cyl(bm, c: Vector, r0: float, r1: float, h: float, sides: int, col, cap: bo
     paint(bm, faces, col)
 
 
-def build_pole(src: str, report: list) -> list:
+def _new_pole_parts(path: str) -> dict:
+    """T-169: do poste de concreto `docs/Modelos/poste/Utility_pole.blend` (Royalty Free, liberado pelo Marco) tira a
+    coluna (raio no pe e no topo, para 11 m de altura), a caixa cilindrica pendurada e o suporte em U de baixo. Os
+    feixes de cabos (24 m, 37 mil triangulos cada) e os cabos pretos saem: os fios sao feitos no jogo. Devolve as
+    medidas ja na escala do nosso poste (11 m), no sistema do poste original (cabos ao longo de X)."""
+    if not path or not os.path.isfile(path):
+        return {}
+    with bpy.data.libraries.load(path, link=False) as (s, d):
+        d.objects = list(s.objects)
+    src = [o for o in d.objects if o is not None and o.type == "MESH"][0]
+    bm = bmesh.new()
+    bm.from_mesh(src.data)
+    bm.transform(src.matrix_world)
+    mats = [m.name if m else "" for m in src.data.materials]
+    z0 = min(v.co.z for v in bm.verts)
+    cement = [v.co for f in bm.faces if mats[f.material_index] == "Cement" for v in f.verts]
+    top = max(c.z for c in cement)
+    k = POLE_H / (top - z0)
+    r0 = max(math.hypot(c.x, c.y) for c in cement if c.z < z0 + 1.0) * k
+    r1 = max(math.hypot(c.x, c.y) for c in cement if c.z > top - 1.0) * k
+    # ilhas pequenas de metal (caixa, suportes): caixa = a de 508 faces; suporte em U de baixo = alto e fino, ~9 m
+    bm.faces.ensure_lookup_table()
+    seen, boxes = set(), []
+    for f in bm.faces:
+        if f.index in seen or mats[f.material_index] != "Metal":
+            continue
+        st, grp = [f], []
+        seen.add(f.index)
+        while st:
+            g = st.pop()
+            grp.append(g)
+            for e in g.edges:
+                for h in e.link_faces:
+                    if h.index not in seen:
+                        seen.add(h.index)
+                        st.append(h)
+        co = [v.co for g in grp for v in g.verts]
+        lo = Vector([min(c[i] for c in co) for i in range(3)])
+        hi = Vector([max(c[i] for c in co) for i in range(3)])
+        boxes.append((len(grp), (lo - Vector((0, 0, z0))) * k, (hi - Vector((0, 0, z0))) * k))
+    bm.free()
+    for o in d.objects:
+        if o is not None:
+            bpy.data.objects.remove(o, do_unlink=True)
+    can = next((b for b in boxes if 300 < b[0] < 800 and (b[2] - b[1]).z > 0.3), None)
+    brackets = sorted((b for b in boxes if (b[2] - b[1]).z > 0.35 and (b[2] - b[1]).x < 0.05 and (b[2] - b[1]).length < 1.0),
+                      key=lambda b: b[1].z)
+    return {"r0": r0, "r1": r1, "can": can, "bracket": brackets[0] if brackets else None,
+            "tris": sum(b[0] for b in boxes), "scale": k}
+
+
+def _box_lohi(bm, lo: Vector, hi: Vector, col) -> None:
+    r = bmesh.ops.create_cube(bm, size=1.0)
+    c, s = (lo + hi) * 0.5, hi - lo
+    for vtx in r["verts"]:
+        vtx.co = Vector((c.x + vtx.co.x * s.x, c.y + vtx.co.y * s.y, c.z + vtx.co.z * s.z))
+    paint(bm, {f for vtx in r["verts"] for f in vtx.link_faces}, col)
+
+
+def _add_new_pole_hardware(bm, parts: dict) -> None:
+    """Caixa e suporte em U do poste novo. No original os cabos correm em X e o suporte sai em -Y; no nosso poste (ja
+    girado) os fios correm em Y: gira +90 graus (x, y) -> (-y, x)."""
+    rot = lambda v: Vector((-v.y, v.x, v.z))  # noqa: E731
+    def lohi(lo, hi):
+        a, b = rot(lo), rot(hi)
+        return Vector((min(a.x, b.x), min(a.y, b.y), lo.z)), Vector((max(a.x, b.x), max(a.y, b.y), hi.z))
+    if parts.get("can"):
+        _, lo, hi = parts["can"]
+        lo, hi = lohi(lo, hi)
+        _cyl(bm, Vector(((lo.x + hi.x) * 0.5, (lo.y + hi.y) * 0.5, lo.z)), (hi.x - lo.x) * 0.5, (hi.x - lo.x) * 0.5,
+             hi.z - lo.z, 6, TRANSFORMER)
+    if parts.get("bracket"):
+        _, lo, hi = parts["bracket"]
+        lo, hi = lohi(lo, hi)
+        t = 0.035                                                      # barra de ~3,5 cm (o original tem 2 cm)
+        far = lo.x if abs(lo.x) > abs(hi.x) else hi.x
+        x0, x1 = (min(0.0, far), max(0.0, far))
+        _box_lohi(bm, Vector((x0, -t, hi.z - t)), Vector((x1, t, hi.z)), STEEL)            # braco de cima
+        _box_lohi(bm, Vector((x0, -t, lo.z)), Vector((x1, t, lo.z + t)), STEEL)            # braco de baixo
+        _box_lohi(bm, Vector((far - t, -t, lo.z)), Vector((far + t, t, hi.z)), STEEL)      # barra de pe
+
+
+def build_pole(src: str, report: list, pole_src: str = "") -> list:
+    newp = _new_pole_parts(pole_src)
     objs = RK.load_objects(os.path.join(src, "road", "Model", "Model", "Models.blend"), ["Pylon_01", "Porcelain_1"])
     pylon = RK.evaluated_copy(objs["Pylon_01"], "pylon")
     pylon.faces.ensure_lookup_table()
@@ -394,7 +482,8 @@ def build_pole(src: str, report: list) -> list:
     bm.transform(Matrix.Translation(-pc))
     paint(bm, bm.faces[:], STEEL)
     bmesh.ops.dissolve_limit(bm, angle_limit=math.radians(3.0), verts=bm.verts[:], edges=bm.edges[:], delimit={"NORMAL"})
-    _cyl(bm, Vector((0, 0, 0)), POLE_R0, POLE_R1, POLE_H, 8, CONCRETE)
+    r0, r1 = (newp["r0"], newp["r1"]) if newp else (POLE_R0, POLE_R1)   # T-169: perfil da coluna do poste novo
+    _cyl(bm, Vector((0, 0, 0)), r0, r1, POLE_H, 8, CONCRETE)
     wires = []
     for _, lo, hi in sorted(stacks, key=lambda s: s[0].y):
         c = Vector(((lo.x + hi.x) * 0.5 - pc.x, (lo.y + hi.y) * 0.5 - pc.y, lo.z))
@@ -411,6 +500,8 @@ def build_pole(src: str, report: list) -> list:
         vtx.co = Vector((vtx.co.x * 0.9, 0.0 + vtx.co.y * 0.08 - 0.2, 7.6 + vtx.co.z * 0.08))
     paint(bm, {f for vtx in r["verts"] for f in vtx.link_faces}, STEEL)
     wires.append((0.45, -0.2, 7.45))
+    if newp:
+        _add_new_pole_hardware(bm, newp)
     bmesh.ops.triangulate(bm, faces=bm.faces[:])
     bm2 = bm.copy()
     ob = RK.mesh_obj("power_pole", bm, ["pole_concrete"])
@@ -424,7 +515,11 @@ def build_pole(src: str, report: list) -> list:
     ob2 = RK.mesh_obj("power_pole_tr", bm2, ["pole_concrete"])
     for o in objs.values():
         bpy.data.objects.remove(o, do_unlink=True)
-    report.append(("power_pole", "Pylon_01 1434 + Porcelain_1 7452 tri", RK.tri_count(ob)))
+    if newp:
+        print("NEW_POLE", json.dumps({"r0": round(newp["r0"], 3), "r1": round(newp["r1"], 3),
+                                      "metal_tris": newp["tris"], "scale": round(newp["scale"], 4)}))
+    report.append(("power_pole", "Pylon_01 1434 + Porcelain_1 7452 tri" + (" + poste novo" if newp else ""),
+                   RK.tri_count(ob)))
     report.append(("power_pole_tr", "(+ transformador)", RK.tri_count(ob2)))
     # pontos dos fios no sistema do Godot (x, y = altura, z = -y do Blender)
     print("POLE_WIRES", json.dumps([[round(x, 3), round(z, 3), round(-y, 3)] for x, y, z in wires]))
@@ -499,7 +594,7 @@ def main() -> None:
     report: list = []
     items = build_pier(a["src"], report)
     items += build_guardrail(a["src"], report)
-    items += build_pole(a["src"], report)
+    items += build_pole(a["src"], report, a["pole_src"])
     for name, objs in items:
         export(objs, name)
     for r in report:
