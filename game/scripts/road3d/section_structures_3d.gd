@@ -11,6 +11,7 @@ const DECK_DROP: float = 1.6              # = perfil da mureta com borda (RoadMe
 const WATER_Y: float = -1.2               # CityBuilder._add_ground (litoral)
 const FOOT_Y: float = -3.5                # pe dos pilares, dentro da agua
 const SLOPE_M: float = 14.0               # comprimento do aterro das cabeceiras
+const PIER_TOP_FRAC: float = 0.74         # T-163: topo do pilar em T = 74% da largura do tabuleiro (pega as 3 longarinas)
 const CONCRETE := Color(0.66, 0.65, 0.62)
 const DARK := Color(0.46, 0.45, 0.43)
 
@@ -51,6 +52,14 @@ func _piers(st: SurfaceTool, br: Vector2) -> void:
 		var c: float = (e.x + e.y) * 0.5
 		var w: float = e.y - e.x
 		var b := Basis(Vector3.UP, path.yaw_at(z))
+		if PontesKit.enabled() and PierT.available():         # T-163: pilar em T da Ponte A sob as longarinas
+			var top: float = _road_y(z) - DECK_DROP - 0.9
+			var foot: Vector3 = _pt(z, c, 0.0)
+			foot.y = FOOT_Y
+			PierT.append(st, foot, b, top - FOOT_Y, w * PIER_TOP_FRAC, CONCRETE)
+			counts["pier"] = int(counts.get("pier", 0)) + 1
+			z += PIER_EVERY
+			continue
 		var cap_top: float = -DECK_DROP - 0.45
 		_box(st, b, _pt(z, c, cap_top - 0.55), Vector3(w + 0.6, 1.1, 2.0), CONCRETE)        # viga de topo
 		var h: float = (_road_y(z) + cap_top - 1.1) - FOOT_Y

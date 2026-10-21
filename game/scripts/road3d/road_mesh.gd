@@ -26,6 +26,7 @@ const SEA_DROP: float = 1.6
 const DECK_CITY: float = 9.0                # altura do viaduto na cidade
 const SOUND_BLOCK_M: float = 300.0          # barreira de som em blocos alternados
 const LANE_W: float = 3.6
+const RAIL_LAT: float = BARRIER_IN + 0.34   # T-163: face dos postes do guard-rail em W do litoral (lamina em 13,28-13,32 m)
 const LANES: int = 3                        # 3 faixas de 3,6 m no meio (Lanes.X); o resto ate ROAD_HALF_WIDTH_M e acostamento
 ## Sub-faixas de uma faixa de rolamento (inicio em m, multiplicador de cor): trilhas de roda mais escuras.
 const LANE_BANDS: Array = [[0.0, 1.0], [0.5, 0.74], [1.15, 0.97], [2.45, 0.74], [3.1, 1.0]]
@@ -41,6 +42,7 @@ var _mats: Dictionary = {}
 var _deck: float = 0.0
 var _used: Dictionary = {}                  # SurfaceTool com algum vertice neste pedaco
 var _prof: PackedVector3Array = PackedVector3Array()   # T-153: perfil da pista no inicio de cada segmento (LaneSections.profile)
+var _wr_until: int = -1                    # T-163: ultimo segmento ja coberto pelo guard-rail em W (anel a cada 4 m)
 
 
 ## Altura do tabuleiro (viaduto) do cenario; 0 = estrada no chao.
@@ -136,7 +138,7 @@ func _make_materials() -> void:
 	rail.albedo_color = Color("#c4ccd8")
 	rail.metallic = 0.85
 	rail.roughness = 0.3
-	_mats["rail"] = rail
+	_mats["rail"] = rail if not PontesKit.enabled() else PontesKit.guardrail(tod)   # T-163: aco galvanizado do kit
 	var glass := StandardMaterial3D.new()         # barreira de som (acrilico translucido)
 	glass.albedo_color = Color(0.62, 0.8, 0.86, 0.22)
 	var fence: Texture2D = load(RoadsideKit.TEX + "truss_fence.png") as Texture2D if RoadsideKit.enabled() 		and ResourceLoader.exists(RoadsideKit.TEX + "truss_fence.png") else null
@@ -350,8 +352,16 @@ func _build_chunk(s0: int, s1: int) -> void:
 		_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -BARRIER_IN)        # grama do lado esquerdo
 		if coast:                                                           # lado do mar: guard-rail, grama curta e praia
 			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
-			_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.55, 0.85)
-			_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.3, 0.42)
+			if PontesKit.enabled():                                         # T-163: guard-rail em W, um anel a cada 4 m
+				if i >= _wr_until:
+					var j2: int = i + GuardrailW.STEP_SEGS
+					if j2 > s1 or narrowed(j2) or in_tunnel(float(i + 1) * Track.SEG_LEN, bridges):
+						j2 = j
+					GuardrailW.sweep(self, sts["rail"], i, j2, RAIL_LAT, RAIL_LAT, 1.0)
+					_wr_until = j2
+			else:
+				_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.55, 0.85)
+				_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.3, 0.42)
 			_strip(sts["ground"], i, j, BARRIER_IN, gw + COAST_GRASS)
 			_strip(sts["sand"], i, j, gw + COAST_GRASS, gw + COAST_GRASS + COAST_SAND, 0.0, -SEA_DROP)
 		else:

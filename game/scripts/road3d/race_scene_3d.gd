@@ -153,9 +153,13 @@ func _ready() -> void:
 	city.keep_out = RailwayLayout.keep_out(_rail.lines)
 	add_child(city)
 	city.build(path, 21, scenery, tod)
+	var power := PowerLines3D.new()                # T-163: postes de energia com fios (montanha, litoral)
+	add_child(power)
+	power.build(path, String(route.id) if route != null else "", scenery, tod, tunnels)
 	var side := Roadside3D.new()
 	add_child(side)
 	side.bridges = bridges
+	side.pole_runs = PowerLineLayout.corridors(power.poles)
 	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)

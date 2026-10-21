@@ -54,8 +54,11 @@ static func segment(rm: RoadMesh, sts: Dictionary, i: int, j: int, tunnel: bool,
 	var coast_rail: bool = rm.kind == &"coast" and not bridge and not tunnel
 	rm._barrier2(bst, i, j, pi.x, pj.x, -1.0, bcol, drop)
 	if coast_rail:                                                            # litoral em terra: guard-rail como no resto
-		rm._blade2(sts["rail"], i, j, pi.y + 0.3, pj.y + 0.3, 0.55, 0.85)
-		rm._blade2(sts["rail"], i, j, pi.y + 0.3, pj.y + 0.3, 0.3, 0.42)
+		if PontesKit.enabled():                                               # T-163: guard-rail em W
+			GuardrailW.sweep(rm, sts["rail"], i, j, pi.y + 0.34, pj.y + 0.34, 1.0)
+		else:
+			rm._blade2(sts["rail"], i, j, pi.y + 0.3, pj.y + 0.3, 0.55, 0.85)
+			rm._blade2(sts["rail"], i, j, pi.y + 0.3, pj.y + 0.3, 0.3, 0.42)
 	else:
 		rm._barrier2(bst, i, j, pi.y, pj.y, 1.0, bcol, drop)
 	if bridge or (old and rm._deck > 0.0):                                   # corrimao de metal em cima do guarda-corpo
