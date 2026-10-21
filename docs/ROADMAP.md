@@ -37,6 +37,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-155] (F4) Acabamento visual: mural aceso à noite (baú e graneleira), ficha da garagem sem corte, carro batido com rodas redondas, bocas de túnel abertas com muros listrados maiores, túnel antigo mais claro, STATUS do Android corrigido (concluída em 2026-10-19, `tests/test_mural_glow.gd`, `tests/test_tunnel_portals.gd`, `docs/capturas_t155/`)
 - [x] [T-154] (F3) Ferrovia ao lado da rodovia: trem de carga, bonde amarelo, viadutos de trem e bocas de túnel; só visual, sem sim nem rede (concluída em 2026-10-19, `tests/test_railway.gd`, `docs/capturas_t154/`)
 - [x] [T-156] (G1) Abertura "frente a frente" antes da largada (cheia ~9,4 s, curta 3 s), campanha 1 contra 1, grid lado a lado, comboio online 3–4 e protocolo 6 com relógio comum (concluída em 2026-10-20, `tests/test_duel_scene_flow.gd`, `docs/capturas_t156/`)
+- [x] [T-170] Som da seta (pisca de troca de faixa): tique-taque do relé sincronizado com a lâmpada (~1,5 Hz, começa aceso) e clique da alavanca a cada toque em < / >; 2 sons novos no ElevenLabs; só apresentação (concluída em 2026-10-20, `tests/test_turn_signal.gd`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)

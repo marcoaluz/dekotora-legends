@@ -207,3 +207,15 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - **Protocolo 6** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total`. Cada cliente toca a abertura pelo **relógio comum** do servidor: setup + ping/2 (`DuelPlan.online_elapsed`). Cliente e servidor precisam da mesma versão: gere o APK de novo.
 - Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo. O executor `tests/run_tests.gd` roda esses testes no 1º quadro, quando a árvore de cena já existe. Hoje: `tests/test_duel_scene_flow.gd`.
 - Regra para texto que cresce na tela (nome, fala, banner VS): desenhe em tamanho de fonte **fixo** e escale com `draw_set_transform` (ver `ui/duel_band.gd`). Cada tamanho de fonte novo cria um cache de textura; o VS chegou a criar +58 MB de memória de textura antes dessa correção.
+
+## Seta / pisca (T-170)
+
+- "Seta" no jogo = o pisca da troca de faixa (`TruckSim.signal_dir`, 1º toque liga, 2º troca). Não existe outro pisca.
+- Ritmo único: `SignalBlink` (`scripts/truck/signal_blink.gd`, 0,33 s aceso/apagado, começa aceso). Quem mostra ou toca
+  a seta (TruckNode, RaceHud, TurnSignalAudio) tem a sua instância e chama `update(signal_dir, SignalBlink.now())`
+  todo quadro; assim lâmpada, HUD e som andam juntos. Não use `Time.get_ticks_msec() / N % 2` para piscar a seta.
+- Som sincronizado com algo visual: toque um arquivo curto em cada borda (acende/apaga) em vez de um loop gerado,
+  cujo ritmo não bate. O clique da alavanca vem da borda de `TruckSim.tap_prev` (igual offline e online); contadores
+  como `lane_changes` podem contar duas vezes no cliente online (a reconciliação reaplica comandos).
+- Teste: `tests/test_turn_signal.gd` (`TurnSignalAudio.step(...)` com o relógio da simulação; fora da árvore só conta).
+- Nos testes, o `_ready` do AudioBus ainda não rodou: o barramento "SFX" pode não existir (o `bus` volta "Master").

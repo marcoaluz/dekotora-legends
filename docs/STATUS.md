@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-19**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-20**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -26,7 +26,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (292) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (300) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -153,6 +153,12 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-170 (som da seta):** jogar e tocar em < ou > (teclado A/D ou setas): deve ouvir o clique da alavanca e o
+  tique-taque enquanto a seta pisca (agora mais devagar, ~1,5 vez por segundo, e acende na hora do toque). Ouvir
+  `game/assets/audio/sfx/truck/turn_signal_tick.mp3` e `turn_signal_switch.mp3` (regerar: `python tools/gen_audio.py
+  --only turn_signal_tick --force`). **Decidir:** quer também um pisca manual (liga e fica ligado até desligar, com
+  botões/teclas próprios, ex. Q/E) ou o da troca de faixa basta? **Gerar o APK de novo** para ouvir no celular.
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer

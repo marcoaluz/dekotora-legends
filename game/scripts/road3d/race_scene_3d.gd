@@ -66,6 +66,7 @@ var _speed_fx: SpeedFx
 var _scrape_t: float = 0.0
 var _brake_fx: BrakeFx                  # T-144: fumaca dos pneus e marcas no asfalto na freada forte
 var _truck_sfx: Array[TruckSfx] = []    # T-144: buzina e freio de cada caminhao (os outros com volume pela distancia)
+var _turn_audio: TurnSignalAudio         # T-170: som da seta do jogador
 var _horns: Array[String] = []          # som de buzina de cada caminhao (peca instalada ou a basica)
 var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
@@ -284,6 +285,8 @@ func _setup_audio() -> void:
 		var horn: String = gs.installed_horn() if k == player and not online else (_horns[k] if k < _horns.size() else "")
 		sfx.setup(self if k == player else _trucks[k], k == player, horn)
 		_truck_sfx.append(sfx)
+	_turn_audio = TurnSignalAudio.new()          # T-170: tique-taque da seta e clique da alavanca (so do jogador)
+	_turn_audio.setup_from_bus(self, sim.trucks[player])
 
 
 ## Corrida online: monta os caminhoes do grid recebido do servidor (pecas, tinta, bots).
@@ -585,6 +588,7 @@ func _update_audio(dt: float) -> void:
 	_audio.update_events(sim.track.events, t.z + t.length * 0.5)
 	for k in _truck_sfx.size():
 		_truck_sfx[k].update(sim.trucks[k], dt)
+	_turn_audio.update(t)
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)

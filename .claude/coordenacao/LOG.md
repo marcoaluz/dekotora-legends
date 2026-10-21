@@ -213,3 +213,9 @@ Formato em `docs/AGENTES.md`.
 ## 2026-10-20 · T-162 · ajudante-rapido · CONCLUÍDA
 - Feito: caminhos padrão de 12 scripts (Blender e tools) apontam para docs/Modelos/<pasta>, com volta ao caminho antigo se o novo não existir; STATUS e skill blender-pixelart atualizados; coordenador corrigiu o exemplo em PIPELINE_ARTE_BLENDER.md (commit 8db8af6).
 - Validação: py_compile e bash -n ok; arquivos esperados existem em docs/Modelos/. Docs históricos (DECISOES, INVENTARIO, LICENCAS) mantêm o caminho antigo como registro.
+
+## 2026-10-20 23:40 · T-170 · especialista · PRECISA DECISÃO
+- Feito: som da seta. "Seta" já existia (pisca da troca de faixa: 1º toque em < / > liga, 2º troca); som ligado a ela: tique-taque do relé em sincronia com a lâmpada (SignalBlink, ~1,5 Hz, começa aceso) e clique da alavanca a cada toque. Lâmpadas e HUD no mesmo ritmo. 2 sons gerados no ElevenLabs. Sem botões/teclas novos (Q/E não criados), sem sim/rede.
+- Arquivos: game/scripts/truck/signal_blink.gd, game/scripts/audio/turn_signal_audio.gd, truck_node.gd, race_hud.gd, race_scene_3d.gd, game/assets/audio/sfx/truck/turn_signal_{tick,switch}.mp3, tests/test_turn_signal.gd, docs (AUDIO_ELEVENLABS, DECISOES, ROADMAP, STATUS), skill godot-dekotora.
+- Validação: run_tests 300/300; race3d --demo=lanes 600 quadros sem erro; menu abre (só o aviso comum "resources still in use at exit").
+- Decisão pendente: Marco quer também um pisca MANUAL (liga/desliga, botões próprios, Q/E) ou o da troca de faixa basta?
