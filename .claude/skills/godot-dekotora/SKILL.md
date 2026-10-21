@@ -286,6 +286,7 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   - `--no-poles`: tira só os postes de energia e os fios (`road3d/pontes_kit.gd`, `road3d/power_lines_3d.gd`).
   - `--no-overpass`: tira só o viaduto que cruza por cima (`road3d/overpass_3d.gd`).
   - `--no-lane-signals`: tira os semáforos de faixa dos túneis (`road3d/tunnel_signals_3d.gd`).
+- T-179: as montanhas ficam a 1–6 km; a câmera da corrida vê até `BackdropKit.CAMERA_FAR` (8 km; `--view-far=900` volta ao antigo) e o shader delas usa neblina própria (`fog_disabled`). Conferir o que o jogador vê de verdade (câmera de jogo, hora da rota, modo médio): `bash tools/capture_t179.sh PASTA` + `bash tools/sheet_t179.sh ANTES DEPOIS`. Capturas com `--cam` fixa e `--time` forçado (capture_t169) escondem problemas da corrida normal.
 - Onde configurar viadutos: `OverpassLayout.for_route(route_id)` em `game/scripts/road3d/overpass_layout.gd`. Devolve `[{z, angle}]` por rota (90 = perpendicular à pista). Hoje: `kanto_2_viaduct` (z 2050, 76°) e `kanto_3_mountain` (z 2580, 70°). O vão mínimo é a constante `CLEAR` (7,6 m).
 - Achar trecho reto para um viaduto novo: `godot --headless --path game -s res://tools_dev/find_overpass_spots.gd` (lista os z retos de cada rota).
 - Conferir um viaduto: `godot --headless --path game -s res://tools_dev/probe_overpass.gd -- --route=kanto_2_viaduct` (distância até a pista e vão livre a cada 10 m).

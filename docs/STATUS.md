@@ -26,7 +26,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (327) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (330) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
@@ -44,6 +44,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
 | Acabamento F4 (T-155) | capturas antes/depois `bash tools/capture_t155.sh PASTA [mural\|ficha\|batido\|tunel]` e folhas `bash tools/sheet_t155.sh` (em `docs/capturas_t155/`); custo `bash tools/measure_t155.sh`; carro batido `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model wreck --wreck-dir "<pasta principal>/docs/Modelos/Novas Melhorias"` |
 | Cenário novo T-169 (+T-163/T-164) | gerar: `blender -b --factory-startup -P blender/scripts/build_backdrop_kit.py -- --snow-src "<pasta principal>/docs/Modelos/Fundo Montanha Gelo/sNOWlaNDSCAPE.fbx" --water-src "<...>/docs/Modelos/Agua/Water_Pack_Ozero.blend" [--preview]`, `build_tree_kit.py -- --src "<...>/docs/Modelos/Arvore"`, `build_road_pontes_kit.py -- --src "<...>/docs/Modelos/Road_pontes" --pole-src "<...>/docs/Modelos/poste/Utility_pole.blend"`; capturas `GODOT=... bash tools/capture_t169.sh PASTA [filtro] [--no-backdrop --no-pontes-kit --no-lane-signals]`; custo `bash tools/measure_t169.sh [quadros] [day\|night]`; corrida: viaduto `-- --route=kanto_2_viaduct --start=1950` ou `--route=kanto_3_mountain --start=2480`; semáforo com X `--route=kanto_2_viaduct --start=975 --event=works:3@1180+170`; desligar: `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals`; testes `-- --only=scenery_t169`; onde cabe viaduto `-s res://tools_dev/find_overpass_spots.gd` |
+| Montanhas visíveis (T-179) | capturas com a câmera do jogo, hora da própria rota e modo médio: `GODOT=... bash tools/capture_t179.sh PASTA [filtro]` (corrida rápida, litoral, viaduto, montanha); folhas antes/depois `bash tools/sheet_t179.sh ANTES DEPOIS` (em `docs/capturas_t179/`); `--view-far=900` volta à câmera antiga; testes `-- --only=scenery_t179` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -156,6 +157,12 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-179 (2026-10-21): montanhas nevadas agora aparecem.** Estavam no APK, mas do avesso (escuras, "lâminas"), cortadas
+  pela câmera (900 m) e apagadas pela neblina; ver `docs/DECISOES.md` (T-179). Olhar `docs/capturas_t179/` (esquerda =
+  antes, direita = depois): `folha_montanha_dia`, `folha_litoral_tarde`, `folha_cidade_noite`. **Gerar o APK de novo**
+  (protocolo de rede igual) e jogar o 1º frete (litoral): montanhas com neve atrás dos prédios, à esquerda; a corrida
+  rápida (cidade à noite): cordilheira azulada com neve acima dos prédios. Dizer se a quantidade/tamanho está bom.
+  O `builds/dekotora.exe` (PC) é de 17/10: **não tem nada da T-169**; para o PC use o Godot ou exporte de novo.
 - **T-169 (2026-10-21): modelos de `docs/Modelos` aplicados (+ T-163 e T-164).** Olhar `docs/capturas_t169/` (folhas `folha_*.png`: esquerda = antes, direita = depois) e dizer: (1) se gosta das **montanhas nevadas** no horizonte (quantidade, altura; neve cheia na montanha, só nos picos no litoral/cidade); (2) da **árvore de folhas** (cidade, 25% da montanha, 20% do litoral do lado da terra); (3) do **viaduto rodoviário por cima** (cidade 2.050 m, montanha 2.580 m) e dos **semáforos de faixa** nos túneis (X vermelho quando um evento fecha a faixa à frente; quer também a seta amarela?); (4) do mar com as ondas novas, dos postes com fios, do guard-rail em W e do pilar em T. Como testar no PC: `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --start=2400` (montanhas, postes, viaduto) e `--route=kanto_2_viaduct --start=950` (túnel com semáforos). **Gerar o APK de novo** para ver no celular (nenhuma mudança de protocolo de rede).
 - **T-171 (garagem: prévia antes de comprar + pneu sobre o chão):** gerar o APK de novo e, na GARAGEM > DECORAÇÃO, tocar
   num encaixe (ex.: Para-choque frontal) e depois num cartão de peça que você não tem: a peça aparece no caminhão, a

@@ -441,3 +441,27 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - **Pendente do Marco**: ouvir (garagem > MECÂNICA > OUVIR, ou `audio_backup/t178_previas_ouvir/antes|depois`) e dizer
   qual som ainda não está bom.
 
+## 2026-10-21 — T-179: montanhas nevadas e árvores da T-169 não apareciam na corrida — CORRIGIDO
+
+- **Pergunta do Marco**: "os itens que coloquei (montanha, árvores...) não foram implementados?". Estavam no jogo e no APK
+  (conferido dentro do `kaido-bakuso-debug.apk` de 2026-10-21 e num `.pck` exportado), mas **não se viam**:
+  1. **Bug**: os 4 maciços (`mountain_a..d.glb`) saíram **do avesso** do Blender (`recalc_face_normals` numa casca aberta
+     escolheu "para baixo"; 899 de 899 triângulos virados para baixo). O jogo mostrava o lado de dentro da encosta de trás:
+     escuro, sem neve, parecendo "lâminas rasgadas". Corrigido em `build_backdrop_kit.py` e regerado.
+  2. **Bug**: a câmera da corrida via só até **900 m** e os maciços ficavam a 0,6–1,2 km: o fundo deles era cortado.
+     Agora `_cam.far = BackdropKit.CAMERA_FAR` (8 km). Custo medido no PC (modo médio, 6 pontos, noite): chamadas e
+     triângulos iguais, FPS no ruído (com near de 0,2 m a precisão de profundidade quase não depende do "far").
+     Depuração: `--view-far=900` volta ao antigo.
+  3. **Visual (ajustado)**: a neblina do jogo (feita para 300–600 m) apagava as montanhas na tarde (litoral) e na noite
+     (cidade). O shader da montanha tem neblina própria leve (`fog_disabled`; no máximo 35% de dia/noite e 50% na tarde) e
+     a neve brilha um pouco à noite (luar).
+  4. **Visual (ajustado)**: eram poucos maciços, pequenos e perto (6 na cidade, escondidos atrás dos prédios). Agora é
+     uma cordilheira: 18 (montanha), 12 (litoral, lado da terra), 12 (cidade e corrida rápida); 1,6–3 km de largura, pé
+     a 0,9–2 km da pista; modo baixo = metade. Neve: montanha cheia; litoral/cidade nas encostas altas (0,8; antes 0,45 =
+     só as pontas). Continuam 4 chamadas de desenho no total.
+  5. **Árvore de folhas**: já aparecia no litoral e na montanha, mas era minoria; agora 35% (antes 20% no litoral e 25%
+     na montanha). Na cidade a pista é elevada e as árvores ficam lá embaixo (de noite quase não se veem): sem mudança.
+- Viaduto por cima (2.050 m da cidade, 2.580 m da montanha), semáforos de faixa (túneis), postes com fios (litoral e
+  montanha), guard-rail em W e mar com ondas **já apareciam**; viaduto e semáforos só existem nesses pontos/rotas.
+- **Para o Marco confirmar**: quantidade, tamanho e neve das montanhas (`docs/capturas_t179/`).
+

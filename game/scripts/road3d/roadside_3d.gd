@@ -98,18 +98,19 @@ func _off_wires(z: float, xu: float, base: Vector3, deck: float) -> Vector3:
 	return base
 
 
-## T-169: com o kit, a arvore de folhas (Gleditsia, BackdropKit) entra no lugar da redonda na cidade, em 25% da
-## montanha (entre os pinheiros) e em 20% do litoral do lado da terra. Um sorteio so (a sequencia nao muda).
+## T-169: com o kit, a arvore de folhas (Gleditsia, BackdropKit) entra no lugar da redonda na cidade, em 35% da
+## montanha (entre os pinheiros) e em 35% do litoral do lado da terra (T-179: eram 25% e 20%, quase nao se notava).
+## Um sorteio so (a sequencia nao muda).
 func _tree_model(kind: StringName, rng: RandomNumberGenerator, xu: float = 0.0) -> String:
 	var r: float = rng.randf()
 	var leafy: bool = BackdropKit.tree_available()
 	match kind:
 		&"coast":
-			if leafy and xu < 0.0 and r >= 0.8:
+			if leafy and xu < 0.0 and r >= 0.65:
 				return "tree_leafy"
 			return "palm" if r < 0.7 else "bush"
 		&"mountain":
-			if leafy and r >= 0.55 and r < 0.8:
+			if leafy and r >= 0.45 and r < 0.8:
 				return "tree_leafy"
 			return "tree_pine" if r < 0.8 else "rock"
 	return "tree_pine" if r < 0.45 else (("tree_leafy" if leafy else "tree_round") if r < 0.85 else "bush")

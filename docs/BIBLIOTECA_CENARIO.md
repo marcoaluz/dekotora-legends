@@ -8,7 +8,7 @@ Custo = triângulos por cópia e chamadas de desenho (modo médio). Todas só vi
 
 | Peça | Arquivo | Custo | Onde liga / como escolher | Desliga |
 | --- | --- | --- | --- | --- |
-| Montanhas nevadas (4 maciços) | `assets/scenery/backdrop/mountain_a..d.glb` | 899 tri cada; 4 chamadas no total | `CityBuilder._massifs` (quantidade por cenário; neve por `BackdropKit.snow_for`) | `--no-backdrop` |
+| Montanhas nevadas (4 maciços) | `assets/scenery/backdrop/mountain_a..d.glb` | 899 tri cada; 4 chamadas no total | `CityBuilder._massifs` (T-179: `MASSIF_COUNT` 18/12/12, `MASSIF_W` 1,6–3 km, `MASSIF_FOOT` 0,9–2 km; neve por `BackdropKit.snow_for`; neblina própria `HAZE_MAX`; a câmera precisa ver até `BackdropKit.CAMERA_FAR`) | `--no-backdrop` (`--view-far=900` = câmera antiga) |
 | Cones de montanha (antigo) | por código | 14 tri cada; 1 chamada | `CityBuilder._mountains` (sem o kit) | — |
 | Mar com ondas | `assets/textures/backdrop/water_waves_nrm.png` | 1 chamada (plano) | `CityBuilder._add_ground` (cenário `coast`) | `--no-backdrop` |
 | Skyline do outro lado da baía | por código | MultiMesh | `CityBuilder.build` (litoral) | — |
@@ -17,7 +17,7 @@ Custo = triângulos por cópia e chamadas de desenho (modo médio). Todas só vi
 
 | Peça | Arquivo | Custo | Onde liga | Observação |
 | --- | --- | --- | --- | --- |
-| Árvore de folhas (Gleditsia) | `assets/scenery/tree_leafy.glb` + `textures/backdrop/tree_leafy_leaves.png` | 279 tri; 2 chamadas por bloco de 150 m | `Roadside3D._tree_model` | 6,5 m; recorte por alfa |
+| Árvore de folhas (Gleditsia) | `assets/scenery/tree_leafy.glb` + `textures/backdrop/tree_leafy_leaves.png` | 279 tri; 2 chamadas por bloco de 150 m | `Roadside3D._tree_model` (T-179: 35% no litoral, lado da terra, e na montanha) | 6,5 m; recorte por alfa |
 | Pinheiro, árvore redonda, palmeira, arbusto, pedra | `assets/scenery/tree_pine/tree_round/palm/bush/rock.glb` | 124–1.272 tri | `Roadside3D._tree_model`, `_extras` | — |
 
 ## Beira de estrada
