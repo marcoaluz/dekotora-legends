@@ -90,6 +90,7 @@ var path: TrackPath
 var tod: TimeOfDay
 var _deck: float = 0.0
 var keep_out: Array = []          # T-154: corredores da ferrovia sem predio ([a, b, meia_largura], RailwayLayout.keep_out)
+var zone: Vector2 = ScenicZone.NONE   # T-188: trecho-piloto (os predios de perto sao do CityBlocks la)
 
 
 func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city", tod_: TimeOfDay = null) -> void:
@@ -113,7 +114,12 @@ func build(path_: TrackPath, seed_: int = 21, kind: StringName = &"city", tod_: 
 				continue
 			if rng.randf() < _building_chance(kind):
 				var dist: float = rng.randf_range(95.0, 260.0) if kind == &"city" else rng.randf_range(140.0, 380.0)
+				var n0: Vector3i = Vector3i(blds.size(), lights.size(), signs.size())
 				_building(rng, zz, yaw, side, dist, 25.0, 110.0, blds, lights, signs, true)
+				if ScenicZone.contains(zone, zz, 120.0):    # T-188: CityBlocks/terreno no trecho (mesmo sorteio fora dele)
+					blds.resize(n0.x)
+					lights.resize(n0.y)
+					signs.resize(n0.z)
 		if kind == &"coast" and rng.randf() < 0.85:                 # skyline do outro lado da baia
 			var far: float = rng.randf_range(380.0, 560.0)          # dentro da neblina visivel
 			var h: float = _building(rng, zz, yaw, 1.0, far, 30.0, 170.0, blds, lights, signs, false)
@@ -278,9 +284,11 @@ func _massifs(rng: RandomNumberGenerator, kind: StringName) -> void:
 		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(w, w * rng.randf_range(0.8, 1.1), w))
 		groups[i % 4].append([Transform3D(b, c2), Color.WHITE])
 		massif_items.append(groups[i % 4].back())
-	var mat: ShaderMaterial = BackdropKit.mountain_material(tod, kind)
+	var t188: bool = ScenicZone.enabled()          # T-188: textura, normais suaves e perspectiva aerea (MassifLook)
+	var mat: ShaderMaterial = MassifLook.material(tod, kind) if t188 else BackdropKit.mountain_material(tod, kind)
 	for k in 4:
-		_multi(BackdropKit.mountain_mesh(k), groups[k], mat, false)
+		var mm: ArrayMesh = BackdropKit.mountain_mesh(k)
+		_multi(MassifLook.smooth(mm) if t188 else mm, groups[k], mat, false)
 		if get_child_count() > 0 and not groups[k].is_empty():   # a caixa do MultiMesh pode ficar toda alem da camera
 			(get_child(get_child_count() - 1) as GeometryInstance3D).extra_cull_margin = 2000.0
 	massif_count = count

@@ -50,3 +50,7 @@ Os demais modelos, texturas e sons são gerados pelo projeto (scripts em `blende
 
 **Nota (2026-10-20, T-166):** o Marco liberou o uso de todas as licenças dos modelos de terceiros ("podemos usar, pode usar sem preocupação").
 Vale para `Tunnel.obj`, `van.abc`, o túnel de `docs/Modelos/Road_pontes` e o bonde de Kaohsiung. Detalhes em `docs/DECISOES.md`.
+
+**T-188:** `assets/textures/scenic/` (detalhe do terreno, fachadas, cartões de árvore) é gerado por código
+(`blender/scripts/build_t188_textures.py`, numpy); `neon_atlas.png` é desenhado pelo Godot com a fonte Noto Sans JP
+(OFL, já listada) em `tools_dev/make_neon_atlas.gd`. Nada baixado.

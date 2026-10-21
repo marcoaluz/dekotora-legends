@@ -37,6 +37,8 @@ var tod: TimeOfDay
 var _blocks: Dictionary = {}            # indice do bloco -> Array [Transform3D, Color]
 var _font: Font
 var _kit: MeshBatch                     # porticos de trelica (null = caixas)
+var zone: Vector2 = ScenicZone.NONE      # T-188: trecho-piloto (placas do portico com o texto na textura)
+var _faces: AtlasQuads
 
 
 func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[Vector2], places: PackedStringArray) -> void:
@@ -77,6 +79,8 @@ func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[V
 		gz += 650.0
 	_markings(L, tunnels)
 	_commit()
+	if _faces != null:
+		_faces.commit()
 	if _kit != null:
 		_kit.commit(self)
 
@@ -136,10 +140,31 @@ func _gantry(z: float, places: PackedStringArray, k: int, L: float) -> void:
 		_box(z - 0.35, lat, 6.6, Vector3(6.8, 2.7, 0.14), Color("#0d6a3b", 0.12))   # na frente da viga (lado de quem chega)
 		_box(z - 0.43, lat, 6.6, Vector3(6.5, 2.4, 0.02), Color("#e8f0ea", 0.12))   # borda branca
 		_box(z - 0.45, lat, 6.6, Vector3(6.3, 2.2, 0.02), Color("#0d6a3b", 0.12))
+		if ScenicZone.contains(zone, z, 60.0) and SignAtlas.has("place_" + place):
+			_panel_faces(z - 0.48, lat, place, roundi(km + 6.0 * b))   # T-188: texto na textura (le de longe)
+			continue
 		var kanji: String = String(KANJI.get(place, place))
 		var romaji: String = String(ROMAJI.get(place, place))
 		_label(kanji, z - 0.48, lat, 7.0, 110, 0.011)
 		_label("%s  %d km" % [romaji, roundi(km + 6.0 * b)], z - 0.48, lat, 5.95, 56, 0.011)
+
+
+## T-188: panel text from the sign atlas (kanji + romaji of the place, distance in green digits + "km"). Mipmapped
+## texture instead of Label3D: readable from 300+ m (the labels vanished beyond 380 m and were thin up close).
+func _panel_faces(z: float, lat: float, place: String, km: int) -> void:
+	if _faces == null:
+		_faces = AtlasQuads.new()
+		add_child(_faces)
+		_faces.setup(load(SignAtlas.ATLAS) as Texture2D, AtlasQuads.level_for(tod))
+	var b := Basis(Vector3.UP, path.yaw_at(z))
+	var c: Vector3 = path.world_point(z, lat / Track.ROAD_HALF_WIDTH_M, 6.6)
+	_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(4.4, 1.65, 1.0)), c - b.x * 0.85 + b.y * 0.1), SignAtlas.uv("place_" + place))
+	var digits: String = str(km)
+	var x: float = 1.75 + 0.22 * (2 - digits.length())
+	for ch in digits:
+		_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(0.44, 0.88, 1.0)), c + b.x * x + b.y * 0.05), SignAtlas.uv("g" + ch))
+		x += 0.44
+	_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(0.6, 0.6, 1.0)), c + b.x * (x + 0.12) - b.y * 0.1), SignAtlas.uv("km"))
 
 
 func _label(text: String, z: float, lat_m: float, y: float, size: int, px: float) -> void:

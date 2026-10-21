@@ -91,6 +91,30 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	if tod == null:
 		tod = TimeOfDay.by_id(&"night")
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
+	var smat: ShaderMaterial = SkyDome.material(tod, fuji, q) if ScenicZone.enabled() else _old_sky(tod, fuji, q)
+	var sky := Sky.new()
+	sky.sky_material = smat
+	sky.radiance_size = Sky.RADIANCE_SIZE_64
+	var env := Environment.new()
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	_finish_env(env, tod, q)
+	var we := WorldEnvironment.new()
+	we.environment = env
+	parent.add_child(we)
+	var sun := DirectionalLight3D.new()
+	sun.light_color = tod.light_color
+	sun.light_energy = tod.light_energy
+	sun.rotation_degrees = tod.light_rotation
+	sun.shadow_enabled = q >= 2                  # sombra so no modo alto (no medio custava +50% de chamadas de dia)
+	sun.directional_shadow_max_distance = 90.0
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # 2 cortes em vez de 4: metade das chamadas de sombra
+	parent.add_child(sun)
+	return {"sun": sun, "env": env}
+
+
+## Ceu antigo (ate a T-187; --t188=off).
+static func _old_sky(tod: TimeOfDay, fuji: bool, q: int) -> ShaderMaterial:
 	var smat := ShaderMaterial.new()
 	var sh := Shader.new()
 	sh.code = SKY_SHADER
@@ -110,12 +134,10 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	smat.set_shader_parameter("fuji", 1.0 if fuji else 0.0)
 	smat.set_shader_parameter("fuji_color", Color("#1c2340").lerp(Color("#4a5a7a"), tod.day_amount))   # azul de distancia
 	smat.set_shader_parameter("snow", 0.4 + 0.6 * tod.day_amount)
-	var sky := Sky.new()
-	sky.sky_material = smat
-	sky.radiance_size = Sky.RADIANCE_SIZE_64
-	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	env.sky = sky
+	return smat
+
+
+static func _finish_env(env: Environment, tod: TimeOfDay, q: int) -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_energy = tod.ambient_energy
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
@@ -124,7 +146,7 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	env.fog_enabled = true
 	env.fog_light_color = tod.fog_color
 	env.fog_density = tod.fog_density
-	env.fog_sky_affect = 0.35
+	env.fog_sky_affect = 0.12 if ScenicZone.enabled() else 0.35   # T-188: o ceu novo ja tem a bruma do horizonte
 	env.adjustment_enabled = true
 	env.adjustment_saturation = tod.saturation
 	env.adjustment_contrast = tod.contrast
@@ -133,18 +155,6 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	env.glow_strength = 0.9
 	env.glow_bloom = tod.glow_bloom
 	env.glow_hdr_threshold = tod.glow_threshold
-	var we := WorldEnvironment.new()
-	we.environment = env
-	parent.add_child(we)
-	var sun := DirectionalLight3D.new()
-	sun.light_color = tod.light_color
-	sun.light_energy = tod.light_energy
-	sun.rotation_degrees = tod.light_rotation
-	sun.shadow_enabled = q >= 2                  # sombra so no modo alto (no medio custava +50% de chamadas de dia)
-	sun.directional_shadow_max_distance = 90.0
-	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # 2 cortes em vez de 4: metade das chamadas de sombra
-	parent.add_child(sun)
-	return {"sun": sun, "env": env}
 
 
 static func _create_indoor(parent: Node3D) -> void:

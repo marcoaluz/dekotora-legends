@@ -126,6 +126,8 @@ func _ready() -> void:
 	var road := RoadMesh.new()
 	add_child(road)
 	road.bridges = bridges
+	var zone: Vector2 = ScenicZone.zone(String(route.id) if route != null else "", path.track.length_m)   # T-188
+	road.bare = zone
 	road.build(path, scenery, tod, tunnels)
 	if not bridges.is_empty():
 		var structures := SectionStructures3D.new()  # T-153: pilares, longarinas e cabeceiras da ponte
@@ -133,6 +135,7 @@ func _ready() -> void:
 		structures.build(path, bridges, tod)
 	var furniture := RoadFurniture.new()
 	add_child(furniture)
+	furniture.zone = zone
 	furniture.build(path, scenery, tod, tunnels, route.places if route != null else PackedStringArray())
 	var signs := RoadSigns.new()                  # T-130: limites, avisos, chevrons, km, saida, tunel, pedagio
 	add_child(signs)
@@ -162,6 +165,10 @@ func _ready() -> void:
 	over.build(path, rid, tod, -1.2 - RoadMesh.deck_height(scenery), _rail.lines)
 	var city := CityBuilder.new()
 	city.keep_out = RailwayLayout.keep_out(_rail.lines) + over_out
+	var scenic := ScenicStretch.new()              # T-188: terreno, montanhas em camadas, quarteiroes, floresta
+	add_child(scenic)
+	scenic.build(path, rid, scenery, tod, zone, city.keep_out)
+	city.zone = zone
 	add_child(city)
 	city.build(path, 21, scenery, tod)
 	var power := PowerLines3D.new()                # T-163: postes de energia com fios (montanha, litoral)
@@ -175,6 +182,7 @@ func _ready() -> void:
 	side.pole_runs = PowerLineLayout.corridors(power.poles)
 	side.rails = _rail.lines                       # T-186: bosques fora da ferrovia, semente pela rota
 	side.route_seed = rid.hash()
+	side.field = scenic.field                      # T-188: arvores e pedras sobre o terreno novo
 	side.build(path, scenery, tod, tunnels)
 	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
 	_fx = Fx3D.new()
@@ -282,7 +290,7 @@ func _resolve_time_of_day() -> TimeOfDay:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--time="):
 			tid = StringName(a.substr(7))
-	return TimeOfDay.by_id(tid)
+	return AtmosTune.tune(TimeOfDay.by_id(tid))       # T-188: perspectiva aerea, luar, ceu novo (copia do preset)
 
 
 func _setup_audio() -> void:
@@ -963,7 +971,7 @@ func _print_surface_budget() -> void:
 		for m in c.find_children("*", "GeometryInstance3D", true, false) + ([c] if c is GeometryInstance3D else []):
 			if m is MeshInstance3D and (m as MeshInstance3D).mesh != null:
 				n += (m as MeshInstance3D).mesh.get_surface_count()
-			elif m is MultiMeshInstance3D and (m as MultiMeshInstance3D).multimesh.mesh != null:
+			elif m is MultiMeshInstance3D and (m as MultiMeshInstance3D).multimesh != null and (m as MultiMeshInstance3D).multimesh.mesh != null:
 				n += (m as MultiMeshInstance3D).multimesh.mesh.get_surface_count()
 		out[key] = int(out.get(key, 0)) + n
 	print("SUPERFICIES: ", out)

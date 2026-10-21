@@ -1,0 +1,14 @@
+T-188 etapa 1 — custo no trecho-piloto (PC do Marco, modo medio --quality=1, 1280x720, sem vsync, 2400 quadros,
+caminhao andando sozinho desde o inicio do trecho, eventos com semente 7). bash tools/measure_t188.sh 2400 day|night
+"antes" = MEASURE_EXTRA="--t188=off" (visual de ate a T-187).
+
+rota (inicio)            hora   FPS antes -> depois   chamadas antes -> depois   triangulos antes -> depois   textura MB
+litoral (650 m)          dia    312 -> 314            323 -> 326                 205.9 mil -> 215.9 mil       43.2 -> 44.3
+cidade (1.350 m)         dia    281 -> 276            386 -> 385                 259.6 mil -> 273.5 mil       46.9 -> 48.3
+montanha (1.150 m)       dia    283 -> 279            393 -> 403                 229.7 mil -> 244.0 mil       45.9 -> 46.4
+litoral (650 m)          noite  296 -> 287            330 -> 334                 206.4 mil -> 216.5 mil       43.2 -> 44.4
+cidade (1.350 m)         noite  247 -> 255            393 -> 392                 260.0 mil -> 273.9 mil       47.0 -> 48.3
+montanha (1.150 m)       noite  271 -> 263            401 -> 411                 230.1 mil -> 244.4 mil       45.9 -> 46.4
+
+Resumo: chamadas -1 a +10 (<= 2,5%), triangulos +10 a +14 mil (+5%), textura +0,5 a +1,4 MB, FPS -3% a +3% (ruido do PC).
+Nao medido no celular (sem aparelho nesta rodada).

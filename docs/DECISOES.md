@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-21 | **Cenário novo em UM trecho-piloto por rota (T-188, etapa 1) — AGUARDA APROVAÇÃO DO MARCO pelos prints.** Litoral 0,6–1,6 km, cidade 1,3–2,05 km, montanha 1,1–2,05 km (`ScenicZone`, `--t188=off|segment|all`, padrão `segment`): terreno com relevo e textura (grama em 3 tons, terra, rocha, copa de floresta, areia na costa, margem do outro lado da baía), montanhas em 3 camadas (morros perto, cordilheira do meio por código, maciços do horizonte com textura, normais suaves e perspectiva aérea), floresta nas encostas, quarteirões com calçada/ruas/telhados variados/8 fachadas/letreiros de neon com kanji (recuo ≥ 40 m do eixo), casas nos morros do litoral, pedras novas, placas do pórtico com texto na textura. **Global** (não dá para cortar por km): céu novo (estrelas pequenas, lua, nuvens com volume), luar azulado + brilho da cidade no horizonte à noite, neblina com a cor do horizonte; neve dos maciços do litoral/cidade 0,8 → 0,5 (para aparecer floresta). Texturas feitas por código (numpy/Blender e Noto Sans JP, OFL); nada baixado | Pedido do Marco (T-188). Custo medido no PC (modo médio): chamadas −1 a +10, triângulos +5%, textura +1,4 MB, FPS no ruído. Detalhes na seção "T-188" no fim |
 | 2026-10-21 | **Biblioteca de cenário inteira no jogo (T-186) — escolhas visuais A CONFIRMAR PELO MARCO.** Inventário completo de docs/Modelos em `docs/BIBLIOTECA_CENARIO.md`. Lá só existe UMA espécie de árvore (Gleditsia, 6 variações), UM poste de luz (dentro da Ponte A) e UM personagem (o boneco do pacote ROAD SIGNS): as 6 Gleditsias, o poste da Ponte A (`lamp_bridge`) e o boneco (`person`) entraram; coqueiros (3 formas), cedro, pinheiro, árvore redonda e arbusto são **por código**. Árvores em **bosques por bioma** (nunca em fila), 2 LODs, MultiMesh; poste antigo na praça do pedágio e no litoral, poste da ponte no viaduto, na serra e nas pontes; pessoas no pedágio, no viaduto por cima e na abertura do duelo; **retrato** do motorista (busto com a camisa na cor do caminhão) na faixa do duelo, para o jogador e o rival. Só visual. Canter (`canter.obj`) continua fora (extraído de outro jogo) | Pedido do Marco (T-186). Detalhes na seção "T-186" no fim |
 | 2026-10-21 | **Modelos novos e antigos de docs/Modelos aplicados (T-169, com T-163 e T-164).** Licença não é mais restrição (Marco). Entraram: **montanhas nevadas** no horizonte das 3 rotas no lugar dos cones (4 maciços do "Fundo Montanha Gelo", ~900 triângulos cada; neve cheia na montanha, só nos picos no litoral e na cidade; 16/10/6 maciços), **ondas do mar** (mapa de normais do pacote "Agua"), **árvore de folhas** (Gleditsia, 279 triângulos, 6,5 m: no lugar da árvore redonda na cidade, 25% na montanha, 20% no litoral do lado da terra), **poste** (coluna, caixa e suporte do poste novo no poste de energia da T-163), **pilar em T, guard-rail em W, postes com fios** (T-163), **viaduto rodoviário cruzando por cima** (cidade 2.050 m, montanha 2.580 m, seção da Ponte A) e **semáforos de faixa nos túneis** (seta verde / X vermelho ligados aos eventos, T-164). Tudo só visual; `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals` desligam. Escolhas de lugar e quantidade feitas pelo Claude: **confirmar** | Pedido do Marco (T-169) e decisões da T-159. Detalhes na seção "T-169" no fim |
 | 2026-10-21 | **Variedade de som do motor e buzinas (T-173) — números e sons A CONFIRMAR PELO MARCO.** (1) **O escapamento define o som do motor**: `exh_straight` (reto esportivo, rouco) = perfil `exh_rasp`; **novos** `exh_stack` (chaminés verticais, grave potente) = `exh_stack` e `exh_chrome_cut` (cromado cortado, estalos) = `exh_pop`; o escape padrão continua com os loops do próprio motor (`i6_std`/`i6_tuned`/`v8`). Cada perfil tem 3 loops (lenta, média, alta) que **substituem** os do motor; o motor só muda o tom (V8 ×0,9, 6 cil. preparado ×1,06). (2) **Turbina**: com turbo simples ou duplo toca o assobio do perfil (duplo 10% mais agudo e +2 dB) e o "pssh" do perfil ao soltar; no escape padrão, os sons de turbo antigos. (3) **Escapes novos na loja** (propostas, ver BALANCEAMENTO): chaminés +2% torque, +16 destaque, 28.000 ¥; cromado cortado +2,5%, +12, 22.000 ¥. As chaminés são só o som/estatística: **não montam** a peça visual `kw_exhaust_stacks` (ligar as duas é decisão pendente). (4) **Buzina escolhida na garagem** (aba MECÂNICA, seção BUZINA, **grátis**): automática (a da peça, como antes) ou uma das 6 (3 antigas + 3 novas: grave de navio, dupla de dois tons, musical dekotora). Vai no descritor de rede (`horn`, **protocolo 7**). (5) **Rivais offline**: motor/turbo/escape/buzina **sorteados só no som** (semente = rota + lugar no grid); a simulação deles não muda. Online: cada um ouve o motor e a buzina do descritor do outro (antes todos ouviam o 6 cilindros padrão). (6) A buzina de ar básica só sustenta ~0,3 s: o loop de "segurar" agora usa a janela medida de cada buzina (antes repetia silêncio). | Pedido do Marco ("3 de cada para validar"). 18 sons gerados no ElevenLabs, 627 créditos |
@@ -533,3 +534,38 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   faixa não ficar desigual (**confirmar**).
 - **Custo** (modo médio, dia, 6 pontos, sem vsync, `tools/measure_t186.sh`): chamadas +1 a +22 (≤ 6,5%), triângulos −0,7 a
   +15 mil, textura +0,7 a +1,0 MB, FPS 220–254 contra 229–271 (−1% a −10%, perto do ruído).
+
+## 2026-10-21 — T-188 (etapa 1): cenário novo num trecho de cada rota — PRECISA APROVAÇÃO DO MARCO
+
+- **Verificação das reclamações** (capturas `docs/capturas_t188/antes/`): montanhas "cones" já tinham virado maciços
+  nevados na T-169/T-179, mas facetados, iguais de dia e sem vegetação (verdade em parte); grama plana e lisa até o
+  horizonte (verdade); prédios flutuando sem base, mesma janela, alguns a 95 m do eixo e sobre o mar no litoral
+  (verdade); árvores: bosques mistos com 2 LODs já vinham da T-186, mas o "brinquedo" (pinheiro/arbusto por código)
+  continua (em parte); pedras = bloco cinza (verdade); estrelas = quadrados de ~7 px (verdade); noite preta (verdade);
+  placas do pórtico: tinham texto (Label3D), mas fino, apagado à noite e sumindo além de 380 m (em parte); sem
+  perspectiva aérea (verdade).
+- **Trecho-piloto** (`road3d/scenic_zone.gd`): litoral 600–1.600 m, cidade 1.300–2.050 m, montanha 1.100–2.050 m;
+  o relevo some suavemente em 140 m nas pontas. `--t188=off` volta tudo ao visual antigo (capturas/medidas);
+  `--t188=all` liga na rota inteira (só para teste; **não aprovado**).
+- **Terreno** (`terrain_field.gd` + `terrain_patch.gd`): grade alinhada à pista até 345 m; plano até 46 m (mureta,
+  árvores, postes, ferrovia a 36–40 m), depois morros (montanha até ~110 m, litoral ~50 m). Outra parte da rota ou
+  corredor de ferrovia/viaduto perto achata o chão (o morro nunca cobre pista). Textura: `terrain_detail.png` (512 px,
+  4 canais em tons de cinza) × cores no shader. À noite um "luar" de preenchimento (o céu escuro quase não ilumina).
+- **Montanhas em camadas**: morros (terreno) → cordilheira do meio por código a 0,6–1,3 km (`mountain_ridges.gd`,
+  1 chamada) → maciços do horizonte (`massif_look.gd`: normais e cor suavizadas, rocha com estratos, floresta embaixo,
+  neblina até a cor do horizonte). Floresta das encostas = cartões cruzados (4 triângulos) por MultiMesh.
+- **Cidade** (`city_blocks.gd`, `city_look.gd`, `neon_signs.gd`): quarteirões com calçada (base), ruas com faixa
+  tracejada, 1–4 prédios por quarteirão com recuo, parques, alturas crescendo para trás, 8 fachadas
+  (`facade_atlas.png`, janelas por andar de 3,5 m e vão de 3 m, térreo com lojas perto da pista), telhados com
+  platibanda, escalonados, caixa d'água, ar-condicionado, casa de máquinas, outdoor no telhado; letreiros de neon com
+  kanji (nomes fictícios, `tools_dev/make_neon_atlas.gd`). Primeira fileira a 44 m (direita) / 62 m (esquerda) do eixo.
+  Litoral: casas nos morros do lado da terra, com base de concreto que acompanha a encosta; skyline da baía agora
+  sobre uma margem de terra.
+- **Céu e noite** (`sky_dome.gd`, `atmos_tune.gd`, numa CÓPIA do `.tres`): estrelas de 1–2 px com brilho e cor
+  variados, via láctea fraca, lua com mares, nuvens com lado iluminado e barriga escura; dia com zênite mais azul e
+  horizonte enevoado; noite com luar azulado (0,85), horizonte azul com brilho de sódio da cidade, neblina na cor do
+  horizonte. `fog_sky_affect` 0,35 → 0,12 (o céu já tem a bruma).
+- **Escolhas do Claude a confirmar**: lugar e tamanho dos trechos; altura dos morros; neve dos maciços no
+  litoral/cidade 0,8 → 0,5; recuo dos prédios; quantidade de janelas acesas; nomes dos letreiros.
+- **Custo** (`tools/measure_t188.sh`, `docs/capturas_t188/custo.txt`): chamadas −1 a +10, triângulos +10 a +14 mil
+  (+5%), textura +0,5 a +1,4 MB, FPS −3% a +3% no PC. Celular não medido.

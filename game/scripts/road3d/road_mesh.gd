@@ -43,6 +43,7 @@ var _deck: float = 0.0
 var _used: Dictionary = {}                  # SurfaceTool com algum vertice neste pedaco
 var _prof: PackedVector3Array = PackedVector3Array()   # T-153: perfil da pista no inicio de cada segmento (LaneSections.profile)
 var _wr_until: int = -1                    # T-163: ultimo segmento ja coberto pelo guard-rail em W (anel a cada 4 m)
+var bare: Vector2 = ScenicZone.NONE         # T-188: trecho sem grama/areia (o TerrainPatch desenha o chao ali)
 
 
 ## Altura do tabuleiro (viaduto) do cenario; 0 = estrada no chao.
@@ -283,6 +284,10 @@ func profile(i: int) -> Vector3:
 	return _prof[mini(i, _prof.size() - 1)]
 
 
+func _bare(z: float) -> bool:
+	return z >= bare.x and z < bare.y
+
+
 func _hash(n: int) -> float:
 	return fmod(absf(sin(float(n) * 12.9898) * 43758.5453), 1.0)
 
@@ -343,13 +348,15 @@ func _build_chunk(s0: int, s1: int) -> void:
 			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
 			if not tunnel:
 				_barrier(sts["barrier"], i, j, BARRIER_IN, 1.0)
-			_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -bo, -_deck, -_deck)
-			_strip(sts["ground"], i, j, bo, bo + GRASS_WIDTH, -_deck, -_deck)
+			if not _bare(z):
+				_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -bo, -_deck, -_deck)
+				_strip(sts["ground"], i, j, bo, bo + GRASS_WIDTH, -_deck, -_deck)
 			if q >= 1 and sound_wall_at(z) and not tunnel:
 				for side in [-1.0, 1.0]:
 					_glass_blade(sts["glass"], i, j, side * (BARRIER_IN + 0.45), 0.85, 4.0)
 			continue
-		_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -BARRIER_IN)        # grama do lado esquerdo
+		if not _bare(z):
+			_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -BARRIER_IN)    # grama do lado esquerdo
 		if coast:                                                           # lado do mar: guard-rail, grama curta e praia
 			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
 			if PontesKit.enabled():                                         # T-163: guard-rail em W, um anel a cada 4 m
@@ -362,13 +369,15 @@ func _build_chunk(s0: int, s1: int) -> void:
 			else:
 				_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.55, 0.85)
 				_blade(sts["rail"], i, j, BARRIER_IN + 0.3, 0.3, 0.42)
-			_strip(sts["ground"], i, j, BARRIER_IN, gw + COAST_GRASS)
-			_strip(sts["sand"], i, j, gw + COAST_GRASS, gw + COAST_GRASS + COAST_SAND, 0.0, -SEA_DROP)
+			if not _bare(z):
+				_strip(sts["ground"], i, j, BARRIER_IN, gw + COAST_GRASS)
+				_strip(sts["sand"], i, j, gw + COAST_GRASS, gw + COAST_GRASS + COAST_SAND, 0.0, -SEA_DROP)
 		else:
 			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
 			if not tunnel:
 				_barrier(sts["barrier"], i, j, BARRIER_IN, 1.0)
-			_strip(sts["ground"], i, j, BARRIER_IN, bo + GRASS_WIDTH)
+			if not _bare(z):
+				_strip(sts["ground"], i, j, BARRIER_IN, bo + GRASS_WIDTH)
 	var mesh := ArrayMesh.new()
 	for k in ["road", "troad", "line", "yline", "ground", "barrier", "tbarrier", "sand", "rail", "glass"]:
 		var st: SurfaceTool = sts[k]

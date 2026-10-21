@@ -25,6 +25,7 @@ const TOLL_ZONE: Vector2 = Vector2(0.0, 420.0)   # T-186: o poste antigo fica na
 var rails: Array = []             # T-186: Array[RailLine] (Railway3D.lines): arvore fora da ferrovia paralela
 var route_seed: int = 0           # T-186: semente dos bosques (mesma rota -> mesmas arvores)
 var tree_count: int = 0           # T-186: quantas arvores foram plantadas (testes/medidas)
+var field: TerrainField           # T-188: chao do trecho-piloto (null = chao plano de antes)
 var _pool_mesh: PlaneMesh
 var _lamp_off: Dictionary = {}
 
@@ -99,6 +100,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 		elif name.begins_with("tree_leafy"):
 			var far: ArrayMesh = BackdropKit.tree_mesh_of(name + "_lod1", tod) if ResourceLoader.exists("%s%s_lod1.glb" % [DIR, name]) else null
 			_add_multi(BackdropKit.tree_mesh_of(name, tod), groups[key], null, far)
+		elif name == RockKit.MODEL:
+			_add_multi(RockKit.mesh(), groups[key], RockKit.material(tod))
 		elif name == "guardrail_w":
 			_add_multi(PontesKit.mesh("guardrail_w", PontesKit.guardrail(tod)), groups[key])
 		else:
@@ -167,10 +170,25 @@ func _tree_model(kind: StringName, rng: RandomNumberGenerator, xu: float = 0.0) 
 
 
 func _put(groups: Dictionary, model: String, t: Transform3D) -> void:
+	if field != null and (model == "rock" or model == "bush" or model.begins_with("tree") or model.begins_with("palm")):
+		var at: Vector3 = _on_terrain(t.origin, model == "rock")
+		if not is_nan(at.y):                           # T-188: no trecho-piloto, sobre o terreno novo (pedra nova)
+			t.origin = at
+			if model == "rock":
+				model = RockKit.MODEL
 	var key: String = "%s#%d_%d" % [model, int(floor(t.origin.x / CHUNK_M)), int(floor(t.origin.z / CHUNK_M))]
 	if not groups.has(key):
 		groups[key] = []
 	groups[key].append(t)
+
+
+## T-188: ponto no chao do trecho-piloto (y = NAN fora dele). Pedra afunda um pouco (nao fica "pousada").
+func _on_terrain(p: Vector3, sink: bool) -> Vector3:
+	var n: Vector3 = field.nearest(Vector2(p.x, p.z))
+	if n.x == INF or not ScenicZone.contains(field.zone, n.y):
+		return Vector3(p.x, NAN, p.z)
+	var h: float = field.height_at(Vector2(p.x, p.z))
+	return Vector3(p.x, h - (0.25 if sink else 0.05), p.z)
 
 
 ## Vegetacao extra fora da pista (arbustos ao pe da mureta, pedras na praia/encosta).
