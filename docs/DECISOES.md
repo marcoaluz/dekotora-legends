@@ -289,3 +289,12 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   nome do jogador; online o nome da sala), nome do caminhão (jogador: Ginga-maru 銀河丸, o andon dele; rivais: nomes
   novos), destaque calculado das peças e uma fala curta original em pt-BR.
 
+
+## 2026-10-20 — T-166: licenças dos modelos de terceiros liberadas pelo Marco
+
+- **Decisão do Marco (2026-10-20):** "todas [as licenças dos modelos de terceiros] podemos usar, pode usar sem preocupação".
+- Vale para: `Tunnel.obj` (T-130), `van.abc` (T-130), o túnel de `docs/Modelos/Road_pontes` (T-159), o bonde
+  `kaohsiung_circular_light_rail_caf_urbos_3` (T-154) e os demais modelos de terceiros.
+- Consequência: a parte de **licença** deixa de ser pendência. Continua valendo o que já está em `game/assets/LICENCAS.md`
+  (crédito do autor onde o arquivo indica) e a escolha de uso de cada item, que segue como pendência de design.
+- `Tunnel.obj` e `van.abc` não estão mais no PC (pasta Downloads vazia): para usá-los, o Marco precisa recolocá-los em `docs/Modelos/`.

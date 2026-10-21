@@ -38,3 +38,6 @@
 | Atlas de placas de veículo e de sinalização (T-130): desenhos nossos + texto na fonte Noto Sans JP (OFL, linha acima) | `assets/textures/plates_atlas.png`, `assets/textures/road_signs_atlas.png` | Gerados por `game/tools_dev/make_sign_atlases.gd`; números de placa e nomes de túnel inventados | Nosso (sem material de terceiros além da fonte) |
 
 Os demais modelos, texturas e sons são gerados pelo projeto (scripts em `blender/scripts/` e `tools/`) ou pelo Marco.
+
+**Nota (2026-10-20, T-166):** o Marco liberou o uso de todas as licenças dos modelos de terceiros ("podemos usar, pode usar sem preocupação").
+Vale para `Tunnel.obj`, `van.abc`, o túnel de `docs/Modelos/Road_pontes` e o bonde de Kaohsiung. Detalhes em `docs/DECISOES.md`.

@@ -213,3 +213,8 @@ Formato em `docs/AGENTES.md`.
 ## 2026-10-20 · T-162 · ajudante-rapido · CONCLUÍDA
 - Feito: caminhos padrão de 12 scripts (Blender e tools) apontam para docs/Modelos/<pasta>, com volta ao caminho antigo se o novo não existir; STATUS e skill blender-pixelart atualizados; coordenador corrigiu o exemplo em PIPELINE_ARTE_BLENDER.md (commit 8db8af6).
 - Validação: py_compile e bash -n ok; arquivos esperados existem em docs/Modelos/. Docs históricos (DECISOES, INVENTARIO, LICENCAS) mantêm o caminho antigo como registro.
+
+## 2026-10-20 · T-166 · ajudante-rapido · CONCLUÍDA
+- Feito: decisão do Marco (licenças de terceiros liberadas) registrada em DECISOES; STATUS atualizado (T-159, T-154, T-130 sem a parte de licença); nota em LICENCAS.md.
+- Arquivos: docs/DECISOES.md, docs/STATUS.md, game/assets/LICENCAS.md, .claude/coordenacao/LOG.md
+- Observação: Tunnel.obj e van.abc continuam fora do PC; o Marco precisa recolocá-los em docs/Modelos/ para uso. Nada apagado.

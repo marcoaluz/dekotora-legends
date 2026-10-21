@@ -155,7 +155,7 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 ## PENDENTE — precisa do Marco
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
-  em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer
+  em `docs/capturas_t159/`; ~~confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros~~ (licença LIBERADA pelo Marco em 2026-10-20, T-166); dizer se quer
   os postes de energia com fios e o viaduto cruzando por cima da pista; o semáforo de faixa do túnel deve acompanhar os
   eventos? Atenção: as pastas de terceiros agora estão em `docs/Modelos/`; os scripts de geração já procuram lá
   (`docs/Modelos/Modelos Melhorados`, `docs/Modelos/Novas Melhorias`, `docs/Modelos/Novos modelos`) e voltam para as pastas antigas se a nova não existir (T-162).
@@ -188,8 +188,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   litoral no fim da rota, viaduto antigo logo depois do acidente, túnel antigo nas curvas do começo da montanha), a
   lombada nova do litoral (para a ponte ficar alta), o nome fictício 湯坂隧道 e se o trecho deve esticar o prazo (hoje não:
   os bots perdem 1 a 3 s). **Gerar o APK de novo** (protocolo de rede 5).
-- **T-154 (ferrovia):** olhar `docs/capturas_t154/` (`antes_depois.png` primeiro) e dizer: (1) se o bonde do arquivo
-  `kaohsiung_circular_light_rail_caf_urbos_3` pode ser usado (licença Sketchfab Standard) e se gosta do amarelo; (2) se os
+- **T-154 (ferrovia):** olhar `docs/capturas_t154/` (`antes_depois.png` primeiro) e dizer: (1) se gosta do amarelo do bonde
+  `kaohsiung_circular_light_rail_caf_urbos_3` (a licença Sketchfab Standard está LIBERADA pelo Marco em 2026-10-20, T-166); (2) se os
   lugares das linhas e dos 2 viadutos de trem estão bons; (3) a frequência (1º trem ~10 s, depois a cada 22–40 s); (4) se quer
   som de trem (2 sons no ElevenLabs, ainda não gerados). Se você baixou um pacote de ferrovia, ele não está no PC: coloque em
   `docs/Modelos/Novas Melhorias/` e avise.
@@ -205,8 +205,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   e `menu_fundo_b.png`) e dizer se a câmera da garagem ficou perto o bastante.
 
 - **T-136:** olhar `docs/capturas_t136/comparacao_antes_depois.png` e dizer se o baú premium fica (e se vale estender aos baús leve/longo e ao Canter); conferir a chapa ondulada no celular (APK).
-- **T-130:** mandar o link e a licença de `Downloads\Tunnel.obj` e `Downloads\van.abc` (sem isso ficam fora do jogo; na T-154
-  a pasta Downloads estava vazia, os dois arquivos não estão mais no PC); olhar
+- **T-130:** a licença de `Tunnel.obj` e `van.abc` está LIBERADA pelo Marco em 2026-10-20 (T-166). Mas os dois arquivos
+  não estão mais no PC (pasta Downloads vazia): para usá-los, recoloque-os em `docs/Modelos/` e avise. Sem isso ficam fora do jogo. Olhar
   `docs/capturas_t130/` e dizer se as placas/sinais estão no tamanho certo.
 - ~~Instalar Android SDK + JDK 17~~ FEITO (ver "Ambiente" no topo; o APK de teste já sai). Falta **instalar e testar o APK no
   celular** (P02, P22, P65, P70, P72): o Android ainda não foi testado num aparelho.
