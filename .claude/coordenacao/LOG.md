@@ -218,3 +218,13 @@ Formato em `docs/AGENTES.md`.
 - Feito: decisão do Marco (licenças de terceiros liberadas) registrada em DECISOES; STATUS atualizado (T-159, T-154, T-130 sem a parte de licença); nota em LICENCAS.md.
 - Arquivos: docs/DECISOES.md, docs/STATUS.md, game/assets/LICENCAS.md, .claude/coordenacao/LOG.md
 - Observação: Tunnel.obj e van.abc continuam fora do PC; o Marco precisa recolocá-los em docs/Modelos/ para uso. Nada apagado.
+
+## 2026-10-20 22:51 · T-167 · ajudante-rapido · CONCLUÍDA
+- Feito: gen_audio --only nos 5 sons de T-139: já existiam (gerados em 2026-10-18, commit 04881bd); script não gastou créditos (0; total 61.135/131.000). Import do Godot rodou sem erro.
+- Arquivos: nenhum alterado (mp3 já versionados via LFS; nada para commitar)
+- Observação: sons de trem (T-154) não têm entradas no gen_audio.py, nada gerado. Os 5 sons podem ser ouvidos em game/assets/audio/sfx/.
+
+## 2026-10-20 22:56 · T-168 · ajudante-rapido · CONCLUIDA
+- Feito: sons de trem train_horn (3 s) e train_pass (6 s, loop) cadastrados na seção 4 e gerados no ElevenLabs.
+- Arquivos: docs/AUDIO_ELEVENLABS.md, game/assets/audio/sfx/ambient/train_horn.mp3 (+.import), game/assets/audio/sfx/ambient/train_pass.mp3 (+.import), .claude/coordenacao/LOG.md
+- Observação: gen_audio.py lê a lista da tabela do doc (não há lista no script). Créditos: 61.135/131.000 antes; contador de gasto mostrou 0, pode estar atrasado. Som ainda não ligado ao jogo.

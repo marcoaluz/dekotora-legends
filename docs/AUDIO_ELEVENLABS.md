@@ -103,6 +103,8 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `toll_gate.wav` | 2 s | Japanese highway toll gate electronic beep and barrier lifting |
 | `pass_car_whoosh.wav` | 1,5 s | Car passing very close at high speed, doppler whoosh |
 | `roadworks_loop.wav` | 5 s | Highway road works at night, diesel generator hum, distant jackhammer, faint warning beeps, seamless loop |
+| `train_horn.wav` | 3 s | Deep low-pitched freight train horn, single long blast, no music, no melody, isolated |
+| `train_pass.wav` | 6 s | Freight train passing at speed, steel wheels rolling over rail joints with rhythmic clack-clack, steady, no music, seamless loop |
 
 ## 5. Interface (`game/assets/audio/sfx/ui/`)
 
@@ -125,6 +127,10 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 > **não foram gerados**. Enquanto não existem, o jogo toca sons de reserva (batida leve / bip da contagem) e o ruído das obras fica
 > mudo. Para gerar: `python tools/gen_audio.py --only cone_hit,barrier_scrape,steel_plate_clank,event_alert_chime,roadworks_loop`
 > e ouvir antes de aceitar.
+
+> **T-168 (ferrovia):** `train_horn` (buzina grave de trem de carga, 3 s) e `train_pass` (passagem com rodas e juntas
+> dos trilhos, 6 s, gerado com a opção de loop do ElevenLabs) foram gerados com `tools/gen_audio.py` em `sfx/ambient/`.
+> **Ainda não ligados ao jogo** (tarefa separada). Marco: ouvir e pedir regeração se algum ficar ruim (`--only nome --force`).
 
 > **T-156 (abertura frente a frente):** `vs_taiko_hit` (tambor no banner VS) foi gerado com `tools/gen_audio.py`
 > (conta em ~61.100 de 131.000 créditos). Os outros sons da cena já existiam: motor acelerando parado = as camadas
