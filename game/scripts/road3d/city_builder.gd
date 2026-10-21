@@ -243,7 +243,7 @@ func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
 
 
 ## T-169: macicos nevados (BackdropKit, "Fundo Montanha Gelo") no lugar dos cones: menos copias e maiores, um
-## MultiMesh por modelo (4 chamadas). Montanha: 16 macicos dos dois lados; litoral (so a terra) e cidade: 10.
+## MultiMesh por modelo (4 chamadas). Montanha: 16 macicos dos dois lados; litoral (so a terra): 10; cidade: 6.
 ## Modo baixo: metade. Cada copia: 750-1250 m de largura (altura = 65-95% da do modelo: 20-37% da largura); o pe do
 ## macico fica a 260-560 m da pista (420-560 fora da montanha).
 var massif_count: int = 0
@@ -251,7 +251,7 @@ var massif_count: int = 0
 
 func _massifs(rng: RandomNumberGenerator, kind: StringName) -> void:
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
-	var count: int = 16 if kind == &"mountain" else 10
+	var count: int = 16 if kind == &"mountain" else (10 if kind == &"coast" else 6)   # cidade: os predios escondem
 	if q <= 0:
 		count /= 2
 	var L: float = path.track.length_m
