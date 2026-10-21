@@ -61,6 +61,8 @@ var _lamp_mats: Dictionary = {}              # nome do material de luz -> Shader
 var _lights_level: float = 1.0
 var _pattern: String = "steady"
 var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 traseira-esq., 3 traseira-dir.
+## Brilho no chao (neon de chao, estribo) e acrilico do andon das pecas deluxe (T-172), pela mesma forca das luzinhas.
+var glow: AccessoryGlow = AccessoryGlow.new()
 
 
 func _ready() -> void:
@@ -122,6 +124,7 @@ func set_lights_on(on: bool, day_preview: bool = false) -> void:
 	_lights_level = (0.4 if day_preview else 1.0) if on else LIGHTS_OFF_LEVEL
 	for m in _lamp_mats.values():
 		(m as ShaderMaterial).set_shader_parameter("level", _lights_level)
+	glow.set_level(_lights_level)
 
 
 ## Luz falsa no mural das laterais (bau e tampas da graneleira; T-155): 0 = sem luz (dia), ~0,5 = noite.
@@ -339,6 +342,7 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 		for n in made:
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
+				glow.apply(n)                            # antes das luzinhas (que tiram o nome dos materiais lamp_*)
 				if chrome_mode != "":
 					ChromeMatcap.apply(n, chrome_mode)
 				_apply_light_materials(n)

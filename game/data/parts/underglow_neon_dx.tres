@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_lxvx7"]
+
+[resource]
+script = ExtResource("1_lxvx7")
+id = &"underglow_neon_dx"
+display_key = "part.underglow_neon_dx"
+slot = &"underglow"
+zones = PackedStringArray("left", "right")
+weight_kg = 18.0
+durability = 25.0
+fame = 20
+price = 24000
+fame_required = 20
+accessory_id = "underglow_neon_dx"

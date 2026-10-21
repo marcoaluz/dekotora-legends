@@ -1837,6 +1837,274 @@
       "preview": "res://assets/vehicles/dekotora/previews/jac_toolbox_34.png",
       "license": "JAC 1045 Truck (CGTrader), Royalty Free; reduzida, sem marca",
       "fit_warnings": []
+    },
+    {
+      "id": "andon_ichiban_dx",
+      "name": "Andon de cabine 一番星 deluxe",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/andon_ichiban_dx.glb",
+      "mount_point": "MOUNT_ROOF",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.537,
+        "y": 1.215,
+        "z": 0.905
+      },
+      "triangles": 5304,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "acrylic_andon",
+        "andon_ink",
+        "chrome",
+        "lamp_amber",
+        "lamp_pink",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ],
+        "ink": [
+          "andon_ink",
+          "plastic",
+          "paint_blue"
+        ]
+      },
+      "customizable": {
+        "text_node": "SIGN_TEXT",
+        "face_node": "SIGN_FACE"
+      },
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/andon_ichiban_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/andon_ichiban_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
+    },
+    {
+      "id": "marker_crown_dx",
+      "name": "Coroa de lanternas de ônibus deluxe",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/lighting/marker_crown_dx.glb",
+      "mount_point": "MOUNT_ROOF_LIGHTS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.284,
+        "y": 0.287,
+        "z": 0.24
+      },
+      "triangles": 4180,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/lighting/marker_crown_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/marker_crown_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
+    },
+    {
+      "id": "underglow_neon_dx",
+      "name": "Neon de chão deluxe",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/underglow_neon_dx.glb",
+      "mount_point": "MOUNT_SIDE_R",
+      "mount_point_left": "MOUNT_SIDE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.7,
+        "y": 0.533,
+        "z": 4.8
+      },
+      "triangles": 958,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "glow_floor_cyan",
+        "lamp_cyan",
+        "plastic_black"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/underglow_neon_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/underglow_neon_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
+    },
+    {
+      "id": "side_bumper_dx",
+      "name": "Estrutura lateral cromada deluxe",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/side_bumper_dx.glb",
+      "mount_point": "MOUNT_SIDE_R",
+      "mount_point_left": "MOUNT_SIDE_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.468,
+        "y": 0.56,
+        "z": 4.17
+      },
+      "triangles": 3292,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "plastic_black",
+        "steel_uroko"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/side_bumper_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/side_bumper_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
+    },
+    {
+      "id": "step_lit_dx",
+      "name": "Estribo cromado iluminado deluxe",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/sides/step_lit_dx.glb",
+      "mount_point": "MOUNT_STEP_R",
+      "mount_point_left": "MOUNT_STEP_L",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.93,
+        "y": 0.49,
+        "z": 0.95
+      },
+      "triangles": 634,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "diamond",
+        "glow_floor_cyan",
+        "lamp_cyan",
+        "plastic_black",
+        "steel"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/sides/step_lit_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/step_lit_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
+    },
+    {
+      "id": "rear_tail_bar_dx",
+      "name": "Barra traseira de 16 lanternas deluxe",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear/rear_tail_bar_dx.glb",
+      "mount_point": "MOUNT_REAR_LAMPS",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.96,
+        "y": 0.56,
+        "z": 0.071
+      },
+      "triangles": 5196,
+      "compatibility": [
+        "dekotora_truck_base"
+      ],
+      "materials_used": [
+        "chrome",
+        "lamp_amber",
+        "lamp_red"
+      ],
+      "materials_available": {
+        "main": [
+          "chrome",
+          "steel",
+          "paint_gold"
+        ],
+        "accent": [
+          "lamp_amber",
+          "lamp_yellow",
+          "lamp_pink",
+          "lamp_cyan"
+        ]
+      },
+      "customizable": null,
+      "source_blend": "res://assets/vehicles/dekotora/source_blend/accessories/rear/rear_tail_bar_dx.blend",
+      "preview": "res://assets/vehicles/dekotora/previews/rear_tail_bar_dx_34.png",
+      "license": "original (gerado por script; sem texturas externas)",
+      "fit_warnings": [],
+      "tier": "deluxe"
     }
   ]
 }

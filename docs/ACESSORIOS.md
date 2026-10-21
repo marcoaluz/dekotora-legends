@@ -132,3 +132,38 @@ exclusão), reduz por ilha (peças simples ficam inteiras) e leva para a conven�
 - Não entraram (de propósito): tomada de ar do capô do Fumi (pequena demais para a cabine e sem lugar num cab-over),
   escapamento esportivo traseiro (briga com o para-choque traseiro), retrovisores (todas as cabines já têm), bull bar e
   faróis auxiliares (o Kenworth não tem).
+
+## Peças deluxe — amostras de acabamento fino (T-172, 2026-10-21)
+
+Pedido do Marco: "muito detalhe: neon, pisca, estura (lido como **estrutura lateral** e **estribo**), baú/andon em cima da
+cabine como no Bakusou Dekotora Densetsu". 6 amostras feitas por código, com cromo de verdade (moldura com espessura,
+coroa e bisel), parafusos sextavados, lâmpadas por revolução com lente em degraus (Fresnel), acrílico leitoso iluminado
+por dentro, inox com escama "uroko" em mapa de normais e brilho do neon no asfalto. Marcadas `"tier": "deluxe"` no
+catálogo; orçamento 6.000 triângulos por peça.
+
+| id | Peça | Encaixe (slot) | Ponto | Triângulos | Materiais (chamadas por lado) |
+| --- | --- | --- | --- | --- | --- |
+| `andon_ichiban_dx` | Andon de cabine 一番星 (caixa de luz alta no teto da cabine; texto trocável `SIGN_TEXT`) | `andon` | `MOUNT_ROOF` | 5.304 | 6 |
+| `marker_crown_dx` | Coroa de 9 lanternas de ônibus âmbar (piscam com o padrão de luzes) | `roof_lights` | `MOUNT_ROOF_LIGHTS` | 4.180 | 3 |
+| `underglow_neon_dx` | Neon de chão: tubo em canaleta + brilho no asfalto | `underglow` (novo) | `MOUNT_SIDE_R/L` | 958 | 4 |
+| `side_bumper_dx` | Estrutura lateral cromada (サイドバンパー): trilhos, painel "uroko", 10 lâmpadas + 6 lanternas | `side_skirts` | `MOUNT_SIDE_R/L` | 3.292 | 4 |
+| `step_lit_dx` | Estribo cromado de 2 degraus, piso xadrez, LED e luz de cortesia no chão | `steps` | `MOUNT_STEP_R/L` | 634 | 6 |
+| `rear_tail_bar_dx` | Barra traseira de 16 lanternas (âmbar em cima pisca, vermelha embaixo) | `rear_lamps` | `MOUNT_REAR_LAMPS` | 5.196 | 3 |
+
+- **Gerar**: `blender -b --factory-startup -P blender/scripts/build_accessories.py -- --deluxe` (≈ 1 min; grava também
+  `previews/<id>_{day,night,detail}_34.png` e a folha `previews/deluxe_contact_sheet.png`). Caminhão montado no Blender:
+  `-- --assembled-deluxe --out-dir PASTA`. Código: `accessories/deluxe.py`, `lib/deluxe_geo.py`, `deluxe_previews.py`.
+- **No jogo**: `AccessoryGlow` (`scripts/truck/accessory_glow.gd`) troca os materiais `glow_*` por um shader aditivo (mancha
+  de luz calculada pela UV, na cor da lâmpada da peça) e controla a emissão do `acrylic_*`; a força segue
+  `TruckNode.set_lights_on` (noite/túnel acende; de dia o chão quase some e o acrílico fica em 1/4).
+- **Ver**: `godot --path game res://scenes/tools/accessory_viewer.tscn -- --cat=deluxe` (Tab até "Deluxe"; [N] luzes
+  acesas/apagadas; `--day` começa de dia). Garagem: `-- --demo --body=base --cab=chata --parts=andon_ichiban_dx,...`.
+  Capturas `docs/capturas_t172/` (`antes_depois_garagem_noite.png`, `antes_depois_garagem_dia.png`,
+  `antes_depois_corrida.png`; `GODOT=... bash tools/capture_t172.sh PASTA_ABS` e `bash tools/sheet_t172.sh PASTA_ABS`).
+- **Custo medido** (`bash tools/measure_t172.sh`: viaduto à noite, modo médio, sem vsync, caminhão de demonstração com
+  as antigas → com as 6 deluxe no lugar das antigas do mesmo encaixe): chamadas de desenho do caminhão 212 → 229
+  (+17; corrida 373–460 → 390–477), triângulos +7,9 mil por quadro, textura 51,1 → 52,0 MB, FPS no ruído
+  (213–238 → 209–236).
+- **Limites conhecidos**: as peças de lado têm 4,2 m (como as saias antigas) e passam da frente do baú no Canter e no baú
+  leve (`docs/capturas_t172/canter/`; as saias antigas fazem igual); o brilho no chão fica 11 cm acima do chão do
+  caminhão (para aparecer em cima da plataforma da garagem).

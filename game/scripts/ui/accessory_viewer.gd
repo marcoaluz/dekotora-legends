@@ -4,8 +4,10 @@ extends Node3D
 ## [Tab] proxima categoria, [1][2][3][4] vistas frente/lado/traseira/3-4, setas/mouse giram a camera,
 ## [A] liga/desliga todas as pecas da categoria no caminhao, [M] troca a variante de material.
 ## Linha de comando para captura: -- --mode=mounted --cat=front --view=34
+## T-172: categoria "deluxe" (so as amostras de acabamento fino, com cromo, luzinhas e brilho no chao como no jogo),
+## [N] noite/dia, `--day` comeca de dia, `--shot=C:/x.png` salva a tela e fecha.
 
-const CATEGORIES: Array[String] = ["front", "lighting", "sides", "rear"]
+const CATEGORIES: Array[String] = ["front", "lighting", "sides", "rear", "deluxe"]
 const VIEWS: Dictionary = {"front": Vector2(15, 8), "side": Vector2(90, 6), "rear": Vector2(180, 8), "34": Vector2(40, 16)}
 
 var catalog: AccessoryCatalog
@@ -29,12 +31,17 @@ const CAT_FRAMING: Dictionary = {
 	"lighting": {"target": Vector3(0, 3.0, -8.0), "dist": 13.0, "az": 35.0, "el": 18.0},
 	"sides": {"target": Vector3(1.2, 1.1, -6.5), "dist": 13.0, "az": 100.0, "el": 8.0},
 	"rear": {"target": Vector3(0, 1.8, -0.3), "dist": 8.5, "az": 160.0, "el": 12.0},
+	"deluxe": {"target": Vector3(0, 2.2, -7.5), "dist": 15.0, "az": 38.0, "el": 12.0},
 }
+var _night: bool = true
+var _glow: AccessoryGlow = AccessoryGlow.new()
+var _lamp_mats: Dictionary = {}
 
 
 func _ready() -> void:
 	catalog = AccessoryCatalog.get_instance()
-	WorldEnv.create(self)
+	_night = not OS.get_cmdline_user_args().has("--day")
+	WorldEnv.create(self, false, TimeOfDay.by_id(&"night" if _night else &"day"))
 	var floor_mi := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(200, 200)
@@ -72,6 +79,7 @@ func _ready() -> void:
 			_view_forced = true
 	_rebuild()
 	_update_camera()
+	DebugShot.arm(self)
 
 
 func _clear() -> void:
@@ -94,19 +102,21 @@ func _rebuild() -> void:
 		if not _view_forced:
 			_az = float(fr["az"])
 			_el = float(fr["el"])
-		for e in catalog.in_category(cat):
+		for e in _entries(cat):
 			for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):
 				var n: Node3D = catalog.attach(_truck, String(e["id"]), side)
 				if n != null:
 					_attached.append(n)
+					if cat == "deluxe":
+						_game_look(n)
 	else:
 		_build_showcase(cat)
 	_label.text = "%s  |  categoria: %s  |  modo: %s   [Tab] categoria  [Espaco] modo  [1-4] vistas  [A] pecas  [M] material" % [
-		"ACESSORIOS DEKOTORA", String(catalog.categories().get(cat, cat)), "montado" if mounted_mode else "vitrine"]
+		"ACESSORIOS DEKOTORA", String(catalog.categories().get(cat, "Deluxe (T-172)" if cat == "deluxe" else cat)), "montado" if mounted_mode else "vitrine"]
 
 
 func _build_showcase(cat: String) -> void:
-	var items: Array = catalog.in_category(cat)
+	var items: Array = _entries(cat)
 	var x: float = -float(items.size() - 1) * 1.6
 	for e in items:
 		var node: Node3D = catalog.instantiate(String(e["id"]))
@@ -118,6 +128,8 @@ func _build_showcase(cat: String) -> void:
 		node.scale = Vector3(s, s, s)
 		node.position = Vector3(x, 1.2, 0.0)
 		_showcase.add_child(node)
+		if cat == "deluxe":
+			_game_look(node)
 		var lbl := Label3D.new()
 		lbl.text = String(e["name"])
 		lbl.font_size = 22
@@ -190,6 +202,9 @@ func _unhandled_input(event: InputEvent) -> void:
 					n.visible = not n.visible
 			KEY_M:
 				_cycle_variant()
+			KEY_N:
+				_night = not _night
+				_rebuild()
 
 
 func _set_view(v: String) -> void:
@@ -213,3 +228,32 @@ func _cycle_variant() -> void:
 			if String(u) in opts:
 				catalog.swap_material(n, String(u), to_name)
 				break
+
+
+## Pecas da categoria; "deluxe" = todas as marcadas com tier deluxe no catalogo (de qualquer categoria).
+func _entries(cat: String) -> Array:
+	if cat != "deluxe":
+		return catalog.in_category(cat)
+	var out: Array = []
+	for e in catalog.data.get("accessories", []):
+		if String(e.get("tier", "")) == "deluxe":
+			out.append(e)
+	return out
+
+
+## Mesmo acabamento do jogo (TruckNode): brilho no chao/acrilico, cromo por matcap e luzinhas animadas.
+## [N] so troca a forca das luzes (o ceu fica o do inicio: `--day` para comecar de dia).
+func _game_look(n: Node3D) -> void:
+	var level: float = 1.0 if _night else 0.12
+	_glow.apply(n)
+	_glow.set_level(level)
+	ChromeMatcap.apply(n, "night" if _night else "day")
+	for mi in n.find_children("*", "MeshInstance3D", true, false):
+		var m: MeshInstance3D = mi as MeshInstance3D
+		for s in m.mesh.get_surface_count():
+			var cur: Material = m.get_active_material(s)
+			if cur != null and LightPatterns.ANIMATED.has(cur.resource_name):
+				if not _lamp_mats.has(cur.resource_name):
+					_lamp_mats[cur.resource_name] = LightPatterns.make_material(cur)
+				(_lamp_mats[cur.resource_name] as ShaderMaterial).set_shader_parameter("level", level)
+				m.set_surface_override_material(s, _lamp_mats[cur.resource_name])

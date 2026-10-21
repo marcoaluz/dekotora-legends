@@ -213,3 +213,9 @@ Formato em `docs/AGENTES.md`.
 ## 2026-10-20 · T-162 · ajudante-rapido · CONCLUÍDA
 - Feito: caminhos padrão de 12 scripts (Blender e tools) apontam para docs/Modelos/<pasta>, com volta ao caminho antigo se o novo não existir; STATUS e skill blender-pixelart atualizados; coordenador corrigiu o exemplo em PIPELINE_ARTE_BLENDER.md (commit 8db8af6).
 - Validação: py_compile e bash -n ok; arquivos esperados existem em docs/Modelos/. Docs históricos (DECISOES, INVENTARIO, LICENCAS) mantêm o caminho antigo como registro.
+
+## 2026-10-21 · T-172 · especialista · PRECISA DECISÃO (visual do Marco)
+- Feito: 6 peças deluxe por código (andon de cabine 一番星, coroa de lanternas de ônibus, neon de chão com brilho no asfalto, estrutura lateral cromada "uroko", estribo iluminado, barra de 16 lanternas), encaixe novo `underglow`, AccessoryGlow (brilho/acrílico seguem dia/noite), dados .tres (preços PROPOSTOS), pt-BR, visualizador com categoria Deluxe, capturas antes/depois.
+- Arquivos: blender/scripts/{accessories/deluxe.py, lib/deluxe_geo.py, deluxe_previews.py, build_accessories.py, lib/mesh3d.py}, game/scripts/truck/{accessory_glow,truck_node,accessory_materials}.gd, scripts/ui/accessory_viewer.gd, tools_dev/gen_data.gd (--only), data/parts/*_dx.tres, tests/test_parts_deluxe.gd, tools/{capture,sheet,measure}_t172.sh, docs/capturas_t172/
+- Validação: Blender 6 peças sem avisos (634–5.304 tri); 297 testes ok; corrida modo médio +17 chamadas, +7,9 mil tri, +0,9 MB textura, FPS no ruído; capturas conferidas.
+- Decisão pendente: Marco aprovar o acabamento e dizer se segue para mais peças; confirmar leitura de "estura" (estrutura lateral + estribo); preços; peças de lado de 4,2 m passam do baú no Canter/leve (igual às saias antigas).

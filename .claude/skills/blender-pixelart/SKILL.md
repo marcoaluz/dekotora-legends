@@ -134,3 +134,11 @@ um problema visual não puder ser entendido pelos renders.
 - Armadilha: ao importar um .glb (`import_scene.gltf`) numa cena que já tem objetos, filtre só os objetos novos
   (conjunto de objetos antes × depois) antes de apagar qualquer coisa. Apagar "tudo que não é do script" pode levar junto os objetos que já estavam na cena.
 
+
+## Peças deluxe (T-172)
+
+- Comando: `blender -b --factory-startup -P blender/scripts/build_accessories.py -- --deluxe` (gera os .glb, prévias de dia/noite/de perto e `previews/deluxe_contact_sheet.png`); `-- --assembled-deluxe --out-dir PASTA` monta as 6 no caminhão do jogo (importa o .glb, que já tem os `MOUNT_*`).
+- Código: `accessories/deluxe.py` (peças) e `lib/deluxe_geo.py` (moldura com perfil `frame`, `sweep_open`, `hex_bolt`, `bulb`, `bus_marker`, `round_tail`, texturas numpy de acrílico e escama "uroko" em mapa de normais).
+- Convenção: `tier="deluxe"` no dict da peça vai para o catálogo; orçamento 6.000 triângulos (as outras 4.500). Materiais com nome `glow_*` (quadrado no chão, UV 0..1) e `acrylic_*` (face com textura na cor e na emissão) são tratados pelo `AccessoryGlow` do jogo.
+- Armadilha: texto 3D em kanji com `offset` padrão (0,04 x tamanho) engrossa demais e os traços de 番/星 se fundem; use `text3d(..., offset=0.014, resolution=4)`.
+- Armadilha: na prévia o chão fica em Z = 0; peça com brilho no chão precisa ficar 1 cm acima (senão o brilho pisca com o chão).

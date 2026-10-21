@@ -5,6 +5,10 @@ Uso (na raiz do projeto):
   blender -b --factory-startup -P blender/scripts/build_accessories.py -- --all
   blender -b --factory-startup -P blender/scripts/build_accessories.py -- --only fb_ornate_steps,step_metal
   blender -b --factory-startup -P blender/scripts/build_accessories.py -- --assembled   (prévias montadas)
+  blender -b --factory-startup -P blender/scripts/build_accessories.py -- --deluxe      (amostras deluxe, T-172:
+      .glb + prévias de dia/noite + folha de contato previews/deluxe_contact_sheet.png)
+  blender -b --factory-startup -P blender/scripts/build_accessories.py -- --assembled-deluxe [--out-dir PASTA]
+      (caminhão com as peças deluxe montadas, dia e noite)
 
 Saída (dentro de game/, pasta do projeto Godot):
   assets/vehicles/dekotora/accessories/<categoria>/<id>.glb     modelo do jogo (materiais embutidos)
@@ -28,6 +32,7 @@ from lib import mesh3d as M, pbr, preview, scene  # noqa: E402
 
 PROTOTYPES = ["fb_ornate_steps", "roof_light_bracket", "skirt_chrome_panel"]
 MAX_TRIS = {"front": 4500, "lighting": 4500, "sides": 4500, "rear": 4500}   # orçamento por peça
+MAX_TRIS_DELUXE = 6000            # T-172: peças "deluxe" (acabamento fino) podem gastar um pouco mais
 
 # Caixas proibidas do caminhão (Blender, metros): (min, max). Penetração aceita = encaixe/fixação.
 KEEPOUT = {
@@ -93,7 +98,7 @@ def build_one(acc: dict, out: str, previews: bool = True) -> dict:
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, blend_rel))
     mount = T3.MOUNTS.get(acc["mount"]) or ACC.thirdparty.EXTRA_MOUNTS[acc["mount"]]
     problems = check_keepout(mn, mx, mount, mirrored=mount[0] < 0)
-    if tris > MAX_TRIS[acc["category"]]:
+    if tris > (MAX_TRIS_DELUXE if acc.get("tier") == "deluxe" else MAX_TRIS[acc["category"]]):
         problems.append(f"orçamento de triângulos excedido: {tris}")
     prev_rel = ""
     if previews:
@@ -122,6 +127,8 @@ def build_one(acc: dict, out: str, previews: bool = True) -> dict:
         "license": acc.get("license", "original (gerado por script; sem texturas externas)"),
         "fit_warnings": problems,
     }
+    if acc.get("tier"):
+        entry["tier"] = acc["tier"]
     log(f"{acc['id']:26s} tris={tris:5d} dims=({size.x:.2f},{size.z:.2f},{size.y:.2f}) {'AVISO: ' + '; '.join(problems) if problems else 'ok'}")
     return entry
 
@@ -184,9 +191,16 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--thirdparty", action="store_true", help="so as pecas tiradas de modelos de terceiros (T-126)")
     ap.add_argument("--assembled", action="store_true")
+    ap.add_argument("--deluxe", action="store_true", help="so as amostras deluxe (T-172) + folha de contato")
+    ap.add_argument("--assembled-deluxe", action="store_true", help="caminhao com as pecas deluxe montadas (dia e noite)")
+    ap.add_argument("--out-dir", default="", help="pasta das imagens do --assembled-deluxe (padrao: previews/)")
     ap.add_argument("--no-preview", action="store_true")
     args = ap.parse_args(argv)
     out = os.path.abspath(args.out)
+    if args.assembled_deluxe:
+        import deluxe_previews
+        deluxe_previews.assembled(out, args.out_dir or os.path.join(out, "previews"))
+        return
     if args.assembled:
         cats = [args.category] if args.category else list(ACC.CATEGORIES)
         assembled_previews(out, cats)
@@ -195,6 +209,8 @@ def main():
         todo = [ACC.BY_ID[i] for i in PROTOTYPES]
     elif args.thirdparty:
         todo = [ACC.BY_ID[i] for i in ACC.THIRDPARTY]
+    elif args.deluxe:
+        todo = [ACC.BY_ID[i] for i in ACC.DELUXE]
     elif args.only:
         todo = [ACC.BY_ID[i] for i in args.only.split(",")]
     elif args.category:
@@ -203,6 +219,9 @@ def main():
         todo = ACC.ALL
     entries = [build_one(a, out, previews=not args.no_preview) for a in todo]
     write_catalog(out, entries)
+    if args.deluxe and not args.no_preview:
+        import deluxe_previews
+        deluxe_previews.sheet(out, todo)
     bad = [e["id"] for e in entries if e["fit_warnings"]]
     log("OK build_accessories:", len(entries), "peças;", "com avisos:" if bad else "sem avisos", ", ".join(bad))
 

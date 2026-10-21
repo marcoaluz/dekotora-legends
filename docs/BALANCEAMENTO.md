@@ -304,6 +304,20 @@ Valores **propostos** (Fama necessária pela regra do preço: < 15 mil livre, < 
 | `jac_steel_rims` | Calotas | Rodas | 50 | 80 | 9 | 9.000 | 0 |
 | `jac_toolbox` | Caixa lateral | Esq./Dir. | 80 | 100 | 6 | 8.000 | 0 |
 
+## Peças deluxe — amostras de acabamento fino (T-172)
+
+Valores **propostos** (mesma regra de Fama necessária pelo preço). Mais caras e com mais Destaque que as antigas do mesmo
+encaixe, porque têm mais cromo e luz; ajustar depois que o Marco aprovar o visual.
+
+| ID | Encaixe | Zona | Peso (kg) | Durab. | Destaque | Preço (¥) | Fama nec. | Substitui (mesmo encaixe) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `andon_ichiban_dx` | Andon | Teto | 95 | 45 | 38 | 48.000 | 60 | `andon_kanji` (15), `andon_big_panel` (30) |
+| `marker_crown_dx` | Luzes de teto | Teto | 45 | 35 | 26 | 32.000 | 60 | `roof_lights_crown` (30) |
+| `underglow_neon_dx` | Neon de chão (novo) | Esq./Dir. | 18 | 25 | 20 | 24.000 | 20 | — |
+| `side_bumper_dx` | Saias laterais | Esq./Dir. | 260 | 220 | 30 | 46.000 | 60 | `skirt_chrome` (15), `skirt_light_bar` (25) |
+| `step_lit_dx` | Degraus | Esq./Dir. | 40 | 60 | 12 | 16.000 | 20 | `step_metal` (4), `kw_steps` (10) |
+| `rear_tail_bar_dx` | Lanternas traseiras | Traseira | 55 | 40 | 22 | 26.000 | 20 | `rear_lamp_cluster` (9) |
+
 ## Carroceria graneleira e regra carga x carroceria (T-145)
 
 Proposta para testar (`data/bodies/graneleira.tres`, `CargoDef.needs`, `BodyDef.cargo_kind`).

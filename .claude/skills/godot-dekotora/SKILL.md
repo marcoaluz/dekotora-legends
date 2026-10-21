@@ -207,3 +207,10 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - **Protocolo 6** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total`. Cada cliente toca a abertura pelo **relógio comum** do servidor: setup + ping/2 (`DuelPlan.online_elapsed`). Cliente e servidor precisam da mesma versão: gere o APK de novo.
 - Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo. O executor `tests/run_tests.gd` roda esses testes no 1º quadro, quando a árvore de cena já existe. Hoje: `tests/test_duel_scene_flow.gd`.
 - Regra para texto que cresce na tela (nome, fala, banner VS): desenhe em tamanho de fonte **fixo** e escale com `draw_set_transform` (ver `ui/duel_band.gd`). Cada tamanho de fonte novo cria um cache de textura; o VS chegou a criar +58 MB de memória de textura antes dessa correção.
+
+## Peças deluxe e brilho que acompanha dia/noite (T-172)
+
+- `AccessoryGlow` (`scripts/truck/accessory_glow.gd`), um por caminhão (`TruckNode.glow`): materiais `glow_*` viram shader aditivo (mancha calculada pela UV, cor da 1ª lâmpada `lamp_*` da peça) e `acrylic_*` só mudam a força da emissão. A força vem de `TruckNode.set_lights_on` (1 noite/túnel, 0,4 prévia de dia, 0,12 apagado). Chame `glow.apply(n)` DEPOIS da variante e ANTES do `LightPatterns` (que tira o nome dos materiais `lamp_*`).
+- Peças só desse lote: `tier = "deluxe"` no catálogo; visualizador `scenes/tools/accessory_viewer.tscn -- --cat=deluxe [--day] [--shot=ARQ.png]` ([N] liga/desliga as luzes).
+- `tools_dev/gen_data.gd -- --only=id1,id2` grava só essas peças. **Sem `--only` regrava as rotas e apaga `lane_sections`/`bridges` (T-153).**
+- Capturas `GODOT=... bash tools/capture_t172.sh PASTA_ABS [garagem|corrida]`; custo `bash tools/measure_t172.sh`.

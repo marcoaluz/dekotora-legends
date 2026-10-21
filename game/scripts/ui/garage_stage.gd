@@ -17,7 +17,7 @@ const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), dista
 const SLOT_FOCUS: Dictionary = {
 	"front_bumper": "front", "front_lip": "front", "grille": "front", "front_trim": "front", "front_ornament": "front",
 	"aux_lights": "front", "visor": "front", "roof_lights": "roof", "roof_ornament": "roof", "roof_frame": "roof", "roof_wing": "roof",
-	"exhaust_stacks": "side",
+	"exhaust_stacks": "side", "underglow": "side",
 	"body_ornament": "roof", "andon": "roof", "side_skirts": "side", "fenders": "side", "steps": "side", "side_trim": "side",
 	"side_box": "side", "side_ornament": "side", "mural": "side", "hubcaps": "wheel", "rear_bumper": "rear",
 	"rear_lamps": "rear", "plate": "rear", "mudflaps": "rear", "rear_ornament": "rear",

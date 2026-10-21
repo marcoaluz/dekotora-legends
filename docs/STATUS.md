@@ -26,7 +26,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (292) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (297) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -153,6 +153,13 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-172 (peças deluxe, amostras de acabamento):** olhar `docs/capturas_t172/` (`antes_depois_garagem_noite.png`
+  primeiro; esquerda = peças antigas, direita = deluxe) e `game/assets/vehicles/dekotora/previews/deluxe_contact_sheet.png`
+  (cada peça de dia, de noite e de perto) e dizer: (1) se o nível de detalhe está bom e se seguimos para mais peças;
+  (2) se "estura" era estrutura lateral/estribo (foi o que fizemos) ou outra coisa; (3) se o andon 一番星 sobre a cabine
+  é o "baú em cima da cabine" que você queria (tamanho/altura); (4) preços propostos em `docs/BALANCEAMENTO.md`.
+  Abrir no PC: `godot --path game res://scenes/tools/accessory_viewer.tscn -- --cat=deluxe` ([N] acende/apaga).
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer
