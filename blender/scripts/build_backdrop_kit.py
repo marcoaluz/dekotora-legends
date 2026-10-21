@@ -213,6 +213,11 @@ def massif_mesh(h: np.ndarray, box: tuple, base: float, thr: float, name: str, p
     bmesh.ops.delete(bm, geom=loose, context="VERTS")
     bmesh.ops.triangulate(bm, faces=bm.faces[:])
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    # T-179: a malha e aberta (casca sem fundo); o recalc escolhia "para baixo" como lado de fora e o jogo via a
+    # parte de dentro da encosta de tras (escura, "laminas rasgadas"). A casca tem de olhar para cima.
+    if sum(f.normal.z * f.calc_area() for f in bm.faces) < 0.0:
+        bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
+        bm.normal_update()
     # pegada: maior lado = 1, centro em (0, 0), base em z = 0 (a saia fica abaixo)
     xs = [v.co.x for v in bm.verts]
     ys = [v.co.y for v in bm.verts]

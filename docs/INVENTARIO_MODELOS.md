@@ -240,3 +240,6 @@ liberada pelo Marco para tudo (créditos em `game/assets/LICENCAS.md`).
 
 Capturas antes/depois: `docs/capturas_t169/` (folhas `folha_*.png`). Catálogo de peças para fases novas:
 `docs/BIBLIOTECA_CENARIO.md`.
+
+**T-179 (2026-10-21):** os maciços do `Fundo Montanha Gelo` estavam no jogo, mas do avesso e cortados pela câmera (não se
+viam como montanhas nevadas). Corrigido e regerado; ver `docs/DECISOES.md` (T-179) e `docs/capturas_t179/`.

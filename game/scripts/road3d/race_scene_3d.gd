@@ -198,7 +198,10 @@ func _ready() -> void:
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2
-	_cam.far = 900.0
+	_cam.far = BackdropKit.CAMERA_FAR if BackdropKit.mountains_available() else 900.0   # T-179: montanhas a 1-6 km
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--view-far="):              # depuracao T-179: comparar o custo (antes era 900)
+			_cam.far = float(a.substr(11))
 	add_child(_cam)
 	_cam.make_current()
 	_speed_fx = SpeedFx.new()

@@ -157,4 +157,7 @@ um problema visual não puder ser entendido pelos renders.
   - `--preview` grava `blender/renders/t163/contact_sheet.png` (a pasta é `t163`, não `t169`).
   - Armadilha: se `--pole-src` não existir, o script não avisa. Ele volta ao poste antigo, sem caixa nem suporte em U. Confira a linha `NEW_POLE` no terminal.
 - Armadilha (worktree): os padrões apontam para a pasta da worktree, que não tem `docs/Modelos`. Passe caminhos absolutos da pasta principal em `--snow-src`, `--water-src`, `--src` e `--pole-src`.
+- Armadilha (T-179): `bmesh.ops.recalc_face_normals` numa **casca aberta** (relevo sem fundo, placa, terreno) pode
+  escolher "para baixo" como lado de fora. No jogo o objeto fica do avesso (escuro, "lâminas"). Depois do recalc,
+  confira a soma de `f.normal.z * f.calc_area()` e use `bmesh.ops.reverse_faces` se for negativa (como em `build_backdrop_kit.py`).
 - Armadilha (CRLF): o Python do Windows grava texto com CRLF. Arquivo de texto que o Godot lê (JSON, por exemplo) precisa de `open(..., newline="\n")`, como o `guardrail_w_profile.json` em `build_road_pontes_kit.py`.

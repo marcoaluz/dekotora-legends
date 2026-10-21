@@ -243,36 +243,46 @@ func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
 
 
 ## T-169: macicos nevados (BackdropKit, "Fundo Montanha Gelo") no lugar dos cones: menos copias e maiores, um
-## MultiMesh por modelo (4 chamadas). Montanha: 16 macicos dos dois lados; litoral (so a terra): 10; cidade: 6.
-## Modo baixo: metade. Cada copia: 750-1250 m de largura (altura = 65-95% da do modelo: 20-37% da largura); o pe do
-## macico fica a 260-560 m da pista (420-560 fora da montanha).
+## MultiMesh por modelo (4 chamadas). Modo baixo: metade.
+## T-179: eram 750-1250 m de largura a 260-560 m da pista: a camera (900 m) cortava o fundo deles ("laminas"
+## rasgadas), a neblina da tarde/noite apagava o resto e na cidade os predios escondiam. Agora sao uma cordilheira de
+## verdade: 1,6-3 km de largura (altura 24-43% da largura), pe a 0,9-2 km da pista, mais copias (MASSIF_COUNT), a
+## camera ve ate BackdropKit.CAMERA_FAR e o shader tem neblina propria (leve).
+const MASSIF_COUNT := {&"mountain": 18, &"coast": 12, &"city": 12}
+const MASSIF_W: Vector2 = Vector2(1600.0, 3000.0)       # largura (m)
+const MASSIF_FOOT: Vector2 = Vector2(900.0, 2000.0)     # do pe do macico ate a pista (m)
 var massif_count: int = 0
+var massif_items: Array = []                            # [Transform3D, Color] (testes)
 
 
 func _massifs(rng: RandomNumberGenerator, kind: StringName) -> void:
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
-	var count: int = 16 if kind == &"mountain" else (10 if kind == &"coast" else 6)   # cidade: os predios escondem
+	var count: int = int(MASSIF_COUNT.get(kind, 12))
 	if q <= 0:
 		count /= 2
 	var L: float = path.track.length_m
 	var groups: Array = [[], [], [], []]
+	massif_items = []
 	for i in count:
 		var zz: float = (float(i) + rng.randf_range(0.1, 0.9)) / float(count) * L       # espalhados ao longo da rota
 		var sd: float = -1.0 if (kind == &"coast" or i % 2 == 0) else 1.0
-		var w: float = rng.randf_range(750.0, 1250.0)
-		var dist: float = w * 0.5 + rng.randf_range(260.0 if kind == &"mountain" else 420.0, 560.0)   # pe longe da pista
+		var w: float = rng.randf_range(MASSIF_W.x, MASSIF_W.y)
+		var dist: float = w * 0.5 + rng.randf_range(MASSIF_FOOT.x, MASSIF_FOOT.y)       # pe longe da pista
 		var c2: Vector3 = path.world_point(zz, sd * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
-		for _k in 12:                                   # a pista faz curva: empurra para fora ate o pe ficar longe dela
-			if _min_track_dist(c2) >= w * 0.55 + 180.0:
+		for _k in 16:                                   # a pista faz curva: empurra para fora ate o pe ficar longe dela
+			if _min_track_dist(c2) >= w * 0.5 + MASSIF_FOOT.x:
 				break
-			dist += 120.0
+			dist += 200.0
 			c2 = path.world_point(zz, sd * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
 		c2.y = -6.0 - _deck
-		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(w, w * rng.randf_range(0.65, 0.95), w))
+		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(w, w * rng.randf_range(0.8, 1.1), w))
 		groups[i % 4].append([Transform3D(b, c2), Color.WHITE])
+		massif_items.append(groups[i % 4].back())
 	var mat: ShaderMaterial = BackdropKit.mountain_material(tod, kind)
 	for k in 4:
 		_multi(BackdropKit.mountain_mesh(k), groups[k], mat, false)
+		if get_child_count() > 0 and not groups[k].is_empty():   # a caixa do MultiMesh pode ficar toda alem da camera
+			(get_child(get_child_count() - 1) as GeometryInstance3D).extra_cull_margin = 2000.0
 	massif_count = count
 
 
@@ -300,7 +310,7 @@ func _building_chance(kind: StringName) -> float:
 func _add_ground(kind: StringName) -> void:
 	var mi := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(9000, 9000)
+	plane.size = Vector2(16000, 16000)        # T-179: o chao passa do pe das montanhas (ate ~6 km)
 	mi.mesh = plane
 	if kind == &"coast":
 		var wm: ShaderMaterial = _shader_mat(WATER_SHADER)
