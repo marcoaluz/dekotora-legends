@@ -27,11 +27,12 @@ const AUDIO_DIRS: Array[String] = ["res://assets/audio/sfx/crash/", "res://asset
 	"res://assets/audio/sfx/ambient/"]
 
 
-func setup(truck: TruckSim, engine_set: String, turbo_id: String, straight: bool, music_name: String) -> void:
+## `engine_spec` = EngineSounds.spec()/from_descriptor() (T-173: perfil do escapamento + turbo dele).
+func setup(truck: TruckSim, engine_spec: Dictionary, music_name: String) -> void:
 	var audio: Node = get_node("/root/AudioBus")
 	player_engine = EngineAudio.new()
 	add_child(player_engine)
-	player_engine.setup(engine_set, turbo_id, straight, truck.engine.has_jake)
+	player_engine.setup_spec(engine_spec, truck.engine.has_jake)
 	for n in ["wind_speed_loop", "tire_screech_loop", "tire_gravel_loop", "cargo_rattle_loop"]:
 		var p := AudioStreamPlayer.new()
 		p.bus = "SFX"
@@ -45,13 +46,15 @@ func setup(truck: TruckSim, engine_set: String, turbo_id: String, straight: bool
 	audio.play_music(music_name)
 
 
-## Motor de um rival: volume e tom proprios, posicional (cai com a distancia).
-func make_rival_engine(parent: Node3D, engine_set: String = "i6_std", turbo_id: String = "turbo_none") -> EngineAudio:
+## Motor de um rival: volume e tom proprios, posicional (cai com a distancia). `engine_spec` = EngineSounds.spec();
+## `synth_boost` = a simulacao dele nao tem turbo (rival offline sorteado): o assobio segue acelerador e RPM.
+func make_rival_engine(parent: Node3D, engine_spec: Dictionary, synth_boost: bool = false) -> EngineAudio:
 	var e := EngineAudio.new()
 	e.positional = true
 	e.bus = "Engine"
+	e.synth_boost = synth_boost
 	parent.add_child(e)
-	e.setup(engine_set, turbo_id, false, false, true)
+	e.setup_spec(engine_spec, false)
 	return e
 
 

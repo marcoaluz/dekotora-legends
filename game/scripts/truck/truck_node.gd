@@ -61,6 +61,10 @@ var _lamp_mats: Dictionary = {}              # nome do material de luz -> Shader
 var _lights_level: float = 1.0
 var _pattern: String = "steady"
 var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 traseira-esq., 3 traseira-dir.
+var _blink := SignalBlink.new()             # T-170: ritmo do pisca (1,5 Hz)
+var _blink_shown: int = 0
+## Brilho no chao (neon de chao, estribo) e acrilico do andon das pecas deluxe (T-172), pela mesma forca das luzinhas.
+var glow: AccessoryGlow = AccessoryGlow.new()
 
 
 func _ready() -> void:
@@ -122,6 +126,7 @@ func set_lights_on(on: bool, day_preview: bool = false) -> void:
 	_lights_level = (0.4 if day_preview else 1.0) if on else LIGHTS_OFF_LEVEL
 	for m in _lamp_mats.values():
 		(m as ShaderMaterial).set_shader_parameter("level", _lights_level)
+	glow.set_level(_lights_level)
 
 
 ## Luz falsa no mural das laterais (bau e tampas da graneleira; T-155): 0 = sem luz (dia), ~0,5 = noite.
@@ -197,12 +202,20 @@ func _build_blinkers() -> void:
 		_blinkers.append(m)
 
 
-## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada), ~3 vezes por segundo.
+## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada), ~1,5 vez por segundo (T-170: SignalBlink,
+## comeca aceso no toque). So mexe na visibilidade quando muda (nenhum no ou material novo).
 func set_signal(dir: int) -> void:
-	var on: bool = dir != 0 and int(Time.get_ticks_msec() / 160) % 2 == 0
+	if _blink.update(dir, SignalBlink.now()) == SignalBlink.Edge.NONE and dir == _blink_shown:
+		return
+	_blink_shown = dir
 	for i in _blinkers.size():
 		var side: int = -1 if i % 2 == 0 else 1
-		_blinkers[i].visible = on and side == dir
+		_blinkers[i].visible = _blink.lit and side == dir
+
+
+## A seta esta acesa agora (testes)?
+func signal_lit() -> bool:
+	return _blink.lit
 
 
 ## Gira as rodas (cada uma por velocidade / raio dela) e estérça as dianteiras; as calotas e rodas da loja
@@ -339,6 +352,7 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 		for n in made:
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
+				glow.apply(n)                            # antes das luzinhas (que tiram o nome dos materiais lamp_*)
 				if chrome_mode != "":
 					ChromeMatcap.apply(n, chrome_mode)
 				_apply_light_materials(n)

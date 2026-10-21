@@ -17,7 +17,7 @@ const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), dista
 const SLOT_FOCUS: Dictionary = {
 	"front_bumper": "front", "front_lip": "front", "grille": "front", "front_trim": "front", "front_ornament": "front",
 	"aux_lights": "front", "visor": "front", "roof_lights": "roof", "roof_ornament": "roof", "roof_frame": "roof", "roof_wing": "roof",
-	"exhaust_stacks": "side",
+	"exhaust_stacks": "side", "underglow": "side",
 	"body_ornament": "roof", "andon": "roof", "side_skirts": "side", "fenders": "side", "steps": "side", "side_trim": "side",
 	"side_box": "side", "side_ornament": "side", "mural": "side", "hubcaps": "wheel", "rear_bumper": "rear",
 	"rear_lamps": "rear", "plate": "rear", "mudflaps": "rear", "rear_ornament": "rear",
@@ -27,6 +27,10 @@ const WHEEL_VIEW_SPEED: float = 1.0
 ## Proporcao de referencia (16:9). Tela mais comprida (celular 20:9) aproxima um pouco para o caminhao
 ## continuar ocupando a mesma fracao da largura.
 const REF_ASPECT: float = 16.0 / 9.0
+## Malha do galpao onde o caminhao fica (plataforma giratoria, 10 cm acima do piso; T-171).
+const PLATFORM_MESH: String = "turntable"
+## Topo da plataforma se o galpao nao tiver a malha (m).
+const PLATFORM_TOP_FALLBACK: float = 0.1
 
 signal wheel_spin_changed(on: bool)
 
@@ -56,13 +60,21 @@ var _zoom_goal: float = 1.0
 var view: String = "default"
 ## Rodas girando ("Ver em movimento"). Desliga ao trocar de vista.
 var wheel_spin: bool = false
+## Previa da garagem (T-171): peca/cor temporaria mostrada no caminhao sem mexer no perfil. null = sem previa.
+var preview: GaragePreview
+## Altura (m) do que o caminhao pisa: topo da plataforma giratoria do galpao (0 sem galpao). T-171: antes o
+## caminhao nascia em y = 0 (piso) e os pneus afundavam 10 cm dentro da plataforma.
+var floor_y: float = 0.0
+static var _wheel_bottom_cache: Dictionary = {}     # caminho do .glb -> ponto mais baixo dos pneus (m)
 
 
 func _ready() -> void:
 	WorldEnv.create(self, true)
 	var hall: PackedScene = load(HALL_PATH) as PackedScene if ResourceLoader.exists(HALL_PATH) else null
 	if hall != null:                                  # galpao industrial (blender/scripts/build_garage_env.py)
-		add_child(hall.instantiate())
+		var h: Node3D = hall.instantiate() as Node3D
+		add_child(h)
+		floor_y = platform_top(h)
 	for n in get_children():
 		if n is WorldEnvironment:
 			_env = (n as WorldEnvironment).environment
@@ -113,6 +125,7 @@ func _spawn_truck() -> void:
 	truck.cab_kind = CabCatalog.normalize(prof.get("cab", ""))
 	truck.chrome_mode = "day" if day else chrome
 	add_child(truck)
+	truck.position.y = floor_y - wheel_bottom(truck)   # pneus apoiados SOBRE a plataforma (T-171)
 	truck.set_lights_on(true, day)
 	truck.set_light_pattern(String(prof.get("light_pattern", "steady")))
 
@@ -154,14 +167,34 @@ func _respawn() -> void:
 	refresh_truck()
 
 
+## Topo da plataforma giratoria do galpao `hall` (m). Sem a malha, PLATFORM_TOP_FALLBACK.
+static func platform_top(hall: Node) -> float:
+	var top: float = TruckGround.top_of(hall, PLATFORM_MESH)
+	return top if top > -INF else PLATFORM_TOP_FALLBACK
+
+
+## Ponto mais baixo dos pneus do caminhao (m, no espaco dele; os .glb atuais dao 0). Medido uma vez por modelo.
+static func wheel_bottom(t: TruckNode) -> float:
+	if t == null or t.model == null:
+		return 0.0
+	var key: String = TruckNode.model_path(t.body_kind, t.cab_kind)
+	if not _wheel_bottom_cache.has(key):
+		_wheel_bottom_cache[key] = TruckGround.wheel_bottom(t.model)
+	return float(_wheel_bottom_cache[key])
+
+
+## Monta o caminhao como esta no perfil; com previa ativa, com a peca/cor da previa (o perfil nao muda).
 func refresh_truck() -> void:
 	var gs: Node = get_node("/root/GameState")
-	truck.apply_loadout(gs.installed_part_defs())
-	var col: Color = Color(String(gs.profile.get("paint", "#e9eef5")))
+	var shown: Array[PartDef] = preview.loadout(gs) if preview != null else gs.installed_part_defs()
+	truck.apply_loadout(shown)
+	var col: Color = preview.paint(gs) if preview != null else Color(String(gs.profile.get("paint", "#e9eef5")))
 	truck.set_paint_color(col)
 	truck.apply_decals(gs.profile.get("decals", []) as Array)
-	# pecas quebradas/amassadas do perfil
-	for d in gs.installed_part_defs():
+	# pecas quebradas/amassadas do perfil (a peca da previa ainda nao comprada aparece nova)
+	for d in shown:
+		if not (gs.profile["owned"] as Dictionary).has(String(d.id)):
+			continue
 		var own: Dictionary = gs.profile["owned"][String(d.id)]
 		var st: String = "broken" if bool(own["broken"]) else ("dent" if d.durability > 0.0 and float(own["dur"]) < d.durability * 0.6 else "ok")
 		truck.set_part_state(String(d.id), st)

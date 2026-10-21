@@ -26,12 +26,13 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (301) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (327) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
 | Demonstração dos acessórios | `godot --path game res://scenes/tools/accessory_viewer.tscn` |
-| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` |
+| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` (T-173: escapamentos, turbinas, buzinas; sem tela: `--headless ... -- --cycle-profiles`) |
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
@@ -156,10 +157,34 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 ## PENDENTE — precisa do Marco
 
 - **T-169 (2026-10-21): modelos de `docs/Modelos` aplicados (+ T-163 e T-164).** Olhar `docs/capturas_t169/` (folhas `folha_*.png`: esquerda = antes, direita = depois) e dizer: (1) se gosta das **montanhas nevadas** no horizonte (quantidade, altura; neve cheia na montanha, só nos picos no litoral/cidade); (2) da **árvore de folhas** (cidade, 25% da montanha, 20% do litoral do lado da terra); (3) do **viaduto rodoviário por cima** (cidade 2.050 m, montanha 2.580 m) e dos **semáforos de faixa** nos túneis (X vermelho quando um evento fecha a faixa à frente; quer também a seta amarela?); (4) do mar com as ondas novas, dos postes com fios, do guard-rail em W e do pilar em T. Como testar no PC: `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --start=2400` (montanhas, postes, viaduto) e `--route=kanto_2_viaduct --start=950` (túnel com semáforos). **Gerar o APK de novo** para ver no celular (nenhuma mudança de protocolo de rede).
+- **T-171 (garagem: prévia antes de comprar + pneu sobre o chão):** gerar o APK de novo e, na GARAGEM > DECORAÇÃO, tocar
+  num encaixe (ex.: Para-choque frontal) e depois num cartão de peça que você não tem: a peça aparece no caminhão, a
+  câmera vai até ela e no alto do painel da direita aparece **PRÉVIA** com COMPRAR E EQUIPAR / VOLTAR AO ATUAL (o
+  dinheiro não muda). Arrastar a lista por cima dos cartões deve continuar rolando sem ativar a prévia. No PC: clique no
+  cartão, ou Tab/setas até ele e Enter (Esc volta). Cores com "F30/F60" agora podem ser tocadas só para ver. Olhar
+  `docs/capturas_t171/folha_previa.png` e `zoom_*.png` (esquerda = antes, pneu cortado; direita = depois). Dizer se o
+  botão deve **comprar e já equipar** (como está) ou só comprar.
 
 - **T-165 (2026-10-20): listas do menu/garagem rolam arrastando o dedo sobre os cartões (`TouchScroll`).** Falta o Marco confirmar no
   celular com **APK novo** (garagem > MODELO: arrastar sobre um cartão rola sem selecionar; toque rápido seleciona; repetir em Mercado e
   Opções). Se a rolagem demorar ou toques virarem rolagem, ajustar `DEADZONE` em `game/scripts/ui/components/touch_scroll.gd`.
+- **T-170 (som da seta):** jogar e tocar em < ou > (teclado A/D ou setas): deve ouvir o clique da alavanca e o
+  tique-taque enquanto a seta pisca (agora mais devagar, ~1,5 vez por segundo, e acende na hora do toque). Ouvir
+  `game/assets/audio/sfx/truck/turn_signal_tick.mp3` e `turn_signal_switch.mp3` (regerar: `python tools/gen_audio.py
+  --only turn_signal_tick --force`). **Decidir:** quer também um pisca manual (liga e fica ligado até desligar, com
+  botões/teclas próprios, ex. Q/E) ou o da troca de faixa basta? **Gerar o APK de novo** para ouvir no celular.
+- **T-173 (som do motor por escapamento, turbina e buzinas):** abrir `godot --path game res://scenes/tools/engine_audio_test.tscn`,
+  escolher o **Escapamento** (Reto rouco, Chaminés V8, Cromado estalos), ligar "Acelerar automático" e trocar a **Turbina**;
+  tocar as 3 buzinas marcadas "(nova)". Dizer quais dos **15 sons de motor/turbo** e das **3 buzinas** regerar
+  (`python tools/gen_audio.py --only nome --force`). No jogo: GARAGEM > MECÂNICA (botão OUVIR nos motores/turbos/escapes;
+  seção BUZINA no fim). Confirmar os 2 escapes novos e os preços (BALANCEAMENTO), buzina grátis, e se as chaminés devem
+  montar a peça visual `kw_exhaust_stacks`. **Gerar o APK de novo** (protocolo de rede 7).
+- **T-172 (peças deluxe, amostras de acabamento):** olhar `docs/capturas_t172/` (`antes_depois_garagem_noite.png`
+  primeiro; esquerda = peças antigas, direita = deluxe) e `game/assets/vehicles/dekotora/previews/deluxe_contact_sheet.png`
+  (cada peça de dia, de noite e de perto) e dizer: (1) se o nível de detalhe está bom e se seguimos para mais peças;
+  (2) se "estura" era estrutura lateral/estribo (foi o que fizemos) ou outra coisa; (3) se o andon 一番星 sobre a cabine
+  é o "baú em cima da cabine" que você queria (tamanho/altura); (4) preços propostos em `docs/BALANCEAMENTO.md`.
+  Abrir no PC: `godot --path game res://scenes/tools/accessory_viewer.tscn -- --cat=deluxe` ([N] acende/apaga).
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; ~~confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros~~ (licença LIBERADA pelo Marco em 2026-10-20, T-166); dizer se quer

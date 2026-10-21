@@ -5,6 +5,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 | Data | Decisão | Motivo |
 | --- | --- | --- |
 | 2026-10-21 | **Modelos novos e antigos de docs/Modelos aplicados (T-169, com T-163 e T-164).** Licença não é mais restrição (Marco). Entraram: **montanhas nevadas** no horizonte das 3 rotas no lugar dos cones (4 maciços do "Fundo Montanha Gelo", ~900 triângulos cada; neve cheia na montanha, só nos picos no litoral e na cidade; 16/10/6 maciços), **ondas do mar** (mapa de normais do pacote "Agua"), **árvore de folhas** (Gleditsia, 279 triângulos, 6,5 m: no lugar da árvore redonda na cidade, 25% na montanha, 20% no litoral do lado da terra), **poste** (coluna, caixa e suporte do poste novo no poste de energia da T-163), **pilar em T, guard-rail em W, postes com fios** (T-163), **viaduto rodoviário cruzando por cima** (cidade 2.050 m, montanha 2.580 m, seção da Ponte A) e **semáforos de faixa nos túneis** (seta verde / X vermelho ligados aos eventos, T-164). Tudo só visual; `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals` desligam. Escolhas de lugar e quantidade feitas pelo Claude: **confirmar** | Pedido do Marco (T-169) e decisões da T-159. Detalhes na seção "T-169" no fim |
+| 2026-10-21 | **Variedade de som do motor e buzinas (T-173) — números e sons A CONFIRMAR PELO MARCO.** (1) **O escapamento define o som do motor**: `exh_straight` (reto esportivo, rouco) = perfil `exh_rasp`; **novos** `exh_stack` (chaminés verticais, grave potente) = `exh_stack` e `exh_chrome_cut` (cromado cortado, estalos) = `exh_pop`; o escape padrão continua com os loops do próprio motor (`i6_std`/`i6_tuned`/`v8`). Cada perfil tem 3 loops (lenta, média, alta) que **substituem** os do motor; o motor só muda o tom (V8 ×0,9, 6 cil. preparado ×1,06). (2) **Turbina**: com turbo simples ou duplo toca o assobio do perfil (duplo 10% mais agudo e +2 dB) e o "pssh" do perfil ao soltar; no escape padrão, os sons de turbo antigos. (3) **Escapes novos na loja** (propostas, ver BALANCEAMENTO): chaminés +2% torque, +16 destaque, 28.000 ¥; cromado cortado +2,5%, +12, 22.000 ¥. As chaminés são só o som/estatística: **não montam** a peça visual `kw_exhaust_stacks` (ligar as duas é decisão pendente). (4) **Buzina escolhida na garagem** (aba MECÂNICA, seção BUZINA, **grátis**): automática (a da peça, como antes) ou uma das 6 (3 antigas + 3 novas: grave de navio, dupla de dois tons, musical dekotora). Vai no descritor de rede (`horn`, **protocolo 7**). (5) **Rivais offline**: motor/turbo/escape/buzina **sorteados só no som** (semente = rota + lugar no grid); a simulação deles não muda. Online: cada um ouve o motor e a buzina do descritor do outro (antes todos ouviam o 6 cilindros padrão). (6) A buzina de ar básica só sustenta ~0,3 s: o loop de "segurar" agora usa a janela medida de cada buzina (antes repetia silêncio). | Pedido do Marco ("3 de cada para validar"). 18 sons gerados no ElevenLabs, 627 créditos |
 | 2026-10-20 | **Respostas do Marco sobre a T-159 (docs/Modelos/Road_pontes):** (1) todos os modelos que o Marco fornece são "Royalty Free (no AI)", sem exigência de crédito — vale também para os próximos; (2) o "Outdor" era mesmo um pórtico de placas; não será usado (os pórticos da T-146 ficam); (3) **sim** aos postes de energia com fios; (4) **sim** ao viaduto rodoviário cruzando por cima da pista; (5) **sim** ao semáforo de faixa no túnel (seta verde / X vermelho) ligado aos eventos de faixa fechada. Os modelos também servem de **referência para fases novas**: cada fase não precisa ter todos os itens; o coordenador mantém um catálogo de peças selecionadas para distribuir depois (docs/BIBLIOTECA_CENARIO.md) | Marco, 2026-10-20 |
 | 2026-10-20 | **Campanha sempre 1 contra 1; amigos 2 a 4 com "comboio" (T-156, G1) — DECISÃO DO MARCO.** A corrida da campanha (Continuar, Mercado de fretes) é só o jogador contra o rival da rota (antes: + 2 bots). A **corrida rápida** (sem rota) continua com o jogador + 3 bots (o Marco não citou; **confirmar**). Online continua 2 a 4 jogadores (bots completam se a sala quiser); com **3 ou 4 jogadores é o modo "comboio": trânsito um nível mais leve** que a regra da sala (normal → leve, pesado → normal), aplicado pelo servidor e mandado no setup. | Pedido do Marco (G1). Detalhes na seção "T-156" no fim |
 | 2026-10-20 | **Abertura "frente a frente" antes da largada (T-156) — visual e números A CONFIRMAR PELO MARCO.** Só apresentação (a simulação espera na largada e começa no fim da contagem, como antes). **Cheia (~9,4 s: 6,4 s de cena + 3 s de contagem)**: os dois caminhões de verdade (peças, pintura, adesivos, padrão de luz) estacionados de frente num cenário montado com peças que já existem — **área de descanso** (noite e fim de tarde: loja, máquinas de bebida, postes de sódio, neon) ou **praça de pedágio** (dia: 2 pedágios da pista, cabines, placas ETC/一般, pinheiros); faróis piscando de provocação; câmera nos detalhes (para-choque, viseira + andon, mural) com a **faixa** de cada um (brasão, nome do motorista e do caminhão, destaque das peças, fala curta); banner **VS** com mancha de tinta vermelha, 対決 e tambor; na pista, o **alinhamento** (os dois entram na faixa, câmera alta descendo) e a contagem com o corte lateral de sempre. **Curta (3 s)**: revanche (mesma rota e rival de novo, até fechar o jogo), corrida rápida e online com 3–4. Um toque/tecla/botão pula para a contagem. **Grid lado a lado** (StartGrid): duelo com uma faixa livre entre os dois (jogador na direita, rival na esquerda), 3–4 = três lado a lado + um atrás; a largada passou para 30 m da pista (atrás do zero não existe asfalto e a câmera ficava em cima do baú). **Rival da IA**: sem duelo nos 8 s iniciais, não prende o jogador no acostamento e não anda abaixo de 80% do ritmo só para ficar ao lado. Sem retratos (não existem): brasão com um kanji na cor do caminhão. **Online**: protocolo 6 (`intro`, `countdown_total` no setup; o servidor espera a abertura inteira) | Pedido do Marco (G1, inspirado no Art Truck Battle sem copiar). Detalhes, custo e medidas na seção "T-156" no fim |
@@ -352,3 +353,64 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   triângulos +0 a +19 mil (máximo na cidade perto do viaduto), textura +0,6 a +0,8 MB, FPS igual dentro do ruído do PC.
 - **Confirmar com o Marco:** quantidade/altura das montanhas e a neve no litoral/cidade; mistura das árvores; lugar dos
   2 viadutos; se o semáforo deve mostrar também a seta amarela (troca de faixa) além do X.
+## 2026-10-20 — T-170: som da seta (pisca) ao tocar em < ou > (pedido do Marco)
+
+- **O que "seta" é no jogo**: o pisca de troca de faixa que JÁ existia (ATB-1): 1º toque em < / > (A/D ou setas do
+  teclado) liga a seta (`TruckSim.signal_dir`, 4 lâmpadas âmbar no `TruckNode`, setas no HUD); 2º toque no mesmo lado
+  dentro de 1,5 s troca de faixa. O pedido "quero som de seta, quando eu clico nele" foi atendido nesse pisca, **sem
+  botões nem teclas novas** (Q/E e botões de pisca separados ficaram de fora: seriam um segundo pisca na tela, confuso).
+  Se o Marco quiser um pisca manual que fica ligado até desligar, é outra tarefa (ver STATUS, pendências).
+- **Ritmo**: o pisca passou de ~3 Hz (relógio global) para **~1,5 Hz** (0,33 s aceso / 0,33 s apagado, como um
+  caminhão de verdade) e **começa aceso no toque** (antes podia demorar até 0,16 s; as setas curtas dos bots às vezes
+  nem acendiam). Lâmpadas, HUD e som usam o mesmo `SignalBlink` (`scripts/truck/signal_blink.gd`). Na janela de 1,5 s
+  a lâmpada acende 3 vezes.
+- **Som** (`scripts/audio/turn_signal_audio.gd`, só do jogador): `turn_signal_tick` (relé) a cada acender (tom normal)
+  e apagar (tom 0,86, mais grave), em sincronia com a lâmpada — por isso NÃO é um arquivo em loop (o ritmo de um loop
+  gerado não bateria com a lâmpada); `turn_signal_switch` (alavanca) a cada toque em < ou > (borda de
+  `TruckSim.tap_prev`; não usa `lane_changes`, que online pode contar o mesmo toque duas vezes na reconciliação).
+  Barramento SFX: volume de efeitos e mudo das Opções valem. Gerados no ElevenLabs (~0 créditos visíveis; conta em
+  61.234 de 131.000).
+- **Só apresentação**: nada mudou em `sim/` nem na rede. Online os piscas dos outros já apareciam (o `signal_dir` vai no
+  snapshot); o som é só da sua seta. Ideia anotada: ouvir baixinho a seta do rival ao lado.
+
+## 2026-10-21 — T-171: prévia de peças na garagem e pneus sobre a plataforma (pedido do Marco)
+
+- **Pneu "enterrado"**: os .glb estão certos (pneu em y = 0 nos 18 modelos, medido por
+  `tools_dev/measure_wheel_ground.gd`), mas a plataforma giratória do galpão (`garage_hall.glb`, malha `turntable`) tem
+  10 cm de altura e o caminhão nascia no piso (y = 0): o pneu afundava 10 cm dentro do disco. Agora o `GarageStage`
+  mede o topo da plataforma e o ponto mais baixo dos pneus (`TruckGround`) e sobe o caminhão (`floor_y`, ~0,10 m).
+  Vale para garagem, lobby e o fundo antigo do menu (todos usam o `GarageStage`). **A corrida não muda** (o
+  `TruckNode` continua com o pneu em y = 0 na pista).
+- **Prévia** (`ui/garage_preview.gd` = estado, `ui/garage_preview_ui.gd` = tela): tocar/clicar num cartão de peça não
+  instalada (ou chegar nele com setas/Tab/controle) monta a peça no caminhão no lugar da do mesmo encaixe, leva a câmera
+  para a vista dela (calotas: vista da roda, girando) e mostra a faixa **PRÉVIA** no topo do painel direito (fora da
+  rolagem, para não cobrir a peça) e a etiqueta "◉ PRÉVIA · nome" no alto da tela. Botões: **COMPRAR E EQUIPAR**
+  (compra e já instala; desligado com o motivo se faltar Fama/dinheiro), **EQUIPAR** (já é sua) e **VOLTAR AO ATUAL**
+  (ou Esc / B). Trocar de encaixe, de aba ou sair da garagem volta ao equipado. Nada entra no perfil até comprar.
+- Arrastar a lista sobre um cartão continua rolando (T-165): só conta como toque se o dedo soltar a até 12 unidades de
+  onde apertou; toque nos botões do cartão fica com o botão.
+- **Cores travadas por Fama** agora podem ser tocadas para ver no caminhão (antes ficavam desligadas); continuam sem poder
+  aplicar. Cores liberadas, luzes e adesivos já aplicavam na hora (grátis), então não precisam de prévia.
+- **Mecânica** (motor, turbo, escape, freio-motor, pneus esportivos) não tem peça visível no caminhão: a prévia continua
+  sendo o efeito em texto (peso, 0–100, destaque). Os escapamentos altos são peça de encaixe e têm prévia 3D.
+- Decisão do Claude (confirmar com o Marco): o botão da faixa compra **e instala** de uma vez; o cartão continua com
+  COMPRAR (só comprar) como antes.
+## 2026-10-21 — T-172: peças "deluxe" (amostras de acabamento fino) — PROPOSTAS, Marco valida
+
+- **Pedido**: "muito detalhe para as peças como neon, pisca, [estura], baú em cima da cabine igual ao Bakusou Dekotora
+  Densetsu". **"estura"** foi lido como **estrutura lateral** (a サイドバンパー, armação cromada com luzes embaixo do baú)
+  **e estribo** (degrau da cabine): saíram as duas peças. Se era "escapamento", os escapamentos altos cromados já existem
+  (`kw_exhaust_stacks`, T-126). **"baú em cima da cabine"** = a caixa de luz alta (andon "Ichibanboshi" 一番星) sobre o
+  teto da cabine, virada para a frente.
+- **6 amostras** (`blender/scripts/accessories/deluxe.py`, até 6.000 triângulos cada, marcadas `tier: "deluxe"` no
+  catálogo): andon de cabine 一番星, coroa de lanternas de ônibus, neon de chão, estrutura lateral cromada, estribo
+  iluminado, barra de 16 lanternas. Entram como **opções a mais** nos encaixes que já existem (andon, luzes de teto, saias,
+  degraus, lanternas traseiras); as 42 peças antigas continuam iguais.
+- **Encaixe novo `underglow` ("Neon de chão")**: o neon de chão fica embaixo do chassi e pode ser usado junto com as saias.
+- **Luz que acompanha dia/noite**: o brilho no asfalto (neon de chão e luz de cortesia do estribo) e a face de acrílico do
+  andon seguem a mesma força das luzinhas (`TruckNode.set_lights_on`): de dia o chão quase não brilha (0,04) e o acrílico
+  fica em 1/4; de noite e nos túneis acendem. As lentes âmbar piscam com o padrão de luzes escolhido na garagem.
+- **Preço/peso/Destaque**: propostas em `docs/BALANCEAMENTO.md` (seção T-172).
+- **Pendente do Marco**: olhar `docs/capturas_t172/` e dizer se o nível de acabamento está bom e se seguimos para mais
+  peças (frente: para-choque/viseira/grade; traseira: andon traseiro; laterais: painéis "uroko" no baú).
+

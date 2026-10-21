@@ -38,6 +38,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-154] (F3) Ferrovia ao lado da rodovia: trem de carga, bonde amarelo, viadutos de trem e bocas de túnel; só visual, sem sim nem rede (concluída em 2026-10-19, `tests/test_railway.gd`, `docs/capturas_t154/`)
 - [x] [T-169] Modelos de docs/Modelos aplicados: montanhas nevadas no horizonte, ondas do mar, árvore de folhas, poste novo; com T-163 (pilar em T, guard-rail em W, postes com fios, `docs/BIBLIOTECA_CENARIO.md`) e T-164 (viaduto rodoviário por cima, semáforos de faixa nos túneis) — concluída em 2026-10-21, `tests/test_scenery_t169.gd`, `docs/capturas_t169/` (escolhas de lugar/quantidade: confirmar com o Marco)
 - [x] [T-156] (G1) Abertura "frente a frente" antes da largada (cheia ~9,4 s, curta 3 s), campanha 1 contra 1, grid lado a lado, comboio online 3–4 e protocolo 6 com relógio comum (concluída em 2026-10-20, `tests/test_duel_scene_flow.gd`, `docs/capturas_t156/`)
+- [x] [T-170] Som da seta (pisca de troca de faixa): tique-taque do relé sincronizado com a lâmpada (~1,5 Hz, começa aceso) e clique da alavanca a cada toque em < / >; 2 sons novos no ElevenLabs; só apresentação (concluída em 2026-10-20, `tests/test_turn_signal.gd`)
+- [x] [T-171] Garagem: prévia da peça montada no caminhão antes de comprar (toque/mouse/teclado/controle, câmera na vista da peça, COMPRAR E EQUIPAR / EQUIPAR / VOLTAR AO ATUAL, cores travadas só para ver) e pneus apoiados sobre a plataforma do galpão (antes afundavam 10 cm) (concluída em 2026-10-21, `tests/test_garage_preview.gd`, `docs/capturas_t171/`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)
@@ -56,11 +58,14 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 
 - [x] [T-145] Carroceria graneleira (aberta com lona, 4 cabines, garagem/perfil/rede/bots) e regra carga x carroceria nos contratos: baú leva carga fechada, graneleira leva granel (grãos, brita), madeira/aço/peças vão nas duas (concluída em 2026-10-19, `tests/test_graneleira.gd`, `docs/capturas_t145/`; regra a confirmar pelo Marco)
 
+- [~] [T-172] Peças deluxe (amostras de acabamento fino): andon de cabine 一番星, coroa de lanternas de ônibus, neon de chão (encaixe novo), estrutura lateral cromada, estribo iluminado, barra de 16 lanternas; brilho/acrílico acompanham dia/noite (feito em 2026-10-21, `tests/test_parts_deluxe.gd`, `docs/capturas_t172/`; **PRECISA MARCO** aprovar o visual para seguir com mais peças)
+
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins
 - [x] [P50] Preparar loops e importar áudio
 - [x] [P51] Som do motor em camadas
 - [x] [P52] Efeitos e música no jogo
+- [x] [T-173] Variedade de som: 3 escapamentos com som próprio do motor (reto rouco, chaminés graves, cromado com estalos), turbina com assobio e "pssh" de cada perfil, 3 buzinas novas escolhidas na aba MECÂNICA (botão OUVIR), rivais com som sorteado, online com buzina/escape do descritor (protocolo 7) (concluída em 2026-10-21, `tests/test_engine_sounds.gd`; Marco precisa OUVIR)
 
 ## Fase 6 — Multiplayer
 - [x] [P60] Servidor headless + salas por código (2 janelas no mesmo PC)

@@ -28,6 +28,11 @@ var _spin_btn: Button
 var _ui_layer: CanvasLayer
 var _preview_cache: Dictionary = {}
 var _last_wheel_part: String = "?"          # roda/calota instalada no ultimo redesenho (instalar uma nova liga o giro)
+## Previa (T-171): peca/cor mostrada no caminhao antes de comprar; nunca entra no perfil.
+var preview := GaragePreview.new()
+var _banner: VBoxContainer                  # faixa "PREVIA" no topo do painel direito (GaragePreviewUi.build_banner)
+var _tag: Label                             # etiqueta "PREVIA" no alto do meio da tela
+var _banner_main: Button
 
 
 func _ready() -> void:
@@ -35,9 +40,15 @@ func _ready() -> void:
 	gs = get_node("/root/GameState")
 	shop = GarageShop.new(gs, _preview, _flash)
 	stage = GarageStage.new()
+	stage.preview = preview
 	add_child(stage)
 	shop.live_decals = func(list: Array) -> void: stage.truck.apply_decals(list)
 	shop.focus_view = func(view: String) -> void: stage.focus_view(view)
+	shop.on_preview = preview_part
+	shop.on_preview_accept = func() -> void:
+		if _banner_main != null and is_instance_valid(_banner_main):
+			_banner_main.grab_focus()
+	shop.on_preview_paint = preview_paint
 	_ui_layer = CanvasLayer.new()
 	add_child(_ui_layer)
 	var root := Control.new()
@@ -69,11 +80,25 @@ func _ready() -> void:
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.alignment = BoxContainer.ALIGNMENT_END
 	mid.add_child(center)
+	_tag = UiKit.heading("", 18, GaragePreviewUi.PREVIEW_COLOR)   # "◉ PREVIA · peca" no alto, sem cobrir o caminhao
+	_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tag.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_tag.custom_minimum_size = Vector2(60, 0)
+	_tag.size_flags_horizontal = Control.SIZE_FILL         # largura do meio; nome comprido vira "..."
+	_tag.add_theme_stylebox_override("normal", UiTheme.box(Color(0.02, 0.04, 0.08, 0.78), GaragePreviewUi.PREVIEW_COLOR, 1, 14, 10))
+	_tag.visible = false
+	center.add_child(_tag)
+	center.add_child(UiKit.spacer(true))
 	_msg = UiKit.heading("", 18, UiTheme.CYAN, false)
 	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	center.add_child(_msg)
 	_right = _column(mid, false)
+	_banner = VBoxContainer.new()                     # faixa PREVIA no topo do painel direito, fora da rolagem
+	_banner.visible = false
+	var right_col: Node = _right.get_parent().get_parent()
+	right_col.add_child(_banner)
+	right_col.move_child(_banner, 0)
 	_build_bottom(vb)
 	stage.wheel_spin_changed.connect(func(_on: bool) -> void: _update_spin_button())
 	var dbg: Dictionary = GarageDebug.apply(self, gs, stage, _ui_layer)
@@ -125,7 +150,9 @@ func _build_bottom(parent: VBoxContainer) -> void:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(row)
 	var back: Button = UiKit.back_button(Vector2(140, 44))
-	back.pressed.connect(func() -> void: SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
+	back.pressed.connect(func() -> void:
+		preview.clear()                        # a previa nunca entrou no perfil: sair nao leva nada junto
+		SceneFader.go(get_tree(), "res://scenes/menu/main_menu.tscn"))
 	row.add_child(back)
 	row.add_child(UiKit.spacer())
 	var strip: PanelContainer = UiKit.glass_panel(0.75)
@@ -177,6 +204,7 @@ func _update_spin_button() -> void:
 func _set_tab(t: String) -> void:
 	_tab = t
 	_slot = ""
+	preview.clear()
 	stage.focus_default()
 	_refresh()
 
@@ -189,6 +217,8 @@ func _clear(c: Control) -> void:
 
 func _refresh() -> void:
 	_preview_cache.clear()
+	preview.settle(gs)                        # peca da previa instalada / cor aplicada: a previa acaba
+	shop.previewing = preview.part_id if preview.part_id != "" else preview.paint_hex
 	if _day_btn != null:
 		_day_btn.text = Tr.t("garage.preview_day") if stage.day else Tr.t("garage.preview_night")
 	stage.refresh_truck()
@@ -221,6 +251,7 @@ func _refresh() -> void:
 		shop.build_slot_detail(_right, _slot)
 	else:
 		GarageInfoPanel.build(_right, gs, _preview({}), func() -> void: _set_tab("parts"))
+	_build_banner()
 
 
 ## Roda/calota nova instalada: mostra a roda e liga o giro para o jogador ver a peca em movimento.
@@ -237,6 +268,82 @@ func _preview(changes: Dictionary) -> Dictionary:
 	if not _preview_cache.has(key):
 		_preview_cache[key] = gs.preview(changes)
 	return _preview_cache[key]
+
+
+# ---------------------------------------------------------------- previa (T-171)
+
+## Mostra a peca `id` no caminhao (sem comprar), leva a camera para a vista dela e liga o giro nas rodas/calotas.
+func preview_part(id: String) -> void:
+	if preview.part_id == id:
+		return
+	preview.set_part(id)
+	_show_preview()
+	var slot: String = preview.slot(gs)
+	stage.focus_slot(slot)
+	if slot == "hubcaps":
+		stage.set_wheel_spin(true)
+
+
+## Cor travada por Fama: so ver no caminhao (a liberada continua aplicando direto, e gratis).
+func preview_paint(hex: String) -> void:
+	if preview.paint_hex == hex.to_lower():
+		return
+	preview.set_paint(hex)
+	_show_preview()
+	stage.focus_view("side")
+
+
+## Sai da previa: o caminhao volta ao que esta equipado (o perfil nunca mudou).
+func end_preview() -> void:
+	if not preview.active():
+		return
+	preview.clear()
+	_show_preview()
+
+
+## Atualiza caminhao, marcas dos cartoes e a faixa sem redesenhar as listas (o foco do teclado fica onde esta).
+func _show_preview() -> void:
+	shop.previewing = preview.part_id if preview.part_id != "" else preview.paint_hex
+	stage.refresh_truck()
+	for id in shop.preview_cards:
+		var c: PanelContainer = shop.preview_cards[id]
+		if is_instance_valid(c):
+			GaragePreviewUi.mark_card(c, String(id) == preview.part_id, false)
+	_build_banner()
+
+
+func _build_banner() -> void:
+	var delta: String = ""
+	if preview.part_id != "":
+		delta = shop.delta_text(_preview({"install": preview.part_id}), _preview({}))
+	_banner_main = GaragePreviewUi.build_banner(_banner, gs, preview, {
+		"buy_install": _preview_buy_install,
+		"install": func() -> void:
+			AudioBus.play_ui("ui_select")
+			gs.install(preview.part_id),
+		"back": func() -> void:
+			AudioBus.play_ui("ui_select")
+			end_preview(),
+	}, delta)
+	GaragePreviewUi.update_tag(_tag, gs, preview)
+
+
+## COMPRAR E EQUIPAR: compra (paga) e instala a peca da previa; a previa vira o caminhao de verdade.
+func _preview_buy_install() -> void:
+	var d: PartDef = gs.part(preview.part_id)
+	if d != null and gs.buy(d):
+		gs.install(String(d.id))
+		AudioBus.play_ui("ui_buy")
+		_flash(Tr.t("garage.bought", [Tr.t("part." + String(d.id))]))
+	else:
+		AudioBus.play_ui("ui_error")
+
+
+## Esc / B do controle durante a previa: volta ao equipado.
+func _unhandled_input(event: InputEvent) -> void:
+	if preview.active() and event.is_action_pressed("ui_cancel"):
+		end_preview()
+		get_viewport().set_input_as_handled()
 
 
 func _flash(text: String) -> void:
@@ -297,6 +404,7 @@ func _build_slots() -> void:
 		b.add_theme_color_override("font_color", UiTheme.GOLD if inst != "" else UiTheme.TEXT)
 		b.pressed.connect(func() -> void:
 			AudioBus.play_ui("ui_select")
+			preview.clear()                                          # trocou de encaixe: volta ao equipado
 			_slot = "" if _slot == String(slot) else String(slot)   # tocar de novo fecha e volta a ficha
 			if _slot != "":
 				stage.focus_slot(_slot)

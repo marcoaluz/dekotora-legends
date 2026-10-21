@@ -193,6 +193,26 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   `godot --headless --path game -s res://tools_dev/make_compare_sheet.gd -- --out=ABS.png A.png B.png ...`
   Opções `--cols=2` e `--w=640`. Ordem: esquerda para a direita, de cima para baixo (antes, depois, antes, depois...).
 
+## Som do motor por escapamento e buzinas (T-173)
+
+- Quem escolhe os arquivos: `scripts/audio/engine_sounds.gd` (`EngineSounds.spec(engine, turbo, exhaust)` /
+  `from_descriptor(desc)` devolve um Dictionary; `EngineAudio.setup_spec(spec, jake)` toca). O mapa escapamento → perfil é
+  dado: `ExhaustDef.sound_profile` em `data/engines/exh_*.tres` ("" = loops do motor, 4 camadas). Perfil = 3 loops
+  `<perfil>_idle/_mid/_high` + `<perfil>_turbo_whine` + `<perfil>_blowoff` em `assets/audio/engines/`. Arquivo faltando =
+  volta ao som antigo.
+- Nome de som que contém `_idle`, `_mid`, `_high`, `_whine`, `_loop`... vira loop no `AudioBus` (`LOOP_HINTS`): "pssh" e
+  buzinas não podem ter esses pedaços no nome.
+- Buzinas: `scripts/audio/horn_catalog.gd` (ids, musical ou sustentada, janela de loop medida). Perfil `horn` ("" =
+  automática = a da peça); `GameState.installed_horn()/set_horn()`; ação online `set_horn`; descritor `horn` (protocolo 7).
+- Garagem: `ui/garage_horns.gd` (seção BUZINA e botão OUVIR); prévia = `audio/sound_preview.gd` (nó filho do `AudioBus`).
+- Rivais offline: `EngineSounds.rival_loadout(seed)` / `HornCatalog.rival_horn(seed)` (só som). `EngineAudio.synth_boost`
+  inventa o boost de quem não tem turbo na sim.
+- Medir som sem ouvir: Blender lê MP3 (`aud.Sound(path).data()` dá numpy) → duração, volume, envelope (ver LOG da T-173).
+- Testes `tests/test_engine_sounds.gd`; ferramenta `-- --cycle-profiles` em `scenes/tools/engine_audio_test.tscn`;
+  `tools/net_test.sh` imprime `SOM_REDE:` (`HORN=`/`EXH=`).
+- Em script de áudio, pegue o `AudioBus` por `(Engine.get_main_loop() as SceneTree).root.get_node_or_null("AudioBus")`
+  quando o nó pode estar fora da árvore (testes): `get_node("/root/...")` falha fora dela.
+
 ## Abertura frente a frente (T-156)
 
 - Flags da corrida (depois de `--`):
@@ -216,3 +236,33 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Teste de toque sem tela: `tests/test_touch_scroll.gd` (manda o mouse emulado com `device = InputEvent.DEVICE_ID_EMULATION` e depois o
   `InputEventScreenTouch/ScreenDrag`, via `root.push_input(ev, true)`; chame `get_minimum_size()` + `NOTIFICATION_SORT_CHILDREN` para montar o layout
   no mesmo quadro). Clique de mouse "real" (device 0) não chega aos botões no modo sem tela; teste mouse na janela.
+## Seta / pisca (T-170)
+
+- "Seta" no jogo = o pisca da troca de faixa (`TruckSim.signal_dir`, 1º toque liga, 2º troca). Não existe outro pisca.
+- Ritmo único: `SignalBlink` (`scripts/truck/signal_blink.gd`, 0,33 s aceso/apagado, começa aceso). Quem mostra ou toca
+  a seta (TruckNode, RaceHud, TurnSignalAudio) tem a sua instância e chama `update(signal_dir, SignalBlink.now())`
+  todo quadro; assim lâmpada, HUD e som andam juntos. Não use `Time.get_ticks_msec() / N % 2` para piscar a seta.
+- Som sincronizado com algo visual: toque um arquivo curto em cada borda (acende/apaga) em vez de um loop gerado,
+  cujo ritmo não bate. O clique da alavanca vem da borda de `TruckSim.tap_prev` (igual offline e online); contadores
+  como `lane_changes` podem contar duas vezes no cliente online (a reconciliação reaplica comandos).
+- Teste: `tests/test_turn_signal.gd` (`TurnSignalAudio.step(...)` com o relógio da simulação; fora da árvore só conta).
+- Nos testes, o `_ready` do AudioBus ainda não rodou: o barramento "SFX" pode não existir (o `bus` volta "Master").
+
+## Garagem: chão do palco e prévia (T-171)
+
+- A origem do `TruckNode` é o chão da pista (pneu em y = 0 em todos os .glb). Em cenário com piso elevado (plataforma da
+  garagem, 0,10 m), suba o caminhão pelo topo da malha: `TruckGround.top_of(cenario, "turntable")` e
+  `TruckGround.wheel_bottom(modelo)` (`scripts/truck/truck_ground.gd`). O `GarageStage` já faz (`floor_y`). Conferir:
+  `tools_dev/measure_wheel_ground.gd`.
+- Prévia de peça/cor: estado em `GaragePreview` (nunca no perfil), o palco monta com `preview.loadout(gs)` /
+  `preview.paint(gs)`. Mudança de encaixe/aba chama `preview.clear()`; `preview.settle(gs)` em todo redesenho encerra a
+  prévia que virou realidade. Cartão tocável: `GaragePreviewUi.make_tappable` (só clique de mouse conta, o toque do
+  Android chega como mouse emulado; soltar a até 12 unidades = toque, senão era rolagem; foco por teclado = prévia).
+- Para não perder o foco do teclado, atualize a prévia sem redesenhar as listas (`_show_preview` na `garage_screen.gd`).
+- Depuração: `-- --demo --noparts --preview=ID`, `--preview-paint=#hex`, `--fame=N`. Teste: `tests/test_garage_preview.gd`.
+## Peças deluxe e brilho que acompanha dia/noite (T-172)
+
+- `AccessoryGlow` (`scripts/truck/accessory_glow.gd`), um por caminhão (`TruckNode.glow`): materiais `glow_*` viram shader aditivo (mancha calculada pela UV, cor da 1ª lâmpada `lamp_*` da peça) e `acrylic_*` só mudam a força da emissão. A força vem de `TruckNode.set_lights_on` (1 noite/túnel, 0,4 prévia de dia, 0,12 apagado). Chame `glow.apply(n)` DEPOIS da variante e ANTES do `LightPatterns` (que tira o nome dos materiais `lamp_*`).
+- Peças só desse lote: `tier = "deluxe"` no catálogo; visualizador `scenes/tools/accessory_viewer.tscn -- --cat=deluxe [--day] [--shot=ARQ.png]` ([N] liga/desliga as luzes).
+- `tools_dev/gen_data.gd -- --only=id1,id2` grava só essas peças. **Sem `--only` regrava as rotas e apaga `lane_sections`/`bridges` (T-153).**
+- Capturas `GODOT=... bash tools/capture_t172.sh PASTA_ABS [garagem|corrida]`; custo `bash tools/measure_t172.sh`.

@@ -24,6 +24,7 @@ var cargo_notice: Array[String] = []     # aviso da carga antes da largada (linh
 var _hf: Font
 var _bf: Font
 var _panel_sb: StyleBoxFlat
+var _blink := SignalBlink.new()          # T-170: ritmo da seta no HUD
 
 
 func bind(sim_: RaceSim, player_: int) -> void:
@@ -241,8 +242,10 @@ func _draw_curve_warning(t: TruckSim, cx: float, y: float) -> void:
 
 
 ## Setas de faixa: a do lado escolhido pisca em ambar enquanto o 2o toque ainda vale; pontos mostram a faixa atual.
+## T-170: mesmo ritmo das lampadas do caminhao e do tique-taque (SignalBlink, 1,5 Hz, comeca aceso).
 func _draw_lane_signal(t: TruckSim, cx: float, y: float) -> void:
-	var blink: bool = int(Time.get_ticks_msec() / 160) % 2 == 0
+	_blink.update(t.signal_dir, SignalBlink.now())
+	var blink: bool = _blink.lit
 	for side in [-1, 1]:
 		var on: bool = t.signal_dir == side
 		var col: Color = Color("#ffa30d") if on and blink else (Color(1, 1, 1, 0.16) if not on else Color(1, 1, 1, 0.3))

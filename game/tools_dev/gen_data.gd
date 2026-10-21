@@ -1,6 +1,8 @@
 extends SceneTree
 ## Gera os .tres de game/data/ a partir das tabelas de docs/BALANCEAMENTO.md (P41).
 ## Uso: godot --headless --path game -s res://tools_dev/gen_data.gd
+##      godot --headless --path game -s res://tools_dev/gen_data.gd -- --only=id1,id2   (so essas pecas; T-172)
+## ATENCAO: sem --only regrava TUDO, inclusive as rotas (perde lane_sections/bridges da T-153, que nao estao aqui).
 ## Os .tres sao a fonte de verdade depois de gerados; rode de novo so para regenerar tudo.
 
 # id, slot, zonas, peso, durabilidade, fama, preco, accessory_id, variante
@@ -52,6 +54,13 @@ const PARTS: Array = [
 	["fumi_sport_rims", "hubcaps", ["wheels"], 30, 50, 14, 20000, "fumi_sport_rims", {}],
 	["jac_steel_rims", "hubcaps", ["wheels"], 50, 80, 9, 9000, "jac_steel_rims", {}],
 	["jac_toolbox", "side_box", ["left", "right"], 80, 100, 6, 8000, "jac_toolbox", {}],
+	# --- T-172: amostras DELUXE (acabamento fino; valores PROPOSTOS, ver docs/BALANCEAMENTO.md)
+	["andon_ichiban_dx", "andon", ["roof"], 95, 45, 38, 48000, "andon_ichiban_dx", {}],
+	["marker_crown_dx", "roof_lights", ["roof"], 45, 35, 26, 32000, "marker_crown_dx", {}],
+	["underglow_neon_dx", "underglow", ["left", "right"], 18, 25, 20, 24000, "underglow_neon_dx", {}],
+	["side_bumper_dx", "side_skirts", ["left", "right"], 260, 220, 30, 46000, "side_bumper_dx", {}],
+	["step_lit_dx", "steps", ["left", "right"], 40, 60, 12, 16000, "step_lit_dx", {}],
+	["rear_tail_bar_dx", "rear_lamps", ["rear"], 55, 40, 22, 26000, "rear_tail_bar_dx", {}],
 ]
 
 # id, peso extra, torque, rpm de corte, preco
@@ -66,10 +75,12 @@ const TURBOS: Array = [
 	["turbo_single", 0.18, 1500.0, 0.8, 40000],
 	["turbo_twin", 0.30, 1300.0, 1.1, 85000],
 ]
-# id, bonus torque, fama, preco
+# id, bonus torque, fama, preco, perfil de som (T-173; "" = loops do motor)
 const EXHAUSTS: Array = [
-	["exh_std", 0.0, 0, 0],
-	["exh_straight", 0.03, 10, 18000],
+	["exh_std", 0.0, 0, 0, ""],
+	["exh_straight", 0.03, 10, 18000, "exh_rasp"],
+	["exh_stack", 0.02, 16, 28000, "exh_stack"],
+	["exh_chrome_cut", 0.025, 12, 22000, "exh_pop"],
 ]
 # id, efeito, valor, efeito colateral, valor, preco
 const UPGRADES: Array = [
@@ -102,7 +113,13 @@ func _save(res: Resource, path: String) -> void:
 
 
 func _initialize() -> void:
+	var only: PackedStringArray = []
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--only="):
+			only = a.substr(7).split(",")
 	for p in PARTS:
+		if not only.is_empty() and not (String(p[0]) in only):
+			continue
 		var d := PartDef.new()
 		d.id = StringName(p[0])
 		d.display_key = "part." + String(p[0])
@@ -117,6 +134,10 @@ func _initialize() -> void:
 		d.variant = p[8]
 		d.horn = String(HORNS.get(String(p[0]), ""))
 		_save(d, "res://data/parts/%s.tres" % p[0])
+	if not only.is_empty():
+		print("OK gen_data (so %d pecas)" % only.size())
+		quit()
+		return
 	for e in ENGINES:
 		var d := EngineDef.new()
 		d.id = StringName(e[0])
@@ -143,6 +164,7 @@ func _initialize() -> void:
 		d.torque_bonus = float(x[1])
 		d.fame = int(x[2])
 		d.price = int(x[3])
+		d.sound_profile = String(x[4])
 		_save(d, "res://data/engines/%s.tres" % x[0])
 	for u in UPGRADES:
 		var d := UpgradeDef.new()

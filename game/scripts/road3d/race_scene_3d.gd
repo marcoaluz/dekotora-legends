@@ -66,7 +66,9 @@ var _speed_fx: SpeedFx
 var _scrape_t: float = 0.0
 var _brake_fx: BrakeFx                  # T-144: fumaca dos pneus e marcas no asfalto na freada forte
 var _truck_sfx: Array[TruckSfx] = []    # T-144: buzina e freio de cada caminhao (os outros com volume pela distancia)
+var _turn_audio: TurnSignalAudio         # T-170: som da seta do jogador
 var _horns: Array[String] = []          # som de buzina de cada caminhao (peca instalada ou a basica)
+var _sound_loadouts: Dictionary = {}    # T-173: indice -> descritor (motor/turbo/escape) dos outros jogadores online
 var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
 var _rail: Railway3D                    # T-154: ferrovia e trens
@@ -278,8 +280,6 @@ func _setup_audio() -> void:
 	_audio = RaceAudio.new()
 	_audio.sim = sim                             # T-141: volume das batidas dos outros pela distancia
 	add_child(_audio)
-	var sets: Dictionary = {"eng_i6_std": "i6_std", "eng_i6_tuned": "i6_tuned", "eng_v8": "v8"}
-	var eng_id: String = String(gs.profile["engine"])
 	var music: String = "race_night_synthwave"
 	if route != null:
 		var rv: RivalDef = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
@@ -287,17 +287,20 @@ func _setup_audio() -> void:
 			music = "boss_enka_rock"
 		elif not tod.headlights:
 			music = "race_day_rock"
-	_audio.setup(sim.trucks[player], String(sets.get(eng_id, "i6_std")), String(gs.profile["turbo"]),
-		String(gs.profile["exhaust"]) == "exh_straight", music)
+	_audio.setup(sim.trucks[player], EngineSounds.from_descriptor(gs.truck_descriptor()), music)
 	for k in range(_trucks.size()):
 		if k != player:
 			if not online:
 				_rival_idx.append(k)
-			_rival_audio.append(_audio.make_rival_engine(_trucks[k], "i6_std"))
+			# T-173: online = motor/turbo/escape do descritor do outro jogador; offline = sorteio so de som
+			var lo: Dictionary = _sound_loadouts.get(k, EngineSounds.rival_loadout(_sound_seed(k)))
+			_rival_audio.append(_audio.make_rival_engine(_trucks[k], EngineSounds.from_descriptor(lo), not online))
 		var sfx := TruckSfx.new()
 		var horn: String = gs.installed_horn() if k == player and not online else (_horns[k] if k < _horns.size() else "")
 		sfx.setup(self if k == player else _trucks[k], k == player, horn)
 		_truck_sfx.append(sfx)
+	_turn_audio = TurnSignalAudio.new()          # T-170: tique-taque da seta e clique da alavanca (so do jogador)
+	_turn_audio.setup_from_bus(self, sim.trucks[player])
 
 
 ## Corrida online: monta os caminhoes do grid recebido do servidor (pecas, tinta, bots).
@@ -318,7 +321,10 @@ func _spawn_field_online() -> void:
 			if d != null:
 				defs.append(d)
 		node.apply_loadout(defs)
-		_horns.append(_horn_of(defs))
+		# T-173: buzina escolhida pelo outro jogador (descritor "horn"); servidor antigo/sem campo = a da peca
+		_horns.append(HornCatalog.resolve(String(entry["loadout"].get("horn", "")), _horn_of(defs)))
+		if not bool(entry["bot"]):
+			_sound_loadouts[i] = entry["loadout"]
 		var paint: String = String(entry.get("paint", "#e9eef5"))
 		if bool(entry["bot"]):
 			paint = FIELD_COLORS[i % FIELD_COLORS.size()].to_html(false)
@@ -411,7 +417,8 @@ func _spawn_field() -> void:
 			node.apply_loadout(defs)
 			node.set_paint_color(paint)
 			_horns.resize(i + 1)
-			_horns[i] = _horn_of(defs)
+			var ph: String = _horn_of(defs, "")
+			_horns[i] = ph if ph != "" else HornCatalog.rival_horn(_sound_seed(i))   # T-173: sem buzina na peca = sorteio
 			_bots.append(BotDriver.new(diff, 100 + i, g.y, i == 1 and rival != null))
 		node.set_headlights(tod.headlights)
 		node.set_light_pattern(String(gs.profile.get("light_pattern", "steady")) if i == 0 else LightPatterns.IDS[i % LightPatterns.IDS.size()])
@@ -420,11 +427,16 @@ func _spawn_field() -> void:
 
 
 ## Buzina que a lista de pecas traz (PartDef.horn) ou a basica (T-144).
-static func _horn_of(defs: Array[PartDef]) -> String:
+static func _horn_of(defs: Array[PartDef], fallback: String = "horn_air_basic") -> String:
 	for d in defs:
 		if d != null and d.horn != "":
 			return d.horn
-	return "horn_air_basic"
+	return fallback
+
+
+## Semente do sorteio de som dos rivais offline (T-173): a mesma rota e lugar no grid = o mesmo motor e buzina.
+func _sound_seed(i: int) -> int:
+	return hash((String(route.id) if route != null else "quick") + ":%d" % i)
 
 
 func _build_pause_menu() -> void:
@@ -599,6 +611,7 @@ func _update_audio(dt: float) -> void:
 	_audio.update_events(sim.track.events, t.z + t.length * 0.5)
 	for k in _truck_sfx.size():
 		_truck_sfx[k].update(sim.trucks[k], dt)
+	_turn_audio.update(t)
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)

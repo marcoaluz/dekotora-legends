@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_utl61"]
+
+[resource]
+script = ExtResource("1_utl61")
+id = &"side_bumper_dx"
+display_key = "part.side_bumper_dx"
+slot = &"side_skirts"
+zones = PackedStringArray("left", "right")
+weight_kg = 260.0
+durability = 220.0
+fame = 30
+price = 46000
+fame_required = 60
+accessory_id = "side_bumper_dx"

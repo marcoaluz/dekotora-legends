@@ -8,8 +8,7 @@ extends Node
 ##  - Freada forte: brake_squeal com volume pela intensidade (para ao soltar) e air_brake_hiss ao soltar, mais
 ##    alto quanto mais velocidade perdeu.
 
-const HORN_LOOP_FROM: float = 0.35        # s: volta para ca (pula o ataque)
-const HORN_LOOP_AT: float = 1.45          # s: daqui comeca a outra voz (antes do fim que decai)
+## Janela de loop (volta para / comeca a outra voz) de cada buzina: HornCatalog.loop_window (T-173).
 const HORN_FADE: float = 0.12             # s de cruzamento / de soltar
 const HORN_DB: float = -3.0
 const BRAKE_DB: float = -4.0
@@ -60,7 +59,7 @@ func _make(s: AudioStream, unit: float, max_d: float) -> Node:
 
 
 func is_musical() -> bool:
-	return horn_name.begins_with("horn_musical")
+	return HornCatalog.is_musical(horn_name)
 
 
 func horn_playing() -> bool:
@@ -84,9 +83,10 @@ func _update_horn(held: bool, dt: float) -> void:
 		_fade = [0.0, 0.0]
 	if _horn_on and not is_musical():
 		var cur: Node = _horn[_voice]
-		if float(cur.call("get_playback_position")) >= HORN_LOOP_AT and _fade[_voice] > 0.0:
+		var win: Array = HornCatalog.loop_window(horn_name)       # T-173: janela de loop medida por buzina
+		if float(cur.call("get_playback_position")) >= float(win[1]) and _fade[_voice] > 0.0:
 			var nxt: int = 1 - _voice
-			_start_voice(nxt, HORN_LOOP_FROM)
+			_start_voice(nxt, float(win[0]))
 			_fade[_voice] = 0.0
 			_fade[nxt] = 1.0
 			_voice = nxt

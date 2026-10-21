@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_k7jcx"]
+
+[resource]
+script = ExtResource("1_k7jcx")
+id = &"step_lit_dx"
+display_key = "part.step_lit_dx"
+slot = &"steps"
+zones = PackedStringArray("left", "right")
+weight_kg = 40.0
+durability = 60.0
+fame = 12
+price = 16000
+fame_required = 20
+accessory_id = "step_lit_dx"
