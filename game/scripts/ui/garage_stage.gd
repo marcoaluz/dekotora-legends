@@ -37,19 +37,29 @@ signal wheel_spin_changed(on: bool)
 var truck: TruckNode
 var day: bool = false                # previa de dia (luz clara) ou noite (luzes do caminhao em destaque)
 ## Cromo do palco: "studio" (garagem, neutro). A previa de dia usa o cromo "day" (como na corrida de dia).
+const INERTIA_TIME: float = 0.3     # s: constante de tempo da inercia depois de soltar
+const MAX_SPIN: float = 400.0       # graus/s maximos de inercia
+const EL_MIN: float = -2.0
+const EL_MAX: float = 70.0
+const ZOOM_MIN: float = 0.5
+const ZOOM_MAX: float = 2.0
 var chrome: String = "studio"
 var _env: Environment
 var _key: SpotLight3D
 var _rim: OmniLight3D
 var _fill: OmniLight3D
 var cam: Camera3D
-var auto_rotate: bool = true
 var _az: float = 38.0
 var _el: float = 11.0
 var _dist: float = 17.0
 var _target: Vector3 = Vector3(0, 1.7, -6.2)
 var _goal: Dictionary = FOCUS["default"]
 var _dragging: bool = false
+var _seek: bool = false            # true so enquanto vai ao angulo de uma vista recem-escolhida
+var _az_vel: float = 0.0           # inercia do arrasto (graus/s); morre em ~0,3 s
+var _el_vel: float = 0.0
+var _touches: Dictionary = {}      # indice do dedo -> posicao (pinca)
+var _pinch_dist: float = 0.0
 var _press_pos: Vector2 = Vector2.ZERO
 var _moved: float = 0.0
 var _shift: float = 0.0            # desloca o caminhao para a direita (fracao da distancia) ao liberar a tela
@@ -204,14 +214,12 @@ func focus_slot(slot: String) -> void:
 	var key: String = String(SLOT_FOCUS.get(slot, "default"))
 	_goal = FOCUS[key]
 	_set_view(key)
-	auto_rotate = false
 
 
 ## Vista pedida pelos botoes da garagem: "default", "front", "side", "rear", "roof" ou "wheel".
 func focus_view(v: String) -> void:
 	_goal = FOCUS.get(v, FOCUS["default"])
 	_set_view(v if FOCUS.has(v) else "default")
-	auto_rotate = view == "default"
 
 
 ## Layout da garagem: os paineis laterais sao de vidro; o caminhao fica no centro, grande (~60% da largura).
@@ -232,17 +240,16 @@ func focus_hero(shift: float = 0.22, dist: float = 15.5) -> void:
 	_shift_goal = shift
 	_zoom_goal = 1.0
 	_set_view("hero")
-	auto_rotate = false
 
 
 func focus_default() -> void:
 	_goal = FOCUS["default"]
 	_set_view("default")
-	auto_rotate = true
 
 
 ## Troca de vista: desliga o giro das rodas (o jogador liga de novo se quiser).
 func _set_view(v: String) -> void:
+	_seek = true
 	if v != view:
 		set_wheel_spin(false)
 	view = v
@@ -295,12 +302,22 @@ func _process(delta: float) -> void:
 	var k: float = 1.0 - exp(-4.0 * delta)
 	_target = _target.lerp(_goal["target"], k)
 	_dist = lerpf(_dist, float(_goal["dist"]), k)
-	if auto_rotate and not _dragging:
-		_az += delta * 12.0
-	elif not _dragging:
-		_az = lerpf(_az, float(_goal["az"]), k * 0.6)
 	if not _dragging:
-		_el = lerpf(_el, float(_goal["el"]), k * 0.6)
+		# inercia curta do arrasto; depois disso a camera so vai ao angulo da vista (nunca gira sozinha)
+		var decay: float = exp(-delta / INERTIA_TIME)
+		_az_vel *= decay
+		_el_vel *= decay
+		if absf(_az_vel) < 4.0:
+			_az_vel = 0.0
+		if absf(_el_vel) < 4.0:
+			_el_vel = 0.0
+		_az += _az_vel * delta
+		_el = clampf(_el + _el_vel * delta, EL_MIN, EL_MAX)
+		if _seek and _az_vel == 0.0 and _el_vel == 0.0:
+			_az = lerpf(_az, float(_goal["az"]), k * 0.6)
+			_el = lerpf(_el, float(_goal["el"]), k * 0.6)
+			if absf(_az - float(_goal["az"])) < 0.05 and absf(_el - float(_goal["el"])) < 0.05:
+				_seek = false
 	var a: float = deg_to_rad(_az)
 	var e: float = deg_to_rad(_el)
 	var dir := Vector3(sin(a) * cos(e), sin(e), -cos(a) * cos(e))
@@ -322,19 +339,63 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_press(event.pressed, event.position)
 	elif event is InputEventScreenTouch:
-		_press(event.pressed, event.position)
+		_touch(event)
 	elif event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-		_zoom_goal = clampf(_zoom_goal * (0.9 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1), 0.5, 2.0)
-	elif (event is InputEventMouseMotion or event is InputEventScreenDrag) and _dragging:
-		_moved += event.relative.length()
-		_az -= event.relative.x * 0.4
-		_el = clampf(_el + event.relative.y * 0.3, -2.0, 70.0)
+		_zoom_goal = clampf(_zoom_goal * (0.9 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1), ZOOM_MIN, ZOOM_MAX)
+	elif event is InputEventScreenDrag:
+		_touches[event.index] = event.position
+		if _touches.size() >= 2:
+			_pinch_update()
+		elif _dragging:
+			_rotate(event.relative, event.velocity)
+	elif event is InputEventMouseMotion and _dragging:
+		_rotate(event.relative, event.velocity)
+
+
+func _rotate(rel: Vector2, vel: Vector2) -> void:
+	_moved += rel.length()
+	_az -= rel.x * 0.4
+	_el = clampf(_el + rel.y * 0.3, EL_MIN, EL_MAX)
+	_az_vel = clampf(-vel.x * 0.4, -MAX_SPIN, MAX_SPIN)
+	_el_vel = clampf(vel.y * 0.3, -MAX_SPIN, MAX_SPIN)
+
+
+func _touch(event: InputEventScreenTouch) -> void:
+	if event.pressed:
+		_touches[event.index] = event.position
+	else:
+		_touches.erase(event.index)
+	_pinch_dist = 0.0
+	if _touches.size() >= 2:
+		_dragging = false
+		_az_vel = 0.0
+		_el_vel = 0.0
+		_pinch_dist = _pinch_span()
+	elif not event.pressed and _touches.size() == 1:
+		_dragging = false      # sobrou um dedo depois da pinca: so volta a girar num novo toque
+	else:
+		_press(event.pressed, event.position)
+
+
+func _pinch_span() -> float:
+	var pts: Array = _touches.values()
+	return (pts[0] as Vector2).distance_to(pts[1] as Vector2)
+
+
+func _pinch_update() -> void:
+	var d: float = _pinch_span()
+	if _pinch_dist > 1.0 and d > 1.0:
+		_zoom_goal = clampf(_zoom_goal * _pinch_dist / d, ZOOM_MIN, ZOOM_MAX)
+	_pinch_dist = d
 
 
 ## Arrastar gira a camera; um toque curto (sem arrastar) sobre uma roda liga/desliga o giro dela.
 func _press(pressed: bool, pos: Vector2) -> void:
 	_dragging = pressed
 	if pressed:
+		_seek = false
+		_az_vel = 0.0
+		_el_vel = 0.0
 		_press_pos = pos
 		_moved = 0.0
 	elif _moved < 10.0 and wheel_at(pos):

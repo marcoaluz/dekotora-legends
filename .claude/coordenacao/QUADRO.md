@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-180 | Garagem: câmera nunca gira sozinha (sem auto_rotate); só arrasto com inércia ~0,3 s; pinça e roda dão zoom com limites; abas só movem ao ângulo | pedido do Marco | médio | coordenador | concluída (343 testes ok; precisa Marco: testar no celular) | 2026-10-21 | 2026-10-21 |
 | T-179 | URGENTE: montanhas nevadas e árvores (T-169) não aparecem no jogo do Marco: investigar se é bug (APK/PC), flag, distância, cena ou rota, e corrigir | pedido do Marco | difícil | especialista | concluída (merge na main; causa: montanhas viradas do avesso, câmera 900 m, neblina; precisa Marco: confirmar docs/capturas_t179) | 2026-10-21 | 2026-10-21 |
 | T-178 | URGENTE: refazer sons de turbo simples/duplo (soam como música/remix disco); motores mais de caminhão; V8 como caminhão de corrida monstro (ElevenLabs) | pedido do Marco | difícil | especialista | concluída (merge na main; 328+ testes ok; 28 sons, 3.179 créditos; precisa Marco: ouvir) | 2026-10-21 | 2026-10-21 |
 | T-177 | URGENTE: garagem > DECORAÇÃO não rola no celular e no PC (T-165 TouchScroll/prévia T-171 sensível; segue o mouse e não o scroll); melhorar UI/UX da lista | pedido do Marco | difícil | especialista | concluída (merge na main; 336 testes ok; precisa Marco: testar no PC e no celular com APK novo) | 2026-10-21 | 2026-10-21 |

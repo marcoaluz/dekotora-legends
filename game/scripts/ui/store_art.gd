@@ -16,7 +16,6 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--art="):
 			art = a.substr(6)
-	stage.auto_rotate = false
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	if art == "icon":
