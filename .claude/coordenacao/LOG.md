@@ -323,3 +323,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: APK de teste gerado com o cenário da T-186 (protocolo de rede 8), 114 MB (113.519.413 bytes); preset restaurado (git diff vazio).
 - Arquivos: builds/kaido-bakuso-debug.apk (sobrescrito); docs/STATUS.md (só a linha do APK).
 - Observação: nada. Sem commit. Log do export em scratchpad (export_t187.log).
+
+## 2026-10-21 19:51 · T-190 · especialista · CONCLUÍDA
+- Feito: pesquisa de personalização Dekotora real + série Bakusou Dekotora Densetsu e comparação com o nosso inventário (48 .glb, 53 peças em 28 encaixes); proposta do "espírito" da garagem e 7 perguntas ao Marco.
+- Arquivos: docs/REFERENCIA_PERSONALIZACAO.md (novo). Nada em game/ nem no QUADRO.
+- Validação: inventário conferido por script no repositório; fontes web abertas uma a uma (2 atribuições corrigidas depois de checar: interior e car-me sem confirmação); só links, nenhuma imagem baixada.
+- Decisão pendente: quem faz os murais figurativos; mural por lado; temas prontos; interior; mestre da oficina; texto livre do andon; quais lacunas entram na próxima rodada.
