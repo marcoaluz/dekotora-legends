@@ -49,7 +49,8 @@ func test_dimensions_and_budgets() -> void:
 		var d: Dictionary = e["dimensions_m"]
 		for k in ["x", "y", "z"]:
 			check(float(d[k]) > 0.0 and float(d[k]) < MAX_DIM, "%s dimensao %s em metros (%.2f)" % [id, k, float(d[k])])
-		check(int(e["triangles"]) <= 4500, "%s dentro do orcamento de triangulos (%d)" % [id, e["triangles"]])
+		var budget: int = 6000 if String(e.get("tier", "")) == "deluxe" else 4500      # T-172: deluxe gasta mais
+		check(int(e["triangles"]) <= budget, "%s dentro do orcamento de triangulos (%d)" % [id, e["triangles"]])
 		check((e["fit_warnings"] as Array).is_empty(), "%s sem avisos de encaixe %s" % [id, e["fit_warnings"]])
 
 

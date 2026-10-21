@@ -185,7 +185,7 @@ func parts_for_slot(slot: String) -> Array[PartDef]:
 
 
 const SLOT_ORDER: Array[String] = ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "visor",
-	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "body_ornament", "exhaust_stacks", "side_skirts", "fenders", "steps", "side_trim",
+	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
 	"side_box", "side_ornament", "mural", "hubcaps", "rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament"]
 
 

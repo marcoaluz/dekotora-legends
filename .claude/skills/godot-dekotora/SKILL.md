@@ -260,3 +260,9 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   Android chega como mouse emulado; soltar a até 12 unidades = toque, senão era rolagem; foco por teclado = prévia).
 - Para não perder o foco do teclado, atualize a prévia sem redesenhar as listas (`_show_preview` na `garage_screen.gd`).
 - Depuração: `-- --demo --noparts --preview=ID`, `--preview-paint=#hex`, `--fame=N`. Teste: `tests/test_garage_preview.gd`.
+## Peças deluxe e brilho que acompanha dia/noite (T-172)
+
+- `AccessoryGlow` (`scripts/truck/accessory_glow.gd`), um por caminhão (`TruckNode.glow`): materiais `glow_*` viram shader aditivo (mancha calculada pela UV, cor da 1ª lâmpada `lamp_*` da peça) e `acrylic_*` só mudam a força da emissão. A força vem de `TruckNode.set_lights_on` (1 noite/túnel, 0,4 prévia de dia, 0,12 apagado). Chame `glow.apply(n)` DEPOIS da variante e ANTES do `LightPatterns` (que tira o nome dos materiais `lamp_*`).
+- Peças só desse lote: `tier = "deluxe"` no catálogo; visualizador `scenes/tools/accessory_viewer.tscn -- --cat=deluxe [--day] [--shot=ARQ.png]` ([N] liga/desliga as luzes).
+- `tools_dev/gen_data.gd -- --only=id1,id2` grava só essas peças. **Sem `--only` regrava as rotas e apaga `lane_sections`/`bridges` (T-153).**
+- Capturas `GODOT=... bash tools/capture_t172.sh PASTA_ABS [garagem|corrida]`; custo `bash tools/measure_t172.sh`.

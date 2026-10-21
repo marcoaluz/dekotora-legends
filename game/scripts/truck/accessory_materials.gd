@@ -15,6 +15,7 @@ const DEFS: Dictionary = {
 	"steel": {"c": "#aeb8c8", "metal": 1.0, "rough": 0.32, "coat": 0.0},
 	"rubber": {"c": "#1a1a1d", "metal": 0.0, "rough": 0.88, "coat": 0.0},
 	"plastic": {"c": "#121214", "metal": 0.0, "rough": 0.55, "coat": 0.0},
+	"andon_ink": {"c": "#7c0d1c", "metal": 0.0, "rough": 0.35, "coat": 0.0},   # letras do andon deluxe (T-172)
 	"lamp_amber": {"c": "#ffb347", "emit": 2.5},
 	"lamp_white": {"c": "#ffe9c2", "emit": 3.5},
 	"lamp_red": {"c": "#ff2a2a", "emit": 2.5},

@@ -30,6 +30,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Testes automáticos (301) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Testes automáticos (309) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (297) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -179,6 +180,12 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
   (`python tools/gen_audio.py --only nome --force`). No jogo: GARAGEM > MECÂNICA (botão OUVIR nos motores/turbos/escapes;
   seção BUZINA no fim). Confirmar os 2 escapes novos e os preços (BALANCEAMENTO), buzina grátis, e se as chaminés devem
   montar a peça visual `kw_exhaust_stacks`. **Gerar o APK de novo** (protocolo de rede 7).
+- **T-172 (peças deluxe, amostras de acabamento):** olhar `docs/capturas_t172/` (`antes_depois_garagem_noite.png`
+  primeiro; esquerda = peças antigas, direita = deluxe) e `game/assets/vehicles/dekotora/previews/deluxe_contact_sheet.png`
+  (cada peça de dia, de noite e de perto) e dizer: (1) se o nível de detalhe está bom e se seguimos para mais peças;
+  (2) se "estura" era estrutura lateral/estribo (foi o que fizemos) ou outra coisa; (3) se o andon 一番星 sobre a cabine
+  é o "baú em cima da cabine" que você queria (tamanho/altura); (4) preços propostos em `docs/BALANCEAMENTO.md`.
+  Abrir no PC: `godot --path game res://scenes/tools/accessory_viewer.tscn -- --cat=deluxe` ([N] acende/apaga).
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; ~~confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros~~ (licença LIBERADA pelo Marco em 2026-10-20, T-166); dizer se quer

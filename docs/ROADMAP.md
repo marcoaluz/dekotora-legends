@@ -57,6 +57,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 
 - [x] [T-145] Carroceria graneleira (aberta com lona, 4 cabines, garagem/perfil/rede/bots) e regra carga x carroceria nos contratos: baú leva carga fechada, graneleira leva granel (grãos, brita), madeira/aço/peças vão nas duas (concluída em 2026-10-19, `tests/test_graneleira.gd`, `docs/capturas_t145/`; regra a confirmar pelo Marco)
 
+- [~] [T-172] Peças deluxe (amostras de acabamento fino): andon de cabine 一番星, coroa de lanternas de ônibus, neon de chão (encaixe novo), estrutura lateral cromada, estribo iluminado, barra de 16 lanternas; brilho/acrílico acompanham dia/noite (feito em 2026-10-21, `tests/test_parts_deluxe.gd`, `docs/capturas_t172/`; **PRECISA MARCO** aprovar o visual para seguir com mais peças)
+
 ## Fase 5 — Áudio
 - [x] Sons de `AUDIO_ELEVENLABS.md` gerados pelo Claude via API (tools/gen_audio.py) — Marco precisa OUVIR e pedir regeração dos ruins
 - [x] [P50] Preparar loops e importar áudio

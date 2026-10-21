@@ -356,3 +356,22 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   sendo o efeito em texto (peso, 0–100, destaque). Os escapamentos altos são peça de encaixe e têm prévia 3D.
 - Decisão do Claude (confirmar com o Marco): o botão da faixa compra **e instala** de uma vez; o cartão continua com
   COMPRAR (só comprar) como antes.
+## 2026-10-21 — T-172: peças "deluxe" (amostras de acabamento fino) — PROPOSTAS, Marco valida
+
+- **Pedido**: "muito detalhe para as peças como neon, pisca, [estura], baú em cima da cabine igual ao Bakusou Dekotora
+  Densetsu". **"estura"** foi lido como **estrutura lateral** (a サイドバンパー, armação cromada com luzes embaixo do baú)
+  **e estribo** (degrau da cabine): saíram as duas peças. Se era "escapamento", os escapamentos altos cromados já existem
+  (`kw_exhaust_stacks`, T-126). **"baú em cima da cabine"** = a caixa de luz alta (andon "Ichibanboshi" 一番星) sobre o
+  teto da cabine, virada para a frente.
+- **6 amostras** (`blender/scripts/accessories/deluxe.py`, até 6.000 triângulos cada, marcadas `tier: "deluxe"` no
+  catálogo): andon de cabine 一番星, coroa de lanternas de ônibus, neon de chão, estrutura lateral cromada, estribo
+  iluminado, barra de 16 lanternas. Entram como **opções a mais** nos encaixes que já existem (andon, luzes de teto, saias,
+  degraus, lanternas traseiras); as 42 peças antigas continuam iguais.
+- **Encaixe novo `underglow` ("Neon de chão")**: o neon de chão fica embaixo do chassi e pode ser usado junto com as saias.
+- **Luz que acompanha dia/noite**: o brilho no asfalto (neon de chão e luz de cortesia do estribo) e a face de acrílico do
+  andon seguem a mesma força das luzinhas (`TruckNode.set_lights_on`): de dia o chão quase não brilha (0,04) e o acrílico
+  fica em 1/4; de noite e nos túneis acendem. As lentes âmbar piscam com o padrão de luzes escolhido na garagem.
+- **Preço/peso/Destaque**: propostas em `docs/BALANCEAMENTO.md` (seção T-172).
+- **Pendente do Marco**: olhar `docs/capturas_t172/` e dizer se o nível de acabamento está bom e se seguimos para mais
+  peças (frente: para-choque/viseira/grade; traseira: andon traseiro; laterais: painéis "uroko" no baú).
+
