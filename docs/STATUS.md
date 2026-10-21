@@ -26,7 +26,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (330) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
+| Testes automáticos (349) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
@@ -46,6 +47,39 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Cenário novo T-169 (+T-163/T-164) | gerar: `blender -b --factory-startup -P blender/scripts/build_backdrop_kit.py -- --snow-src "<pasta principal>/docs/Modelos/Fundo Montanha Gelo/sNOWlaNDSCAPE.fbx" --water-src "<...>/docs/Modelos/Agua/Water_Pack_Ozero.blend" [--preview]`, `build_tree_kit.py -- --src "<...>/docs/Modelos/Arvore"`, `build_road_pontes_kit.py -- --src "<...>/docs/Modelos/Road_pontes" --pole-src "<...>/docs/Modelos/poste/Utility_pole.blend"`; capturas `GODOT=... bash tools/capture_t169.sh PASTA [filtro] [--no-backdrop --no-pontes-kit --no-lane-signals]`; custo `bash tools/measure_t169.sh [quadros] [day\|night]`; corrida: viaduto `-- --route=kanto_2_viaduct --start=1950` ou `--route=kanto_3_mountain --start=2480`; semáforo com X `--route=kanto_2_viaduct --start=975 --event=works:3@1180+170`; desligar: `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals`; testes `-- --only=scenery_t169`; onde cabe viaduto `-s res://tools_dev/find_overpass_spots.gd` |
 | Montanhas visíveis (T-179) | capturas com a câmera do jogo, hora da própria rota e modo médio: `GODOT=... bash tools/capture_t179.sh PASTA [filtro]` (corrida rápida, litoral, viaduto, montanha); folhas antes/depois `bash tools/sheet_t179.sh ANTES DEPOIS` (em `docs/capturas_t179/`); `--view-far=900` volta à câmera antiga; testes `-- --only=scenery_t179` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
+
+## Câmera livre de exploração (T-181)
+
+Para andar pelo mapa e apontar problemas ("objeto X no km 1,2 está flutuando"). A corrida **congela** (simulação, bots,
+trânsito e som) enquanto ela está ligada; ao sair, a corrida volta exatamente do mesmo ponto, com a câmera normal.
+
+- **Quem pode usar**: build de debug (o Godot do PC e o APK de teste) sempre; versão final só com **Opções > Avançado >
+  Modo explorador (câmera livre)** ligado (gravado em `user://settings.cfg`, seção `[advanced]`); ou com `--freecam`.
+- **Nunca na corrida online**: lá a simulação é do servidor e dos outros jogadores (não dá para pausar); F1 e `--freecam` não fazem nada.
+- **Ligar**: `-- --freecam` na linha de comando (a corrida já abre nela), **F1** na corrida (PC) ou o botão **CÂMERA LIVRE** na
+  pausa (celular e PC). Sair: **F1**, **Esc** ou o botão **SAIR**.
+
+| PC | Celular | Faz |
+| --- | --- | --- |
+| W A S D | stick esquerdo | anda (frente/trás/lados, para onde a câmera olha) |
+| Q / E | DESCE / SOBE | desce / sobe |
+| botão direito do mouse segurado + mover | stick direito | olha em volta |
+| Shift segurado | botão 4x (liga/desliga) | 4 vezes mais rápido |
+| roda do mouse | — | muda a velocidade (1 a 400 m/s; começa em 20) |
+| T | KM | campo "Ir para o km": `1,2` (km) ou `800 m`; leva a câmera ao centro da pista, 6 m acima, olhando o sentido da rota |
+| P | FOTO | salva print em `user://shots/<rota>_km<1.234>_<objeto>_<data-hora>.png` |
+| H | HUD | esconde/mostra o painel (para print limpo; no celular o botão HUD fica) |
+
+- **Painel no canto**: FPS, chamadas de desenho, objetos visíveis, km da câmera (+ distância lateral e altura acima da pista),
+  rota e hora do dia, velocidade da câmera.
+- **Mira no centro**: "Sistema > objeto" (ex.: `Roadside3D > lamp_post #6`, `Roadside3D > tree_leafy #2`), o material, a
+  distância e o arquivo `.glb` de origem (ou "sem .glb: feito por código" para estrada, prédios e túneis gerados no jogo).
+  O `#N` é qual cópia daquele modelo (árvores/postes são desenhados em lote).
+- **Onde ficam os prints**: PC `%APPDATA%\Godot\app_userdata\Kaido Bakuso\shots\` (o caminho completo sai no terminal como
+  `FREECAM_SHOT:`). Celular (APK de debug): `adb exec-out run-as com.marco.kaidobakuso tar c files/shots > shots.tar`
+  (ou tire o print do próprio celular).
+- Código: `game/scripts/debug/` (`freecam.gd` câmera e teclas, `freecam_math.gd` contas puras, `freecam_picker.gd` mira,
+  `freecam_overlay.gd` painel, `freecam_touch.gd` sticks). Na corrida: 1 linha em `race_scene_3d._process` congela tudo.
 
 ## O que existe (resumo por fase)
 
@@ -157,6 +191,10 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-181 (2026-10-21): câmera livre de exploração.** No PC: `godot --path game res://scenes/race/race3d.tscn --
+  --route=kanto_3_mountain --freecam`, voar com WASD + botão direito, T e digitar `1,2`, mirar num poste e apertar P.
+  No celular: **gerar o APK de novo**, pausar a corrida e tocar CÂMERA LIVRE (sticks e SOBE/DESCE). Dizer se os
+  comandos estão bons. Não foi testado no celular de verdade (só no PC; os sticks foram vistos na janela com `--touch`).
 - **T-179 (2026-10-21): montanhas nevadas agora aparecem.** Estavam no APK, mas do avesso (escuras, "lâminas"), cortadas
   pela câmera (900 m) e apagadas pela neblina; ver `docs/DECISOES.md` (T-179). Olhar `docs/capturas_t179/` (esquerda =
   antes, direita = depois): `folha_montanha_dia`, `folha_litoral_tarde`, `folha_cidade_noite`. **Gerar o APK de novo**

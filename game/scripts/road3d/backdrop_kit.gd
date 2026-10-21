@@ -118,6 +118,7 @@ static func tree_mesh(tod: TimeOfDay) -> ArrayMesh:
 		return _cache[k]
 	var src: ArrayMesh = GlbMesh.merged(TREE)
 	var out := ArrayMesh.new()
+	out.resource_name = TREE                  # T-181: source shown by the explorer camera
 	for s in src.get_surface_count():
 		var name: String = src.surface_get_material(s).resource_name if src.surface_get_material(s) != null else ""
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))

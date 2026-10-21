@@ -54,6 +54,7 @@ func commit(parent: Node3D) -> int:
 		mi.mesh = am
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		mi.visibility_range_end = range_m
+		mi.set_meta("pieces", _blocks[bi])     # T-181: [[Mesh, Transform3D], ...] for FreecamPicker
 		parent.add_child(mi)
 		n += 1
 	return n

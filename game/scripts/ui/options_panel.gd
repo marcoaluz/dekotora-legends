@@ -9,7 +9,8 @@ signal profile_changed
 signal menu_bg_changed
 
 const CATEGORIES: Array = [["controls", "options.cat_controls", "gamepad-2"], ["graphics", "options.cat_graphics", "monitor"],
-		["audio", "options.cat_audio", "volume-2"], ["account", "options.cat_account", "circle-user"]]
+		["audio", "options.cat_audio", "volume-2"], ["account", "options.cat_account", "circle-user"],
+		["advanced", "options.cat_advanced", "wrench"]]
 
 var _s: Node
 var _gs: Node
@@ -98,6 +99,10 @@ func _show(id: String) -> void:
 			_slider(Tr.t("options.sfx"), _s.sfx_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.sfx_volume = v, true)
 		"account":
 			_account()
+		"advanced":                                   # T-181: camera livre de exploracao
+			_toggle(Tr.t("options.explorer_mode"), _s.explorer_mode, func(on: bool) -> void: _s.explorer_mode = on)
+			_hint(Tr.t("options.explorer_hint"))
+			_hint(Tr.t("options.explorer_keys"))
 
 
 func _row_label(text: String) -> Label:

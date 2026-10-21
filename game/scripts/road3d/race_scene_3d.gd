@@ -75,6 +75,7 @@ var _rail: Railway3D                    # T-154: ferrovia e trens
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
 var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
+var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
 
 
 func _ready() -> void:
@@ -204,6 +205,7 @@ func _ready() -> void:
 			_cam.far = float(a.substr(11))
 	add_child(_cam)
 	_cam.make_current()
+	_freecam = Freecam.attach(self, path, _cam, route, tod, online)    # T-181: F1 / --freecam / botao da pausa
 	_speed_fx = SpeedFx.new()
 	add_child(_speed_fx)
 	var streaks := LightStreaks.new()
@@ -449,6 +451,10 @@ func _build_pause_menu() -> void:
 	_pause_layer.visible = false
 	add_child(_pause_layer)
 	var menu := PauseMenu.new()                  # pausa SEM escurecer a corrida (ATB-1), centralizada (T-138)
+	menu.freecam_enabled = _freecam != null
+	menu.freecam_pressed.connect(func() -> void:
+		_toggle_pause()
+		_freecam.activate())
 	_pause_layer.add_child(menu)
 	menu.resume_pressed.connect(_toggle_pause)
 	menu.rematch_pressed.connect(_rematch)
@@ -480,7 +486,7 @@ func _pause_options() -> void:
 
 
 func _toggle_pause() -> void:
-	if _result_shown or online:
+	if _result_shown or online or (_freecam != null and _freecam.active):
 		return
 	get_tree().paused = not get_tree().paused
 	_pause_layer.visible = get_tree().paused
@@ -497,7 +503,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if get_tree().paused:
+	if get_tree().paused or (_freecam != null and _freecam.active):   # T-181: camera livre congela a corrida
 		return
 	if _fps_log:                                 # depuracao: media de FPS a cada 5 s no terminal
 		_fps_t += delta

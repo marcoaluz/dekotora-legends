@@ -97,6 +97,7 @@ static func mesh(model: String, tod: TimeOfDay) -> ArrayMesh:
 		return null
 	var src: ArrayMesh = GlbMesh.merged(path)
 	var out := ArrayMesh.new()
+	out.resource_name = path                  # T-181: source shown by the explorer camera
 	for s in src.get_surface_count():
 		var mat: Material = src.surface_get_material(s)
 		var name: String = mat.resource_name if mat != null else ""

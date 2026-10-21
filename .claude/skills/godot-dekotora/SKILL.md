@@ -292,3 +292,16 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Conferir um viaduto: `godot --headless --path game -s res://tools_dev/probe_overpass.gd -- --route=kanto_2_viaduct` (distância até a pista e vão livre a cada 10 m).
 - Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t169.sh PASTA [FILTRO] [extras]`. FILTRO é um trecho do nome (ex.: `montanha`, `arvore`, `night`); `all` = tudo. Antes: `bash tools/capture_t169.sh PASTA_ANTES all --no-backdrop --no-pontes-kit`.
 - Custo: `GODOT=... bash tools/measure_t169.sh [QUADROS] [day|night]` (padrão 1500 quadros, noite). Comparar: `MEASURE_EXTRA="--no-backdrop --no-pontes-kit --no-lane-signals" bash tools/measure_t169.sh`.
+
+## Câmera livre / explorador (T-181)
+
+- Código em `game/scripts/debug/` (`Freecam`, `FreecamMath`, `FreecamPicker`, `FreecamOverlay`, `FreecamTouch`). A corrida cria com
+  `Freecam.attach(...)` (null online ou sem permissão) e congela com `if ... _freecam.active: return` no `_process`.
+- Liga: `-- --freecam`, F1, ou botão CÂMERA LIVRE da pausa. Permissão: `FreecamMath.allowed(online, debug, Settings.explorer_mode, flag)`.
+- Mira = raio contra triângulos (`TriangleMesh.intersect_ray`), sem física. Malha nova copiada de um .glb: ponha
+  `out.resource_name = path` para a mira mostrar o arquivo (`GlbMesh.source_of`).
+- **Armadilha (headless)**: sem tela o `MultiMesh` não guarda a posição de cada cópia (`get_instance_transform` volta identidade,
+  `get_aabb` vazio). Teste com a posição do próprio nó ou numa janela.
+- Script `-s` que cita classe que usa autoload (Settings, AudioBus) com tipo estático não compila (autoloads ainda não existem):
+  use variáveis sem tipo nesses scripts de sonda, ou carregue a cena em tempo de execução.
+- Testes: `-- --only=freecam` (`tests/test_freecam.gd`, IN_TREE).

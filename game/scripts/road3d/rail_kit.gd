@@ -106,6 +106,7 @@ static func mesh(model: String, tod: TimeOfDay) -> ArrayMesh:
 		return null
 	var src: ArrayMesh = GlbMesh.merged(path)
 	var out := ArrayMesh.new()
+	out.resource_name = path                  # T-181: source shown by the explorer camera
 	for s in src.get_surface_count():
 		var mat: Material = src.surface_get_material(s)
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))
@@ -150,6 +151,7 @@ static func bed_mesh(model: String) -> ArrayMesh:
 				st.set_uv(Vector2(0.5 + verts[v].x * 0.1, 1.0 - lerpf(band.x, band.y, clampf(uv[v].y * 8.0 - floorf(c.y * 8.0), 0.0, 1.0))))
 				st.add_vertex(verts[v])
 	var out: ArrayMesh = st.commit()
+	out.resource_name = path                  # T-181
 	_meshes[k] = out
 	return out
 

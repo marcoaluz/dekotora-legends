@@ -7,8 +7,10 @@ signal resume_pressed
 signal rematch_pressed
 signal giveup_pressed
 signal options_pressed
+signal freecam_pressed            # T-181: camera livre (so aparece se `freecam_enabled`)
 
 var first_button: Button
+var freecam_enabled: bool = false  # defina ANTES de entrar na arvore (o _ready monta os botoes)
 
 
 func _ready() -> void:
@@ -60,3 +62,9 @@ func _ready() -> void:
 	opt.pressed.connect(func() -> void: options_pressed.emit())
 	opt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	col.add_child(opt)
+	if freecam_enabled:                            # T-181: entrada da camera livre no celular (no PC tambem e F1)
+		var fc: Button = UiTheme.button(Tr.t("race.freecam"), Vector2(220, 40))
+		fc.icon = UiKit.icon("camera")
+		fc.pressed.connect(func() -> void: freecam_pressed.emit())
+		fc.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(fc)

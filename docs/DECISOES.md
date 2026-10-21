@@ -465,3 +465,17 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   montanha), guard-rail em W e mar com ondas **já apareciam**; viaduto e semáforos só existem nesses pontos/rotas.
 - **Para o Marco confirmar**: quantidade, tamanho e neve das montanhas (`docs/capturas_t179/`).
 
+## 2026-10-21 — T-181: câmera livre de exploração (pedido do Marco)
+
+- **Online: desligada** (F1, `--freecam` e o botão da pausa não existem na corrida em rede). A outra opção era só congelar
+  o visual local, mas o caminhão do jogador continuaria correndo no servidor sem comando (bateria/perderia a corrida) e a
+  predição do cliente acumularia erro. Como a ferramenta é para achar defeitos do mapa, a corrida offline basta.
+- **Congelar** = a cena da corrida pula o `_process` inteiro (simulação, bots, câmera, HUD, som do motor); o som geral fica
+  mudo enquanto explora e volta como estava. Nada em `scripts/sim/` sabe da câmera livre.
+- **Quem pode**: build de debug sempre (inclui o APK de teste: botão CÂMERA LIVRE na pausa); versão final só com Opções >
+  Avançado > Modo explorador ou `--freecam`. No PC os sticks aparecem só com `--touch` ou com "botões na tela" (o projeto
+  emula toque pelo mouse, então o Godot diz que o PC tem tela de toque).
+- **Mira** sem física: o raio é testado contra os triângulos visíveis (o cenário não tem colisão). Para mostrar o `.glb`,
+  as malhas copiadas dos kits guardam o caminho no `resource_name` e os lotes `MeshBatch` guardam a lista de peças (meta
+  `pieces`); custo zero quando a câmera está desligada (só memória das listas, pequena).
+- Teclas extras não pedidas: Esc também sai; T aceita metros (`800 m`); o nome do print também leva a rota.

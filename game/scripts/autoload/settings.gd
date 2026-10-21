@@ -20,6 +20,7 @@ var fx_trails: bool = true              # rastro das lanternas traseiras
 var fx_rain: bool = false               # chuva (opcional)
 var fx_impact: bool = true              # faiscas, pedacos de cromo, chacoalhada e fumaca/marcas dos pneus (T-141/T-144)
 var menu_bg: String = "a"               # fundo da tela inicial: "a" posto a noite, "b" rodovia (T-138; MenuBackdrop)
+var explorer_mode: bool = false         # T-181: camera livre (F1 / pausa) tambem fora da build de debug
 
 
 func _ready() -> void:
@@ -33,9 +34,9 @@ func _ready() -> void:
 			fx_impact = false
 
 
-func load_settings() -> void:
+func load_settings(path: String = PATH) -> void:
 	var cfg := ConfigFile.new()
-	if cfg.load(PATH) != OK:
+	if cfg.load(path) != OK:
 		return
 	touch_scale = clampf(float(cfg.get_value("controls", "touch_scale", touch_scale)), 0.7, 1.5)
 	use_tilt = bool(cfg.get_value("controls", "use_tilt", use_tilt))
@@ -53,9 +54,10 @@ func load_settings() -> void:
 	fx_rain = bool(cfg.get_value("graphics", "fx_rain", fx_rain))
 	fx_impact = bool(cfg.get_value("graphics", "fx_impact", fx_impact))
 	menu_bg = String(cfg.get_value("graphics", "menu_bg", menu_bg))
+	explorer_mode = bool(cfg.get_value("advanced", "explorer_mode", explorer_mode))
 
 
-func save_settings() -> void:
+func save_settings(path: String = PATH) -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("controls", "touch_scale", touch_scale)
 	cfg.set_value("controls", "use_tilt", use_tilt)
@@ -73,7 +75,8 @@ func save_settings() -> void:
 	cfg.set_value("graphics", "fx_rain", fx_rain)
 	cfg.set_value("graphics", "fx_impact", fx_impact)
 	cfg.set_value("graphics", "menu_bg", menu_bg)
-	cfg.save(PATH)
+	cfg.set_value("advanced", "explorer_mode", explorer_mode)
+	cfg.save(path)
 
 
 ## Inclinacao do aparelho (paisagem) -> -1..+1. No Android o eixo y do acelerometro e o

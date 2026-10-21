@@ -10,6 +10,7 @@ static func merged(path: String) -> ArrayMesh:
 	if _cache.has(path):
 		return _cache[path]
 	var out := ArrayMesh.new()
+	out.resource_name = path         # T-181: the explorer camera shows the source .glb
 	var ps: PackedScene = load(path) as PackedScene
 	if ps == null:
 		push_warning("GlbMesh: nao achei " + path)
@@ -20,6 +21,17 @@ static func merged(path: String) -> ArrayMesh:
 	root.free()
 	_cache[path] = out
 	return out
+
+
+## Source .glb of a mesh (resource_name set by merged()/the kits, or the import sub-resource path); "" if unknown.
+static func source_of(mesh: Mesh) -> String:
+	if mesh == null:
+		return ""
+	for s in [mesh.resource_name, mesh.resource_path]:
+		var i: int = String(s).find(".glb")
+		if i >= 0:
+			return String(s).substr(0, i + 4)
+	return ""
 
 
 static func _collect(node: Node, parent_xf: Transform3D, out: ArrayMesh) -> void:

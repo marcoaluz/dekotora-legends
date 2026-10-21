@@ -100,6 +100,7 @@ static func mesh(model: String, mat: Material) -> ArrayMesh:
 		return null
 	var src: ArrayMesh = GlbMesh.merged(path)
 	var out := ArrayMesh.new()
+	out.resource_name = path                  # T-181: source shown by the explorer camera
 	for s in src.get_surface_count():
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))
 		out.surface_set_material(out.get_surface_count() - 1, mat)
