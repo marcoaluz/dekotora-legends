@@ -505,3 +505,6 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   desenho por acidentado + 1 do triângulo + fumaça nos primeiros 12 s.
 - **Rede**: protocolo 8 (1 byte por carro no snapshot). Para o Marco confirmar: duração da fumaça, distância do triângulo,
   9 m/s² de arrasto, 300 m para sumir, bots usarem o acostamento.
+
+### T-183 — números do carro acidentado confirmados pelo Marco (2026-10-21)
+Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 m/s² enquanto arrasta, sumir a 300 m atrás do último caminhão, bots usam o acostamento quando não há faixa livre.
