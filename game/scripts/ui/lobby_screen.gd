@@ -95,7 +95,7 @@ func _new_panel(title: String, icon_name: String, width: float = 520.0) -> VBoxC
 	outer.add_theme_constant_override("separation", 10)
 	pc.add_child(outer)
 	outer.add_child(UiKit.screen_title(title, icon_name))
-	var sc := ScrollContainer.new()
+	var sc := TouchScroll.new()               # rola arrastando sobre os cartoes (T-165)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sc.custom_minimum_size = Vector2(0, 0)
 	outer.add_child(sc)

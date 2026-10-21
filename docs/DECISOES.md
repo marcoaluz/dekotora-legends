@@ -298,3 +298,18 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - Consequência: a parte de **licença** deixa de ser pendência. Continua valendo o que já está em `game/assets/LICENCAS.md`
   (crédito do autor onde o arquivo indica) e a escolha de uso de cada item, que segue como pendência de design.
 - `Tunnel.obj` e `van.abc` não estão mais no PC (pasta Downloads vazia): para usá-los, o Marco precisa recolocá-los em `docs/Modelos/`.
+
+
+## 2026-10-20 — T-165: listas do menu/garagem rolam arrastando o dedo sobre os cartões
+
+- **Problema (Marco, APK no celular):** escolher cabine/modelo/peças arrastando o dedo "às vezes não vai".
+- **Causa:** no Godot 4.7 o `ScrollContainer` só rola pelo toque se receber o evento; botões, cartões e painéis vêm com
+  `mouse_filter = STOP` e seguram o toque. O arraste só funcionava começando nos vãos entre os cartões.
+- **Regra nova:** toda lista com rolagem usa `TouchScroll` (`game/scripts/ui/components/touch_scroll.gd`) no lugar de
+  `ScrollContainer`. Ele troca STOP por PASS em tudo que estiver dentro (inclusive o que for criado depois), menos
+  controles com arraste próprio (slider, barra, campo de texto, outra lista), e fica ele mesmo STOP (o toque não vaza
+  para o palco 3D atrás).
+- **Zona morta de 10 unidades** (tela base 960×540, ≈ 20 px no celular): toque com o dedo tremendo continua sendo toque;
+  passou disso vira rolagem e o cartão **não** é selecionado ao soltar.
+- No PC: clicar e arrastar com o mouse sobre um cartão também rola a lista (já rolava nos vãos); clique simples,
+  roda do mouse, teclado e controle continuam iguais. Teste: `game/tests/test_touch_scroll.gd`.

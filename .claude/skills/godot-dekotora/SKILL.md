@@ -207,3 +207,12 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - **Protocolo 6** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total`. Cada cliente toca a abertura pelo **relógio comum** do servidor: setup + ping/2 (`DuelPlan.online_elapsed`). Cliente e servidor precisam da mesma versão: gere o APK de novo.
 - Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo. O executor `tests/run_tests.gd` roda esses testes no 1º quadro, quando a árvore de cena já existe. Hoje: `tests/test_duel_scene_flow.gd`.
 - Regra para texto que cresce na tela (nome, fala, banner VS): desenhe em tamanho de fonte **fixo** e escale com `draw_set_transform` (ver `ui/duel_band.gd`). Cada tamanho de fonte novo cria um cache de textura; o VS chegou a criar +58 MB de memória de textura antes dessa correção.
+
+## Listas com rolagem no celular (T-165)
+
+- Use **`TouchScroll.new()`** (`scripts/ui/components/touch_scroll.gd`), nunca `ScrollContainer.new()`, em listas de botões/cartões.
+  No 4.7 o `ScrollContainer` rola pelo toque via clique de mouse emulado; filhos com `mouse_filter = STOP` (botões, painéis) seguram o evento
+  e a lista não rola. O `TouchScroll` põe os descendentes em PASS (também os criados depois) e usa zona morta de 10 unidades.
+- Teste de toque sem tela: `tests/test_touch_scroll.gd` (manda o mouse emulado com `device = InputEvent.DEVICE_ID_EMULATION` e depois o
+  `InputEventScreenTouch/ScreenDrag`, via `root.push_input(ev, true)`; chame `get_minimum_size()` + `NOTIFICATION_SORT_CHILDREN` para montar o layout
+  no mesmo quadro). Clique de mouse "real" (device 0) não chega aos botões no modo sem tela; teste mouse na janela.
