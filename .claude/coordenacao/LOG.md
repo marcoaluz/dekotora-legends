@@ -261,3 +261,13 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/build_backdrop_kit.py, build_tree_kit.py, build_road_pontes_kit.py; game/scripts/road3d/{backdrop_kit,overpass_layout,overpass_3d,tunnel_signals_3d,pier_t,guardrail_w,pontes_kit,power_line_layout,power_lines_3d,viaduct_piers_3d}.gd + city_builder/roadside_3d/race_scene_3d; tests/test_scenery_t169.gd; tools/{capture,measure}_t169.sh; docs/capturas_t169/. Branch t169-modelos (worktree .claude/worktrees/t169), 15 commits; a main (até 5571731, T-170..T-173) já foi juntada no branch (conflitos só de docs, resolvidos mantendo as duas partes): o merge na main é direto.
 - Validação: 327 testes ok depois de juntar a main (4 novos meus); --quit-after sem erro; medida modo médio noite 6 pontos: +6 a +11 chamadas, +0 a +19 mil triângulos, +0,6–0,8 MB textura, FPS igual no ruído; folhas antes/depois conferidas. net_test não rodado (sim/rede intocados).
 - Decisão pendente: Marco confirmar quantidade/altura/neve das montanhas, mistura das árvores, lugar dos 2 viadutos, se o semáforo ganha a seta amarela. APK novo para ver no celular.
+
+## 2026-10-21 04:16 · T-175 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste debug gerado na main (111 MB, 2026-10-21 04:14, protocolo de rede 7); export_presets.cfg restaurado (sha256 igual ao original); STATUS atualizado e commitado.
+- Arquivos: builds/kaido-bakuso-debug.apk (ignorado pelo git), docs/STATUS.md
+- Observação: nada. Instalar: D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk
+
+## 2026-10-21 04:20 · T-174 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Cenário T-169" em blender-pixelart/SKILL.md (comandos de build_backdrop_kit, build_tree_kit, build_road_pontes_kit com as opções do argparse, armadilhas de worktree e CRLF) e seção "Cenário T-169/T-164" em godot-dekotora/SKILL.md (flags --no-backdrop, --no-pontes-kit, --no-poles, --no-overpass, --no-lane-signals; tools/capture_t169.sh, tools/measure_t169.sh; tools_dev/find_overpass_spots.gd, tools_dev/probe_overpass.gd; OverpassLayout.for_route).
+- Arquivos: .claude/skills/blender-pixelart/SKILL.md, .claude/skills/godot-dekotora/SKILL.md, .claude/coordenacao/LOG.md
+- Observação: docs/ROADMAP.md sem alteração (a T-169 já estava [x]; não há item da T-174). Nas skills, o build_road_pontes_kit sem --pole-src válido cai no poste antigo sem aviso (registrado na seção).
