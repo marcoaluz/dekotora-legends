@@ -173,7 +173,10 @@ func _ready() -> void:
 	side.overpass_out = over_out
 	side.bridges = bridges
 	side.pole_runs = PowerLineLayout.corridors(power.poles)
+	side.rails = _rail.lines                       # T-186: bosques fora da ferrovia, semente pela rota
+	side.route_seed = rid.hash()
 	side.build(path, scenery, tod, tunnels)
+	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_brake_fx = BrakeFx.new()

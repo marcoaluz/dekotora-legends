@@ -31,6 +31,41 @@ func build(tod: TimeOfDay) -> void:
 	else:
 		_toll_plaza(tod)
 	_batch.commit(self)
+	_extras_people()
+
+
+## T-186: the two drivers standing by the cab door of their trucks (camera side), shirt in the truck's paint.
+func add_drivers(colors: Array[Color]) -> void:
+	var xs: Array = []
+	var looks: Array = []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 156
+	for n in mini(colors.size(), 2):
+		var side: float = -1.0 if n == 0 else 1.0
+		var p := Vector3(side * (GAP * 0.5 + 2.4), 0.0, 2.3)
+		xs.append(PeopleKit.stand(p, Vector3(-side * 0.8, 0.0, 1.0), 1.0))
+		looks.append(PeopleKit.look(rng, colors[n]))
+	add_child(PeopleKit.group(xs, looks, _tod, "drivers"))
+
+
+## T-186: people of the place: shoppers at the store and the vending machines (rest area) or toll staff by the booths.
+func _extras_people() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 186
+	var xs: Array = []
+	var looks: Array = []
+	if rest_area:
+		for i in 2:                                           # at the vending machines, looking at them
+			xs.append(PeopleKit.stand(Vector3(13.0 + float(i) * 2.2, 0.0, -12.3), Vector3(0.1, 0.0, -1.0), rng.randf_range(0.94, 1.04)))
+			looks.append(PeopleKit.look(rng))
+		for p in [Vector3(-6.0, 0.0, -12.4), Vector3(-4.8, 0.0, -11.8), Vector3(-11.0, 0.0, -7.0)]:   # store door, lamp
+			xs.append(PeopleKit.stand(p, Vector3(rng.randf_range(-1.0, 1.0), 0.0, 1.0), rng.randf_range(0.94, 1.04)))
+			looks.append(PeopleKit.look(rng))
+	else:
+		for i in 3:                                           # toll staff next to the booths, facing the trucks
+			xs.append(PeopleKit.stand(Vector3(-16.0 + float(i) * 8.0 + 1.1, 0.25, -15.4), Vector3(0.2, 0.0, 1.0), rng.randf_range(0.95, 1.03)))
+			looks.append(PeopleKit.look(rng, PeopleKit.STAFF))
+	add_child(PeopleKit.group(xs, looks, _tod, "people"))
 
 
 ## Transform (stage -> world) for a truck of nose offset `front` (m from its rear to its nose) on side -1 (player,
@@ -163,11 +198,12 @@ func _toll_plaza(tod: TimeOfDay) -> void:
 		_glb_jersey(Vector3(-17.5 + float(i) * 3.5, 0.0, 30.0))
 	for p in [Vector3(-12.0, 0, 8.5), Vector3(12.0, 0, 8.5)]:
 		_lamp(p, Color(0.9, 0.95, 1.0), 1.2)
-	var pine: String = "res://assets/scenery/tree_pine.glb"
+	var kinds: Array[String] = ["tree_pine", "tree_cedar", "tree_round"]             # T-186: + Japanese cedar
 	for i in 12:                                                                      # tree line closing the view
 		var ang: float = float(i) / 12.0 * TAU
 		var r: float = 38.0 + float(i % 3) * 6.0
-		_glb(pine if i % 2 == 0 else "res://assets/scenery/tree_round.glb",
+		var tree: String = "res://assets/scenery/%s.glb" % kinds[i % 3]
+		_glb(tree if ResourceLoader.exists(tree) else "res://assets/scenery/tree_pine.glb",
 			Transform3D(Basis(Vector3.UP, ang).scaled(Vector3.ONE * (1.8 + 0.3 * float(i % 3))), Vector3(sin(ang) * r, 0.0, cos(ang) * r)))
 	_billboard(Vector3(26.0, 0.0, -24.0), 1)
 

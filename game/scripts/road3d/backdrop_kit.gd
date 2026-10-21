@@ -112,17 +112,26 @@ static func water_normal() -> Texture2D:
 
 ## Arvore de folhas com os materiais do jogo (cache por hora do dia).
 static func tree_mesh(tod: TimeOfDay) -> ArrayMesh:
+	return tree_mesh_of("tree_leafy", tod)
+
+
+## T-186: qualquer das 6 Gleditsias (tree_leafy, tree_leafy_b.._f) e o LOD1 delas ("<nome>_lod1"); cada variacao
+## tem o proprio atlas de tufos (`<nome>_leaves.png`, o LOD1 usa o da variacao). Malha vazia se faltar o arquivo.
+static func tree_mesh_of(name: String, tod: TimeOfDay) -> ArrayMesh:
 	var day: float = tod.day_amount if tod != null else 0.0
-	var k: String = "tree@%.2f" % day
+	var k: String = "%s@%.2f" % [name, day]
 	if _cache.has(k):
 		return _cache[k]
-	var src: ArrayMesh = GlbMesh.merged(TREE)
+	var glb: String = "res://assets/scenery/%s.glb" % name
+	var src: ArrayMesh = GlbMesh.merged(glb)
 	var out := ArrayMesh.new()
-	out.resource_name = TREE                  # T-181: source shown by the explorer camera
+	out.resource_name = glb                   # T-181: source shown by the explorer camera
+	var leaves: StandardMaterial3D = _leaves(day, TEX_DIR + name.trim_suffix("_lod1") + "_leaves.png")
+	var bark: StandardMaterial3D = _bark(day)
 	for s in src.get_surface_count():
-		var name: String = src.surface_get_material(s).resource_name if src.surface_get_material(s) != null else ""
+		var mname: String = src.surface_get_material(s).resource_name if src.surface_get_material(s) != null else ""
 		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))
-		out.surface_set_material(out.get_surface_count() - 1, _leaves(day) if name.begins_with("tree_leaves") else _bark(day))
+		out.surface_set_material(out.get_surface_count() - 1, leaves if mname.begins_with("tree_leaves") else bark)
 	_cache[k] = out
 	return out
 
@@ -135,9 +144,9 @@ static func _bark(day: float) -> StandardMaterial3D:
 	return m
 
 
-static func _leaves(day: float) -> StandardMaterial3D:
+static func _leaves(day: float, tex: String = LEAVES_TEX) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
-	m.albedo_texture = load(LEAVES_TEX) as Texture2D
+	m.albedo_texture = load(tex if ResourceLoader.exists(tex) else LEAVES_TEX) as Texture2D
 	m.vertex_color_use_as_albedo = true
 	m.albedo_color = Color(0.85, 0.9, 0.85).lerp(Color(1.05, 1.05, 1.0), day)
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR

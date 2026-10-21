@@ -18,8 +18,15 @@ var bridges: Array[Vector2] = []  # T-153 (RouteDef.bridges): nada de arvore/ped
 var pole_runs: Array = []         # T-163 (PowerLineLayout.corridors): arvores saem do caminho dos fios
 var overpass_out: Array = []      # T-164 (OverpassLayout.keep_out): nada de poste/arvore/placa embaixo do viaduto
 const WIRE_LANE: Vector2 = Vector2(14.5, 20.0)   # T-163: faixa lateral (m) dos fios; a arvore vai para fora dela
+const TREE_LOD_M: float = 140.0   # T-186: arvore troca para o LOD1 a partir desta distancia (centro do bloco)
+const VIEW_M: float = 450.0
+const LAMPS: Array[String] = ["lamp_post", "lamp_bridge"]
+const TOLL_ZONE: Vector2 = Vector2(0.0, 420.0)   # T-186: o poste antigo fica na praca do pedagio (z = 150)
+var rails: Array = []             # T-186: Array[RailLine] (Railway3D.lines): arvore fora da ferrovia paralela
+var route_seed: int = 0           # T-186: semente dos bosques (mesma rota -> mesmas arvores)
+var tree_count: int = 0           # T-186: quantas arvores foram plantadas (testes/medidas)
 var _pool_mesh: PlaneMesh
-var _lamp_off: ArrayMesh
+var _lamp_off: Dictionary = {}
 
 
 func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null, tunnels: Array[Vector2] = []) -> void:
@@ -52,11 +59,16 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 		var b := Basis(Vector3.UP, yaw)
 		match k:
 			"lamp_post":
+				model = lamp_model(z, deck, kind, bridges)
 				if xu < 0.0:
 					b = Basis(Vector3.UP, yaw + PI)   # o braco aponta para a pista
 				if tod.lamps_on and tod.pool_energy > 0.0:
 					_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, xu * 0.6, 0.06)))
 			"tree":
+				if groves_enabled():                  # T-186: os bosques (RoadsideTrees) entram no lugar
+					for _i in 4:
+						rng.randf()                   # mesmos 4 sorteios de antes: pedras e arbustos nao mudam
+					continue
 				model = _tree_model(kind, rng, xu)
 				base = _off_wires(z, xu, base, deck)
 				var sc: float = rng.randf_range(0.8, 1.5)
@@ -72,19 +84,57 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 				b = Basis(Vector3.UP, yaw + PI)       # o texto fica legivel para quem vem pela pista
 		_put(groups, model, Transform3D(b, base))
 	_extras(groups, kind, rng, deck, tunnels)
+	if groves_enabled():
+		var blocked: Callable = func(zz: float, lat: float, pos: Vector3) -> bool: return _tree_blocked(zz, lat, pos, tunnels)
+		for t in RoadsideTrees.place(path, kind, 186 + route_seed, deck, blocked, rails):
+			_put(groups, String(t[0]), t[1])
+			tree_count += 1
 	var pool_mat: StandardMaterial3D = _pool_material()
 	for key in groups:
 		var name: String = String(key).get_slice("#", 0)
 		if name == POOL:
 			_add_multi(_pool(), groups[key], pool_mat)
-		elif name == "lamp_post" and not tod.lamps_on:
-			_add_multi(_lamp_unlit(), groups[key])
-		elif name == "tree_leafy":
-			_add_multi(BackdropKit.tree_mesh(tod), groups[key])
+		elif name in LAMPS and not tod.lamps_on:
+			_add_multi(_lamp_unlit(name), groups[key])
+		elif name.begins_with("tree_leafy"):
+			var far: ArrayMesh = BackdropKit.tree_mesh_of(name + "_lod1", tod) if ResourceLoader.exists("%s%s_lod1.glb" % [DIR, name]) else null
+			_add_multi(BackdropKit.tree_mesh_of(name, tod), groups[key], null, far)
 		elif name == "guardrail_w":
 			_add_multi(PontesKit.mesh("guardrail_w", PontesKit.guardrail(tod)), groups[key])
 		else:
-			_add_multi(GlbMesh.merged("%s%s.glb" % [DIR, name]), groups[key])
+			var lod1: String = "%s%s_lod1.glb" % [DIR, name]
+			_add_multi(GlbMesh.merged("%s%s.glb" % [DIR, name]), groups[key], null,
+				GlbMesh.merged(lod1) if ResourceLoader.exists(lod1) else null)
+
+
+## T-186: bosques novos ligados (padrao); `--old-trees` volta as arvores enfileiradas de antes (comparar e medir).
+static func groves_enabled() -> bool:
+	return not "--old-trees" in OS.get_cmdline_user_args()
+
+
+## T-186: os 2 postes de luz. O da ponte (Ponte A, mais alto, braco curto) nas pontes, no viaduto da cidade e na
+## serra; o antigo (lamp_post) na praca do pedagio e no trecho urbano do litoral.
+static func lamp_model(z: float, deck: float, kind: StringName, bridges_: Array[Vector2]) -> String:
+	if not ResourceLoader.exists(DIR + "lamp_bridge.glb") or "--old-lamps" in OS.get_cmdline_user_args():
+		return "lamp_post"
+	if z >= TOLL_ZONE.x and z <= TOLL_ZONE.y:
+		return "lamp_post"
+	if deck > 0.0 or kind == &"mountain" or RoadMesh.in_tunnel(z, bridges_, 12.0):
+		return "lamp_bridge"
+	return "lamp_post"
+
+
+## T-186: lugar proibido para arvore: tunel, ponte (mar embaixo), embaixo do viaduto, no caminho dos fios.
+func _tree_blocked(z: float, lat: float, pos: Vector3, tunnels: Array[Vector2]) -> bool:
+	if RoadMesh.in_tunnel(z, tunnels, 6.0) or RoadMesh.in_tunnel(z, bridges, 14.0):
+		return true
+	if not overpass_out.is_empty() and OverpassLayout.blocked(overpass_out, pos, 3.0):
+		return true
+	if absf(lat) >= WIRE_LANE.x - 1.0 and absf(lat) <= WIRE_LANE.y + 1.0:
+		for r in pole_runs:
+			if z >= float(r[0]) - 20.0 and z <= float(r[1]) + 20.0 and signf(lat) == float(r[2]):
+				return true
+	return false
 
 
 ## T-163: arvore no caminho dos fios dos postes de energia vai 6 m para fora (mesmo sorteio, so muda o lugar).
@@ -142,9 +192,18 @@ func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator, d
 		z += rng.randf_range(14.0, 30.0)
 
 
-func _add_multi(mesh: Mesh, xforms: Array, mat: Material = null) -> void:
+## Um MultiMesh por modelo e bloco. Com `far` (T-186: LOD1), dois: o detalhado ate TREE_LOD_M e o leve dali ate
+## VIEW_M (a troca e por bloco: o centro do bloco decide).
+func _add_multi(mesh: Mesh, xforms: Array, mat: Material = null, far: Mesh = null) -> void:
 	if xforms.is_empty() or mesh == null or mesh.get_surface_count() == 0:
 		return
+	var use_far: bool = far != null and far.get_surface_count() > 0 and not "--no-tree-lod" in OS.get_cmdline_user_args()
+	_multi_node(mesh, xforms, mat, 0.0, TREE_LOD_M if use_far else VIEW_M)
+	if use_far:
+		_multi_node(far, xforms, mat, TREE_LOD_M, VIEW_M)
+
+
+func _multi_node(mesh: Mesh, xforms: Array, mat: Material, begin: float, end: float) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.mesh = mesh
@@ -153,7 +212,12 @@ func _add_multi(mesh: Mesh, xforms: Array, mat: Material = null) -> void:
 		mm.set_instance_transform(i, xforms[i])
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
-	mi.visibility_range_end = 450.0
+	mi.visibility_range_begin = begin
+	mi.visibility_range_end = end
+	if begin > 0.0:
+		mi.visibility_range_begin_margin = 8.0
+	if end < VIEW_M:
+		mi.visibility_range_end_margin = 8.0
 	if mat != null:
 		mi.material_override = mat
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -186,15 +250,16 @@ func _pool_material() -> StandardMaterial3D:
 	return m
 
 
-## Poste com a lampada apagada (copia da malha sem emissao): usado de dia.
-func _lamp_unlit() -> ArrayMesh:
-	if _lamp_off == null:
-		_lamp_off = GlbMesh.merged(DIR + "lamp_post.glb").duplicate() as ArrayMesh
-		for s in _lamp_off.get_surface_count():
-			var m: StandardMaterial3D = _lamp_off.surface_get_material(s) as StandardMaterial3D
+## Poste com a lampada apagada (copia da malha sem emissao): usado de dia (os 2 modelos, T-186).
+func _lamp_unlit(name: String = "lamp_post") -> ArrayMesh:
+	if not _lamp_off.has(name):
+		var off_mesh: ArrayMesh = GlbMesh.merged(DIR + name + ".glb").duplicate() as ArrayMesh
+		for s in off_mesh.get_surface_count():
+			var m: StandardMaterial3D = off_mesh.surface_get_material(s) as StandardMaterial3D
 			if m != null and m.emission_enabled:
 				var off: StandardMaterial3D = m.duplicate() as StandardMaterial3D
 				off.emission_enabled = false
 				off.albedo_color = Color("#d8dde4")
-				_lamp_off.surface_set_material(s, off)
-	return _lamp_off
+				off_mesh.surface_set_material(s, off)
+		_lamp_off[name] = off_mesh
+	return _lamp_off[name]

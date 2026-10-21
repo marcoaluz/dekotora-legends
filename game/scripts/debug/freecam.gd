@@ -57,6 +57,7 @@ static func attach(race_: Node3D, path_: TrackPath, race_cam_: Camera3D, route: 
 	race_.add_child(fc)
 	if flag:
 		fc.activate.call_deferred()
+	FreecamTour.maybe_attach(fc)                       # T-186: --freecam-tour= (capturas automaticas)
 	return fc
 
 

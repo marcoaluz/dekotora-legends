@@ -49,6 +49,10 @@ func setup(kind_: String, tod: TimeOfDay, trucks_: Array[TruckNode], pair_: Arra
 		stage = DuelStage.new()
 		add_child(stage)
 		stage.build(tod)
+		var paints: Array[Color] = []                       # T-186: drivers by their trucks, shirt in the paint
+		for c in cards:
+			paints.append(c.get("color", Color.WHITE))
+		stage.add_drivers(paints)
 		band.place = Tr.t("intro.place_rest" if stage.rest_area else "intro.place_toll", [place])
 		for k in pair:
 			trucks[k].set_lights_on(true)

@@ -10,6 +10,8 @@ const GOLD := Color("#f5cc5a")
 const CYAN := Color("#21e6ff")
 const INK := Color("#c8102e")
 const BAR_H: float = 22.0
+const BUST_BASE := "res://assets/textures/people/bust_base.png"      # T-186 (build_t186_props.py)
+const BUST_SHIRT := "res://assets/textures/people/bust_shirt.png"
 
 ## {driver, truck, crest, color, destaque, line}: [0] = player (left), [1] = rival (right).
 var cards: Array[Dictionary] = []
@@ -23,6 +25,8 @@ var _hf: Font
 var _bf: Font
 var _jf: Font
 var _t: float = 0.0
+var _bust_base: Texture2D
+var _bust_shirt: Texture2D
 
 
 func _ready() -> void:
@@ -96,7 +100,7 @@ func _band(i: int, p: float, w: float, h: float) -> void:
 	draw_rect(Rect2(r.position.x + (r.size.x - 4.0 if right else 0.0), r.position.y + 6, 4, r.size.y - 12), accent)
 	var col: Color = c.get("color", Color.WHITE)
 	var pc := Vector2(r.end.x - 34.0, r.position.y + 29.0) if right else Vector2(r.position.x + 34.0, r.position.y + 29.0)
-	_crest(pc, 22.0, col, String(c.get("crest", "")), accent)
+	_crest(pc, 22.0, col, String(c.get("crest", "")), accent, right)
 	var tx: float = r.position.x + (14.0 if right else 64.0)
 	var tw: float = bw - 80.0
 	var al: int = HORIZONTAL_ALIGNMENT_RIGHT if right else HORIZONTAL_ALIGNMENT_LEFT
@@ -130,10 +134,30 @@ func wrap_lines(text: String, width: float, font_size: int) -> PackedStringArray
 	return out
 
 
-## Crest in the portrait square: circle in the truck's paint with its kanji (no portrait art exists yet).
-func _crest(c: Vector2, r: float, col: Color, kanji: String, edge: Color) -> void:
-	draw_rect(Rect2(c - Vector2(r + 3, r + 3), Vector2(r + 3, r + 3) * 2.0), Color(0, 0, 0, 0.6))
-	draw_rect(Rect2(c - Vector2(r + 3, r + 3), Vector2(r + 3, r + 3) * 2.0), edge, false, 1.5)
+## Portrait square: T-186 the driver (bust of the standing man of the scenery library, PeopleKit) in a shirt of the
+## truck's paint, facing the other band, with the crest kanji as a small badge; without the art, the crest circle.
+func _crest(c: Vector2, r: float, col: Color, kanji: String, edge: Color, right: bool = false) -> void:
+	var sq := Rect2(c - Vector2(r + 3, r + 3), Vector2(r + 3, r + 3) * 2.0)
+	draw_rect(sq, Color(0, 0, 0, 0.6))
+	if _bust_base == null and ResourceLoader.exists(BUST_BASE) and ResourceLoader.exists(BUST_SHIRT):
+		_bust_base = load(BUST_BASE) as Texture2D
+		_bust_shirt = load(BUST_SHIRT) as Texture2D
+	if _bust_base != null:
+		draw_rect(sq.grow(-1.0), col.darkened(0.55).lerp(Color(0.1, 0.1, 0.16), 0.4))
+		var flip: bool = not right                          # the player (left) looks to the right
+		draw_set_transform(sq.get_center(), 0.0, Vector2(-1.0 if flip else 1.0, 1.0))
+		var art := Rect2(-sq.size * 0.5 + Vector2(1, 1), sq.size - Vector2(2, 2))
+		draw_texture_rect(_bust_base, art, false)
+		draw_texture_rect(_bust_shirt, art, false, col.lerp(Color.WHITE, 0.08))
+		draw_set_transform(Vector2.ZERO)
+		draw_rect(sq, edge, false, 1.5)
+		var b := Vector2(sq.position.x + 8.0, sq.end.y - 8.0) if right else Vector2(sq.end.x - 8.0, sq.end.y - 8.0)
+		draw_circle(b, 7.5, col.darkened(0.15))
+		draw_arc(b, 7.5, 0.0, TAU, 20, Color(1, 1, 1, 0.8), 1.0)
+		if kanji != "":
+			_text(_jf, b + Vector2(-7.5, 4.0), kanji, 11, Color(0.08, 0.06, 0.1) if col.get_luminance() > 0.6 else Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, 15.0)
+		return
+	draw_rect(sq, edge, false, 1.5)
 	draw_circle(c, r, col.darkened(0.15))
 	draw_arc(c, r, 0.0, TAU, 40, Color(1, 1, 1, 0.7), 1.2)
 	draw_arc(c, r - 3.0, 0.0, TAU, 40, Color(0, 0, 0, 0.35), 1.0)
