@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-19**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-21**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -26,7 +26,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (292) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (301) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -42,6 +42,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Kit de beira de estrada (T-146) | `blender -b --factory-startup -P blender/scripts/build_roadside_kit.py -- --src "CAMINHO/docs/Modelos/Novas Melhorias" [--preview]` (modelos e texturas reduzidos); artes dos outdoors: `godot --path game -s res://tools_dev/make_billboard_art.gd`; capturas `GODOT=... bash tools/capture_t146.sh PASTA [--no-kit]`; custo `bash tools/measure_roadside.sh` e `bash tools/measure_roadside_spot.sh` |
 | Ferrovia e trens (T-154) | `blender -b --factory-startup -P blender/scripts/build_railway_kit.py -- --lrt-src "CAMINHO/docs/Modelos/Modelos Melhorados/kaohsiung_circular_light_rail_caf_urbos_3.glb" [--preview]` (modelos e texturas; `--no-lrt` pula o bonde); corrida: `--no-rail` desliga, `--train=freight\|lrt` e `--train-dir=same\|opposite` forçam o próximo trem; capturas `GODOT=... bash tools/capture_t154.sh PASTA [cenas]`; custo `GODOT=... bash tools/measure_railway.sh` |
 | Acabamento F4 (T-155) | capturas antes/depois `bash tools/capture_t155.sh PASTA [mural\|ficha\|batido\|tunel]` e folhas `bash tools/sheet_t155.sh` (em `docs/capturas_t155/`); custo `bash tools/measure_t155.sh`; carro batido `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model wreck --wreck-dir "<pasta principal>/docs/Modelos/Novas Melhorias"` |
+| Cenário novo T-169 (+T-163/T-164) | gerar: `blender -b --factory-startup -P blender/scripts/build_backdrop_kit.py -- --snow-src "<pasta principal>/docs/Modelos/Fundo Montanha Gelo/sNOWlaNDSCAPE.fbx" --water-src "<...>/docs/Modelos/Agua/Water_Pack_Ozero.blend" [--preview]`, `build_tree_kit.py -- --src "<...>/docs/Modelos/Arvore"`, `build_road_pontes_kit.py -- --src "<...>/docs/Modelos/Road_pontes" --pole-src "<...>/docs/Modelos/poste/Utility_pole.blend"`; capturas `GODOT=... bash tools/capture_t169.sh PASTA [filtro] [--no-backdrop --no-pontes-kit --no-lane-signals]`; custo `bash tools/measure_t169.sh [quadros] [day\|night]`; corrida: viaduto `-- --route=kanto_2_viaduct --start=1950` ou `--route=kanto_3_mountain --start=2480`; semáforo com X `--route=kanto_2_viaduct --start=975 --event=works:3@1180+170`; desligar: `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals`; testes `-- --only=scenery_t169`; onde cabe viaduto `-s res://tools_dev/find_overpass_spots.gd` |
 | Build Windows | `godot --headless --path game --export-release "Windows" ../builds/dekotora.exe` (testado: roda a corrida 3D com áudio) |
 
 ## O que existe (resumo por fase)
@@ -153,6 +154,8 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-169 (2026-10-21): modelos de `docs/Modelos` aplicados (+ T-163 e T-164).** Olhar `docs/capturas_t169/` (folhas `folha_*.png`: esquerda = antes, direita = depois) e dizer: (1) se gosta das **montanhas nevadas** no horizonte (quantidade, altura; neve cheia na montanha, só nos picos no litoral/cidade); (2) da **árvore de folhas** (cidade, 25% da montanha, 20% do litoral do lado da terra); (3) do **viaduto rodoviário por cima** (cidade 2.050 m, montanha 2.580 m) e dos **semáforos de faixa** nos túneis (X vermelho quando um evento fecha a faixa à frente; quer também a seta amarela?); (4) do mar com as ondas novas, dos postes com fios, do guard-rail em W e do pilar em T. Como testar no PC: `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --start=2400` (montanhas, postes, viaduto) e `--route=kanto_2_viaduct --start=950` (túnel com semáforos). **Gerar o APK de novo** para ver no celular (nenhuma mudança de protocolo de rede).
 
 - **T-165 (2026-10-20): listas do menu/garagem rolam arrastando o dedo sobre os cartões (`TouchScroll`).** Falta o Marco confirmar no
   celular com **APK novo** (garagem > MODELO: arrastar sobre um cartão rola sem selecionar; toque rápido seleciona; repetir em Mercado e

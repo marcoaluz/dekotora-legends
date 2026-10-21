@@ -214,3 +214,29 @@ Melhorias`, `Novos modelos` e `Road_pontes`). A pasta continua fora do Git (`.gi
 **Licença:** nenhuma pasta tem arquivo de licença; só o `road` traz o nome da CGTrader. Nada contradiz "Royalty Free
 License (no AI)" nem pede crédito. Texturas de terceiros que vieram dentro (Textures.com, Pixabay) **não** devem ser
 copiadas; as propostas usam as nossas. **Falta o Marco confirmar** a licença do túnel (ficou fora na T-130) e dos outros.
+
+
+---
+
+# T-169 (2026-10-21): pastas novas de `docs/Modelos/` (Agua, Arvore, Fundo Montanha Gelo, poste) e revisão das antigas
+
+Pedido do Marco: "coloquei novos arquivos e todos podemos usar sem problemas [...] analise os novos arquivos e antigos e
+aplique os que necessitar e achar melhor". Medido com `blender/scripts/inspect_model.py` (só lê o original). Licença:
+liberada pelo Marco para tudo (créditos em `game/assets/LICENCAS.md`).
+
+| Pasta / arquivo | O que é de verdade | Triângulos | Texturas | No jogo (T-169) |
+| --- | --- | --- | --- | --- |
+| `Fundo Montanha Gelo/sNOWlaNDSCAPE.fbx` (+ `.glb` de 335 MB e 2 pastas de texturas iguais) | Relevo com **9 maciços nevados** num quadrado de 53 unidades (alturas até 6,6) | 6,27 milhões | Snow004 4K (ambientCG) e rocha 4K, só em 1 dos 13 materiais | **Sim**: 4 maciços (`assets/scenery/backdrop/mountain_a..d.glb`, 899 tri cada) no horizonte das 3 rotas, no lugar dos cones |
+| `Agua/Water_Pack_Ozero.blend` | **Placa de ondas** de 33 x 33 m (lago), 1 material azul, sem textura | 280 mil | nenhuma | **Sim**: mapa de normais das ondas do mar (`assets/textures/backdrop/water_waves_nrm.png`, 512 px) |
+| `Arvore/Gledista_Triacanthos_*` (BLEND 425 MB, 6 FBX, 6 OBJ, versões 3ds Max/GrowFX) | **Árvore de folhas** (Gleditsia triacanthos), 6 variações; folhas em cartões com máscara | 436 mil (a menor) a 813 mil | casca, folha, flor e vagem (400–1600 px) | **Sim**: `assets/scenery/tree_leafy.glb` (279 tri, 6,5 m) + atlas de tufos 512 px |
+| `poste/Utility_pole.*` (blend, fbx, glb, obj, stl, usdc) | **Poste de concreto** redondo de ~11 m com caixa, suportes em U, braçadeiras e feixes de cabos de 24 m para os 2 lados; traz texturas de ponto de ônibus de Helsinque (não ligadas ao poste) | 346 mil (290 mil nos cabos) | placas reais de ônibus (finlandês) | **Em parte**: coluna, caixa e suporte em U no poste de energia da T-163 (`power_pole*.glb`); cabos e placas **não** |
+| `Road_pontes/Ponte` (Ponte A) | Viaduto de concreto (T-159) | 414 mil | — | **Sim**: pilar em T (T-163) e módulo do **viaduto que cruza por cima** (T-164) |
+| `Road_pontes/road` (kit CGTrader) | Kit de beira de estrada (T-159) | 14 mil | 2048 px | **Sim**: guard-rail em W e partes do poste (T-163) |
+| `Road_pontes/Tunel` | O mesmo `Tunnel.obj` da T-130 | 105 mil | — | **Como referência**: semáforos de faixa por código (T-164) |
+| `Road_pontes/Outdor`, `Outra ponte` | Pórtico de placas dos EUA; ponte pênsil europeia | 177 mil; 636 mil | — | **Não** (placas reais; estreita/estilo) |
+| `Novos modelos/Caminhão/canter.obj` | Canter extraído de outro jogo | 130 mil | — | **Não**: o Canter do jogo já vem do JAC 1045 |
+| `Modelos Melhorados/kenworth_w990_truck.glb` (carreta) | Carreta do Kenworth | 2,17 milhões (o todo) | — | **Não por enquanto** (proposta: carreta no trânsito lento, outra tarefa) |
+| Os demais (carros, ônibus, viatura, jipe, carro batido, Metais, Placas, Placão, Carroceria, bonde, cabine CF500, Van 01, JAC) | — | — | — | Já no jogo (T-119 a T-154) |
+
+Capturas antes/depois: `docs/capturas_t169/` (folhas `folha_*.png`). Catálogo de peças para fases novas:
+`docs/BIBLIOTECA_CENARIO.md`.

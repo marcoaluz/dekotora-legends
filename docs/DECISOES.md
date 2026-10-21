@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-21 | **Modelos novos e antigos de docs/Modelos aplicados (T-169, com T-163 e T-164).** Licença não é mais restrição (Marco). Entraram: **montanhas nevadas** no horizonte das 3 rotas no lugar dos cones (4 maciços do "Fundo Montanha Gelo", ~900 triângulos cada; neve cheia na montanha, só nos picos no litoral e na cidade; 16/10/6 maciços), **ondas do mar** (mapa de normais do pacote "Agua"), **árvore de folhas** (Gleditsia, 279 triângulos, 6,5 m: no lugar da árvore redonda na cidade, 25% na montanha, 20% no litoral do lado da terra), **poste** (coluna, caixa e suporte do poste novo no poste de energia da T-163), **pilar em T, guard-rail em W, postes com fios** (T-163), **viaduto rodoviário cruzando por cima** (cidade 2.050 m, montanha 2.580 m, seção da Ponte A) e **semáforos de faixa nos túneis** (seta verde / X vermelho ligados aos eventos, T-164). Tudo só visual; `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals` desligam. Escolhas de lugar e quantidade feitas pelo Claude: **confirmar** | Pedido do Marco (T-169) e decisões da T-159. Detalhes na seção "T-169" no fim |
 | 2026-10-20 | **Respostas do Marco sobre a T-159 (docs/Modelos/Road_pontes):** (1) todos os modelos que o Marco fornece são "Royalty Free (no AI)", sem exigência de crédito — vale também para os próximos; (2) o "Outdor" era mesmo um pórtico de placas; não será usado (os pórticos da T-146 ficam); (3) **sim** aos postes de energia com fios; (4) **sim** ao viaduto rodoviário cruzando por cima da pista; (5) **sim** ao semáforo de faixa no túnel (seta verde / X vermelho) ligado aos eventos de faixa fechada. Os modelos também servem de **referência para fases novas**: cada fase não precisa ter todos os itens; o coordenador mantém um catálogo de peças selecionadas para distribuir depois (docs/BIBLIOTECA_CENARIO.md) | Marco, 2026-10-20 |
 | 2026-10-20 | **Campanha sempre 1 contra 1; amigos 2 a 4 com "comboio" (T-156, G1) — DECISÃO DO MARCO.** A corrida da campanha (Continuar, Mercado de fretes) é só o jogador contra o rival da rota (antes: + 2 bots). A **corrida rápida** (sem rota) continua com o jogador + 3 bots (o Marco não citou; **confirmar**). Online continua 2 a 4 jogadores (bots completam se a sala quiser); com **3 ou 4 jogadores é o modo "comboio": trânsito um nível mais leve** que a regra da sala (normal → leve, pesado → normal), aplicado pelo servidor e mandado no setup. | Pedido do Marco (G1). Detalhes na seção "T-156" no fim |
 | 2026-10-20 | **Abertura "frente a frente" antes da largada (T-156) — visual e números A CONFIRMAR PELO MARCO.** Só apresentação (a simulação espera na largada e começa no fim da contagem, como antes). **Cheia (~9,4 s: 6,4 s de cena + 3 s de contagem)**: os dois caminhões de verdade (peças, pintura, adesivos, padrão de luz) estacionados de frente num cenário montado com peças que já existem — **área de descanso** (noite e fim de tarde: loja, máquinas de bebida, postes de sódio, neon) ou **praça de pedágio** (dia: 2 pedágios da pista, cabines, placas ETC/一般, pinheiros); faróis piscando de provocação; câmera nos detalhes (para-choque, viseira + andon, mural) com a **faixa** de cada um (brasão, nome do motorista e do caminhão, destaque das peças, fala curta); banner **VS** com mancha de tinta vermelha, 対決 e tambor; na pista, o **alinhamento** (os dois entram na faixa, câmera alta descendo) e a contagem com o corte lateral de sempre. **Curta (3 s)**: revanche (mesma rota e rival de novo, até fechar o jogo), corrida rápida e online com 3–4. Um toque/tecla/botão pula para a contagem. **Grid lado a lado** (StartGrid): duelo com uma faixa livre entre os dois (jogador na direita, rival na esquerda), 3–4 = três lado a lado + um atrás; a largada passou para 30 m da pista (atrás do zero não existe asfalto e a câmera ficava em cima do baú). **Rival da IA**: sem duelo nos 8 s iniciais, não prende o jogador no acostamento e não anda abaixo de 80% do ritmo só para ficar ao lado. Sem retratos (não existem): brasão com um kanji na cor do caminhão. **Online**: protocolo 6 (`intro`, `countdown_total` no setup; o servidor espera a abertura inteira) | Pedido do Marco (G1, inspirado no Art Truck Battle sem copiar). Detalhes, custo e medidas na seção "T-156" no fim |
@@ -313,3 +314,41 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   passou disso vira rolagem e o cartão **não** é selecionado ao soltar.
 - No PC: clicar e arrastar com o mouse sobre um cartão também rola a lista (já rolava nos vãos); clique simples,
   roda do mouse, teclado e controle continuam iguais. Teste: `game/tests/test_touch_scroll.gd`.
+
+
+## 2026-10-21 — T-169: modelos de docs/Modelos aplicados (com T-163 e T-164)
+
+- **Pedido do Marco:** usar o que fizer sentido de todos os arquivos de `docs/Modelos` (novos: `Agua`, `Arvore`,
+  `Fundo Montanha Gelo`, `poste`; e os antigos). Licença liberada para todos. Créditos em `game/assets/LICENCAS.md`.
+- **Montanhas do horizonte** (`blender/scripts/build_backdrop_kit.py`, `road3d/backdrop_kit.gd`, `CityBuilder._massifs`):
+  o relevo de 6,3 milhões de triângulos virou um mapa de altura 512 x 512; os 4 maiores maciços foram refeitos como malha
+  de 899 triângulos com a neve marcada na cor por vértice. No jogo: montanha 16, litoral 10 (só do lado da terra), cidade
+  6; 750–1.250 m de largura, pé a 260–560 m da pista (empurrado para fora onde a pista faz curva). Neve: cheia na
+  montanha, só nos picos no litoral e na cidade; à noite azulada. 4 chamadas (antes 1).
+- **Mar:** o mapa de normais das ondas vem da placa "Water Pack Ozero" (alturas → normal 512 px repetível), no mesmo
+  shader de antes.
+- **Árvore de folhas** (`blender/scripts/build_tree_kit.py`): Gleditsia de 436 mil → 279 triângulos (tronco reduzido +
+  20 tufos em cartões cruzados; textura 512 px com 4 tufos renderizados da copa original), 6,5 m. Cidade: no lugar da
+  redonda; montanha: 25% (entre os pinheiros); litoral: 20% do lado da terra (as palmeiras continuam).
+- **Poste:** o poste de energia da T-163 ganhou a coluna de concreto (raio 0,18 → 0,10 m), a caixa e o suporte em U do
+  poste novo (222/256 triângulos). Os cabos e as placas de ponto de ônibus de Helsinque do arquivo não entram.
+- **T-163 (trazido do worktree parado):** pilar em T da Ponte A nas pontes/viadutos, guard-rail em W varrido na curva do
+  litoral, postes de energia com fios na montanha e no litoral (lado da terra, a 17 m, a cada 35 m).
+- **T-164 viaduto rodoviário por cima** (`road3d/overpass_layout.gd`, `overpass_3d.gd`): módulos de 10 m da seção da
+  crista da Ponte A (482 triângulos perto da pista, 68 longe), reto e plano até 320 m de cada lado (para antes se for
+  passar baixo sobre outro trecho da rota), pilares em T a cada 40 m perto e colunas longe; vão livre ≥ 7,6 m medido no
+  ponto mais alto da pista embaixo (cidade fica com ~9,3 m por causa da rampa). Cidade 2.050 m (antes do trecho antigo
+  de 2 faixas), montanha 2.580 m (passa sobre a pista e a ferrovia). Postes, árvores, placas e prédios saem de baixo; os
+  fios de energia são cortados ali. 1 chamada por viaduto à vista.
+- **T-164 semáforos de faixa** (`road3d/tunnel_signals_3d.gd`): pórtico na boca e a cada 200 m de cada túnel, um sinal
+  por faixa (2 no túnel antigo); X vermelho se um evento de faixa fechada (acidente, obra, estreitamento) começa até
+  600 m depois do pórtico ou já fecha a faixa ali; senão seta verde. Usa a mesma lista de eventos da simulação (online
+  também). 2 chamadas por túnel à vista.
+- **Ficou de fora:** pórtico "Outdor" (placas reais da Califórnia, já temos pórticos), ponte pênsil (estreita, europeia),
+  ponte A inteira como pista, túnel do arquivo inteiro (reto; virou referência), Canter `canter.obj` (extraído de outro
+  jogo e o Canter do JAC já existe), carreta do Kenworth (2 milhões de triângulos; proposta para outra tarefa),
+  `Tunnel.obj`/`van.abc` de Downloads (não estão no PC; o túnel de `Road_pontes` é o mesmo arquivo).
+- **Custo medido** (modo médio, noite, sem vsync, 6 pontos; `bash tools/measure_t169.sh`): chamadas +6 a +11,
+  triângulos +0 a +19 mil (máximo na cidade perto do viaduto), textura +0,6 a +0,8 MB, FPS igual dentro do ruído do PC.
+- **Confirmar com o Marco:** quantidade/altura das montanhas e a neve no litoral/cidade; mistura das árvores; lugar dos
+  2 viadutos; se o semáforo deve mostrar também a seta amarela (troca de faixa) além do X.
