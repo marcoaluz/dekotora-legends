@@ -35,7 +35,7 @@ func _ready() -> void:
 	head.add_child(UiKit.chip("coins", Tr.yen(_gs.money()), UiTheme.GOLD))
 	head.add_child(UiKit.chip("star", "%s %d" % [Tr.t("hud.fame"), _gs.fame()]))
 	root.add_child(head)
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()           # rola arrastando sobre os cartoes (T-165)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	root.add_child(scroll)

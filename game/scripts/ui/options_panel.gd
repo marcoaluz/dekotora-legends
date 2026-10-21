@@ -45,7 +45,7 @@ func _ready() -> void:
 		b.pressed.connect(func() -> void: _show(id))
 		side.add_child(b)
 		_tabs[id] = b
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScroll.new()           # rola arrastando sobre os cartoes (T-165)
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
