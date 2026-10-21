@@ -306,3 +306,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: APK de teste gerado com protocolo de rede 8 (carro acidentado T-183), chave de debug; preset restaurado e conferido (git diff vazio).
 - Arquivos: builds/kaido-bakuso-debug.apk (111,2 MB, sobrescrito; .idsig também), docs/STATUS.md (só a linha do APK).
 - Observação: nada commitado; game/export_presets.cfg igual ao Git (sha256 conferido).
+
+## 2026-10-21 16:20 · T-185 · especialista · CONCLUÍDA (Marco confere o visual)
+- Feito: disco preto = fumaça de freada (brake_fx). O material das partículas usava BILLBOARD_PARTICLES sem billboard_keep_scale: o Godot ignora a escala de cada partícula, então as que ainda não nasceram (escala 0, cor padrão preta opaca) eram desenhadas em tamanho cheio no ponto do emissor, que fica parado na pista depois de uma freada curta. Corrigido com keep_scale=true no brake_fx e no wreck_fx (mesmo defeito na fumaça do capô); quad reduzido (2,0→1,0 m e 1,6→1,3 m) para manter o tamanho médio de antes, agora que scale_amount e a curva de crescimento funcionam.
+- Arquivos: game/scripts/road3d/brake_fx.gd, game/scripts/road3d/wreck_fx.gd, skill godot-dekotora (armadilha).
+- Validação: reproduzido com --demo=crash --cam=wreck (disco em t09/t10); NOBRAKE temporário tirou o disco (causa isolada); depois da correção dia e noite sem disco; --demo=brake (entardecer) fumaça branca macia, tamanho parecido com docs/capturas_t141; 358 testes, 0 falharam.
+- Decisão pendente: nenhuma. Obs.: Fx3D.set_smoke (motor ferido) tem o mesmo modo sem keep_scale (BILLBOARD_ENABLED, quadrado cinza na frente da cabine), não mexido.

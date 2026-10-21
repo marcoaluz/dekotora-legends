@@ -49,9 +49,10 @@ func setup(path_: TrackPath) -> void:
 	_puff_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_puff_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_puff_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	_puff_mat.billboard_keep_scale = true      # T-185: unborn particles (scale 0, black) must not draw (see BrakeFx)
 	_puff_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 	_puff_mesh = QuadMesh.new()
-	_puff_mesh.size = Vector2(1.6, 1.6)
+	_puff_mesh.size = Vector2(1.3, 1.3)        # x scale 1.3..2.2 x curve 0.4..1: same ~1.6 m average as before
 	_set_lit(true)
 
 

@@ -70,9 +70,13 @@ func _ready() -> void:
 	_puff_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_puff_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_puff_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	# T-185: without keep_scale the billboard ignores each particle's scale, so the particles not born yet (scale 0,
+	# default color = opaque black) were drawn full size at the emitter: the black disc left on the road after a
+	# short brake. With it, scale_amount and the curve work; the 1 m quad keeps the old average size (~2 m).
+	_puff_mat.billboard_keep_scale = true
 	_puff_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 	_puff_mesh = QuadMesh.new()
-	_puff_mesh.size = Vector2(2.0, 2.0)
+	_puff_mesh.size = Vector2(1.0, 1.0)
 
 
 ## Compila os shaders da fumaca e das marcas na largada (desenhados escondidos embaixo do asfalto, ver ImpactFx.warmup).
