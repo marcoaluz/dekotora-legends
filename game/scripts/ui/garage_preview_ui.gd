@@ -1,7 +1,7 @@
 class_name GaragePreviewUi
 extends RefCounted
-## Pedacos de tela da previa da garagem (T-171): cartao que vira "toque para ver no caminhao" e a faixa
-## "PREVIA" no meio da tela com COMPRAR E EQUIPAR / EQUIPAR / VOLTAR AO ATUAL.
+## Pedacos de tela da previa da garagem (T-171): cartao que vira "toque para ver no caminhao", a faixa
+## "PREVIA" no topo do painel direito com COMPRAR E EQUIPAR / EQUIPAR / VOLTAR AO ATUAL e a etiqueta no alto.
 ##
 ## Toque e mouse: o toque do Android chega como clique de mouse emulado, entao so o clique conta. Soltar perto
 ## de onde apertou (< TAP_SLOP) = toque; mais longe = o dedo estava rolando a lista (TouchScroll) e nada acontece.
@@ -67,7 +67,7 @@ static func preview_tag() -> Label:
 	return l
 
 
-## Faixa da previa no meio da tela. `act`: {"buy_install": Callable, "install": Callable, "back": Callable}.
+## Faixa da previa no topo do painel direito (fora da rolagem; nao cobre o caminhao). `act`: {"buy_install": Callable, "install": Callable, "back": Callable}.
 ## Devolve o botao principal (para o foco do teclado/controle) ou null.
 static func build_banner(box: Control, gs: Node, pv: GaragePreview, act: Dictionary, delta: String) -> Button:
 	for n in box.get_children():
@@ -76,44 +76,38 @@ static func build_banner(box: Control, gs: Node, pv: GaragePreview, act: Diction
 	box.visible = pv.active()
 	if not pv.active():
 		return null
-	var p: PanelContainer = UiKit.glass_panel(0.9)
-	p.add_theme_stylebox_override("panel", UiTheme.box(Color(0.03, 0.05, 0.1, 0.9), PREVIEW_COLOR, 2, 12, 12))
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", UiTheme.box(Color(0.03, 0.12, 0.18, 0.92), PREVIEW_COLOR, 2, 10, 10))
 	p.mouse_filter = Control.MOUSE_FILTER_STOP                 # o toque na faixa nao gira a camera
-	p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(p)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 6)
 	p.add_child(v)
 	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 10)
-	head.alignment = BoxContainer.ALIGNMENT_CENTER
+	head.add_theme_constant_override("separation", 8)
 	v.add_child(head)
 	head.add_child(UiKit._icon_rect("eye", 20, PREVIEW_COLOR))
-	head.add_child(UiKit.heading(Tr.t("garage.preview_tag"), 22, PREVIEW_COLOR))
+	head.add_child(UiKit.heading(Tr.t("garage.preview_tag"), 20, PREVIEW_COLOR))
 	var main: Button = null
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	if pv.part_id != "":
 		var d: PartDef = gs.part(pv.part_id)
-		head.add_child(UiKit.heading(Tr.t("part." + pv.part_id), 20, UiTheme.TEXT, false))
-		var hint: String = Tr.t("garage.preview_hint")
+		v.add_child(GarageShop.wl(Tr.t("part." + pv.part_id), 17, UiTheme.TEXT, 240.0))
+		v.add_child(GarageShop.wl(Tr.t("garage.preview_hint"), 13, UiTheme.TEXT_DIM, 240.0))
 		if delta != "":
-			hint += "   " + delta
-		v.add_child(_center(GarageShop.wl(hint, 14, UiTheme.TEXT_DIM, 300.0)))
+			v.add_child(GarageShop.wl(delta, 13, UiTheme.CYAN, 240.0))
 		if not gs.owns(pv.part_id):
 			var reason: String = gs.can_buy(d)
-			main = UiKit.primary_button("%s  %s" % [Tr.t("garage.preview_buy_install"), Tr.yen(d.price)], "coins", Vector2(0, 42))
-			main.add_theme_font_size_override("font_size", 16)
+			main = UiKit.primary_button("%s  %s" % [Tr.t("garage.preview_buy_install"), Tr.yen(d.price)], "", Vector2(0, 40))
+			main.add_theme_font_size_override("font_size", 15)
 			main.disabled = reason != ""
 			main.pressed.connect(act["buy_install"])
 			if reason != "":
-				v.add_child(_center(GarageShop.wl(reason, 14, UiTheme.BAD, 300.0)))
+				v.add_child(GarageShop.wl(reason, 13, UiTheme.BAD, 240.0))
 		else:
-			main = UiKit.primary_button(Tr.t("garage.preview_equip"), "check", Vector2(0, 42))
-			main.add_theme_font_size_override("font_size", 16)
+			main = UiKit.primary_button(Tr.t("garage.preview_equip"), "check", Vector2(0, 40))
+			main.add_theme_font_size_override("font_size", 15)
 			main.pressed.connect(act["install"])
-		row.add_child(main)
+		v.add_child(main)
 	else:
 		var pid: String = ""
 		var need: int = 0
@@ -121,19 +115,24 @@ static func build_banner(box: Control, gs: Node, pv: GaragePreview, act: Diction
 			if String(pp["hex"]).to_lower() == pv.paint_hex:
 				pid = String(pp["id"])
 				need = int(pp["fame_required"])
-		head.add_child(UiKit.heading(Tr.t("paint." + pid) if pid != "" else pv.paint_hex, 20, UiTheme.TEXT, false))
-		v.add_child(_center(GarageShop.wl(Tr.t("garage.preview_paint_locked", [need]), 14, UiTheme.BAD, 300.0)))
+		v.add_child(GarageShop.wl(Tr.t("paint." + pid) if pid != "" else pv.paint_hex, 17, UiTheme.TEXT, 240.0))
+		v.add_child(GarageShop.wl(Tr.t("garage.preview_paint_locked", [need]), 13, UiTheme.BAD, 240.0))
 	var back: Button = GarageShop.small_button(Tr.t("garage.preview_back"))
 	back.icon = UiKit.icon("rotate-ccw")
 	back.add_theme_constant_override("icon_max_width", 18)
+	back.add_theme_font_size_override("font_size", 15)
 	back.pressed.connect(act["back"])
-	row.add_child(back)
-	v.add_child(row)
+	v.add_child(back)
 	return main if main != null and not main.disabled else back
 
 
-static func _center(c: Control) -> Control:
-	c.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	if c is Label:
-		(c as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	return c
+## Etiqueta pequena "PREVIA · nome" no alto do meio da tela (nao cobre o caminhao; nao recebe toque).
+static func update_tag(tag: Label, gs: Node, pv: GaragePreview) -> void:
+	tag.visible = pv.active()
+	if not pv.active():
+		return
+	var nm: String = Tr.t("part." + pv.part_id) if pv.part_id != "" else Tr.t("garage.paint")
+	for pp in StyleCatalog.PAINTS:
+		if pv.part_id == "" and String(pp["hex"]).to_lower() == pv.paint_hex:
+			nm = Tr.t("paint." + String(pp["id"]))
+	tag.text = "◉ %s · %s" % [Tr.t("garage.preview_tag"), nm]

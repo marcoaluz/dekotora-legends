@@ -38,6 +38,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-154] (F3) Ferrovia ao lado da rodovia: trem de carga, bonde amarelo, viadutos de trem e bocas de túnel; só visual, sem sim nem rede (concluída em 2026-10-19, `tests/test_railway.gd`, `docs/capturas_t154/`)
 - [x] [T-156] (G1) Abertura "frente a frente" antes da largada (cheia ~9,4 s, curta 3 s), campanha 1 contra 1, grid lado a lado, comboio online 3–4 e protocolo 6 com relógio comum (concluída em 2026-10-20, `tests/test_duel_scene_flow.gd`, `docs/capturas_t156/`)
 - [x] [T-170] Som da seta (pisca de troca de faixa): tique-taque do relé sincronizado com a lâmpada (~1,5 Hz, começa aceso) e clique da alavanca a cada toque em < / >; 2 sons novos no ElevenLabs; só apresentação (concluída em 2026-10-20, `tests/test_turn_signal.gd`)
+- [x] [T-171] Garagem: prévia da peça montada no caminhão antes de comprar (toque/mouse/teclado/controle, câmera na vista da peça, COMPRAR E EQUIPAR / EQUIPAR / VOLTAR AO ATUAL, cores travadas só para ver) e pneus apoiados sobre a plataforma do galpão (antes afundavam 10 cm) (concluída em 2026-10-21, `tests/test_garage_preview.gd`, `docs/capturas_t171/`)
 
 ## Fase 4 — Garagem e economia
 - [x] [P40] Todas as peças do MVP no Blender (8 slots)

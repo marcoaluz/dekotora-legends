@@ -3,7 +3,8 @@ extends RefCounted
 ## Argumentos de depuracao da garagem (capturas): --demo (monta um caminhao cheio de pecas; --noparts = sem pecas;
 ## --cab=<estilo>; --body=<modelo>; --parts=a,b), --damage, --decals, --lights=<padrao>, --hideui, --day,
 ## --view=<vista>, --spin (rodas em movimento), --zoom=<z>, --tab=model|parts|mech|repair, --slot=<slot>,
-## --shot=ARQUIVO.png (depois de 6 s; --shot-pair = mais um quadro seguido).
+## --shot=ARQUIVO.png (depois de 6 s; --shot-pair = mais um quadro seguido), --preview=<peca> e
+## --preview-paint=<#hex> (T-171: previa antes de comprar).
 ## O --demo grava em user://demo_profile.json, NUNCA no perfil real do jogador.
 
 const DEMO_PARTS: Array[String] = ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji",
@@ -25,6 +26,9 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 				var d: PartDef = gs.part(id)
 				if d != null and gs.buy(d):
 					gs.install(id)
+	for a in args:
+		if a.begins_with("--fame=") and "--demo" in args:    # T-171: Fama baixa (cores travadas)
+			gs.profile["fame"] = int(a.substr(7))
 	if "--damage" in args:
 		for id in gs.profile["owned"]:
 			var d2: PartDef = gs.part(String(id))
@@ -67,6 +71,15 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 		elif a.begins_with("--shot="):          # captura de tela depois de 6 s (camera assentada) e fecha
 			var path: String = a.substr(7)
 			screen.get_tree().create_timer(6.0).timeout.connect(func() -> void: _take_shot(screen, path))
+		elif a.begins_with("--preview=") and screen.has_method("preview_part"):   # T-171: peca em previa
+			out["tab"] = "parts"
+			var pp: PartDef = gs.part(a.substr(10))
+			if pp != null:
+				out["slot"] = String(pp.slot)
+				screen.preview_part(a.substr(10))
+		elif a.begins_with("--preview-paint=") and screen.has_method("preview_paint"):   # cor travada so para ver
+			out["tab"] = "parts"
+			screen.preview_paint(a.substr(16))
 		elif a.begins_with("--tab="):
 			out["tab"] = a.substr(6)
 		elif a.begins_with("--slot="):

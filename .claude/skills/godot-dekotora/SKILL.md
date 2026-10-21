@@ -227,3 +227,16 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   como `lane_changes` podem contar duas vezes no cliente online (a reconciliação reaplica comandos).
 - Teste: `tests/test_turn_signal.gd` (`TurnSignalAudio.step(...)` com o relógio da simulação; fora da árvore só conta).
 - Nos testes, o `_ready` do AudioBus ainda não rodou: o barramento "SFX" pode não existir (o `bus` volta "Master").
+
+## Garagem: chão do palco e prévia (T-171)
+
+- A origem do `TruckNode` é o chão da pista (pneu em y = 0 em todos os .glb). Em cenário com piso elevado (plataforma da
+  garagem, 0,10 m), suba o caminhão pelo topo da malha: `TruckGround.top_of(cenario, "turntable")` e
+  `TruckGround.wheel_bottom(modelo)` (`scripts/truck/truck_ground.gd`). O `GarageStage` já faz (`floor_y`). Conferir:
+  `tools_dev/measure_wheel_ground.gd`.
+- Prévia de peça/cor: estado em `GaragePreview` (nunca no perfil), o palco monta com `preview.loadout(gs)` /
+  `preview.paint(gs)`. Mudança de encaixe/aba chama `preview.clear()`; `preview.settle(gs)` em todo redesenho encerra a
+  prévia que virou realidade. Cartão tocável: `GaragePreviewUi.make_tappable` (só clique de mouse conta, o toque do
+  Android chega como mouse emulado; soltar a até 12 unidades = toque, senão era rolagem; foco por teclado = prévia).
+- Para não perder o foco do teclado, atualize a prévia sem redesenhar as listas (`_show_preview` na `garage_screen.gd`).
+- Depuração: `-- --demo --noparts --preview=ID`, `--preview-paint=#hex`, `--fame=N`. Teste: `tests/test_garage_preview.gd`.

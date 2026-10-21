@@ -30,7 +30,8 @@ var _preview_cache: Dictionary = {}
 var _last_wheel_part: String = "?"          # roda/calota instalada no ultimo redesenho (instalar uma nova liga o giro)
 ## Previa (T-171): peca/cor mostrada no caminhao antes de comprar; nunca entra no perfil.
 var preview := GaragePreview.new()
-var _banner: VBoxContainer                  # faixa "PREVIA" no meio da tela (GaragePreviewUi.build_banner)
+var _banner: VBoxContainer                  # faixa "PREVIA" no topo do painel direito (GaragePreviewUi.build_banner)
+var _tag: Label                             # etiqueta "PREVIA" no alto do meio da tela
 var _banner_main: Button
 
 
@@ -79,15 +80,25 @@ func _ready() -> void:
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.alignment = BoxContainer.ALIGNMENT_END
 	mid.add_child(center)
-	_banner = VBoxContainer.new()
-	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_banner.visible = false
-	center.add_child(_banner)
+	_tag = UiKit.heading("", 18, GaragePreviewUi.PREVIEW_COLOR)   # "◉ PREVIA · peca" no alto, sem cobrir o caminhao
+	_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tag.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_tag.custom_minimum_size = Vector2(60, 0)
+	_tag.size_flags_horizontal = Control.SIZE_FILL         # largura do meio; nome comprido vira "..."
+	_tag.add_theme_stylebox_override("normal", UiTheme.box(Color(0.02, 0.04, 0.08, 0.78), GaragePreviewUi.PREVIEW_COLOR, 1, 14, 10))
+	_tag.visible = false
+	center.add_child(_tag)
+	center.add_child(UiKit.spacer(true))
 	_msg = UiKit.heading("", 18, UiTheme.CYAN, false)
 	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	center.add_child(_msg)
 	_right = _column(mid, false)
+	_banner = VBoxContainer.new()                     # faixa PREVIA no topo do painel direito, fora da rolagem
+	_banner.visible = false
+	var right_col: Node = _right.get_parent().get_parent()
+	right_col.add_child(_banner)
+	right_col.move_child(_banner, 0)
 	_build_bottom(vb)
 	stage.wheel_spin_changed.connect(func(_on: bool) -> void: _update_spin_button())
 	var dbg: Dictionary = GarageDebug.apply(self, gs, stage, _ui_layer)
@@ -314,6 +325,7 @@ func _build_banner() -> void:
 			AudioBus.play_ui("ui_select")
 			end_preview(),
 	}, delta)
+	GaragePreviewUi.update_tag(_tag, gs, preview)
 
 
 ## COMPRAR E EQUIPAR: compra (paga) e instala a peca da previa; a previa vira o caminhao de verdade.
