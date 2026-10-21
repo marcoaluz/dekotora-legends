@@ -224,9 +224,15 @@ func build_mech(box: VBoxContainer) -> void:
 			else:
 				b = small_button(Tr.t("garage.install") if not inst else (Tr.t("garage.turn_off") if kind == "upgrade" else Tr.t("garage.installed")))
 				b.disabled = inst and kind != "upgrade"
-				b.pressed.connect(func() -> void: gs.install_mech(String(id)))
-			v.add_child(b)
+				b.pressed.connect(func() -> void:
+					if gs.install_mech(String(id)) and kind != "upgrade":
+						GarageHorns.preview_engine(gs, {}))           # T-173: ouve o motor como ficou
+			if kind == "upgrade":
+				v.add_child(b)
+			else:                                              # T-173: OUVIR = trecho do motor com este item
+				v.add_child(GarageHorns.with_listen(b, func() -> void: GarageHorns.preview_engine(gs, {kind: String(id)})))
 			box.add_child(cv[0])
+	GarageHorns.build(box, gs)
 
 
 # ---------------------------------------------------------------- reparo (P43)

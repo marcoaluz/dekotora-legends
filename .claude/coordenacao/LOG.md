@@ -213,3 +213,9 @@ Formato em `docs/AGENTES.md`.
 ## 2026-10-20 · T-162 · ajudante-rapido · CONCLUÍDA
 - Feito: caminhos padrão de 12 scripts (Blender e tools) apontam para docs/Modelos/<pasta>, com volta ao caminho antigo se o novo não existir; STATUS e skill blender-pixelart atualizados; coordenador corrigiu o exemplo em PIPELINE_ARTE_BLENDER.md (commit 8db8af6).
 - Validação: py_compile e bash -n ok; arquivos esperados existem em docs/Modelos/. Docs históricos (DECISOES, INVENTARIO, LICENCAS) mantêm o caminho antigo como registro.
+
+## 2026-10-21 · T-173 · especialista · CONCLUÍDA (Marco precisa ouvir e confirmar)
+- Feito: escapamento define o som do motor (exh_straight=exh_rasp rouco; novos exh_stack grave e exh_chrome_cut=exh_pop com estalos; 3 loops cada), turbina com assobio e "pssh" do perfil, 3 buzinas novas + escolha grátis na aba MECÂNICA (seção BUZINA, botão OUVIR com prévia), rivais offline com som sorteado, online com motor/escape/buzina do descritor (protocolo 7); loop da buzina por janela medida (a básica repetia silêncio).
+- Arquivos: audio/{engine_sounds,horn_catalog,sound_preview,engine_audio,race_audio,truck_sfx}.gd, ui/{garage_horns,garage_shop,engine_audio_test}.gd, autoload/game_state.gd, net/{protocol,server_main,bot_client}.gd, road3d/race_scene_3d.gd, data/engines/exh_{stack,chrome_cut,straight}.tres, i18n, tests/test_engine_sounds.gd, tools/net_test.sh, 18 MP3
+- Validação: 301 testes ok; engine_audio_test --cycle-profiles 12 combinações ok; garagem/corrida/menu abrem sem SCRIPT ERROR; net_test 0 ms e 150 ms+2% PASSOU com SOM_REDE OK; sons medidos no Blender (aud.Sound().data()): duração certa, loops estáveis. ElevenLabs: 627 créditos (61.873/131.000).
+- Decisão pendente: preços/efeitos dos 2 escapes novos; buzina grátis; chaminés montarem a peça kw_exhaust_stacks?; quais sons regerar. APK novo (protocolo 7).

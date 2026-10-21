@@ -282,12 +282,23 @@ func apply_demo_profile() -> void:
 	profile["turbo"] = "turbo_twin"
 
 
-## Buzina da primeira peca instalada que traga uma; senao a buzina de ar basica.
+## Buzina tocada: a escolhida na garagem (perfil "horn", T-173); "" (automatica) = a da primeira peca instalada que
+## traga uma; senao a buzina de ar basica.
 func installed_horn() -> String:
+	var part_horn: String = ""
 	for d in installed_part_defs():
 		if d.horn != "":
-			return d.horn
-	return "horn_air_basic"
+			part_horn = d.horn
+			break
+	return HornCatalog.resolve(String(profile.get("horn", HornCatalog.AUTO)), part_horn)
+
+
+## Escolhe a buzina (HornCatalog.IDS ou HornCatalog.AUTO). Sem custo (T-173: so som, para validar).
+func set_horn(id: String) -> void:
+	profile["horn"] = id if HornCatalog.is_valid(id) else HornCatalog.AUTO
+	save_profile()
+	_act("set_horn", id)
+	profile_changed.emit()
 
 
 # ---------------------------------------------------------------- montagem -> simulacao
@@ -324,7 +335,7 @@ func build_sim_loadout() -> Array[Dictionary]:
 const MECH_KINDS: Dictionary = {
 	"engine": {"dir": "res://data/engines/", "key": "engine", "ids": ["eng_i6_std", "eng_i6_tuned", "eng_v8"]},
 	"turbo": {"dir": "res://data/engines/", "key": "turbo", "ids": ["turbo_none", "turbo_single", "turbo_twin"]},
-	"exhaust": {"dir": "res://data/engines/", "key": "exhaust", "ids": ["exh_std", "exh_straight"]},
+	"exhaust": {"dir": "res://data/engines/", "key": "exhaust", "ids": ["exh_std", "exh_straight", "exh_stack", "exh_chrome_cut"]},
 	"upgrade": {"dir": "res://data/upgrades/", "key": "", "ids": ["jake_brake", "tires_sport"]},
 }
 
@@ -433,6 +444,7 @@ func truck_descriptor() -> Dictionary:
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
 		"body": String(profile.get("body", "base")), "cab": CabCatalog.normalize(profile.get("cab", "")),
+		"horn": installed_horn(),                                  # T-173: os outros ouvem a buzina certa (protocolo 7)
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
 	}.merged(Contracts.sim_fields(pending_contract))
 
@@ -618,6 +630,9 @@ func apply_action(action: String, arg: String) -> bool:
 			return repair_all() > 0
 		"buy_new":
 			return buy_new_replacement(arg)
+		"set_horn":                                   # T-173
+			set_horn(arg)
+			return true
 	return false
 
 

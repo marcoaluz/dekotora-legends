@@ -26,12 +26,12 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
-| Testes automáticos (292) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (301) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
 | Demonstração dos acessórios | `godot --path game res://scenes/tools/accessory_viewer.tscn` |
-| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` |
+| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` (T-173: escapamentos, turbinas, buzinas; sem tela: `--headless ... -- --cycle-profiles`) |
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
@@ -153,6 +153,13 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-173 (som do motor por escapamento, turbina e buzinas):** abrir `godot --path game res://scenes/tools/engine_audio_test.tscn`,
+  escolher o **Escapamento** (Reto rouco, Chaminés V8, Cromado estalos), ligar "Acelerar automático" e trocar a **Turbina**;
+  tocar as 3 buzinas marcadas "(nova)". Dizer quais dos **15 sons de motor/turbo** e das **3 buzinas** regerar
+  (`python tools/gen_audio.py --only nome --force`). No jogo: GARAGEM > MECÂNICA (botão OUVIR nos motores/turbos/escapes;
+  seção BUZINA no fim). Confirmar os 2 escapes novos e os preços (BALANCEAMENTO), buzina grátis, e se as chaminés devem
+  montar a peça visual `kw_exhaust_stacks`. **Gerar o APK de novo** (protocolo de rede 7).
 
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros; dizer se quer
