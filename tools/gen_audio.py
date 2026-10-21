@@ -7,6 +7,8 @@ Uso (na raiz do projeto):
     python tools/gen_audio.py --section 5             # gera uma seção (1..7)
     python tools/gen_audio.py --all                   # gera tudo que falta (não regrava o que já existe)
     python tools/gen_audio.py --music                 # só a música (seção 7)
+    python tools/gen_audio.py --only a,b --force --out-dir PASTA --variants 3
+                                                      # T-178: gera a_v1..a_v3 em PASTA (fora do jogo) para escolher
 
 A chave vem de .chaves.env (ELEVENLABS_API_KEY); NUNCA é impressa. Os arquivos saem em MP3 (o Godot
 importa MP3 e a música/loops usam loop=true no import); o nome segue a tabela, com extensão .mp3.
@@ -81,8 +83,9 @@ def parse_doc():
     return items + extra
 
 
-def target_path(it):
-    return os.path.join(OUT, FOLDERS[it["section"]], it["file"] + ".mp3")
+def target_path(it, out_root=None, suffix=""):
+    """Caminho final no jogo; com out_root (T-178) vai para PASTA/<subpasta>/<nome><suffix>.mp3, fora do jogo."""
+    return os.path.join(out_root or OUT, FOLDERS[it["section"]], it["file"] + suffix + ".mp3")
 
 
 def is_loop(it):
@@ -120,18 +123,19 @@ def usage(key):
     return 0, 0
 
 
-def generate(it, key):
-    os.makedirs(os.path.dirname(target_path(it)), exist_ok=True)
+def generate(it, key, out_root=None, suffix="", influence=0.5):
+    path = target_path(it, out_root, suffix)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     if it["section"] == 7:
         body = {"prompt": it["prompt"], "music_length_ms": int(it["seconds"] * 1000), "force_instrumental": True}
         data = post("/v1/music?output_format=mp3_44100_128", body, key, timeout=600)
     else:
         body = {"text": it["prompt"], "duration_seconds": max(0.5, min(it["seconds"], 30.0)),
-                "prompt_influence": 0.5, "model_id": "eleven_text_to_sound_v2"}
+                "prompt_influence": influence, "model_id": "eleven_text_to_sound_v2"}
         if is_loop(it):
             body["loop"] = True
         data = post("/v1/sound-generation?output_format=mp3_44100_128", body, key)
-    with open(target_path(it), "wb") as f:
+    with open(path, "wb") as f:
         f.write(data)
     return len(data)
 
@@ -145,6 +149,9 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--max-credits", type=int, default=30000, help="para de gerar se gastar mais que isso nesta execução")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--out-dir", default="", help="T-178: grava em outra pasta (ex.: rascunho fora do jogo) em vez de game/assets/audio")
+    ap.add_argument("--variants", type=int, default=1, help="T-178: quantas versões de cada som (nome_v1, nome_v2...; só com --out-dir)")
+    ap.add_argument("--influence", type=float, default=0.5, help="prompt_influence do ElevenLabs (0..1; maior = segue mais o texto)")
     ap.add_argument("--music-max", type=float, default=120.0, help="duração máxima (s) de cada música, para economizar créditos")
     args = ap.parse_args()
     items = parse_doc()
@@ -164,6 +171,10 @@ def main():
             print(("OK      " if os.path.exists(target_path(i)) else "FALTA   ") + FOLDERS[i["section"]] + "/" + i["file"])
         print(f"{len(todo)} faltando de {len(items)}")
         return
+    out_root = os.path.abspath(args.out_dir) if args.out_dir else None
+    variants = max(1, args.variants) if out_root else 1
+    if out_root:
+        todo = items
     key = load_key()
     start, limit = usage(key)
     print(f"créditos usados: {start}/{limit}")
@@ -174,8 +185,10 @@ def main():
                 print("limite de créditos desta execução atingido; parando")
                 break
         try:
-            size = generate(it, key)
-            print(f"[{n}/{len(todo)}] {FOLDERS[it['section']]}/{it['file']}.mp3  {size // 1024} KB")
+            for v in range(1, variants + 1):
+                suffix = f"_v{v}" if variants > 1 else ""
+                size = generate(it, key, out_root, suffix, args.influence)
+                print(f"[{n}/{len(todo)}] {FOLDERS[it['section']]}/{it['file']}{suffix}.mp3  {size // 1024} KB")
         except urllib.error.HTTPError as e:
             print(f"[{n}/{len(todo)}] ERRO {it['file']}: HTTP {e.code} {e.read()[:200]!r}")
         except Exception as e:  # noqa: BLE001

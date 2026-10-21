@@ -51,10 +51,20 @@ static func rev_curve(t: float) -> Vector2:
 	return Vector2(lerpf(0.92, 0.05, clampf((t - 1.9) / 1.0, 0.0, 1.0)), 0.0)
 
 
+## Turbo boost (0..1) of the rev at time t (pure, testable). T-178: before the throttle (t < 0.4) the old formula
+## gave boost 5.5, so every preview started with a loud squeal at ~4.6x pitch sliding down (the "DJ" effect).
+static func boost_at(t: float) -> float:
+	if rev_curve(t).y > 0.5:
+		return clampf((t - 0.8) / 0.8, 0.0, 1.0)
+	if t < 1.9:
+		return 0.0
+	return clampf(1.0 - (t - 1.9) / 0.4, 0.0, 1.0)
+
+
 func _process(dt: float) -> void:
 	_t += dt
 	var c: Vector2 = rev_curve(_t)
-	var boost: float = clampf((_t - 0.8) / 0.8, 0.0, 1.0) if c.y > 0.5 else maxf(0.0, 1.0 - (_t - 1.9) / 0.4)
+	var boost: float = boost_at(_t)
 	if c.y < 0.5 and _t >= 1.9 and not _blown:
 		_blown = true
 		if _engine.turbo_set != "":

@@ -18,8 +18,10 @@ const BANDS_4: Array[String] = ["idle", "low", "mid", "high"]
 const BANDS_3: Array[String] = ["idle", "mid", "high"]
 ## Profiles generated in T-173 (3 loops each + turbo whine + blow-off). Order = garage / test tool order.
 const PROFILES: Array[String] = ["exh_rasp", "exh_stack", "exh_pop"]
-## Measured loudness of the generated files (docs/AUDIO_ELEVENLABS.md, T-173): exh_pop_high came out ~6 dB quieter.
-const LAYER_GAIN_DB: Dictionary = {"exh_pop_high": 5.0, "exh_stack_idle": -2.0}
+## Measured loudness of the generated files (docs/AUDIO_ELEVENLABS.md). T-178 files (RMS dBFS): exh_pop idle/mid/high
+## -21.8/-17.6/-22.3 and exh_stack ~-16, quieter than the T-173 ones; these gains bring them back to the old level.
+const LAYER_GAIN_DB: Dictionary = {"exh_pop_idle": 3.0, "exh_pop_mid": 2.0, "exh_pop_high": 5.0,
+	"exh_stack_idle": 1.5, "exh_stack_mid": 1.5, "exh_stack_high": 1.5}
 const EXHAUST_IDS: Array[String] = ["exh_std", "exh_straight", "exh_stack", "exh_chrome_cut"]
 const TURBO_IDS: Array[String] = ["turbo_none", "turbo_single", "turbo_twin"]
 const ENGINE_IDS: Array[String] = ["eng_i6_std", "eng_i6_tuned", "eng_v8"]

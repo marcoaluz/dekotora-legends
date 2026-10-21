@@ -128,7 +128,30 @@ func test_rival_draw_is_deterministic_and_varied() -> void:
 	check(horns.size() >= 4, "rivais variam a buzina (%d em 40)" % horns.size())
 
 
+func test_turbo_pitch_sweep_is_short() -> void:
+	# T-178: o assobio subindo quase uma oitava com o boost soava como sintetizador; agora no maximo ~7 semitons
+	var lo: float = EngineAudio.turbo_pitch_for(0.0)
+	var hi: float = EngineAudio.turbo_pitch_for(1.0)
+	check(hi > lo, "turbina sobe o tom com o boost (spool)")
+	check(12.0 * log(hi / lo) / log(2.0) <= 7.0, "subida do tom da turbina curta (%.1f semitons)" % (12.0 * log(hi / lo) / log(2.0)))
+	check_near(EngineAudio.turbo_pitch_for(2.0), hi, 0.0001, "boost acima de 1 nao passa do topo")
+	var bus: Node = Engine.get_main_loop().root.get_node("AudioBus")
+	for n in ["turbo_single_whine", "turbo_twin_whine", "exh_rasp_turbo_whine", "exh_stack_turbo_whine", "exh_pop_turbo_whine"]:
+		var s: AudioStream = bus.stream(n)
+		check(s != null, "turbina %s carrega" % n)
+		if s is AudioStreamMP3:
+			check((s as AudioStreamMP3).loop, "turbina %s em loop" % n)
+
+
 func test_sound_preview_curve() -> void:
 	check(SoundPreview.rev_curve(0.0).x < 0.1, "previa comeca em marcha lenta")
 	check(SoundPreview.rev_curve(1.7).x > 0.85 and SoundPreview.rev_curve(1.7).y > 0.5, "sobe ate perto do corte acelerando")
 	check(SoundPreview.rev_curve(SoundPreview.DURATION).x < 0.1 and SoundPreview.rev_curve(2.5).y < 0.5, "solta e volta para a lenta")
+	# T-178: o boost da previa fica sempre em 0..1 (antes valia 5,5 no comeco = guincho agudo da turbina)
+	var t: float = 0.0
+	while t <= SoundPreview.DURATION:
+		var b: float = SoundPreview.boost_at(t)
+		check(b >= 0.0 and b <= 1.0, "boost da previa em 0..1 (t=%.2f: %.2f)" % [t, b])
+		t += 0.05
+	check_eq(SoundPreview.boost_at(0.1), 0.0, "sem turbina antes de acelerar")
+	check_near(SoundPreview.boost_at(1.7), 1.0, 0.001, "turbina cheia no alto do giro")

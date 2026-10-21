@@ -1,0 +1,31 @@
+# T-178: qual versão gerada foi para o jogo (game/assets/audio/engines/<nome>.mp3)
+# formato: nome  pasta/arquivo escolhido   (as outras versões ficam ao lado, para trocar sem gastar créditos)
+# Os sons de ANTES da T-178 estão em audio_backup/t178_antes/engines/ (para voltar: copiar por cima do arquivo do jogo).
+turbo_single_whine     t178_variantes/engines/turbo_single_whine_v2.mp3
+turbo_twin_whine       t178_variantes/engines/turbo_twin_whine_v3.mp3
+exh_rasp_turbo_whine   t178_variantes/engines/exh_rasp_turbo_whine_v1.mp3
+exh_stack_turbo_whine  t178_variantes/engines/exh_stack_turbo_whine_v3.mp3
+exh_pop_turbo_whine    t178_variantes/engines/exh_pop_turbo_whine_v2.mp3
+turbo_blowoff_2        t178_variantes/engines/turbo_blowoff_2_v1.mp3
+exh_pop_blowoff        t178_variantes/engines/exh_pop_blowoff_v2.mp3
+i6_std_idle            t178_variantes/engines/i6_std_idle_v1.mp3
+i6_std_low             t178_variantes/engines/i6_std_low_v2.mp3
+i6_std_mid             t178_variantes/engines/i6_std_mid_v1.mp3
+i6_std_high            t178_variantes/engines/i6_std_high_v2.mp3
+i6_tuned_idle          t178_variantes/engines/i6_tuned_idle_v1.mp3
+i6_tuned_low           t178_variantes/engines/i6_tuned_low_v2.mp3
+i6_tuned_mid           t178_variantes/engines/i6_tuned_mid_v1.mp3
+i6_tuned_high          t178_variantes/engines/i6_tuned_high_v2.mp3
+v8_idle                t178_variantes_v8c/engines/v8_idle_v2.mp3
+v8_low                 t178_variantes_v8c/engines/v8_low_v1.mp3
+v8_mid                 t178_variantes_v8b/engines/v8_mid_v3.mp3
+v8_high                t178_variantes_v8b/engines/v8_high_v3.mp3
+exh_rasp_idle          t178_variantes/engines/exh_rasp_idle_v1.mp3
+exh_rasp_mid           t178_variantes/engines/exh_rasp_mid_v1.mp3
+exh_rasp_high          t178_variantes/engines/exh_rasp_high_v2.mp3
+exh_stack_idle         t178_variantes/engines/exh_stack_idle_v2.mp3
+exh_stack_mid          t178_variantes/engines/exh_stack_mid_v1.mp3
+exh_stack_high         t178_variantes/engines/exh_stack_high_v1.mp3
+exh_pop_idle           t178_variantes/engines/exh_pop_idle_v2.mp3
+exh_pop_mid            t178_variantes/engines/exh_pop_mid_v2.mp3
+exh_pop_high           t178_variantes/engines/exh_pop_high_v1.mp3

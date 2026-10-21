@@ -20,10 +20,10 @@ Dica: sempre inclua "steady constant RPM, no acceleration, seamless loop".
 
 | Arquivo | Duração | Prompt |
 | --- | --- | --- |
-| `i6_std_idle.wav` | 4 s | Heavy Japanese truck inline-six diesel engine idling, steady constant RPM, low rumble, recorded from behind the truck, no acceleration, seamless loop |
-| `i6_std_low.wav` | 4 s | Heavy truck inline-six diesel engine at steady low RPM under load, deep chugging, recorded from behind, no acceleration, seamless loop |
-| `i6_std_mid.wav` | 4 s | Heavy truck inline-six diesel engine at steady medium RPM cruising on highway, strong drone, recorded from behind, no acceleration, seamless loop |
-| `i6_std_high.wav` | 4 s | Heavy truck inline-six diesel engine at steady high RPM near redline, loud straining roar, recorded from behind, no acceleration, seamless loop |
+| `i6_std_idle.wav` | 4 s | Heavy truck inline-six diesel engine idling, real semi truck, deep diesel clatter and low rumble, recorded outside near the exhaust, steady constant RPM, no acceleration, seamless loop |
+| `i6_std_low.wav` | 4 s | Heavy truck inline-six diesel engine at steady low RPM pulling a heavy load, deep chugging diesel knock and rumble, real semi truck recorded from behind, no acceleration, seamless loop |
+| `i6_std_mid.wav` | 4 s | Heavy truck inline-six diesel engine at steady medium RPM cruising on the highway, gritty diesel growl with mechanical clatter, real semi truck recorded from behind, no acceleration, seamless loop |
+| `i6_std_high.wav` | 4 s | Heavy truck inline-six diesel engine at steady high RPM under full power, loud rough diesel roar, real semi truck recorded from behind, no acceleration, seamless loop |
 
 ### Motor 6 cilindros preparado — `i6_tuned_*.wav`
 
@@ -33,19 +33,19 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 
 | Arquivo | Duração | Prompt |
 | --- | --- | --- |
-| `v8_idle.wav` | 4 s | Huge V8 diesel truck engine idling with a lopey uneven burble, deep bass, steady RPM, no acceleration, seamless loop |
-| `v8_low.wav` | 4 s | Huge V8 diesel truck engine at steady low RPM under heavy load, thunderous rumble, no acceleration, seamless loop |
-| `v8_mid.wav` | 4 s | Huge V8 diesel truck engine cruising at steady medium RPM, powerful growl, no acceleration, seamless loop |
-| `v8_high.wav` | 4 s | Huge V8 diesel truck engine at steady high RPM, screaming heavy roar, no acceleration, seamless loop |
+| `v8_idle.wav` | 4 s | Monster truck racing V8 engine idling, loud choppy cammed idle, sharp crisp crackling barks from open headers, raw metallic rasp, recorded right next to the headers, steady RPM, no acceleration, seamless loop |
+| `v8_low.wav` | 4 s | Monster truck racing V8 engine at steady low RPM under load, loud snarling bark with crisp crackling rasp from open headers, raw and metallic, recorded right next to the headers, no acceleration, seamless loop |
+| `v8_mid.wav` | 4 s | Monster truck racing V8 engine at steady medium RPM, loud aggressive raw roar with crackling rasp through open headers, recorded close, no acceleration, seamless loop |
+| `v8_high.wav` | 4 s | Monster truck racing V8 engine at steady high RPM at full throttle, ear splitting raw screaming roar with harsh crackling rasp through open headers, recorded close, no acceleration, seamless loop |
 
 ### Turbo, escape e freio-motor
 
 | Arquivo | Duração | Prompt |
 | --- | --- | --- |
-| `turbo_single_whine.wav` | 3 s | Diesel truck turbocharger whistle at steady high boost, constant pitch high whine, isolated, no engine, seamless loop |
-| `turbo_twin_whine.wav` | 3 s | Twin turbochargers whistling together at steady boost, layered high pitched whine, isolated, no engine, seamless loop |
+| `turbo_single_whine.wav` | 3 s | Real diesel truck turbocharger at full boost recorded close under the hood, airy rushing hiss of air sucked into the compressor with a thin metallic whistle on top, mechanical industrial sound, steady, seamless loop |
+| `turbo_twin_whine.wav` | 3 s | Two big diesel truck turbochargers at full boost recorded close under the hood, thick roaring rush of intake air and hiss with a faint metallic whistle, mechanical industrial sound, steady, seamless loop |
 | `turbo_blowoff_1.wav` | 1 s | Big truck turbo blow-off valve release, sharp loud pssshh air burst |
-| `turbo_blowoff_2.wav` | 1 s | Truck turbo wastegate flutter, rapid chattering stu-tu-tu air sound when lifting off throttle |
+| `turbo_blowoff_2.wav` | 1 s | Diesel truck turbo dump valve venting when the driver lifts off the throttle, quick sharp burst of compressed air hiss, pneumatic psssh |
 | `exhaust_straight_layer.wav` | 4 s | Straight-pipe truck exhaust rumble, raw loud low frequency popping drone, steady, no acceleration, seamless loop |
 | `jake_brake.wav` | 3 s | Semi truck engine brake (jake brake) loud machine-gun like braaap, steady, seamless loop |
 | `engine_damaged_rattle.wav` | 3 s | Damaged diesel engine knocking and rattling, metallic clatter and misfires, steady, seamless loop |
@@ -59,27 +59,44 @@ Mapa no código: `ExhaustDef.sound_profile` (`game/data/engines/exh_*.tres`) e `
 
 | Arquivo | Duração | Prompt |
 | --- | --- | --- |
-| `exh_rasp_idle.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust idling, raspy crackling raw tone, steady constant RPM, recorded from behind near the tailpipe, no acceleration, seamless loop |
-| `exh_rasp_mid.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust at steady medium RPM under load, raspy aggressive snarl, recorded from behind near the tailpipe, no acceleration, seamless loop |
-| `exh_rasp_high.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust at steady high RPM near redline, loud raspy screaming rasp, recorded from behind near the tailpipe, no acceleration, seamless loop |
-| `exh_stack_idle.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks idling, deep booming bass burble, steady constant RPM, open air, no acceleration, seamless loop |
-| `exh_stack_mid.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks cruising at steady medium RPM, deep powerful thunder from the stacks, no acceleration, seamless loop |
-| `exh_stack_high.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks at steady high RPM, massive deep roaring bellow from the stacks, no acceleration, seamless loop |
-| `exh_pop_idle.wav` | 4 s | Diesel truck with a short cut chrome exhaust idling, choppy lumpy idle with irregular misfire pops and burbles, steady constant RPM, no acceleration, seamless loop |
-| `exh_pop_mid.wav` | 4 s | Diesel truck with a short cut chrome exhaust at steady medium RPM, punchy rhythmic exhaust note with occasional crackles and pops, no acceleration, seamless loop |
-| `exh_pop_high.wav` | 4 s | Diesel truck with a short cut chrome exhaust at steady high RPM, loud crackling exhaust with rapid pops and bangs, no acceleration, seamless loop |
-| `exh_rasp_turbo_whine.wav` | 3 s | Small high-revving sport turbocharger at steady boost, sharp bright metallic whistle, isolated, no engine, seamless loop |
-| `exh_stack_turbo_whine.wav` | 3 s | Big diesel truck turbocharger at steady high boost, deep loud jet-like whoosh with a low whine, isolated, no engine, seamless loop |
-| `exh_pop_turbo_whine.wav` | 3 s | Turbocharger whistling at steady boost with a fluttering chirp, mid-pitched siren-like whine, isolated, no engine, seamless loop |
+| `exh_rasp_idle.wav` | 4 s | Heavy diesel semi truck with a straight-pipe exhaust idling, raw raspy diesel crackle and rumble, recorded from behind near the tailpipe, steady constant RPM, no acceleration, seamless loop |
+| `exh_rasp_mid.wav` | 4 s | Heavy diesel semi truck with a straight-pipe exhaust at steady medium RPM under load, raspy aggressive diesel snarl, recorded from behind near the tailpipe, no acceleration, seamless loop |
+| `exh_rasp_high.wav` | 4 s | Heavy diesel semi truck with a straight-pipe exhaust at steady high RPM under full power, loud raw raspy diesel roar, recorded from behind near the tailpipe, no acceleration, seamless loop |
+| `exh_stack_idle.wav` | 4 s | Big rig semi truck with tall vertical chrome exhaust stacks idling, deep booming diesel bass rumble, recorded outside in open air, steady constant RPM, no acceleration, seamless loop |
+| `exh_stack_mid.wav` | 4 s | Big rig semi truck with tall vertical chrome exhaust stacks at steady medium RPM, deep powerful diesel thunder from the stacks, recorded outside, no acceleration, seamless loop |
+| `exh_stack_high.wav` | 4 s | Big rig semi truck with tall vertical chrome exhaust stacks at steady high RPM under full power, massive deep diesel roar from the stacks, recorded outside, no acceleration, seamless loop |
+| `exh_pop_idle.wav` | 4 s | Heavy diesel truck with a short cut chrome exhaust idling, rough lumpy diesel idle with occasional random pops, recorded from behind, steady constant RPM, no acceleration, seamless loop |
+| `exh_pop_mid.wav` | 4 s | Heavy diesel truck with a short cut chrome exhaust at steady medium RPM, rough gritty diesel exhaust with occasional random crackles and pops, recorded from behind, no acceleration, seamless loop |
+| `exh_pop_high.wav` | 4 s | Heavy diesel truck with a short cut chrome exhaust at steady high RPM, loud crackling diesel roar with random pops and bangs, recorded from behind, no acceleration, seamless loop |
+| `exh_rasp_turbo_whine.wav` | 3 s | Small fast spinning turbocharger on a diesel truck at full boost recorded close, bright airy hiss with a sharp thin metallic whistle, mechanical industrial sound, steady, seamless loop |
+| `exh_stack_turbo_whine.wav` | 3 s | Huge diesel big rig turbocharger at full boost recorded close, deep heavy rushing air roar like a jet intake with a low metallic whir, mechanical industrial sound, steady, seamless loop |
+| `exh_pop_turbo_whine.wav` | 3 s | Diesel truck turbocharger at full boost recorded close, gritty rushing air hiss with a metallic whistle, mechanical industrial sound, steady, seamless loop |
 | `exh_rasp_blowoff.wav` | 1 s | Sport turbo blow-off valve, short sharp high pitched psssh air release |
 | `exh_stack_blowoff.wav` | 1 s | Huge diesel truck turbo dump valve, long deep loud whoosh of air release |
-| `exh_pop_blowoff.wav` | 1 s | Turbo wastegate flutter stu-tu-tu followed by a single exhaust backfire pop when lifting off throttle |
+| `exh_pop_blowoff.wav` | 1 s | Diesel truck turbo blow-off valve releasing pressure, short loud pneumatic psssh of compressed air, then one dry exhaust backfire bang |
 
 > **T-173 (2026-10-21):** os 15 sons acima e as 3 buzinas novas da seção 2 (`horn_ship_deep`, `horn_dual_tone`,
 > `horn_musical_dekotora`) foram gerados com `tools/gen_audio.py` (**627 créditos**; conta em 61.873 de 131.000). Conferidos
 > por análise (duração 4/3/1 s, loops estáveis; `exh_pop_high` saiu ~6 dB mais baixo e ganha +5 dB no jogo,
 > `EngineSounds.LAYER_GAIN_DB`; `exh_stack_turbo_whine` saiu mais "whoosh" grave do que assobio). Marco: ouvir na
 > ferramenta `scenes/tools/engine_audio_test.tscn` e pedir regeração (`python tools/gen_audio.py --only nome --force`).
+
+> **T-178 (2026-10-21) — turbinas "de música de discoteca" refeitas; motores mais caminhão; V8 de monster truck.**
+> Causa medida: os assobios da T-173 eram **notas puras** (`turbo_single_whine` = série harmônica perfeita 1141/2271/3402 Hz,
+> `exh_pop_turbo_whine` com vibrato de sirene, `turbo_twin_whine` com batimento rítmico de 4 Hz) e o jogo subia o tom delas
+> quase uma oitava com o boost (efeito "riser" de sintetizador). Na prévia OUVIR havia ainda um erro: antes de acelerar o
+> boost valia 5,5, e a turbina tocava um guincho a ~4,6× o tom. O `turbo_blowoff_2` ("stu-tu-tu") também era tonal.
+> Correção: prompts sem palavras que puxam tom ou ritmo (whine, constant pitch, siren, chirp, flutter, rhythmic, drone) e
+> com ar, chiado e "mechanical industrial"; subida do tom da turbina 0,85→1,2 (`EngineAudio.turbo_pitch_for`); boost da
+> prévia preso em 0..1 (`SoundPreview.boost_at`). Refeitos 28 sons (5 assobios, 2 pssh, 8 do 6 cilindros, 4 do V8, 9 dos
+> perfis de escape), com `prompt_influence` 0,7 e 2 a 3 versões de cada, escolhidas por análise (planicidade espectral,
+> pulsação, emenda do loop): **3.179 créditos** (conta em 65.052 de 131.000).
+> Os sons de antes estão em `audio_backup/t178_antes/`. Todas as versões geradas estão em `audio_backup/t178_variantes*/`, e a
+> escolhida de cada som está em `audio_backup/t178_escolhas.txt`: para trocar por outra versão, basta copiar, sem gastar créditos.
+> Prévias OUVIR em WAV, antes e depois: `audio_backup/t178_previas_ouvir/`. Ferramentas (rodam no Blender): `tools/audio_analyze.py`,
+> `tools/audio_spectro.py` e `tools/audio_preview_mix.py`. Novo no `gen_audio.py`: `--out-dir PASTA --variants N --influence 0.7`.
+> Atenção: a marcha lenta do V8 tende a sair muito grave (mais de 80% abaixo de 150 Hz em 8 tentativas). Foi escolhida a com
+> mais estalos, mas no alto-falante do celular ela soa mais baixa.
 
 ## 2. Caminhão (`game/assets/audio/sfx/truck/`)
 
