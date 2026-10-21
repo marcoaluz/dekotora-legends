@@ -1,0 +1,19 @@
+TOUR kanto_1_coast pedagio km=0.13 draw=213 tri=137821 fps=34
+TOUR kanto_1_coast bosque_terra km=0.90 draw=100 tri=85319 fps=50
+TOUR kanto_1_coast palmeiras_mar km=1.30 draw=107 tri=67143 fps=67
+TOUR kanto_1_coast ponte km=2.15 draw=123 tri=93514 fps=66
+TOUR kanto_1_coast alto km=1.60 draw=155 tri=98158 fps=55
+TOUR kanto_2_viaduct pedagio km=0.13 draw=247 tri=136294 fps=68
+TOUR kanto_2_viaduct arvores_rua km=0.75 draw=82 tri=59862 fps=65
+TOUR kanto_2_viaduct postes_viaduto km=1.30 draw=166 tri=118064 fps=65
+TOUR kanto_2_viaduct viaduto_pessoas km=2.02 draw=134 tri=122161 fps=60
+TOUR kanto_2_viaduct alto km=1.20 draw=154 tri=107370 fps=69
+TOUR kanto_3_mountain pedagio km=0.13 draw=248 tri=132529 fps=41
+TOUR kanto_3_mountain floresta_esq km=1.50 draw=98 tri=82966 fps=51
+TOUR kanto_3_mountain floresta_dir km=1.50 draw=159 tri=106617 fps=47
+TOUR kanto_3_mountain viaduto_pessoas km=2.56 draw=86 tri=78044 fps=58
+TOUR kanto_3_mountain alto km=1.40 draw=161 tri=102059 fps=71
+TOUR kanto_2_viaduct dia_arvores_rua km=0.75 draw=79 tri=59490 fps=46
+TOUR kanto_2_viaduct dia_viaduto_pessoas km=2.02 draw=130 tri=121887 fps=58
+TOUR kanto_2_viaduct dia_alto km=1.20 draw=144 tri=103272 fps=56
+capturas em /d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t186/depois

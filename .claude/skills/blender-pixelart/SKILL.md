@@ -161,3 +161,16 @@ um problema visual não puder ser entendido pelos renders.
   escolher "para baixo" como lado de fora. No jogo o objeto fica do avesso (escuro, "lâminas"). Depois do recalc,
   confira a soma de `f.normal.z * f.calc_area()` e use `bmesh.ops.reverse_faces` se for negativa (como em `build_backdrop_kit.py`).
 - Armadilha (CRLF): o Python do Windows grava texto com CRLF. Arquivo de texto que o Godot lê (JSON, por exemplo) precisa de `open(..., newline="\n")`, como o `guardrail_w_profile.json` em `build_road_pontes_kit.py`.
+
+## Biblioteca de cenário (T-186)
+
+- Inventário de qualquer pasta de modelos: `bash tools/inventory_models.sh [PASTA] [SAIDA]` (um Blender por arquivo,
+  `blender/scripts/inventory_models.py`; .dae, .3ds, .max, .ma/.mb, .3dm, .stp não abrem no Blender 5 e saem com `error`).
+- Árvores: `build_tree_kit.py -- [--only a..f] [--preview]` (6 Gleditsias + LOD1; código comum em `lib/tree_atlas.py`);
+  `build_tree_species.py` (cedro, coqueiros, LOD1 das antigas); `build_t186_props.py` (poste da Ponte A e pessoa + busto).
+- Armadilha: nos FBX da Gleditsia a ordem dos materiais muda entre as variações; o TRONCO é o material com a imagem
+  "bark reflect" ("bark2" são os galhos finos). Pegar o material errado espalha os cartões da copa pelo tronco.
+- Armadilha: o DECIMATE (collapse) não reduz malha aberta de galhos abaixo de ~2x o alvo, nem com 2 passes; para o LOD1 o
+  tronco é trocado por um cone de 6 lados (`_simple_trunk`).
+- Armadilha: imagem de "ID" renderizada com emissão sai em sRGB no PNG (0,5 linear = 0,735); compare com o valor convertido
+  (`build_t186_props.bust`).

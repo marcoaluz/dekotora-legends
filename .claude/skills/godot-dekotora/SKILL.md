@@ -320,3 +320,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - `--demo=crash --cam=wreck` (câmera no acidentado) e linhas `ACIDENTADO` no console; `tools/capture_t183.sh`;
   `tools_dev/trace_wreck.gd` (sem tela, roda também no código antigo: lê campos novos com `get()`).
 - Testes `-- --only=wreck`. Snapshot: 1 byte por carro (protocolo 8).
+
+## Biblioteca de cenário: bosques, LOD, pessoas (T-186)
+
+- Árvores: `road3d/roadside_trees.gd` (`RoadsideTrees.place`, puro, mistura por bioma em `MIX`) + `Roadside3D` desenha. Modelo
+  com `<nome>_lod1.glb` ganha 2 MultiMesh por bloco (perto até `TREE_LOD_M` = 140 m, leve até 450). Flags: `--old-trees`,
+  `--old-lamps`, `--no-people`, `--no-tree-lod`. Gleditsia nova: `BackdropKit.tree_mesh_of(nome, tod)` (atlas `<nome>_leaves.png`).
+- **Armadilha (visibility_range)**: a distância é medida até o CENTRO do AABB do nó. Um MultiMesh com cópias espalhadas
+  pela rota inteira (ex.: pessoas do pedágio em 150 m + do viaduto em 2.580 m) tem centro no meio da pista e some sempre.
+  Um grupo (nó) por lugar.
+- **Armadilha (MultiMesh no Compatibility)**: `use_custom_data = true` SEM `use_colors` faz os dados da cópia chegarem
+  ao shader como `COLOR` (a cor por vértice some). Ligue `use_colors` e ponha `Color.WHITE` em cada cópia (`PeopleKit.group`).
+- Prints da câmera livre sem teclado: `-- --freecam --freecam-tour=PASTA --tour=nome@km,lateral,altura,giro,inclinacao;...`
+  (`debug/freecam_tour.gd`; giro positivo = para a esquerda); imprime `TOUR rota pose km draw tri fps`. Script pronto:
+  `tools/capture_t186.sh`. Testes `-- --only=scenery_t186`.

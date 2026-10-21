@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-21**. Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-21** (T-186). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -26,8 +26,9 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
+| Biblioteca de cenário (T-186) | inventário `bash tools/inventory_models.sh`; corrida com as árvores/postes/pessoas novas é a normal; antigo: `-- --old-trees --old-lamps --no-people`; `--no-tree-lod`; prints com a câmera livre sem teclado `GODOT=... bash tools/capture_t186.sh PASTA [extras]` (`--freecam --freecam-tour=PASTA --tour=nome@km,lat,alt,giro,incl;...`); custo `bash tools/measure_t186.sh [quadros] [day|night]` (`MEASURE_EXTRA="--old-trees --old-lamps --no-people"`); folha dos modelos `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t186.gd -- --out=PASTA_ABS`; contagem de árvores `-s res://tools_dev/probe_groves.gd`; testes `-- --only=scenery_t186`; detalhes em `docs/BIBLIOTECA_CENARIO.md` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
-| Testes automáticos (358) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (366) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
@@ -81,6 +82,16 @@ trânsito e som) enquanto ela está ligada; ao sair, a corrida volta exatamente 
   (ou tire o print do próprio celular).
 - Código: `game/scripts/debug/` (`freecam.gd` câmera e teclas, `freecam_math.gd` contas puras, `freecam_picker.gd` mira,
   `freecam_overlay.gd` painel, `freecam_touch.gd` sticks). Na corrida: 1 linha em `race_scene_3d._process` congela tudo.
+
+## Biblioteca de cenário (T-186)
+
+docs/Modelos só tem 1 espécie de árvore (Gleditsia, 6 variações), 1 poste de luz (o da Ponte A) e 1 personagem (o boneco
+do pacote ROAD SIGNS). Todos entraram: 6 Gleditsias + coqueiros (3), cedro, pinheiro, árvore redonda e arbusto (por
+código) em bosques por bioma (`road3d/roadside_trees.gd`, desenhados por `Roadside3D` em MultiMesh com 2 LODs);
+`lamp_bridge` no viaduto/serra/pontes e `lamp_post` no pedágio/litoral; pessoas (`road3d/people_kit.gd`) no pedágio, no
+viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminhão); retrato do motorista na faixa do duelo
+(`ui/duel_band.gd`). Custo medido: +1 a +22 chamadas, FPS no ruído (DECISOES, T-186). Capturas e folhas em
+`docs/capturas_t186/`. Não validado no celular (APK novo).
 
 ## Carro acidentado no trânsito (T-183)
 

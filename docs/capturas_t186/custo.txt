@@ -1,0 +1,13 @@
+T-186 - custo medido (PC do Marco, 1280x720, modo MEDIO --quality=1, sem vsync, dia, 1500 quadros, caminhao no automatico)
+Comando: bash tools/measure_t186.sh 1500 day   |   antes: MEASURE_EXTRA="--old-trees --old-lamps --no-people" bash tools/measure_t186.sh 1500 day
+
+ponto                     | ANTES: FPS / chamadas / triangulos / textura | DEPOIS: FPS / chamadas / triangulos / textura
+kanto_1_coast 300         | 266.7 / 326 / 193.894 / 42.5 MB            | 253.7 / 334 / 193.206 / 43.2 MB
+kanto_1_coast 1700        | 239.7 / 340 / 209.576 / 42.5 MB            | 235.3 / 362 / 217.041 / 43.2 MB
+kanto_2_viaduct 1900      | 231.3 / 343 / 239.788 / 46.0 MB            | 230.0 / 361 / 254.536 / 47.0 MB
+kanto_2_viaduct 900       | 245.1 / 324 / 211.487 / 45.9 MB            | 220.1 / 325 / 212.300 / 46.9 MB
+kanto_3_mountain 1350     | 271.4 / 379 / 228.795 / 44.9 MB            | 249.2 / 395 / 232.491 / 45.9 MB
+kanto_3_mountain 2420     | 229.0 / 365 / 217.875 / 45.0 MB            | 227.9 / 370 / 224.444 / 46.0 MB
+
+Resumo: chamadas +1 a +22 (ate +6,5%), triangulos -0,7 a +15 mil, textura +0,7 a +1,0 MB, FPS -1% a -10% (ruido da
+maquina ~ +-5%). Arvores por rota: 314-361 (antes 171-187). Camera livre (tour_*.txt): mesmo ponto antes/depois.
