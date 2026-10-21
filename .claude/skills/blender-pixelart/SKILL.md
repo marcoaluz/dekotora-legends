@@ -142,3 +142,19 @@ um problema visual não puder ser entendido pelos renders.
 - Convenção: `tier="deluxe"` no dict da peça vai para o catálogo; orçamento 6.000 triângulos (as outras 4.500). Materiais com nome `glow_*` (quadrado no chão, UV 0..1) e `acrylic_*` (face com textura na cor e na emissão) são tratados pelo `AccessoryGlow` do jogo.
 - Armadilha: texto 3D em kanji com `offset` padrão (0,04 x tamanho) engrossa demais e os traços de 番/星 se fundem; use `text3d(..., offset=0.014, resolution=4)`.
 - Armadilha: na prévia o chão fica em Z = 0; peça com brilho no chão precisa ficar 1 cm acima (senão o brilho pisca com o chão).
+
+## Cenário T-169 (montanhas, mar, árvore, pontes e viaduto)
+
+- Entradas em `docs/Modelos/` (pasta fora do Git). Os três scripts são determinísticos e gravam direto em `game/assets/`.
+- Montanhas e mar: `blender -b --factory-startup -P blender/scripts/build_backdrop_kit.py -- [--snow-src "PASTA/docs/Modelos/Fundo Montanha Gelo/sNOWlaNDSCAPE.fbx"] [--water-src "PASTA/docs/Modelos/Agua/Water_Pack_Ozero.blend"] [--only mountains|water] [--preview]`
+  - Padrões: os dois caminhos acima, relativos à raiz. `--only mountains` gera só os 4 maciços (`scenery/backdrop/mountain_a..d.glb`); `--only water` gera só `textures/backdrop/water_waves_nrm.png`.
+  - `--preview` grava `blender/renders/t169/backdrop_sheet.png` (o mar aparece 2 × 2 para ver se há emenda).
+  - Arquivo não encontrado: para com `ERRO:`.
+- Árvore: `blender -b --factory-startup -P blender/scripts/build_tree_kit.py -- [--src "PASTA/docs/Modelos/Arvore"] [--preview]`
+  - `--src` é a pasta `Arvore` (o script completa o caminho do `.fbx`). Saídas: `scenery/tree_leafy.glb` e `textures/backdrop/tree_leafy_leaves.png`. `--preview` grava `blender/renders/t169/tree_sheet.png`.
+- Pontes, poste e viaduto: `blender -b --factory-startup -P blender/scripts/build_road_pontes_kit.py -- [--src "PASTA/docs/Modelos/Road_pontes"] [--pole-src "PASTA/docs/Modelos/poste/Utility_pole.blend"] [--preview]`
+  - Gera em `game/assets/scenery/kit/`: `pier_t`, `guardrail_w`, `power_pole`, `power_pole_tr` e, desde a T-164, `overpass_deck.glb` (laje, vigas e corrimão, ~482 triângulos) e `overpass_deck_lite.glb` (68 triângulos).
+  - `--preview` grava `blender/renders/t163/contact_sheet.png` (a pasta é `t163`, não `t169`).
+  - Armadilha: se `--pole-src` não existir, o script não avisa. Ele volta ao poste antigo, sem caixa nem suporte em U. Confira a linha `NEW_POLE` no terminal.
+- Armadilha (worktree): os padrões apontam para a pasta da worktree, que não tem `docs/Modelos`. Passe caminhos absolutos da pasta principal em `--snow-src`, `--water-src`, `--src` e `--pole-src`.
+- Armadilha (CRLF): o Python do Windows grava texto com CRLF. Arquivo de texto que o Godot lê (JSON, por exemplo) precisa de `open(..., newline="\n")`, como o `guardrail_w_profile.json` em `build_road_pontes_kit.py`.

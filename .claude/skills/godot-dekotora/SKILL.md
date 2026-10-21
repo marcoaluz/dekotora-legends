@@ -266,3 +266,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Peças só desse lote: `tier = "deluxe"` no catálogo; visualizador `scenes/tools/accessory_viewer.tscn -- --cat=deluxe [--day] [--shot=ARQ.png]` ([N] liga/desliga as luzes).
 - `tools_dev/gen_data.gd -- --only=id1,id2` grava só essas peças. **Sem `--only` regrava as rotas e apaga `lane_sections`/`bridges` (T-153).**
 - Capturas `GODOT=... bash tools/capture_t172.sh PASTA_ABS [garagem|corrida]`; custo `bash tools/measure_t172.sh`.
+
+## Cenário T-169/T-164 (montanhas, mar, árvores, viaduto, semáforos)
+
+- Flags da corrida (depois de `--`), para comparar antes/depois:
+  - `--no-backdrop`: volta aos cones de montanha e ao mar antigo (`road3d/backdrop_kit.gd`).
+  - `--no-pontes-kit`: volta ao visual antigo das pontes (pilares de caixa, guard-rail de lâmina, sem postes); também desliga o viaduto e os postes (`road3d/pontes_kit.gd`).
+  - `--no-poles`: tira só os postes de energia e os fios (`road3d/pontes_kit.gd`, `road3d/power_lines_3d.gd`).
+  - `--no-overpass`: tira só o viaduto que cruza por cima (`road3d/overpass_3d.gd`).
+  - `--no-lane-signals`: tira os semáforos de faixa dos túneis (`road3d/tunnel_signals_3d.gd`).
+- Onde configurar viadutos: `OverpassLayout.for_route(route_id)` em `game/scripts/road3d/overpass_layout.gd`. Devolve `[{z, angle}]` por rota (90 = perpendicular à pista). Hoje: `kanto_2_viaduct` (z 2050, 76°) e `kanto_3_mountain` (z 2580, 70°). O vão mínimo é a constante `CLEAR` (7,6 m).
+- Achar trecho reto para um viaduto novo: `godot --headless --path game -s res://tools_dev/find_overpass_spots.gd` (lista os z retos de cada rota).
+- Conferir um viaduto: `godot --headless --path game -s res://tools_dev/probe_overpass.gd -- --route=kanto_2_viaduct` (distância até a pista e vão livre a cada 10 m).
+- Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t169.sh PASTA [FILTRO] [extras]`. FILTRO é um trecho do nome (ex.: `montanha`, `arvore`, `night`); `all` = tudo. Antes: `bash tools/capture_t169.sh PASTA_ANTES all --no-backdrop --no-pontes-kit`.
+- Custo: `GODOT=... bash tools/measure_t169.sh [QUADROS] [day|night]` (padrão 1500 quadros, noite). Comparar: `MEASURE_EXTRA="--no-backdrop --no-pontes-kit --no-lane-signals" bash tools/measure_t169.sh`.
