@@ -67,6 +67,12 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `passing_flash.wav` | 0,5 s | Quick electric click and whoosh of high beam headlights flashing |
 | `cargo_rattle_loop.wav` | 3 s | Loose cargo shaking and rattling inside a metal truck box, steady, seamless loop |
 | `steel_plate_clank.wav` | 0,5 s | Heavy truck tire rolling fast over a loose steel road plate at road works, loud metallic clank and bang |
+| `turn_signal_tick.wav` | 0,5 s | Single click of a truck turn signal flasher relay heard inside the cab, one short dry plastic tick at the very start, isolated, no reverb, silence after the click |
+| `turn_signal_switch.wav` | 0,5 s | Truck turn signal stalk lever flicked on the steering column, one short crisp plastic snap click at the very start, isolated, no reverb, silence after |
+
+> **T-170 (seta / pisca):** `turn_signal_tick` toca a cada vez que a lâmpada da seta acende (tom normal) e apaga (tom
+> mais grave), sincronizado com o pisca (`SignalBlink`, 1,5 Hz); `turn_signal_switch` é o clique da alavanca a cada
+> toque em < ou > (liga a seta, troca de faixa ou troca recusada). Ficam na seção 2 (caminhão), não na 4 (ambiente).
 
 ## 3. Batidas (`game/assets/audio/sfx/crash/`)
 

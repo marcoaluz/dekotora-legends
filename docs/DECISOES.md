@@ -313,3 +313,22 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   passou disso vira rolagem e o cartão **não** é selecionado ao soltar.
 - No PC: clicar e arrastar com o mouse sobre um cartão também rola a lista (já rolava nos vãos); clique simples,
   roda do mouse, teclado e controle continuam iguais. Teste: `game/tests/test_touch_scroll.gd`.
+## 2026-10-20 — T-170: som da seta (pisca) ao tocar em < ou > (pedido do Marco)
+
+- **O que "seta" é no jogo**: o pisca de troca de faixa que JÁ existia (ATB-1): 1º toque em < / > (A/D ou setas do
+  teclado) liga a seta (`TruckSim.signal_dir`, 4 lâmpadas âmbar no `TruckNode`, setas no HUD); 2º toque no mesmo lado
+  dentro de 1,5 s troca de faixa. O pedido "quero som de seta, quando eu clico nele" foi atendido nesse pisca, **sem
+  botões nem teclas novas** (Q/E e botões de pisca separados ficaram de fora: seriam um segundo pisca na tela, confuso).
+  Se o Marco quiser um pisca manual que fica ligado até desligar, é outra tarefa (ver STATUS, pendências).
+- **Ritmo**: o pisca passou de ~3 Hz (relógio global) para **~1,5 Hz** (0,33 s aceso / 0,33 s apagado, como um
+  caminhão de verdade) e **começa aceso no toque** (antes podia demorar até 0,16 s; as setas curtas dos bots às vezes
+  nem acendiam). Lâmpadas, HUD e som usam o mesmo `SignalBlink` (`scripts/truck/signal_blink.gd`). Na janela de 1,5 s
+  a lâmpada acende 3 vezes.
+- **Som** (`scripts/audio/turn_signal_audio.gd`, só do jogador): `turn_signal_tick` (relé) a cada acender (tom normal)
+  e apagar (tom 0,86, mais grave), em sincronia com a lâmpada — por isso NÃO é um arquivo em loop (o ritmo de um loop
+  gerado não bateria com a lâmpada); `turn_signal_switch` (alavanca) a cada toque em < ou > (borda de
+  `TruckSim.tap_prev`; não usa `lane_changes`, que online pode contar o mesmo toque duas vezes na reconciliação).
+  Barramento SFX: volume de efeitos e mudo das Opções valem. Gerados no ElevenLabs (~0 créditos visíveis; conta em
+  61.234 de 131.000).
+- **Só apresentação**: nada mudou em `sim/` nem na rede. Online os piscas dos outros já apareciam (o `signal_dir` vai no
+  snapshot); o som é só da sua seta. Ideia anotada: ouvir baixinho a seta do rival ao lado.
