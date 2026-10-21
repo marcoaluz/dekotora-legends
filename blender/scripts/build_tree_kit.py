@@ -1,7 +1,7 @@
 """T-169: arvore de folhas (Gleditsia triacanthos, `docs/Modelos/Arvore/`, liberada pelo Marco; a pasta fica FORA do
 Git) reduzida para o celular: 436 mil -> ~300 triangulos.
 
-  Gledista_Triacanthos.fbx (o menor dos 6; unidades em decimetros: x 0,1 = ~9 m de altura)
+  Gledista_Triacanthos.fbx (o menor dos 6; unidades em decimetros: ~9 m; reduzida para 6,5 m)
       -> game/assets/scenery/tree_leafy.glb
          - tronco e galhos grossos (Material__5) reduzidos a ~TRUNK_TRIS triangulos, cor por vertice de casca;
          - copa: os triangulos de folha/galhinho/vagem viram CARDS grupos (k-medias deterministico dos centros) e
@@ -37,7 +37,7 @@ OUT_TEX = os.path.join(ROOT, "game", "assets", "textures", "backdrop")
 WORK = os.path.join(ROOT, "blender", "renders", "t169")
 REL = os.path.join("Gledista_Triacanthos_FBX", "Gledista_Triacanthos_FBX", "Gledista_Triacanthos.fbx")
 
-SCALE = 0.1
+SCALE = 0.07         # o original tem ~9 m (decimetros x 0,1); 6,5 m: com a escala sorteada do jogo fica 5-13 m
 CARDS = 20
 TRUNK_TRIS = 200
 CELL = 256
