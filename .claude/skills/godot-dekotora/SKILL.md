@@ -236,6 +236,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Teste de toque sem tela: `tests/test_touch_scroll.gd` (manda o mouse emulado com `device = InputEvent.DEVICE_ID_EMULATION` e depois o
   `InputEventScreenTouch/ScreenDrag`, via `root.push_input(ev, true)`; chame `get_minimum_size()` + `NOTIFICATION_SORT_CHILDREN` para montar o layout
   no mesmo quadro). Clique de mouse "real" (device 0) não chega aos botões no modo sem tela; teste mouse na janela.
+- **T-177: o arraste é do próprio `TouchScroll`** (`_gui_input` fica com o botão esquerdo, o movimento e a roda; o arraste nativo do
+  `ScrollContainer` nunca começa). Motivo: o nativo ficava preso em "arrastando" quando o botão clicado redesenhava a lista (a garagem faz isso
+  em todo clique: o botão sai da árvore e o "soltar" morre junto) e a lista passava a seguir a seta do mouse sem botão. Regras:
+  só rola com o botão/dedo apertado (`button_mask`), embalo ao soltar, roda rola 1/8 da altura e não vaza para a câmera 3D.
+- Cartão que vira toque (`GaragePreviewUi.make_tappable`): só conta se `TouchScroll.of(card).scrolling()` for falso. Não use
+  `Input.is_mouse_button_pressed` sozinho para separar clique de teclado: nos testes (`push_input`) o `Input` não sabe do clique.
+- Testes: `tests/test_touch_scroll_mouse.gd` (PC, roda, arraste, lista que se redesenha no clique) e `tests/test_garage_deco_nav.gd`
+  (garagem de verdade; `_settle()` força o layout dos containers no mesmo quadro).
+- Garagem > DECORAÇÃO tem seções (`GarageDecoNav`, `ui/garage_deco_nav.gd`): barra fixa PEÇAS / PINTURA / LUZES / ADESIVOS fora da rolagem;
+  encaixes em 2 colunas por lugar (frente, teto, laterais, traseira). Encaixe novo precisa entrar em `GarageDecoNav.AREAS` (o teste acusa).
+  Captura de uma seção: `--deco=parts|paint|lights|decals`.
 ## Seta / pisca (T-170)
 
 - "Seta" no jogo = o pisca da troca de faixa (`TruckSim.signal_dir`, 1º toque liga, 2º troca). Não existe outro pisca.

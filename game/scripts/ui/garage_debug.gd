@@ -3,6 +3,7 @@ extends RefCounted
 ## Argumentos de depuracao da garagem (capturas): --demo (monta um caminhao cheio de pecas; --noparts = sem pecas;
 ## --cab=<estilo>; --body=<modelo>; --parts=a,b), --damage, --decals, --lights=<padrao>, --hideui, --day,
 ## --view=<vista>, --spin (rodas em movimento), --zoom=<z>, --tab=model|parts|mech|repair, --slot=<slot>,
+## --deco=parts|paint|lights|decals (secao da DECORACAO, T-177),
 ## --shot=ARQUIVO.png (depois de 6 s; --shot-pair = mais um quadro seguido), --preview=<peca> e
 ## --preview-paint=<#hex> (T-171: previa antes de comprar).
 ## O --demo grava em user://demo_profile.json, NUNCA no perfil real do jogador.
@@ -82,6 +83,9 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 			screen.preview_paint(a.substr(16))
 		elif a.begins_with("--tab="):
 			out["tab"] = a.substr(6)
+		elif a.begins_with("--deco="):                     # T-177: secao da DECORACAO (parts|paint|lights|decals)
+			out["tab"] = "parts"
+			out["deco"] = a.substr(7)
 		elif a.begins_with("--slot="):
 			out["tab"] = "parts"
 			out["slot"] = a.substr(7)
