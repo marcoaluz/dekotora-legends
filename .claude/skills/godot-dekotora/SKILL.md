@@ -334,3 +334,19 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Prints da câmera livre sem teclado: `-- --freecam --freecam-tour=PASTA --tour=nome@km,lateral,altura,giro,inclinacao;...`
   (`debug/freecam_tour.gd`; giro positivo = para a esquerda); imprime `TOUR rota pose km draw tri fps`. Script pronto:
   `tools/capture_t186.sh`. Testes `-- --only=scenery_t186`.
+
+## Cenário trecho-piloto (T-188)
+
+- Opção da corrida (depois de `--`): `--t188=off|segment|all` (código em `game/scripts/road3d/scenic_zone.gd`).
+  - `off`: volta ao visual antigo em todas as rotas (use para os "antes" das capturas e medições).
+  - `segment`: padrão. Só o trecho-piloto novo de cada rota.
+  - `all`: existe, mas **não foi validada**. Não use para aprovar nada.
+- Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]`. Para o "antes": `bash tools/capture_t188.sh PASTA_ANTES day night -- --t188=off`.
+- Folhas antes | depois: `bash tools/sheet_t188.sh [PASTA]` (usa `PASTA/antes` e `PASTA/depois`; padrão `docs/capturas_t188`).
+- Custo: `GODOT=... bash tools/measure_t188.sh [QUADROS] [day|night]`. Para o "antes": `MEASURE_EXTRA="--t188=off" bash tools/measure_t188.sh [QUADROS] [day|night]`.
+- Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=scenery_t188` (`tests/test_scenery_t188.gd`).
+- Log: ao montar a rota, `scenic_stretch.gd` imprime no console uma linha `SCENIC_T188 <rota> zona=... terreno=... tri cordilheira=... floresta=... predios=...`.
+- **Armadilha 1 (MultiMeshInstance3D vazio)**: um `MultiMeshInstance3D` sem `multimesh` (ou com `multimesh.mesh` nulo) quebrava `_print_surface_budget` (`race_scene_3d.gd`). Hoje isso já está protegido; se a contagem de superfícies falhar de novo, confira esse nó primeiro.
+- **Armadilha 2 (cores do terreno)**: as cores do shader do terreno (`scenic_shaders.gd`, `TERRAIN`) precisam ser bem escuras, porque as cores são sRGB. A noite também precisa do `night_lift` (uniform do shader, luz de lua), porque o céu noturno é escuro demais para iluminar o terreno.
+
+

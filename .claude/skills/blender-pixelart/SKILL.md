@@ -174,3 +174,8 @@ um problema visual não puder ser entendido pelos renders.
   tronco é trocado por um cone de 6 lados (`_simple_trunk`).
 - Armadilha: imagem de "ID" renderizada com emissão sai em sRGB no PNG (0,5 linear = 0,735); compare com o valor convertido
   (`build_t186_props.bust`).
+
+## Texturas do cenário (T-188)
+
+- Comando: `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` (gera as texturas da T-188 por código; por padrão grava em `game/assets/textures/scenic`, e `-- --out PASTA` troca a saída).
+- Armadilha (alfa como máscara): ao salvar um PNG com alfa que o Godot usa como máscara, crie o `.import` com `process/fix_alpha_border=false`.
