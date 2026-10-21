@@ -12,7 +12,7 @@ var language: String = "pt-BR"
 var player_name: String = "Jogador"
 var server_address: String = "127.0.0.1:24600"   # IP:porta do servidor (campo manual de depuracao)
 var show_touch_controls: bool = false   # forca os botoes na tela (teste no PC)
-var quality: int = 2                    # 0 baixa, 1 media, 2 alta (celular comeca em media)
+var quality: int = 2                    # 0 baixa, 1 media, 2 alta, 3 ultra (so PC/Forward+; celular comeca em media)
 var show_fps: bool = false
 var fx_speed: bool = true               # linhas de velocidade, tremor, FOV e clarao do Passing
 var fx_reflections: bool = true         # reflexo falso das luzes no asfalto (noite/fim de tarde)
@@ -21,17 +21,35 @@ var fx_rain: bool = false               # chuva (opcional)
 var fx_impact: bool = true              # faiscas, pedacos de cromo, chacoalhada e fumaca/marcas dos pneus (T-141/T-144)
 var menu_bg: String = "a"               # fundo da tela inicial: "a" posto a noite, "b" rodovia (T-138; MenuBackdrop)
 var explorer_mode: bool = false         # T-181: camera livre (F1 / pausa) tambem fora da build de debug
+var fx_life: bool = true                # T-189: vida do cenario (vento, passaros, insetos, vapor, transito contrario, pessoas, som ambiente)
+var fx_motion_blur: bool = false        # T-189: borrao de velocidade (so Ultra; opcional)
+## T-189: versao do arquivo de opcoes. Quem vinha de antes (sem a chave) e estava em Alta num PC com Forward+ sobe uma vez para Ultra.
+const GRAPHICS_VERSION: int = 2
 
 
 func _ready() -> void:
 	if OS.has_feature("mobile"):
 		quality = 1
+		fx_life = false                          # T-189: celular fica igual a antes; o jogador pode ligar
+	elif UltraLook.available():
+		quality = UltraLook.ULTRA                # T-189: PC com Forward+ comeca no Ultra
 	load_settings()
-	for a in OS.get_cmdline_user_args():          # depuracao: --quality=0|1|2 (nao grava)
+	for a in OS.get_cmdline_user_args():          # depuracao: --quality=0|1|2|3 (nao grava)
 		if a.begins_with("--quality="):
-			quality = clampi(int(a.substr(10)), 0, 2)
+			quality = clampi(int(a.substr(10)), 0, 3)
 		elif a == "--no-impact-fx":                   # depuracao: mede o custo das faiscas/fumaca (nao grava)
 			fx_impact = false
+		elif a == "--rain":                           # T-189 depuracao: chuva ligada/desligada (nao grava)
+			fx_rain = true
+		elif a == "--no-rain":
+			fx_rain = false
+		elif a == "--life=off":                       # T-189 depuracao: sem a vida do cenario (nao grava)
+			fx_life = false
+		elif a == "--life=on":
+			fx_life = true
+		elif a == "--motion-blur":
+			fx_motion_blur = true
+	quality = UltraLook.clamp_quality(quality)    # Ultra so com Forward+ (celular: Compatibility -> Alta no maximo)
 
 
 func load_settings(path: String = PATH) -> void:
@@ -46,7 +64,9 @@ func load_settings(path: String = PATH) -> void:
 	language = String(cfg.get_value("general", "language", language))
 	player_name = String(cfg.get_value("net", "player_name", player_name))
 	server_address = String(cfg.get_value("net", "server_address", server_address))
-	quality = clampi(int(cfg.get_value("graphics", "quality", quality)), 0, 2)
+	quality = clampi(int(cfg.get_value("graphics", "quality", quality)), 0, 3)
+	if int(cfg.get_value("graphics", "version", 1)) < GRAPHICS_VERSION and quality == 2 and UltraLook.available():
+		quality = UltraLook.ULTRA                    # T-189: Alta de antes vira Ultra uma vez no PC
 	show_fps = bool(cfg.get_value("graphics", "show_fps", show_fps))
 	fx_speed = bool(cfg.get_value("graphics", "fx_speed", fx_speed))
 	fx_reflections = bool(cfg.get_value("graphics", "fx_reflections", fx_reflections))
@@ -55,6 +75,8 @@ func load_settings(path: String = PATH) -> void:
 	fx_impact = bool(cfg.get_value("graphics", "fx_impact", fx_impact))
 	menu_bg = String(cfg.get_value("graphics", "menu_bg", menu_bg))
 	explorer_mode = bool(cfg.get_value("advanced", "explorer_mode", explorer_mode))
+	fx_life = bool(cfg.get_value("graphics", "fx_life", fx_life))
+	fx_motion_blur = bool(cfg.get_value("graphics", "fx_motion_blur", fx_motion_blur))
 
 
 func save_settings(path: String = PATH) -> void:
@@ -76,6 +98,9 @@ func save_settings(path: String = PATH) -> void:
 	cfg.set_value("graphics", "fx_impact", fx_impact)
 	cfg.set_value("graphics", "menu_bg", menu_bg)
 	cfg.set_value("advanced", "explorer_mode", explorer_mode)
+	cfg.set_value("graphics", "fx_life", fx_life)
+	cfg.set_value("graphics", "fx_motion_blur", fx_motion_blur)
+	cfg.set_value("graphics", "version", GRAPHICS_VERSION)
 	cfg.save(path)
 
 

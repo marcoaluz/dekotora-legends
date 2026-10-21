@@ -99,6 +99,7 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
 	_finish_env(env, tod, q)
+	UltraLook.apply_env(env, tod, q)             # T-189: SDFGI, SSAO/SSIL, SSR, nevoa volumetrica, LUT (so Ultra/PC)
 	var we := WorldEnvironment.new()
 	we.environment = env
 	parent.add_child(we)
@@ -109,6 +110,7 @@ static func create(parent: Node3D, indoor: bool = false, tod: TimeOfDay = null, 
 	sun.shadow_enabled = q >= 2                  # sombra so no modo alto (no medio custava +50% de chamadas de dia)
 	sun.directional_shadow_max_distance = 90.0
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # 2 cortes em vez de 4: metade das chamadas de sombra
+	UltraLook.apply_sun(sun, tod, q)             # T-189: sombra suave em 4 cortes, atlas grande (so Ultra/PC)
 	parent.add_child(sun)
 	return {"sun": sun, "env": env}
 

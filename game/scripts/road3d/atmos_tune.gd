@@ -25,6 +25,8 @@ static func tune(tod: TimeOfDay) -> TimeOfDay:
 			t.contrast = 1.06
 			t.land_color = Color("#3c4c2a")
 			t.mountain_color = Color("#56627a")
+		"dawn":                                          # T-189: preset only for --time=dawn (no route uses it yet)
+			t.fog_density = 0.0011
 		"dusk":
 			t.fog_color = t.sky_horizon.lerp(t.horizon_glow, 0.3).darkened(0.25)
 			t.fog_density = 0.0016

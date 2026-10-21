@@ -85,14 +85,22 @@ func _show(id: String) -> void:
 						_s.menu_bg = bgs[i]
 						menu_bg_changed.emit())
 			_hint(Tr.t("options.menu_bg_hint"))
-			_choice(Tr.t("options.quality"), [Tr.t("options.quality_low"), Tr.t("options.quality_mid"), Tr.t("options.quality_high")], _s.quality, func(i: int) -> void: _s.quality = i)
+			var qs: Array = [Tr.t("options.quality_low"), Tr.t("options.quality_mid"), Tr.t("options.quality_high")]
+			if UltraLook.available():                 # T-189: Ultra so no PC (Forward+)
+				qs.append(Tr.t("options.quality_ultra"))
+			_choice(Tr.t("options.quality"), qs, mini(_s.quality, qs.size() - 1), func(i: int) -> void: _s.quality = i)
 			_hint(Tr.t("options.quality_hint"))
+			if UltraLook.available():
+				_hint(Tr.t("options.quality_ultra_hint"))
 			_toggle(Tr.t("options.show_fps"), _s.show_fps, func(on: bool) -> void: _s.show_fps = on)
 			_toggle(Tr.t("options.fx_speed"), _s.fx_speed, func(on: bool) -> void: _s.fx_speed = on)
 			_toggle(Tr.t("options.fx_reflections"), _s.fx_reflections, func(on: bool) -> void: _s.fx_reflections = on)
 			_toggle(Tr.t("options.fx_trails"), _s.fx_trails, func(on: bool) -> void: _s.fx_trails = on)
 			_toggle(Tr.t("options.fx_rain"), _s.fx_rain, func(on: bool) -> void: _s.fx_rain = on)
 			_toggle(Tr.t("options.fx_impact"), _s.fx_impact, func(on: bool) -> void: _s.fx_impact = on)
+			_toggle(Tr.t("options.fx_life"), _s.fx_life, func(on: bool) -> void: _s.fx_life = on)
+			if UltraLook.available():
+				_toggle(Tr.t("options.fx_motion_blur"), _s.fx_motion_blur, func(on: bool) -> void: _s.fx_motion_blur = on)
 			_hint(Tr.t("options.fx_hint"))
 		"audio":
 			_slider(Tr.t("options.music"), _s.music_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.music_volume = v, true)

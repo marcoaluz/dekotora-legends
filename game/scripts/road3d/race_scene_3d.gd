@@ -72,6 +72,7 @@ var _sound_loadouts: Dictionary = {}    # T-173: indice -> descritor (motor/turb
 var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
 var _rail: Railway3D                    # T-154: ferrovia e trens
+var _speed_blur: SpeedBlur               # T-189: borrao de velocidade (Ultra, opcional; null = desligado)
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
 var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
@@ -114,8 +115,7 @@ func _ready() -> void:
 			sim.deadline += track.events.time_allowance()     # T-139: o prazo estica com os eventos de pista
 	path = TrackPath.new(sim.track)
 	var q: int = int(Settings.quality)
-	get_viewport().scaling_3d_scale = [0.6, 0.8, 1.0][q]      # menos pixels no celular
-	get_viewport().msaa_3d = Viewport.MSAA_2X if q >= 2 else Viewport.MSAA_DISABLED
+	UltraLook.apply_viewport(get_viewport(), q)    # escala 3D e antisserrilhado (T-189: FSR2 nativo no Ultra)
 	tod = _resolve_time_of_day()
 	var scenery: StringName = route.scenery if route != null else &"city"
 	var world: Dictionary = WorldEnv.create(self, false, tod, scenery == &"mountain")
@@ -217,6 +217,7 @@ func _ready() -> void:
 	add_child(_cam)
 	_cam.make_current()
 	_freecam = Freecam.attach(self, path, _cam, route, tod, online)    # T-181: F1 / --freecam / botao da pausa
+	_speed_blur = SpeedBlur.attach(_cam, q, Settings.fx_motion_blur)
 	_speed_fx = SpeedFx.new()
 	add_child(_speed_fx)
 	var streaks := LightStreaks.new()
@@ -290,7 +291,8 @@ func _resolve_time_of_day() -> TimeOfDay:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--time="):
 			tid = StringName(a.substr(7))
-	return AtmosTune.tune(TimeOfDay.by_id(tid))       # T-188: perspectiva aerea, luar, ceu novo (copia do preset)
+	var t: TimeOfDay = AtmosTune.tune(TimeOfDay.by_id(tid))       # T-188: perspectiva aerea, luar, ceu novo (copia do preset)
+	return UltraLook.tune_tod(t, int(Settings.quality), Settings.fx_rain)   # T-189: pista molhada
 
 
 func _setup_audio() -> void:
@@ -706,6 +708,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 	_traffic3d.refresh()
 	if _cam != null:
 		_rail.update(dt, _player_z(), sim.trucks[player].speed, _cam.global_position)
+	if _speed_blur != null:
+		_speed_blur.update(sim.trucks[player].speed)
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
@@ -904,11 +908,13 @@ func _setup_intro(args: PackedStringArray) -> void:
 	_intro.finished.connect(_on_intro_finished)
 	_intro.setup(kind, tod, _trucks, pair, cards, DuelCards.place_of(route))
 	if _intro.running():
+		_cam.attributes = UltraLook.intro_attributes(int(Settings.quality))   # T-189: profundidade de campo (Ultra)
 		_hud_layer.visible = false
 		print("ABERTURA: %s (%.1f s antes da contagem)" % [kind, DuelPlan.intro_seconds(kind)])
 
 
 func _on_intro_finished() -> void:
+	_cam.attributes = null
 	_hud_layer.visible = not _nohud and not get_tree().paused
 	_lights_state = not (tod.headlights or _tunnel.amount > 0.3)    # reaplica as luzes da hora do dia
 	_update_truck_lights()
