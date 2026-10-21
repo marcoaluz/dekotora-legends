@@ -5,6 +5,9 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-185 | Investigar disco preto nas capturas da corrida (docs/capturas_t183/antes_mesma_cam_t08.png, depois_acidentado_*_t09.png); suspeita brake_fx.gd/chuva; só diagnosticar | delegado da T-183 | médio | ajudante-rapido | em andamento | 2026-10-21 | |
+| T-184 | APK de teste novo (protocolo 8, carro acidentado) e linha do APK no STATUS | delegado da T-183 | fácil | ajudante-rapido | concluída (APK 111 MB, protocolo 8; precisa Marco: instalar e testar) | 2026-10-21 | 2026-10-21 |
+| T-183 | Carro de tráfego batido vira carro acidentado: para onde parou, pisca-alerta, obstáculo na sim, empurrável, determinístico/snapshot (protocolo), some a 300 m atrás; opcional fumaça e triângulo | pedido do Marco | difícil | especialista | concluída (358 testes ok, net_test ok; protocolo 8; precisa Marco: confirmar números e testar no celular) | 2026-10-21 | 2026-10-21 |
 | T-182 | Gerar APK de teste novo com a câmera livre (docs/RELEASE_ANDROID.md) e atualizar linha do APK no STATUS | delegado da T-181 | fácil | ajudante-rapido | concluída (APK 111 MB; precisa Marco: instalar e testar) | 2026-10-21 | 2026-10-21 |
 | T-181 | Modo câmera livre (--freecam/F1): voo, sticks no celular, pausa da corrida, teleporte por km, overlay, mira com nome/.glb, print P, HUD H | pedido do Marco | difícil | especialista | concluída (349 testes ok; precisa Marco: testar no celular) | 2026-10-21 | 2026-10-21 |
 | T-180 | Garagem: câmera nunca gira sozinha (sem auto_rotate); só arrasto com inércia ~0,3 s; pinça e roda dão zoom com limites; abas só movem ao ângulo | pedido do Marco | médio | coordenador | concluída (343 testes ok; precisa Marco: testar no celular) | 2026-10-21 | 2026-10-21 |

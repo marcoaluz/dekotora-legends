@@ -301,3 +301,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: sim/{wreck,traffic_look}.gd (novos), sim/{traffic_sim,thrown_car,collision,bot_driver,race_sim}.gd, net/{snapshot,client_sync,protocol,bot_client}.gd, road3d/{wreck_fx,wreck_props}.gd (novos), road3d/{traffic_3d,race_demo,race_scene_3d}.gd, tests/test_wreck.gd (9), tests/test_impacts.gd, tools_dev/trace_wreck.gd, tools/{capture_t183,net_test}.sh, docs/capturas_t183/, docs/{DECISOES,MULTIPLAYER,STATUS}.md, skill godot-dekotora.
 - Validação: 358 testes ok (9 novos); --quit-after sem erro novo; net_test 0 ms e 150 ms+2% PASSOU (nenhum arremesso nessas corridas: online com acidentado real não exercitado); trace_wreck antes/depois (antes: giro volta a 0 e 9 m/s; depois: parado a 158,7° por 30 s); capturas antes/depois na mesma câmera + --cam=wreck dia/noite.
 - Decisão pendente: nenhuma de design bloqueante; Marco confirmar fumaça 12 s, triângulo 9 m, arrasto 9 m/s², 300 m, bots no acostamento. APK novo (protocolo 8). Obs.: disco preto nas capturas da corrida (chuva/puff) já existia no "antes".
+
+## 2026-10-21 15:42 · T-184 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste gerado com protocolo de rede 8 (carro acidentado T-183), chave de debug; preset restaurado e conferido (git diff vazio).
+- Arquivos: builds/kaido-bakuso-debug.apk (111,2 MB, sobrescrito; .idsig também), docs/STATUS.md (só a linha do APK).
+- Observação: nada commitado; game/export_presets.cfg igual ao Git (sha256 conferido).
