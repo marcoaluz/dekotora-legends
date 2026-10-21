@@ -13,7 +13,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 - **Android: JÁ INSTALADO, não instale de novo.** Em `D:\DEV\android-tools\` (sem administrador): JDK 17 Temurin
   (`jdk\jdk-17.0.20.1+1`), Android SDK (`sdk`: Platform 36, Build-Tools 36.0.0, Platform-Tools, command-line tools).
   O APK de teste já é gerado: `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk`
-  (**111 MB em 2026-10-21 14:53 (T-182, com câmera livre T-181 e T-177/178/179), protocolo de rede 7**, chave de debug; antes 111 MB das 11:36 e 105 MB em 2026-10-19), usando uma **cópia temporária** do `export_presets.cfg` com "Min SDK"/"Target SDK"
+  (**111 MB em 2026-10-21 14:53 (T-182, com câmera livre T-181 e T-177/178/179), protocolo de rede 7 — a T-183 subiu para 8: gerar de novo**, chave de debug; antes 111 MB das 11:36 e 105 MB em 2026-10-19), usando uma **cópia temporária** do `export_presets.cfg` com "Min SDK"/"Target SDK"
   vazios (Gradle desligado) e restaurando depois; passo a passo em `docs/RELEASE_ANDROID.md`. Instalar no celular:
   `D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk`.
 - Python do sistema não tem numpy/Pillow (use o Python do Blender, ver `tools/image_resize.py`).
@@ -27,7 +27,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
-| Testes automáticos (349) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (358) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
@@ -37,6 +37,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
+| Carro acidentado (T-183) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28 --cam=wreck` (a câmera vai para o carro batido: pisca-alerta, fumaça, triângulo; `--time=night`); console: `ACIDENTADO carro N: ... v=0.0 m/s`; capturas `bash tools/capture_t183.sh PASTA` (em `docs/capturas_t183/`); sem tela `godot --headless --path game -s res://tools_dev/trace_wreck.gd` (antes/depois em `docs/capturas_t183/trace_*.txt`); testes `-- --only=wreck` |
 | Batidas e freada (T-141/T-144) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_1_coast --no-events --demo=crash --start=300 --start-speed=28` (bate no trânsito; `--cam=21,7,3.2,12,0,1.2` vê de lado); `--demo=brake --start-speed=30` (buzina e freada forte); `--no-impact-fx` desliga os efeitos; com `--shots=PASTA` o `--demo=crash` grava `batida_antes` e `batida_a..e` e o console mostra `BATIDA ... 101 -> 61 km/h (penalidade 40%)` (T-152); sonda: `godot --path game -s res://tools_dev/fx_probe.gd -- --out=X.png [--brake]` |
 | Batidas por corrida | `godot --headless --path game -s res://tools_dev/measure_impacts.gd [-- --seeds=4 --route=ROTA]` (T-152: chegada de cada bot e quanto as batidas custaram) |
 | Custo dos eventos no tempo | `godot --headless --path game -s res://tools_dev/measure_event_times.gd [-- --seeds=5 --route=ROTA]` |
@@ -80,6 +81,17 @@ trânsito e som) enquanto ela está ligada; ao sair, a corrida volta exatamente 
   (ou tire o print do próprio celular).
 - Código: `game/scripts/debug/` (`freecam.gd` câmera e teclas, `freecam_math.gd` contas puras, `freecam_picker.gd` mira,
   `freecam_overlay.gd` painel, `freecam_touch.gd` sticks). Na corrida: 1 linha em `race_scene_3d._process` congela tudo.
+
+## Carro acidentado no trânsito (T-183)
+
+Carro arremessado por caminhão não volta mais a andar: desliza, para torto (atravessado ou no acostamento), pisca-alerta
+âmbar nas 4 pontas, fumaça leve do capô por 12 s e triângulo 9 m atrás depois de 3 s. Vira obstáculo: caminhões batem
+(empurra, ele para de novo), bots e carros desviam ou freiam. Some a 300 m atrás do último caminhão. Estado no snapshot
+(**protocolo 8**: gerar APK novo). Código: `sim/wreck.gd` (regras e "pegada" girada), `sim/traffic_look.gd` (o que o carro
+enxerga), `sim/thrown_car.gd`, `road3d/wreck_fx.gd` + `wreck_props.gd` (visual). Decisões em `docs/DECISOES.md` (T-183).
+Antes/depois: `docs/capturas_t183/` (folhas e `trace_antes.txt` / `trace_depois.txt`).
+Não validado: o caso online com um carro acidentado de verdade (nas corridas do `net_test` ninguém arremessou carro; o
+snapshot e a interpolação do cliente estão cobertos pelo teste `test_wreck.gd`) e o custo no celular.
 
 ## O que existe (resumo por fase)
 

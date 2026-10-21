@@ -268,6 +268,7 @@ func _ready() -> void:
 	_setup_intro(args)
 	var hidden: Vector3 = path.world_point(_player_z() + 22.0, _player_x(), -1.2)   # embaixo do asfalto, na frente da camera
 	_impact.warmup(hidden)
+	_traffic3d.wreck_fx.warmup(hidden)            # T-183: pisca-alerta, fumaca e triangulo do carro acidentado
 	_brake_fx.warmup(hidden)
 	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
 

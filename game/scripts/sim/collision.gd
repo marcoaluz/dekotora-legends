@@ -180,10 +180,20 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 	var events: Array[Dictionary] = []
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
-		var half: float = (TruckSim.WIDTH_X + c.width_x) * 0.5
+		var cz: float = c.z                 # rear (m), length (m), center x and width (x units) of the car body
+		var clen: float = c.length
+		var cx: float = c.x
+		var cw: float = c.width_x
+		if c.wrecked:                       # T-183: the crashed car (turned) uses its real footprint on the road
+			var fp: Rect2 = Wreck.footprint(c)
+			cz = fp.position.x
+			clen = fp.size.x
+			cx = fp.get_center().y
+			cw = fp.size.y
+		var half: float = (TruckSim.WIDTH_X + cw) * 0.5
 		var key: String = "t%d:c%d" % [truck_id, i]
-		var pen_x: float = (half - absf(c.x - truck.x)) * M_X
-		var pen_z: float = minf(truck.z + truck.length, c.z + c.length) - maxf(truck.z, c.z)
+		var pen_x: float = (half - absf(cx - truck.x)) * M_X
+		var pen_z: float = minf(truck.z + truck.length, cz + clen) - maxf(truck.z, cz)
 		if pen_x <= 0.0 or pen_z <= 0.0 or c.y > 1.2:     # pulando por cima da altura do para-choque: passa
 			_contacts.erase(key)
 			continue
@@ -191,8 +201,8 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 		_contacts[key] = true
 		if started:
 			truck.cargo_touch()
-		var rear_hit: bool = (pen_z < pen_x or absf(c.x - truck.x) < WIDTH_ALIGNED) and truck.z < c.z
-		var side: float = signf(c.x - truck.x)
+		var rear_hit: bool = (pen_z < pen_x or absf(cx - truck.x) < WIDTH_ALIGNED) and truck.z < cz
+		var side: float = signf(cx - truck.x)
 		if side == 0.0:
 			side = 1.0 if i % 2 == 0 else -1.0             # alinhados: lado fixo pelo indice (deterministico)
 		var toward: float = maxf(truck.lateral_vel * side, 0.0)   # x/s do caminhao entrando no carro
@@ -202,7 +212,7 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 		var pen: float = 0.0
 		var ev: Dictionary = {}
 		if started and dv > MIN_EVENT_DV:
-			var zone: String = "front" if rear_hit else ("right" if c.x > truck.x else "left")
+			var zone: String = "front" if rear_hit else ("right" if cx > truck.x else "left")
 			var dmg: float = DamageModel.impact_damage(dv, c.mass)
 			var broken: Array[String] = DamageModel.apply_impact(truck, zone, dmg)
 			truck.cargo_hit(dv)
@@ -211,9 +221,9 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 			if not truck.jolted():                      # T-152: uma penalidade por batida (o tranco e a recarga)
 				pen = penalty_fraction(rear_hit, dv, c.mass)
 				truck.jolt_t = JOLT_TIME
-				truck.jolt_side = 0 if rear_hit else (1 if c.x > truck.x else -1)
+				truck.jolt_side = 0 if rear_hit else (1 if cx > truck.x else -1)
 				truck.jolts += 1
-			ev = {"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv,
+			ev = {"type": "traffic", "truck": truck_id, "car": i, "zone": zone, "force": dv, "wreck": c.wrecked,
 				"damage": dmg, "broken": broken, "thrown": thrown, "car_kind": c.kind, "penalty": pen,
 				"speed_before": speed_before, "speed_after": speed_before}
 			events.append(ev)
@@ -230,10 +240,10 @@ func resolve_traffic(truck: TruckSim, truck_id: int, traffic: TrafficSim) -> Arr
 						THROW_TIME + THROW_TIME_PER_DV * dvv)
 				else:
 					c.speed = maxf(c.speed, new_car)
-			c.z = maxf(c.z, truck.z + truck.length)             # nunca fica dentro da frente do caminhao
+			c.z += maxf(truck.z + truck.length - cz, 0.0)        # nunca fica dentro da frente do caminhao
 		else:
 			if thrown:
-				var lever: float = clampf(((truck.z + truck.length * 0.5) - (c.z + c.length * 0.5)) / maxf(c.length, 1.0), -1.0, 1.0)
+				var lever: float = clampf(((truck.z + truck.length * 0.5) - (cz + clen * 0.5)) / maxf(c.length, 1.0), -1.0, 1.0)
 				var lat2: float = side * (toward * (1.0 + CAR_RESTITUTION) * share_car + 0.25)
 				traffic.throw_car(c, c.speed, lat2, -side * lever * THROW_SPIN_PER_DV * dv * 1.5 * share_car,
 					_hop(dv, c.mass, share_car) * 0.5, THROW_TIME + THROW_TIME_PER_DV * dv)

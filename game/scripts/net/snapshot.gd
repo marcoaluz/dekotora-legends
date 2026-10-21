@@ -6,7 +6,8 @@ extends RefCounted
 ##   u8 gear, u8 boost, u8 flags, u8 passing_charge, u8 draft, u8 lane, u8 signal(0..2 = -1/0/+1 +1),
 ##   u8 signal_time (centesimos de s), u8 tap_prev(0..2), u8 lane_change_time (centesimos),
 ##   u8 jolt (ticks de tranco que faltam, T-152), u32 ack (ultimo comando aplicado)
-##   · u8 n_cars · por carro: f32 z, f32 x, s16 giro (milirradianos), u8 altura (2 cm; carro arremessado, T-141).
+##   · u8 n_cars · por carro: f32 z, f32 x, s16 giro (milirradianos), u8 altura (2 cm; carro arremessado, T-141),
+##   u8 acidentado (T-183: 0 = anda normal; 1..255 = acidentado ha (n - 1) decimos de s, satura em 25,4 s).
 ##   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144), bit5 empurrado (fumaca, T-141),
 ##   bit6/bit7 tranco batido do lado esquerdo/direito (nenhum = de frente; T-152)
 ## O dano completo NAO vai aqui: so quando muda, por evento ("damage").
@@ -45,13 +46,30 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_float(c.x)
 		b.put_16(clampi(roundi(wrapf(c.yaw, -PI, PI) * 1000.0), -32767, 32767))
 		b.put_u8(clampi(roundi(c.y * 50.0), 0, 255))
+		b.put_u8(wreck_byte(c))
 	return b.data_array
+
+
+## T-183: estado de acidentado em 1 byte (0 = normal; 1 + decimos de s desde a batida, ate 255).
+static func wreck_byte(c: TrafficSim.Car) -> int:
+	return 1 + clampi(roundi(c.crash_t * 10.0), 0, 254) if c.wrecked else 0
+
+
+## T-183: o contrario de wreck_byte: -1 = normal; senao, s desde a batida.
+static func wreck_time(byte: int) -> float:
+	return -1.0 if byte == 0 else float(byte - 1) / 10.0
+
+
+## T-183: aplica o estado de acidentado (`t` de wreck_time) ao carro do espelho do cliente.
+static func apply_wreck(c: TrafficSim.Car, t: float) -> void:
+	c.wrecked = t >= 0.0
+	c.crash_t = maxf(t, 0.0)
 
 
 static func unpack(data: PackedByteArray) -> Dictionary:
 	var b := StreamPeerBuffer.new()
 	b.data_array = data
-	var out: Dictionary = {"tick": b.get_u32(), "trucks": [], "cars": [], "cars_spin": []}
+	var out: Dictionary = {"tick": b.get_u32(), "trucks": [], "cars": [], "cars_spin": [], "cars_wreck": []}
 	var n: int = b.get_u8()
 	for i in n:
 		var t: Dictionary = {}
@@ -85,6 +103,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 	for k in nc:
 		(out["cars"] as Array).append(Vector2(b.get_float(), b.get_float()))
 		(out["cars_spin"] as Array).append(Vector2(float(b.get_16()) / 1000.0, float(b.get_u8()) / 50.0))
+		(out["cars_wreck"] as Array).append(wreck_time(b.get_u8()))
 	return out
 
 
@@ -125,9 +144,12 @@ static func apply_to(sim: RaceSim, snap: Dictionary, skip_idx: int = -1) -> void
 	if sim.traffic != null:
 		var cars: Array = snap["cars"]
 		var spin: Array = snap.get("cars_spin", [])
+		var wreck: Array = snap.get("cars_wreck", [])
 		for k in mini(cars.size(), sim.traffic.cars.size()):
 			sim.traffic.cars[k].z = (cars[k] as Vector2).x
 			sim.traffic.cars[k].x = (cars[k] as Vector2).y
 			if k < spin.size():
 				sim.traffic.cars[k].yaw = (spin[k] as Vector2).x
 				sim.traffic.cars[k].y = (spin[k] as Vector2).y
+			if k < wreck.size():
+				apply_wreck(sim.traffic.cars[k], float(wreck[k]))

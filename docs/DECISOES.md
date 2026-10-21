@@ -479,3 +479,29 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   as malhas copiadas dos kits guardam o caminho no `resource_name` e os lotes `MeshBatch` guardam a lista de peças (meta
   `pieces`); custo zero quando a câmera está desligada (só memória das listas, pequena).
 - Teclas extras não pedidas: Esc também sai; T aceita metros (`800 m`); o nome do print também leva a rota.
+
+## 2026-10-21 — T-183: carro do trânsito batido vira carro ACIDENTADO (pedido do Marco)
+
+- **Antes**: o carro arremessado girava ~2 s e depois o motorista endireitava (0,9 rad/s) e voltava à velocidade de
+  cruzeiro. **Agora** ele nunca volta a andar: desliza e gira até parar (6,5 m/s² enquanto está fora de controle,
+  depois **9 m/s²** arrastando de lado; escolha do Claude para não deslizar ~90 m), fica no ângulo em que parou (não
+  endireita), atravessado na faixa ou jogado no acostamento.
+- Só vira acidentado quem é **arremessado** (batida a partir de 3 m/s, carro até 3 t). Encostão fraco só empurra e o
+  ônibus nunca vira acidentado (regras da T-141, iguais).
+- **Obstáculo na simulação** (`sim/wreck.gd`): o carro ocupa a pista pelo corpo **girado** (retângulo em volta do carro,
+  pivô no eixo traseiro, igual ao desenho), não pela faixa. Caminhões batem nele com a mesma física de antes (de novo
+  arremessa/empurra, ele para de novo e continua acidentado). Carros do trânsito atrás trocam de faixa ou freiam e esperam
+  a vez; se não conseguirem frear, encostam, ficam atrás e o empurram um pouco (não atravessam). Carro parado não dá vácuo.
+- **Bots**: enxergam o acidentado 1,2 s mais longe que um carro normal e desviam **na hora** (sem a demora de "preso no
+  trânsito"). Sem faixa de rolagem livre, usam o acostamento vizinho para passar (escolha do Claude: antes ficavam presos
+  para sempre atrás de um acidentado entre duas faixas). Ajuste junto: a freada planejada do bot para o limite das obras
+  passou de 1,8 para 1,5 m/s² (o freio proporcional atrasava ~1,44 m/s, mais que a tolerância de 5 km/h; apareceu com o
+  trânsito novo no teste das obras).
+- **Some** quando está a **300 m** atrás do último caminhão (carro normal: 150 m) e volta como carro novo à frente do líder.
+- **Visual** (`road3d/wreck_fx.gd`, só lê o estado): pisca-alerta nas 4 pontas (os modelos não têm seta separada: são 4
+  lâmpadas âmbar feitas por código, com brilho), todas juntas no ritmo da seta (`SignalBlink`, ~1,5 Hz) pelo relógio
+  visual; fumaça cinza leve saindo do capô por 12 s depois da batida (chave "Faíscas, pedaços e fumaça"); triângulo
+  vermelho no chão **9 m atrás** do carro, colocado 3 s depois da batida e só quando o carro parou. Custo: 2 chamadas de
+  desenho por acidentado + 1 do triângulo + fumaça nos primeiros 12 s.
+- **Rede**: protocolo 8 (1 byte por carro no snapshot). Para o Marco confirmar: duração da fumaça, distância do triângulo,
+  9 m/s² de arrasto, 300 m para sumir, bots usarem o acostamento.

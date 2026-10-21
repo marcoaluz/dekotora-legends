@@ -18,6 +18,8 @@ var racing: bool = false
 var _acc: float = 0.0
 var _started_sent: bool = false
 var _elapsed: float = 0.0
+var _wrecks_max: int = 0                  # T-183: mais carros acidentados vistos ao mesmo tempo (vindos do servidor)
+var _thrown_events: int = 0               # T-183: batidas que arremessaram carro do transito
 var _body: String = ""
 var _max_runtime: float = 300.0
 var _log_acc: float = 0.0
@@ -169,6 +171,8 @@ func _on_events(events: Array) -> void:
 	for e in events:
 		if String(e["type"]) in ["truck", "traffic", "finish"]:
 			print("[botclient %s] evento: %s" % [_name, JSON.stringify(e)])
+		if String(e["type"]) == "traffic" and bool(e.get("thrown", false)):
+			_thrown_events += 1
 
 
 func _on_end(result: Dictionary) -> void:
@@ -176,6 +180,8 @@ func _on_end(result: Dictionary) -> void:
 		_name, _err_max, _err_sum / maxf(float(_err_n), 1.0), _err_big, _err_n])
 	print("[botclient %s] RESULTADO posicao=%d pagamento=%d fama=%d carga=%.2f tempo=%.1f" % [
 		_name, int(result["position"]), int(result["pay"]), int(result["fame"]), float(result["cargo"]), float(result["time"])])
+	print("[botclient %s] ACIDENTADOS: carros arremessados (eventos) %d, maximo de acidentados ao mesmo tempo no cliente %d" % [
+		_name, _thrown_events, _wrecks_max])
 	print("[botclient %s] BOTCLIENT_DONE" % _name)
 	get_tree().create_timer(0.5).timeout.connect(func() -> void: get_tree().quit(0))
 
@@ -195,6 +201,8 @@ func _process(delta: float) -> void:
 		var tk: int = sync.local_step(cmd)
 		Net.send_commands(tk, cmd)
 	sync.interpolate(Time.get_ticks_msec(), delta)
+	if sync.sim.traffic != null:                    # T-183: carros acidentados que chegaram pelo snapshot
+		_wrecks_max = maxi(_wrecks_max, sync.sim.traffic.wreck_count())
 	_log_acc += delta
 	if _log_acc >= 5.0:
 		_log_acc = 0.0

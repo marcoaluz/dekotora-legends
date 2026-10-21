@@ -131,6 +131,8 @@ func _update_draft_and_passing(dt: float) -> void:
 					target = 1.0 - gap / DRAFT_RANGE
 			if traffic != null:
 				for c in traffic.cars:
+					if c.wrecked:                       # T-183: carro parado nao da vacuo
+						continue
 					var gap2: float = c.z - nose
 					if gap2 > 0.0 and gap2 < DRAFT_RANGE and absf(c.x - me.x) < DRAFT_ALIGN:
 						target = maxf(target, 1.0 - gap2 / DRAFT_RANGE)

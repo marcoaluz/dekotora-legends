@@ -8,6 +8,7 @@ extends RefCounted
 ## veiculo sai so do indice dele (Kind fixo a corrida toda), entao servidor e clientes concordam sem
 ## mandar nada pela rede. Quem alcanca um veiculo mais lento na mesma faixa tenta trocar de faixa e,
 ## se nao der, segue atras dele (ninguem atravessa o onibus).
+## T-183: carro arremessado vira carro ACIDENTADO (Wreck): para, fica atravessado, e os outros desviam ou freiam.
 
 enum Density { LIGHT, NORMAL, HEAVY }
 enum Kind { CAR, BUS, SPORT }
@@ -62,6 +63,9 @@ class Car:
 	var yaw_rate: float = 0.0            # rad/s
 	var y: float = 0.0                   # m above the road (hop)
 	var vy: float = 0.0                  # m/s
+	## Crashed (T-183): never drives again; obstacle until it is Wreck.DESPAWN_BEHIND m behind the last truck.
+	var wrecked: bool = false
+	var crash_t: float = 0.0             # s since the crash (visual: smoke, warning triangle; in the snapshot)
 
 
 var cars: Array[Car] = []
@@ -69,6 +73,8 @@ var density: int = Density.NORMAL
 var hits: int = 0                          # contagem de batidas (debug / testes)
 var honk_yields: int = 0                   # carros que sairam da frente por causa da buzina (testes)
 var throws: int = 0                        # carros arremessados por caminhoes (T-141, testes)
+var wrecks: int = 0                        # carros que viraram acidentados (T-183, testes)
+var wreck_bumps: int = 0                   # contatos de carro do transito com um acidentado (T-183, testes)
 var events: TrackEvents = null             # eventos de pista (T-139); null = pista livre
 var _rng := RandomNumberGenerator.new()
 
@@ -101,8 +107,8 @@ func _init(seed_: int = 1234, density_: int = Density.NORMAL) -> void:
 ## Giro do corpo (rad, > 0 = esquerda) na troca de faixa: sobe e desce suave, no maximo TruckSim.MAX_BODY_YAW.
 ## Na curva o carro acompanha a pista (mesma regra dos caminhoes, T-132).
 static func body_yaw(c: Car) -> float:
-	if c.out_t > 0.0 or c.yaw != 0.0:
-		return c.yaw                    # arremessado (T-141): o giro da batida manda
+	if c.wrecked or c.out_t > 0.0 or c.yaw != 0.0:
+		return c.yaw                    # arremessado/acidentado (T-141/T-183): o giro da batida manda
 	var rem: float = LANES[c.lane] - c.x
 	if absf(rem) < 0.001:
 		return 0.0
@@ -156,68 +162,10 @@ func _avoid_closure(c: Car, trucks: Array) -> float:
 		var target: int = events.nearest_open_lane(c.lane + 1, c.z, bz + 60.0)
 		if target >= 0:
 			var nl: int = c.lane + signi(target - 1 - c.lane)
-			if nl != c.lane and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) and not _closed(nl, c.z, nose + 10.0):
+			if nl != c.lane and TrafficLook.lane_free(cars, nl, c.z, c) and not TrafficLook.truck_beside(nl, c, trucks) and not _closed(nl, c.z, nose + 10.0):
 				c.lane = nl
 				return INF
 	return sqrt(BRAKE * maxf(bz - nose - CLOSURE_STOP_M, 0.0))
-
-
-## Faixa `lane` livre para o carro `ignore` ocupar a partir de `z`: nenhuma carroceria a menos de LANE_GAP.
-func _lane_free(lane: int, z: float, ignore: Car) -> bool:
-	var length: float = ignore.length if ignore != null else CAR_LEN
-	for o in cars:
-		if o != ignore and o.lane == lane:
-			var gap: float = maxf(o.z - (z + length), z - (o.z + o.length))
-			if gap < LANE_GAP:
-				return false
-	return true
-
-
-## Veiculo (carro ou caminhao) mais lento logo a frente de `c` na mesma linha, perto o bastante para
-## precisar frear (distancia de frenagem + FOLLOW_GAP). {} se livre.
-func _blocker(c: Car, trucks: Array) -> Dictionary:
-	var best: Dictionary = {}
-	var nose: float = c.z + c.length
-	for o in cars:
-		if o != c and absf(o.x - c.x) < (o.width_x + c.width_x) * 0.5:
-			best = _closer(best, o.z - nose, o.speed, c.speed)
-	for t in trucks:
-		var tr: TruckSim = t
-		if absf(tr.x - c.x) < (TruckSim.WIDTH_X + c.width_x) * 0.5:
-			best = _closer(best, tr.z - nose, tr.speed, c.speed)
-	return best
-
-
-func _closer(best: Dictionary, gap: float, other_speed: float, my_speed: float) -> Dictionary:
-	if gap <= -1.0 or gap > LOOK_AHEAD or other_speed >= my_speed + 0.5 and gap > FOLLOW_GAP:
-		return best
-	var dv: float = maxf(my_speed - other_speed, 0.0)
-	if gap > dv * dv / (2.0 * BRAKE) + FOLLOW_GAP:
-		return best
-	if best.is_empty() or gap < float(best["gap"]):
-		return {"gap": gap, "speed": other_speed}
-	return best
-
-
-## Algum caminhao buzinando logo atras de `c`, na mesma linha (ate HORN_RANGE da traseira do carro ao nariz dele)?
-func _honked(c: Car, trucks: Array) -> bool:
-	for t in trucks:
-		var tr: TruckSim = t
-		if tr.horn and absf(tr.x - c.x) < (TruckSim.WIDTH_X + c.width_x) * 0.5:
-			var gap: float = c.z - (tr.z + tr.length)
-			if gap > -1.0 and gap < HORN_RANGE:
-				return true
-	return false
-
-
-## Algum caminhao ocupa a faixa `lane` ao lado de `c` (com folga de 6 m na frente e atras)?
-func _truck_beside(lane: int, c: Car, trucks: Array) -> bool:
-	for t in trucks:
-		var tr: TruckSim = t
-		var beside_x: bool = absf(tr.x - LANES[lane]) < (TruckSim.WIDTH_X + c.width_x) * 0.5
-		if beside_x and tr.z < c.z + c.length + 6.0 and tr.z + tr.length + 6.0 > c.z:
-			return true
-	return false
 
 
 ## Arremessa o carro (T-141; chamado pela Collision): nova velocidade para a frente, deslize lateral (x/s),
@@ -230,48 +178,56 @@ func throw_car(c: Car, new_speed: float, vx: float, yaw_rate: float, vy: float, 
 		c.vy = vy
 	c.out_t = maxf(c.out_t, seconds)
 	throws += 1
+	if Wreck.mark(c):                    # T-183: nunca mais volta a andar
+		wrecks += 1
 
 
 func is_thrown(c: Car) -> bool:
 	return c.out_t > 0.0 or c.y > 0.0
 
 
+func wreck_count() -> int:
+	var n: int = 0
+	for c in cars:
+		if c.wrecked:
+			n += 1
+	return n
+
+
 func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void:
 	for c in cars:
 		if c.cruise < 0.0:
 			c.cruise = c.speed
-		if is_thrown(c):
+		if c.wrecked or is_thrown(c):    # T-183: acidentado so desliza ate parar (nao volta a dirigir)
 			ThrownCar.step(c, dt)
+			if c.wrecked:
+				Wreck.step(c, dt)
 			if events != null:
 				EventContact.car(events, c, dt)
 			_respawn_if_behind(c, leader_z, rear_z)
 			continue
 		var target_speed: float = c.cruise
-		if c.yaw != 0.0:                 # voltando para a direcao da pista depois do arremesso (devagar)
-			c.yaw = move_toward(c.yaw, 0.0, ThrownCar.RECOVER_YAW_RATE * dt)
-			if absf(c.yaw) > 0.1:
-				target_speed = minf(target_speed, ThrownCar.RECOVER_SPEED)
 		if events != null:
 			target_speed = minf(target_speed, _avoid_closure(c, trucks))
 			target_speed = minf(target_speed, events.limit_ahead(c.z, c.z + c.length, 120.0, BRAKE * 0.5,
 				TrackEvents.WORKS_LIMIT_KMH / 3.6))           # works: slows down to the posted limit
-		var blk: Dictionary = _blocker(c, trucks)
+		var blk: Dictionary = TrafficLook.blocker(cars, c, trucks)
 		if not blk.is_empty() and float(blk["speed"]) < c.cruise:
 			# alcancou alguem mais lento: tenta a faixa da esquerda, depois a da direita; senao, segue atras
 			var moved: bool = false
 			if absf(c.x - LANES[c.lane]) < 0.05:
 				for nl in [c.lane - 1, c.lane + 1]:
-					if nl >= 0 and nl < LANES.size() and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) \
+					if nl >= 0 and nl < LANES.size() and TrafficLook.lane_free(cars, nl, c.z, c) and not TrafficLook.truck_beside(nl, c, trucks) \
 							and not _closed(nl, c.z, c.z + CLOSURE_LOOK):
 						c.lane = nl
 						moved = true
 						break
 			if not moved:
 				target_speed = minf(target_speed, float(blk["speed"]))
-		elif absf(c.x - LANES[c.lane]) < 0.05 and _honked(c, trucks):
+		elif absf(c.x - LANES[c.lane]) < 0.05 and TrafficLook.honked(c, trucks):
 			# buzina de um caminhao logo atras (T-144): sai da frente mais cedo, para o lado que estiver livre
 			for nl in [c.lane - 1, c.lane + 1]:
-				if nl >= 0 and nl < LANES.size() and _lane_free(nl, c.z, c) and not _truck_beside(nl, c, trucks) \
+				if nl >= 0 and nl < LANES.size() and TrafficLook.lane_free(cars, nl, c.z, c) and not TrafficLook.truck_beside(nl, c, trucks) \
 						and not _closed(nl, c.z, c.z + CLOSURE_LOOK):
 					c.lane = nl
 					honk_yields += 1
@@ -287,13 +243,15 @@ func step(dt: float, leader_z: float, rear_z: float, trucks: Array = []) -> void
 			c.timer = _rng.randf_range(4.0, 12.0)
 			var dir: int = -1 if _rng.randf() < 0.5 else 1
 			var nl2: int = c.lane + dir
-			if nl2 >= 0 and nl2 < LANES.size() and _lane_free(nl2, c.z, c) and not _closed(nl2, c.z, c.z + CLOSURE_LOOK):
+			if nl2 >= 0 and nl2 < LANES.size() and TrafficLook.lane_free(cars, nl2, c.z, c) and not _closed(nl2, c.z, c.z + CLOSURE_LOOK):
 				c.lane = nl2
 		_respawn_if_behind(c, leader_z, rear_z)
+	wreck_bumps += Wreck.resolve_cars(cars)
 
 
 func _respawn_if_behind(c: Car, leader_z: float, rear_z: float) -> void:
-	if c.z < rear_z - DESPAWN_BEHIND:
+	if c.z < rear_z - (Wreck.DESPAWN_BEHIND if c.wrecked else DESPAWN_BEHIND):
+		Wreck.clear(c)
 		c.out_t = 0.0
 		c.vx = 0.0
 		c.yaw = 0.0
@@ -302,5 +260,5 @@ func _respawn_if_behind(c: Car, leader_z: float, rear_z: float) -> void:
 		c.vy = 0.0
 		for attempt in 6:
 			_place(c, leader_z + _rng.randf_range(SPAWN_AHEAD_MIN, SPAWN_AHEAD_MAX))
-			if _lane_free(c.lane, c.z, c):
+			if TrafficLook.lane_free(cars, c.lane, c.z, c):
 				break

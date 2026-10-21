@@ -184,6 +184,8 @@ func interpolate(now_ms: int, dt: float) -> void:
 		var cb: Array = b["s"]["cars"]
 		var sa: Array = a["s"].get("cars_spin", [])
 		var sb: Array = b["s"].get("cars_spin", [])
+		var wa: Array = a["s"].get("cars_wreck", [])
+		var wb: Array = b["s"].get("cars_wreck", [])
 		for k in mini(mini(ca.size(), cb.size()), sim.traffic.cars.size()):
 			var car: TrafficSim.Car = sim.traffic.cars[k]
 			car.z = lerpf((ca[k] as Vector2).x, (cb[k] as Vector2).x, f)
@@ -191,6 +193,11 @@ func interpolate(now_ms: int, dt: float) -> void:
 			if k < sa.size() and k < sb.size():          # carro arremessado (T-141): giro e pulo vem do servidor
 				car.yaw = lerp_angle((sa[k] as Vector2).x, (sb[k] as Vector2).x, clampf(f, 0.0, 1.0))
 				car.y = maxf(lerpf((sa[k] as Vector2).y, (sb[k] as Vector2).y, clampf(f, 0.0, 1.0)), 0.0)
+			if k < wb.size():                            # T-183: acidentado (pisca, fumaca, triangulo) vem do servidor
+				var tw: float = float(wb[k])
+				if tw >= 0.0 and k < wa.size() and float(wa[k]) >= 0.0:
+					tw = lerpf(float(wa[k]), tw, clampf(f, 0.0, 1.0))
+				Snapshot.apply_wreck(car, tw)
 
 
 ## Dano completo de um caminhao enviado pelo servidor (so quando muda).

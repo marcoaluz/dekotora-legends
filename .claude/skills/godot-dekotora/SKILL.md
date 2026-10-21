@@ -305,3 +305,15 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Script `-s` que cita classe que usa autoload (Settings, AudioBus) com tipo estático não compila (autoloads ainda não existem):
   use variáveis sem tipo nesses scripts de sonda, ou carregue a cena em tempo de execução.
 - Testes: `-- --only=freecam` (`tests/test_freecam.gd`, IN_TREE).
+
+## Carro acidentado (T-183)
+
+- Regra na sim: `sim/wreck.gd` (`Wreck.footprint(c)` = retângulo do corpo GIRADO, pivô no eixo traseiro = `TrackPath.REAR_AXLE`;
+  use isso, e não `c.x`/`c.lane`, para saber se um acidentado ocupa uma faixa). `TrafficSim.Car.wrecked`/`crash_t`.
+  O que o carro do trânsito enxerga: `sim/traffic_look.gd`. Bots: `BotDriver._obstacle_ahead` marca `"wreck": true`.
+- Rect2 é float32: nas contas de carro NORMAL continue usando os floats (`c.z`, `c.length`), senão os números mudam.
+- Visual só lê o estado: `road3d/wreck_fx.gd` (pisca no ritmo `SignalBlink`, fumaça por `crash_t`, triângulo quando o
+  carro fica parado 0,3 s — a sim anda a 30/s, um quadro parado não basta).
+- `--demo=crash --cam=wreck` (câmera no acidentado) e linhas `ACIDENTADO` no console; `tools/capture_t183.sh`;
+  `tools_dev/trace_wreck.gd` (sem tela, roda também no código antigo: lê campos novos com `get()`).
+- Testes `-- --only=wreck`. Snapshot: 1 byte por carro (protocolo 8).

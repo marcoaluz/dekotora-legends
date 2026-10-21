@@ -55,6 +55,13 @@ lobby; hoje a sala acaba no fim da corrida). **Grid** (`StartGrid`, igual no ser
 30 m do começo da pista. Medido no `tools/net_test.sh` (linha `LARGADA:`): o servidor larga X ms depois da hora que o
 cliente previu (ver STATUS, T-156).
 
+**Protocolo versão 8** (T-183): cada carro do trânsito no snapshot ganhou 1 byte, **acidentado** (0 = anda normal;
+1..255 = acidentado há (n − 1) décimos de segundo, satura em 25,4 s). O carro arremessado por um caminhão vira carro
+acidentado no servidor (para, fica torto, pisca-alerta) e todos os clientes desenham igual (pisca, fumaça e triângulo
+saem desse tempo). Os bots do cliente de teste também desviam dele, porque o espelho do cliente sabe quem está acidentado.
+`tools/net_test.sh` mostra a linha `ACIDENTADOS:` (quantos o cliente recebeu). Cliente e servidor precisam da mesma
+versão: gere o APK de novo.
+
 **Protocolo versão 7** (T-173): o descritor do caminhão (`loadout` de cada entrada do grid) leva `horn` (buzina
 escolhida na garagem, `HornCatalog.IDS`; o servidor monta pelo perfil guardado e aceita a do cliente, como a cabine,
 porque é só som). Os clientes tocam o motor dos outros pelo `engine`/`turbo`/`exhaust` do descritor
@@ -68,8 +75,8 @@ porque é só som). Os clientes tocam o motor dos outros pelo `engine`/`turbo`/`
 `boost`, flags (Passing, acostamento, chegou, **buzina**, **freada forte**, **empurrado** — fumaça nos pneus, **lado do
 tranco** — 2 bits, T-152), **tranco** (u8, ticks que faltam, T-152), mais
 **eventos** do tick (colisão com zona e força, peça quebrada, Passing, carro arremessado, freada). Cada carro do trânsito
-leva `z`, `x`, **giro** (s16, milirradianos) e **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
-(T-141). O dano completo só vai quando muda. **Protocolo versão 6** (4 = T-152, 5 = T-153, 6 = T-156; cliente e servidor precisam da mesma versão: gere o APK de novo).
+leva `z`, `x`, **giro** (s16, milirradianos), **altura** (u8, 2 cm) — o carro arremessado é desenhado igual em todos
+(T-141) — e **acidentado** (u8, T-183). O dano completo só vai quando muda. **Protocolo versão 8** (4 = T-152, 5 = T-153, 6 = T-156, 7 = T-173, 8 = T-183; cliente e servidor precisam da mesma versão: gere o APK de novo).
 
 ## Suavidade no cliente
 

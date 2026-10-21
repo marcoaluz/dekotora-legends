@@ -33,7 +33,9 @@ const MUST_MOVE_M: float = 110.0                            # m: daqui em diante
 const CLOSURE_BRAKE: float = 3.5                            # m/s^2 para parar antes do bloqueio se nao consegue sair
 const WORKS_LIMIT_F: Array[float] = [0.9, 0.95, 1.0]        # fator sobre o limite das obras (a tolerancia e +5 km/h)
 const WORKS_LOOK: float = 260.0                             # m a frente em que comeca a frear para o limite das obras
-const WORKS_BRAKE: float = 1.8                              # m/s^2 planejados (o freio do bot e proporcional: atrasa)
+const WORKS_BRAKE: float = 1.5                              # m/s^2 planejados (freio proporcional atrasa ~WORKS_BRAKE/1,25 m/s; T-183: 1,8 dava 1,44 > tolerancia de 5 km/h)
+const WRECK_LOOK_S: float = 1.2                             # T-183: s a mais de visao para um carro acidentado (parado)
+const WRECK_MARGIN_X: float = 0.02                          # T-183: folga lateral (x) para passar ao lado do acidentado
 
 var difficulty: int = Difficulty.NORMAL
 var rival: bool = false                # duela com o jogador mesmo na dificuldade facil
@@ -82,6 +84,13 @@ func _obstacle_ahead(sim: RaceSim, me: TruckSim, index: int, x: float, horizon: 
 	var nose: float = me.z + me.length
 	if sim.traffic != null:
 		for c in sim.traffic.cars:
+			if c.wrecked:                     # T-183: parado, girado; ve de mais longe e desvia sem esperar (command_for)
+				var r: Rect2 = Wreck.footprint(c)
+				var gw: float = r.position.x - nose
+				if gw > -2.0 and gw < horizon + me.speed * WRECK_LOOK_S and Wreck.overlaps_x(r, x, TruckSim.WIDTH_X * 0.5 + WRECK_MARGIN_X):
+					if best.is_empty() or gw < float(best["gap"]):
+						best = {"gap": gw, "speed": c.speed, "truck": -1, "wreck": true}
+				continue
 			var gap: float = c.z - nose
 			if gap > -2.0 and gap < horizon and absf(c.x - x) < half + 0.05:
 				if best.is_empty() or gap < float(best["gap"]):
@@ -131,6 +140,16 @@ func _closure(sim: RaceSim, me: TruckSim, index: int, desired: float) -> float:
 	return minf(desired, sqrt(2.0 * CLOSURE_BRAKE * maxf(bz - nose - 8.0, 0.0)))
 
 
+## T-183: acidentado na frente e nenhuma faixa de rolagem livre: o acostamento vizinho, se estiver livre.
+func _shoulder_escape(sim: RaceSim, me: TruckSim, index: int, horizon: float) -> Array[int]:
+	var out: Array[int] = []
+	for step_ in [-1, 1]:
+		var nl: int = target_lane + int(step_)
+		if (nl == Lanes.SHOULDER_L or nl == Lanes.SHOULDER_R) and _obstacle_ahead(sim, me, index, Lanes.X[nl], horizon).is_empty() 				and _lane_side_clear(sim, me, index, nl):
+			out.append(nl)
+	return out
+
+
 ## Ninguem ao lado (caminhao ou carro sobreposto em z) na faixa `lane`: trocar para ela nao bate de lado.
 func _lane_side_clear(sim: RaceSim, me: TruckSim, index: int, lane: int) -> bool:
 	var lx: float = Lanes.X[lane]
@@ -142,7 +161,11 @@ func _lane_side_clear(sim: RaceSim, me: TruckSim, index: int, lane: int) -> bool
 				return false
 	if sim.traffic != null:
 		for c in sim.traffic.cars:
-			if absf(c.x - lx) < 0.4 and c.z < me.z + me.length + margin and c.z + c.length + margin > me.z:
+			if c.wrecked:                     # T-183: corpo girado do acidentado
+				var r: Rect2 = Wreck.footprint(c)
+				if Wreck.overlaps_x(r, lx, 0.4 - TrafficSim.CAR_WIDTH_X * 0.5) and r.position.x < me.z + me.length + margin 						and r.end.x + margin > me.z:
+					return false
+			elif absf(c.x - lx) < 0.4 and c.z < me.z + me.length + margin and c.z + c.length + margin > me.z:
 				return false
 	return true
 
@@ -215,7 +238,10 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 			var nl: int = target_lane + int(step_)
 			if _lane_free(sim, me, index, nl, horizon * 1.2):
 				options.append(nl)
-		if not options.is_empty() and _lane_timer <= 0.0 and _blocked_time >= STUCK_DELAY[difficulty]:
+		var wreck: bool = bool(obstacle.get("wreck", false))     # T-183: carro acidentado nao anda: sai ja
+		if options.is_empty() and wreck:
+			options = _shoulder_escape(sim, me, index, horizon)     # sem faixa livre: passa pelo acostamento
+		if not options.is_empty() and (_lane_timer <= 0.0 or wreck) and (_blocked_time >= STUCK_DELAY[difficulty] or wreck):
 			target_lane = options[_rng.randi_range(0, options.size() - 1)] if options.size() > 1 else options[0]
 			_lane_timer = 1.0
 			passing = int(obstacle["truck"]) >= 0

@@ -5,6 +5,7 @@ extends Node3D
 ## (TrafficSim.Car.kind); o modelo dentro do tipo sai de (indice + color_id), entao a mesma semente
 ## da sempre o mesmo transito, no servidor e nos clientes.
 ## Modelos com rodas separadas (nos "wheel_*", pivo no eixo) giram as rodas pela distancia andada.
+## T-183: carro acidentado (TrafficSim.Car.wrecked) ganha pisca-alerta, fumaca e triangulo (WreckFx).
 
 ## Modelos por tipo (indice = TrafficSim.Kind). Os 4 primeiros carros sao os genericos feitos por codigo;
 ## os outros vem de modelos de terceiros reduzidos (blender/scripts/build_traffic_*.py, creditos em LICENCAS.md).
@@ -29,6 +30,9 @@ var traffic: TrafficSim
 var _nodes: Array[Node3D] = []
 var _wheels: Array = []            # por carro: Array[Node3D] com as rodas (vazio se o modelo nao tem)
 var _wheel_rest: Array = []        # por carro: Array[Basis] (rotacao original de cada roda)
+var _models: Array[String] = []    # por carro: nome do modelo (forma das lampadas do pisca-alerta)
+var wreck_fx: WreckFx               # T-183
+var _last_ms: int = -1
 
 
 ## Todos os modelos (sem repetir), na ordem dos tipos.
@@ -49,6 +53,9 @@ static func model_for(kind: int, i: int, color_id: int) -> String:
 func setup(path_: TrackPath, traffic_: TrafficSim, plates: LicensePlates = null) -> void:
 	path = path_
 	traffic = traffic_
+	wreck_fx = WreckFx.new()
+	add_child(wreck_fx)
+	wreck_fx.setup(path)
 	var scenes: Dictionary = {}          # nome do modelo -> PackedScene (so os usados nesta corrida)
 	var classic: bool = "--traffic-classic" in OS.get_cmdline_user_args()
 	var forced: String = ""              # depuracao (--traffic-model=car_jeep): todo carro comum vira esse modelo (capturas)
@@ -90,6 +97,7 @@ func setup(path_: TrackPath, traffic_: TrafficSim, plates: LicensePlates = null)
 		_wheel_rest.append(rest)
 		add_child(n)
 		_nodes.append(n)
+		_models.append(model)
 		if plates != null:
 			if not spots.has(model):
 				spots[model] = plate_spots(model, n)
@@ -128,6 +136,9 @@ func car_transforms() -> Array[Transform3D]:
 
 
 func refresh() -> void:
+	var now_ms: int = Time.get_ticks_msec()
+	var dt: float = 0.0 if _last_ms < 0 else float(now_ms - _last_ms) / 1000.0
+	_last_ms = now_ms
 	for i in traffic.cars.size():
 		var c: TrafficSim.Car = traffic.cars[i]
 		var xf: Transform3D = path.vehicle_transform(c.z, c.x, c.length, TrafficSim.body_yaw(c))
@@ -135,9 +146,14 @@ func refresh() -> void:
 			var roll: float = clampf(-c.vx * 0.35, -0.5, 0.5) + clampf(c.vy * 0.06, -0.25, 0.25) * signf(c.yaw_rate)
 			xf = Transform3D(xf.basis * Basis(Vector3.BACK, roll), xf.origin + xf.basis.y * c.y)
 		_nodes[i].transform = xf
+		if c.wrecked:                              # T-183: pisca-alerta, fumaca, triangulo
+			wreck_fx.show_wreck(i, _nodes[i], _models[i], c, dt)
+		elif wreck_fx.has_kit(i):
+			wreck_fx.clear(i)
 		var ws: Array = _wheels[i]
 		for k in ws.size():
 			var w: Node3D = ws[k]
 			# altura do pivo = raio da roda; giro = distancia / raio (frente = -Z, por isso o sinal)
 			var spin: float = fmod(c.z / maxf(w.position.y, 0.1), TAU)
 			w.transform.basis = Basis(Vector3.RIGHT, -spin) * (_wheel_rest[i][k] as Basis)
+	wreck_fx.blink(SignalBlink.now())

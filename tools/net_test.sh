@@ -29,6 +29,7 @@ kill $SERVER 2>/dev/null
 echo "--- servidor"; grep -E "^\[servidor\]" "$LOGDIR/server.log" | head -20
 echo "--- Ana (saida $RA)"; grep -E "RESULTADO|PRED:|LARGADA|abertura|erro_pred|erro do servidor|desconectado" "$LOGDIR/ana.log" | tail -9
 echo "--- Beto (saida $RB)"; grep -E "RESULTADO|PRED:|LARGADA|abertura|erro_pred|erro do servidor|desconectado" "$LOGDIR/beto.log" | tail -9
+echo "--- carro acidentado (T-183: estado no snapshot, protocolo 8)"; grep -h "ACIDENTADOS:" "$LOGDIR/ana.log" "$LOGDIR/beto.log"
 echo "--- largada (T-156: abertura e relogio comum)"; grep -hE "abertura|LARGADA" "$LOGDIR/ana.log" "$LOGDIR/beto.log"
 echo "--- som (T-173: buzina e escapamento no descritor)"; grep -h "SOM:" "$LOGDIR/ana.log"
 SOM_OK=0

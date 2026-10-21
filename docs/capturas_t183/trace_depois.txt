@@ -1,0 +1,73 @@
+BATIDA t=3.70 caminhao=0 carro=0 zona=front forca=19.7 m/s arremessado=true
+t= 0.00 carro0 z=  415.6 x= 0.00 giro=   0.0 graus v= 34.4 m/s fora=2.28 s acidentado=true | carro3 atras d=-4 v=23.2 x=-0.50 | bot z-rel=-162 x=0.00
+t= 0.53 carro0 z=  432.9 x= 0.75 giro=-123.0 graus v= 30.9 m/s fora=1.75 s acidentado=true | carro3 atras d=1 v=23.2 x=-0.50 | bot z-rel=-164 x=0.00
+t= 1.07 carro0 z=  448.4 x= 1.18 giro=-189.1 graus v= 27.5 m/s fora=1.22 s acidentado=true | carro3 atras d=4 v=23.2 x=-0.50 | bot z-rel=-164 x=0.00
+t= 1.60 carro0 z=  462.1 x= 1.30 giro= 158.7 graus v= 24.0 m/s fora=0.68 s acidentado=true | carro3 atras d=6 v=23.2 x=-0.50 | bot z-rel=-161 x=0.00
+t= 2.13 carro0 z=  473.9 x= 1.30 giro= 158.7 graus v= 20.5 m/s fora=0.15 s acidentado=true | carro3 atras d=5 v=23.2 x=-0.50 | bot z-rel=-157 x=0.00
+t= 2.67 carro0 z=  483.6 x= 1.30 giro= 158.7 graus v= 16.1 m/s fora=0.00 s acidentado=true | carro3 atras d=3 v=23.2 x=-0.50 | bot z-rel=-151 x=0.00
+t= 3.20 carro0 z=  490.8 x= 1.30 giro= 158.7 graus v= 11.3 m/s fora=0.00 s acidentado=true | carro3 atras d=-3 v=23.2 x=-0.50 | bot z-rel=-142 x=0.00
+t= 3.73 carro0 z=  495.5 x= 1.30 giro= 158.7 graus v=  6.5 m/s fora=0.00 s acidentado=true | bot z-rel=-130 x=0.00
+t= 4.27 carro0 z=  497.6 x= 1.30 giro= 158.7 graus v=  1.7 m/s fora=0.00 s acidentado=true | bot z-rel=-115 x=0.00
+t= 4.77 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-100 x=0.00
+t= 5.30 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-83 x=0.00
+t= 5.83 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-67 x=0.00
+t= 6.37 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-52 x=0.00
+t= 6.90 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-39 x=0.00
+t= 7.43 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-29 x=0.21
+t= 7.97 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-24 x=0.46
+t= 8.50 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-19 x=0.53
+t= 9.03 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-14 x=0.52
+t= 9.57 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-8 x=0.50
+t=10.10 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=-2 x=0.50
+t=10.63 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=5 x=0.50
+t=11.17 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=12 x=0.50
+t=11.70 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=19 x=0.50
+t=12.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=26 x=0.50
+t=12.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=33 x=0.50
+t=13.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=40 x=0.27
+t=13.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=48 x=0.04
+t=14.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=56 x=-0.03
+t=14.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=64 x=-0.02
+t=15.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=72 x=-0.01
+t=15.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=81 x=0.00
+t=16.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=90 x=0.00
+t=16.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=99 x=0.00
+t=17.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=108 x=0.00
+t=17.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=116 x=-0.00
+t=18.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=123 x=-0.00
+t=18.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=129 x=-0.00
+t=19.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=134 x=0.15
+t=19.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=140 x=0.41
+t=20.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=145 x=0.52
+t=20.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=151 x=0.53
+t=21.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=158 x=0.51
+t=21.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=164 x=0.50
+t=22.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=171 x=0.50
+t=22.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=178 x=0.50
+t=23.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=185 x=0.50
+t=23.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=193 x=0.50
+t=24.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=200 x=0.50
+t=24.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=208 x=0.37
+t=25.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=217 x=0.10
+t=25.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=225 x=-0.02
+t=26.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=234 x=-0.03
+t=26.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=243 x=-0.01
+t=27.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=252 x=-0.00
+t=27.73 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=261 x=0.00
+t=28.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=271 x=0.00
+t=28.77 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=281 x=0.00
+t=29.30 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=291 x=-0.00
+t=29.83 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=302 x=-0.00
+t=30.37 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=313 x=-0.00
+t=30.90 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=323 x=0.00
+t=31.43 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=335 x=0.00
+t=31.97 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=346 x=0.00
+t=32.50 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=357 x=-0.00
+t=33.03 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=369 x=-0.00
+t=33.57 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=381 x=-0.00
+t=34.10 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=393 x=0.00
+t=34.63 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=405 x=0.00
+t=35.17 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=418 x=0.00
+t=35.70 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=430 x=-0.00
+t=36.23 carro0 z=  497.7 x= 1.30 giro= 158.7 graus v=  0.0 m/s fora=0.00 s acidentado=true | bot z-rel=443 x=-0.00
+RESUMO: carros que passaram o batido=1, quadros com carro sobreposto ao batido=0, menor folga do bot na linha dele=149.8 m

@@ -8,6 +8,7 @@ extends RefCounted
 ##   --shots=PASTA  salva PNGs (troca de faixa e batida lateral) na PASTA
 ##   --cam=DZ,LAT,H,LDZ,LLAT,LH camera fixa relativa ao jogador (m): posicao (z a frente, lateral, altura) e alvo
 ##   --cam=top|high|side camera presa ao caminhao do jogador: de cima (30 m), bem alta (75 m) ou alta de lado (T-132)
+##   --cam=wreck    T-183: camera normal ate a 1a batida; depois olha o carro acidentado mais recente (de tras e de lado)
 ##   --nohud        esconde o HUD e os botoes (capturas limpas; lido pela RaceScene3D)
 ##   --snap-every=S com --shots: tambem uma captura a cada S segundos (t01, t02...; placas e sinalizacao, T-130)
 ##   --burst=S      com --shots: aos S segundos, 2 capturas em quadros SEGUIDOS (roda_1, roda_2; rodas girando, T-133)
@@ -37,7 +38,7 @@ func _init(args: PackedStringArray) -> void:
 		elif a.begins_with("--shots="):
 			shot_dir = a.substr(8)
 		elif a.begins_with("--cam="):
-			if a.substr(6) in ["top", "high", "side"]:
+			if a.substr(6) in ["top", "high", "side", "wreck"]:
 				cam_mode = a.substr(6)
 			else:
 				for v in a.substr(6).split(","):
@@ -159,6 +160,8 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 
 ## Camera de depuracao (--cam=...): devolve true se assumiu a camera neste quadro.
 func camera(cam: Camera3D, path: TrackPath, z: float, x: float = 0.0, length: float = Collision.LEN) -> bool:
+	if cam_mode == "wreck":
+		return _wreck_camera(cam, path)
 	if cam_mode != "":
 		_place_camera(cam, path, z, x, length)
 		return true
@@ -180,6 +183,34 @@ func _place_camera(cam: Camera3D, path: TrackPath, z: float, x: float, length: f
 	var ahead: float = 0.0 if cam_mode == "top" else 30.0
 	cam.global_position = path.world_point(mid + ahead, x, 30.0 if cam_mode == "top" else 75.0)
 	cam.look_at(path.world_point(mid + ahead, x, 1.0), path.forward_at(mid + ahead))   # frente da pista para cima
+
+
+## --cam=wreck (T-183): de tras e do lado de dentro da pista, olhando o carro acidentado mais recente.
+func _wreck_camera(cam: Camera3D, path: TrackPath) -> bool:
+	if _sim == null or _sim.traffic == null:
+		return false
+	var best: TrafficSim.Car = null
+	for c in _sim.traffic.cars:
+		if c.wrecked and (best == null or c.crash_t < best.crash_t):
+			best = c
+	if best == null:
+		return false
+	var r: Rect2 = Wreck.footprint(best)
+	var cz: float = r.get_center().x
+	var cx: float = r.get_center().y
+	var side: float = -0.45 if cx > 0.0 else 0.45
+	cam.global_position = path.world_point(cz - 19.0, cx + side, 3.4)       # ve o carro e o triangulo (9 m atras)
+	cam.look_at(path.world_point(cz - 4.0, cx, 0.6), Vector3.UP)
+	return true
+
+
+## T-183: estado dos carros acidentados no console (antes/depois), uma linha por segundo.
+func _print_wrecks() -> void:
+	for k in _sim.traffic.cars.size():
+		var c: TrafficSim.Car = _sim.traffic.cars[k]
+		if c.wrecked:
+			print("ACIDENTADO carro %d: z=%.1f x=%.2f giro=%.0f graus v=%.1f m/s ha %.1f s (caminhao em z=%.0f)" % [k, c.z, c.x,
+				rad_to_deg(c.yaw), c.speed, c.crash_t, _sim.trucks[0].z])
 
 
 func active() -> bool:
@@ -248,6 +279,8 @@ func on_event(e: Dictionary, player: int, race_time: float) -> void:
 ## Chame todo quadro (depois de avancar a simulacao).
 func update(viewport: Viewport, player_truck: TruckSim, dt: float) -> void:
 	_clock += dt
+	if mode == "crash" and _sim != null and _sim.traffic != null and floorf(_clock) != floorf(_clock - dt):
+		_print_wrecks()
 	if shot_dir == "":
 		return
 	if _snap_every > 0.0 and _clock >= _next_snap:

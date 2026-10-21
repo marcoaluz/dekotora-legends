@@ -153,7 +153,7 @@ func test_rear_hit_throws_the_car_out_of_the_truck_line() -> void:
 	check(absf(c.yaw) > 0.2, "ficou de lado (%.2f rad)" % c.yaw)
 
 
-func test_strong_hit_hops_and_car_recovers_later() -> void:
+func test_strong_hit_hops_and_car_stays_wrecked() -> void:
 	var tr := TrafficSim.new(1, TrafficSim.Density.LIGHT)
 	_cars(tr, [[TrafficSim.Kind.CAR, 200.0, 1, 10.0]])
 	var truck := TruckSim.new()
@@ -169,9 +169,10 @@ func test_strong_hit_hops_and_car_recovers_later() -> void:
 		max_y = maxf(max_y, c.y)
 	check(max_y > 0.15, "batida de 22 m/s tira o carro do chao (%.2f m)" % max_y)
 	check(not tr.is_thrown(c), "o arremesso acaba")
-	check_near(c.yaw, 0.0, 0.001, "o motorista endireita o carro")
-	check(c.speed > 8.0, "e volta a andar (%.1f m/s)" % c.speed)
-	check(absf(c.x) <= 0.55, "numa faixa de rolagem")
+	# T-183: antes o motorista endireitava e voltava a andar; agora o carro fica acidentado, parado e torto
+	check(c.wrecked, "virou carro acidentado")
+	check_eq(c.speed, 0.0, "parado")
+	check(absf(c.yaw) > 0.05, "nao endireita (%.2f rad)" % c.yaw)
 
 
 func test_light_touch_only_nudges_and_bus_is_not_thrown() -> void:
