@@ -9,6 +9,12 @@ var preview: Callable          # func(changes: Dictionary) -> Dictionary (com ca
 var flash: Callable            # func(text: String) -> void
 var live_decals: Callable      # func(decals: Array) -> void: mostra os adesivos no caminhao sem reconstruir a tela (sliders)
 var focus_view: Callable       # func(view: String) -> void: enquadra o caminhao no lugar do adesivo
+## Previa (T-171, GaragePreviewUi): tocar num cartao de peca nao instalada mostra a peca no caminhao.
+var on_preview: Callable        # func(part_id: String) -> void
+var on_preview_accept: Callable # func() -> void: Enter/A no cartao leva o foco ao botao da faixa PREVIA
+var on_preview_paint: Callable  # func(hex: String) -> void: cor travada por Fama (so ver)
+var previewing: String = ""     # peca ou cor (hex) em previa agora
+var preview_cards: Dictionary = {}   # id da peca -> cartao (para marcar a previa sem redesenhar a lista)
 var _decals: GarageDecals
 
 
@@ -54,6 +60,12 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 	var v: VBoxContainer = cv[1]
 	var title: String = Tr.t("part." + String(d.id)) + ("  ✔" if installed else "")
 	v.add_child(wl(title, 18, UiTheme.GOLD if installed else UiTheme.TEXT))
+	if not installed and on_preview.is_valid():         # T-171: tocar no cartao mostra a peca no caminhao
+		var pid: String = String(d.id)
+		v.add_child(GaragePreviewUi.preview_tag())
+		GaragePreviewUi.make_tappable(cv[0], func() -> void: on_preview.call(pid), on_preview_accept)
+		preview_cards[pid] = cv[0]
+		GaragePreviewUi.mark_card(cv[0], previewing == pid, false)
 	var dur: String = "—" if d.durability <= 0.0 else str(int(d.durability))
 	v.add_child(wl("%s %d kg · %s %s · %s +%d" % [Tr.t("garage.weight"), int(d.weight_kg), Tr.t("garage.durability"), dur, Tr.t("garage.destaque"), d.fame], 14, UiTheme.TEXT_DIM))
 	v.add_child(wl("%s: %s" % [Tr.t("garage.protects"), _zones_text(d)], 13, UiTheme.TEXT_DIM))
@@ -97,7 +109,10 @@ func _zones_text(d: PartDef) -> String:
 
 
 func build_slot_detail(box: VBoxContainer, slot: String) -> void:
+	preview_cards.clear()
 	box.add_child(UiKit.heading(Tr.t("slot." + slot).to_upper(), 22, UiTheme.PINK))
+	if on_preview.is_valid():
+		box.add_child(wl(Tr.t("garage.preview_tap_hint"), 13, GaragePreviewUi.PREVIEW_COLOR))
 	var inst: String = gs.installed_id(slot)
 	var base: Dictionary = preview.call({})
 	for d in gs.parts_for_slot(slot):
@@ -133,7 +148,7 @@ func build_deco_header(box: VBoxContainer) -> void:
 	for p in StyleCatalog.PAINTS:
 		var hex: String = String(p["hex"])
 		var locked: bool = gs.fame() < int(p["fame_required"])
-		var sel: bool = hex.to_lower() == cur_hex
+		var sel: bool = hex.to_lower() == cur_hex or hex.to_lower() == previewing
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(62, 52)
 		b.text = "+%d" % int(p["points"]) if not locked else "F%d" % int(p["fame_required"])
@@ -145,8 +160,12 @@ func build_deco_header(box: VBoxContainer) -> void:
 		b.add_theme_stylebox_override("normal", UiTheme.box(col, UiTheme.GOLD if sel else Color(1, 1, 1, 0.25), 3 if sel else 1, 8, 4))
 		b.add_theme_stylebox_override("hover", UiTheme.box(col.lightened(0.15), UiTheme.PINK, 2, 8, 4))
 		b.add_theme_color_override("font_color", Color.BLACK if col.get_luminance() > 0.5 else Color.WHITE)
-		b.disabled = locked
+		b.disabled = locked and not on_preview_paint.is_valid()   # travada: so ver no caminhao (T-171)
 		b.pressed.connect(func() -> void:
+			if locked:
+				AudioBus.play_ui("ui_select")
+				on_preview_paint.call(hex)
+				return
 			gs.profile["paint"] = hex
 			gs.save_profile()
 			AudioBus.play_ui("ui_select")
