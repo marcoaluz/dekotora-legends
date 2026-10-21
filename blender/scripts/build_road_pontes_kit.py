@@ -526,6 +526,150 @@ def build_pole(src: str, report: list, pole_src: str = "") -> list:
     return [("power_pole", [ob]), ("power_pole_tr", [ob2])]
 
 
+# ---------------------------------------------------------------- viaduto que cruza por cima (T-164, Ponte A)
+OV_CUT_X = 187.0        # crista da Ponte A: eixo em X, pista quase plana
+OV_MOD = 10.0           # comprimento de um modulo (o jogo enfileira modulos ao longo do viaduto)
+ASPHALT = (0.2, 0.2, 0.22)
+OV_CONCRETE = (0.7, 0.7, 0.68)
+
+
+def _section_loops(o, x: float) -> list:
+    """Contornos (lacos fechados, pontos (y, z)) da secao da malha `o` no plano X = x."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bm.transform(o.matrix_world)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.003)   # as vigas vem em faces soltas
+    res = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], dist=1e-4,
+                                 plane_co=(x, 0, 0), plane_no=(1, 0, 0))
+    edges = [e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMEdge)]
+    adj: dict = {}
+    for e in edges:
+        a, b = e.verts
+        adj.setdefault(a, []).append(b)
+        adj.setdefault(b, []).append(a)
+    loops, used = [], set()
+    for start in adj:
+        if start in used:
+            continue
+        loop, prev, cur = [start], None, start
+        used.add(start)
+        while True:
+            nxt = [n for n in adj[cur] if n is not prev and n not in used]
+            if not nxt:
+                break
+            prev, cur = cur, nxt[0]
+            used.add(cur)
+            loop.append(cur)
+        if len(loop) >= 3:
+            loops.append([(v.co.y, v.co.z) for v in loop])
+    bm.free()
+    return loops
+
+
+def _simplify(loop: list, tol: float = 0.02) -> list:
+    """Tira pontos quase em linha reta (e repetidos)."""
+    pts = []
+    for p in loop:
+        if not pts or math.hypot(p[0] - pts[-1][0], p[1] - pts[-1][1]) > 0.005:
+            pts.append(p)
+    changed = True
+    while changed and len(pts) > 4:
+        changed = False
+        for i in range(len(pts)):
+            a, b, c = pts[i - 1], pts[i], pts[(i + 1) % len(pts)]
+            ab = (b[0] - a[0], b[1] - a[1])
+            ac = (c[0] - a[0], c[1] - a[1])
+            l = math.hypot(*ac)
+            if l < 1e-6 or abs(ab[0] * ac[1] - ab[1] * ac[0]) / l < tol:
+                pts.pop(i)
+                changed = True
+                break
+    return pts
+
+
+def _extrude(bm, loop: list, length: float, col_fn) -> None:
+    """Paredes de um contorno (y, z) extrudado de X = 0 a X = length (pontas abertas: os modulos se encostam)."""
+    lay = colored(bm)
+    a = [bm.verts.new((0.0, y, z)) for y, z in loop]
+    b = [bm.verts.new((length, y, z)) for y, z in loop]
+    n = len(loop)
+    for i in range(n):
+        j = (i + 1) % n
+        f = bm.faces.new((a[i], a[j], b[j], b[i]))
+        f.normal_update()
+        col = col_fn(loop[i], loop[j])
+        for lp in f.loops:
+            lp[lay] = (col[0], col[1], col[2], 1.0)
+
+
+def build_overpass(src: str, report: list) -> list:
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=os.path.join(src, "Ponte", "bridge_model.FBX"))
+    bpy.context.view_layer.update()
+    slab = _section_loops(bpy.data.objects["Layer:3D_Bridge_Matcau"], OV_CUT_X)
+    beams = _section_loops(bpy.data.objects["Layer:3D_Bridge_Beam"], OV_CUT_X)
+    rails = _section_loops(bpy.data.objects["Layer:3D_Bridge_Lancan"], OV_CUT_X)
+    for ob in [o for o in bpy.data.objects if o not in before]:   # so o que este passo importou
+        bpy.data.objects.remove(ob, do_unlink=True)
+    slab = max(slab, key=len)
+    ys = [p[0] for p in slab]
+    yc = (min(ys) + max(ys)) * 0.5
+    top = max(p[1] for p in slab)
+    shift = lambda loop: [(y - yc, z - top) for y, z in loop]  # noqa: E731  centro da pista em y = 0, topo em z = 0
+    slab = _simplify(shift(slab), 0.03)
+    beams = [_simplify(shift(b), 0.01) for b in beams if len(b) >= 4]
+    beams = [b for b in beams if len(b) >= 4]
+    rails = [_simplify(shift(r), 0.005) for r in rails if len(r) >= 3]
+    half = (max(p[0] for p in slab) - min(p[0] for p in slab)) * 0.5
+
+    def slab_col(p, q):
+        mid_z = (p[1] + q[1]) * 0.5
+        flat = abs(p[1] - q[1]) < 0.12 * max(abs(p[0] - q[0]), 1e-3)
+        return ASPHALT if flat and mid_z > -0.35 and abs((p[0] + q[0]) * 0.5) < half - 0.5 else OV_CONCRETE
+
+    full = bmesh.new()
+    _extrude(full, slab, OV_MOD, slab_col)
+    for b in beams:
+        _extrude(full, b, OV_MOD, lambda p, q: OV_CONCRETE)
+    for r in rails:
+        _extrude(full, r, OV_MOD, lambda p, q: STEEL)
+    for side in (-1, 1):                                   # postes do corrimao (no original, 578 postinhos de 568 tri)
+        rs = [r for r in rails if (sum(p[0] for p in r) / len(r)) * side > 0]
+        if not rs:
+            continue
+        ry = sum(p[0] for r in rs for p in r) / sum(len(r) for r in rs)
+        rtop = max(p[1] for r in rs for p in r)
+        curb = max(p[1] for p in slab if abs(p[0] - ry) < 0.6)
+        for k in range(4):
+            x = (k + 0.5) * OV_MOD / 4
+            _box_lohi(full, Vector((x - 0.05, ry - 0.05, curb)), Vector((x + 0.05, ry + 0.05, rtop)), STEEL)
+    bmesh.ops.triangulate(full, faces=full.faces[:])
+    bmesh.ops.recalc_face_normals(full, faces=full.faces[:])
+    # versao leve (pontas ao longe): laje + 2 vigas-caixa + 1 corrimao em cada lado
+    lite = bmesh.new()
+    _extrude(lite, slab, OV_MOD, slab_col)
+    zb = min(p[1] for b in beams for p in b) if beams else -2.0
+    zs = min(p[1] for p in slab)
+    for yy in (-half * 0.45, half * 0.45):
+        box = [(yy - 1.2, zs), (yy + 1.2, zs), (yy + 0.9, zb), (yy - 0.9, zb)]
+        _extrude(lite, box, OV_MOD, lambda p, q: OV_CONCRETE)
+    rz = max(p[1] for r in rails for p in r) if rails else 1.0
+    for s in (-1, 1):
+        y0 = s * (half - 0.15)
+        box = [(y0 - 0.08, rz - 0.1), (y0 + 0.08, rz - 0.1), (y0 + 0.08, rz), (y0 - 0.08, rz)]
+        _extrude(lite, box, OV_MOD, lambda p, q: STEEL)
+    bmesh.ops.triangulate(lite, faces=lite.faces[:])
+    bmesh.ops.recalc_face_normals(lite, faces=lite.faces[:])
+    o1 = RK.mesh_obj("overpass_deck", full, ["pole_concrete"])
+    o2 = RK.mesh_obj("overpass_deck_lite", lite, ["pole_concrete"])
+    info = {"width": round(half * 2, 3), "slab_bottom": round(zs, 3), "beam_bottom": round(zb, 3),
+            "rail_top": round(rz, 3), "beams": len(beams), "rails": len(rails), "slab_pts": len(slab)}
+    print("OVERPASS", json.dumps(info))
+    report.append(("overpass_deck", "Matcau+Beam+Lancan (secao x=187)", RK.tri_count(o1)))
+    report.append(("overpass_deck_lite", "(laje + 2 vigas + corrimao)", RK.tri_count(o2)))
+    return [("overpass_deck", [o1]), ("overpass_deck_lite", [o2])]
+
+
 def export(objs: list, name: str) -> str:
     """Como RK.export, mas leva as cores por vertice (COLOR_0) do poste."""
     path = os.path.join(OUT_GLB, name + ".glb")
@@ -595,6 +739,7 @@ def main() -> None:
     items = build_pier(a["src"], report)
     items += build_guardrail(a["src"], report)
     items += build_pole(a["src"], report, a["pole_src"])
+    items += build_overpass(a["src"], report)          # T-164: modulo do viaduto que cruza por cima
     for name, objs in items:
         export(objs, name)
     for r in report:

@@ -16,6 +16,7 @@ var path: TrackPath
 var tod: TimeOfDay
 var bridges: Array[Vector2] = []  # T-153 (RouteDef.bridges): nada de arvore/pedra em cima do mar
 var pole_runs: Array = []         # T-163 (PowerLineLayout.corridors): arvores saem do caminho dos fios
+var overpass_out: Array = []      # T-164 (OverpassLayout.keep_out): nada de poste/arvore/placa embaixo do viaduto
 const WIRE_LANE: Vector2 = Vector2(14.5, 20.0)   # T-163: faixa lateral (m) dos fios; a arvore vai para fora dela
 var _pool_mesh: PlaneMesh
 var _lamp_off: ArrayMesh
@@ -44,6 +45,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 				xu = signf(xu) * ((p.x if xu < 0.0 else p.y) + 0.35) / Track.ROAD_HALF_WIDTH_M
 		var outside: bool = absf(xu) * Track.ROAD_HALF_WIDTH_M > RoadMesh.BARRIER_IN
 		var base: Vector3 = path.world_point(z, xu, -deck if outside else 0.0)
+		if not overpass_out.is_empty() and k != "guardrail" and OverpassLayout.blocked(overpass_out, base, 1.5):
+			continue
 		var yaw: float = path.yaw_at(z)
 		var model: String = k
 		var b := Basis(Vector3.UP, yaw)

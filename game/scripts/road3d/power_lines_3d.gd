@@ -16,6 +16,7 @@ const WIRES: Array[Vector3] = [Vector3(1.621, 10.583, -0.183), Vector3(-0.004, 1
 	Vector3(-1.631, 10.583, -0.194), Vector3(0.45, 7.45, 0.2)]
 
 var poles: Array = []                    # PowerLineLayout.poles (depois do build)
+var keep_out: Array = []                 # T-164: embaixo do viaduto (OverpassLayout.keep_out) nao ha poste
 var counts: Dictionary = {}
 var tris: int = 0
 
@@ -24,6 +25,15 @@ func build(path: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay, 
 	if not PontesKit.poles_enabled():
 		return
 	poles = PowerLineLayout.poles(route_id, kind, path.track, tunnels)
+	if not keep_out.is_empty():                  # T-164: tira os postes de baixo do viaduto (e corta os fios ali)
+		var kept: Array = []
+		var bump: int = 0
+		for p in poles:
+			if OverpassLayout.blocked(keep_out, transform_of(path, p).origin, 2.0):
+				bump += 1
+				continue
+			kept.append([p[0], p[1], p[2], int(p[3]) + bump * 1000])
+		poles = kept
 	if poles.is_empty():
 		return
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
