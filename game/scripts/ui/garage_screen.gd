@@ -18,6 +18,8 @@ var gs: Node
 var shop: GarageShop
 var _tab: String = "model"
 var _slot: String = ""
+var _deco: String = "parts"                 # secao da aba DECORACAO (GarageDecoNav.SECTIONS), T-177
+var _deco_bar: HBoxContainer                # barra PECAS / PINTURA / LUZES / ADESIVOS, fora da rolagem
 var _left: VBoxContainer
 var _right: VBoxContainer
 var _chips: HBoxContainer
@@ -104,6 +106,7 @@ func _ready() -> void:
 	var dbg: Dictionary = GarageDebug.apply(self, gs, stage, _ui_layer)
 	_tab = String(dbg.get("tab", _tab))
 	_slot = String(dbg.get("slot", _slot))
+	_deco = String(dbg.get("deco", _deco))
 	gs.profile_changed.connect(_refresh)               # depois da depuracao: montar o caminhao demo nao conta como "roda nova"
 	_refresh()
 
@@ -134,6 +137,10 @@ func _column(parent: Control, with_tabs: bool) -> VBoxContainer:
 			tabs.add_child(b)
 			_tab_buttons[id] = b
 		v.add_child(tabs)
+		_deco_bar = HBoxContainer.new()               # secoes da DECORACAO: sempre a mao, nao rolam junto (T-177)
+		_deco_bar.add_theme_constant_override("separation", 4)
+		_deco_bar.visible = false
+		v.add_child(_deco_bar)
 	var sc := TouchScroll.new()               # rola arrastando sobre os cartoes (T-165)
 	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -204,9 +211,29 @@ func _update_spin_button() -> void:
 func _set_tab(t: String) -> void:
 	_tab = t
 	_slot = ""
+	_deco = "parts"
 	preview.clear()
 	stage.focus_default()
 	_refresh()
+	_scroll_top(_left)
+
+
+## Troca a secao da DECORACAO: fecha o encaixe aberto e volta a lista ao topo.
+func _set_deco(id: String) -> void:
+	if id == _deco:
+		return
+	_deco = id
+	_slot = ""
+	preview.clear()
+	stage.focus_default()
+	_refresh()
+	_scroll_top(_left)
+
+
+func _scroll_top(box: Control) -> void:
+	var sc: ScrollContainer = box.get_parent() as ScrollContainer
+	if sc != null:
+		sc.scroll_vertical = 0
 
 
 func _clear(c: Control) -> void:
@@ -235,19 +262,30 @@ func _refresh() -> void:
 		var b: Button = _tab_buttons[k]
 		b.add_theme_color_override("font_color", UiTheme.PINK if on else UiTheme.TEXT)
 		b.add_theme_color_override("icon_normal_color", UiTheme.PINK if on else Color(1, 1, 1, 0.8))
+	_deco_bar.visible = _tab == "parts"
+	if _tab == "parts":
+		if not GarageDecoNav.is_section(_deco):
+			_deco = "parts"
+		GarageDecoNav.build_bar(_deco_bar, _deco, _set_deco)
 	match _tab:
 		"model":
 			_build_model()
 		"parts":
-			shop.build_deco_header(_left)
-			shop.build_decals(_left)
-			_left.add_child(UiKit.heading(Tr.t("garage.parts").to_upper(), 18, UiTheme.PINK))
-			_build_slots()
+			match _deco:
+				"paint":
+					shop.build_paint(_left)
+				"lights":
+					shop.build_lights(_left)
+				"decals":
+					shop.build_decals(_left)
+				_:                                     # PECAS: encaixes primeiro (T-177), resumo no fim
+					GarageDecoNav.build_slots(_left, gs, _slot, _pick_slot)
+					shop.build_deco_summary(_left)
 		"mech":
 			shop.build_mech(_left)
 		"repair":
 			shop.build_repair(_left)
-	if _tab == "parts" and _slot != "":
+	if _tab == "parts" and _deco == "parts" and _slot != "":
 		shop.build_slot_detail(_right, _slot)
 	else:
 		GarageInfoPanel.build(_right, gs, _preview({}), func() -> void: _set_tab("parts"))
@@ -387,28 +425,16 @@ func _choice_card(field: String, kind: String, default_kind: String, apply: Call
 	_left.add_child(b)
 
 
-# ---------------------------------------------------------------- aba PECAS
+# ---------------------------------------------------------------- aba DECORACAO > PECAS (botoes: GarageDecoNav)
 
-func _build_slots() -> void:
-	for slot in gs.slots():
-		var inst: String = gs.installed_id(String(slot))
-		var sub: String = Tr.t("part." + inst) if inst != "" else "— " + Tr.t("garage.empty")
-		var sel: bool = String(slot) == _slot
-		var b := Button.new()
-		b.text = "%s\n%s" % [Tr.t("slot." + String(slot)), sub]
-		b.custom_minimum_size = Vector2(0, 50)
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.add_theme_font_size_override("font_size", 15)
-		b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.14) if sel else Color(1, 1, 1, 0.04), UiTheme.PINK if sel else Color(1, 1, 1, 0.08), 1, 8, 12))
-		b.add_theme_color_override("font_color", UiTheme.GOLD if inst != "" else UiTheme.TEXT)
-		b.pressed.connect(func() -> void:
-			AudioBus.play_ui("ui_select")
-			preview.clear()                                          # trocou de encaixe: volta ao equipado
-			_slot = "" if _slot == String(slot) else String(slot)   # tocar de novo fecha e volta a ficha
-			if _slot != "":
-				stage.focus_slot(_slot)
-			else:
-				stage.focus_default()
-			_refresh())
-		_left.add_child(b)
+## Toque num encaixe: abre as pecas dele no painel direito; tocar de novo fecha e volta a ficha.
+func _pick_slot(slot: String) -> void:
+	AudioBus.play_ui("ui_select")
+	preview.clear()                                          # trocou de encaixe: volta ao equipado
+	_slot = "" if _slot == slot else slot
+	if _slot != "":
+		stage.focus_slot(_slot)
+	else:
+		stage.focus_default()
+	_refresh()
+	_scroll_top(_right)                                      # a lista de pecas comeca do topo

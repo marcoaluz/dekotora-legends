@@ -4,7 +4,8 @@ extends RefCounted
 ## "PREVIA" no topo do painel direito com COMPRAR E EQUIPAR / EQUIPAR / VOLTAR AO ATUAL e a etiqueta no alto.
 ##
 ## Toque e mouse: o toque do Android chega como clique de mouse emulado, entao so o clique conta. Soltar perto
-## de onde apertou (< TAP_SLOP) = toque; mais longe = o dedo estava rolando a lista (TouchScroll) e nada acontece.
+## de onde apertou (< TAP_SLOP) e sem a lista ter rolado (TouchScroll.scrolling()) = toque; senao o dedo estava
+## rolando a lista e nada acontece.
 ## Teclado/controle: o cartao recebe foco (setas/Tab); foco no cartao = previa; Enter/A leva o foco ao botao
 ## principal da faixa.
 
@@ -20,24 +21,32 @@ static func make_tappable(card: Control, on_tap: Callable, on_accept: Callable) 
 	card.mouse_filter = Control.MOUSE_FILTER_STOP              # o TouchScroll troca para PASS (rolagem continua)
 	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	card.add_theme_stylebox_override("focus", UiTheme.box(Color(0, 0, 0, 0), PREVIEW_COLOR, 2, 10, 10))
-	var st: Dictionary = {"down": false, "pos": Vector2.ZERO}
+	var st: Dictionary = {"down": false, "pos": Vector2.ZERO, "ptr": false}
 	card.gui_input.connect(func(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and (ev as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
 			var mb: InputEventMouseButton = ev
+			st["ptr"] = mb.pressed
 			if mb.pressed:
 				st["down"] = not _on_button(card, mb.global_position)
 				st["pos"] = mb.global_position
 			elif bool(st["down"]):
 				st["down"] = false
-				if mb.global_position.distance_to(st["pos"]) <= TAP_SLOP:
+				var list: TouchScroll = TouchScroll.of(card)       # T-177: o dedo rolou a lista = nao e toque
+				if mb.global_position.distance_to(st["pos"]) <= TAP_SLOP and (list == null or not list.scrolling()):
 					on_tap.call()
 		elif ev.is_action_pressed("ui_accept"):
 			card.accept_event()
 			on_tap.call()
 			on_accept.call())
 	card.focus_entered.connect(func() -> void:
-		if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):  # clique/toque: decide ao soltar (pode ser rolagem)
-			on_tap.call())
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):      # clique/toque: decide ao soltar (pode ser rolagem)
+			return
+		# T-177: o foco chega antes do clique no cartao; decide no fim do quadro, quando ja se sabe se foi clique
+		var cid: int = card.get_instance_id()                   # id, nao o no: o cartao pode sumir antes
+		(func() -> void:
+			var c: Control = instance_from_id(cid) as Control
+			if c != null and c.is_inside_tree() and c.has_focus() and not bool(st["ptr"]):
+				on_tap.call()).call_deferred())
 
 
 ## true se `pos` (tela) cai num botao dentro de `card`.

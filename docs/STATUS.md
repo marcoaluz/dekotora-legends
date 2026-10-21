@@ -168,6 +168,9 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 - **T-165 (2026-10-20): listas do menu/garagem rolam arrastando o dedo sobre os cartões (`TouchScroll`).** Falta o Marco confirmar no
   celular com **APK novo** (garagem > MODELO: arrastar sobre um cartão rola sem selecionar; toque rápido seleciona; repetir em Mercado e
   Opções). Se a rolagem demorar ou toques virarem rolagem, ajustar `DEADZONE` em `game/scripts/ui/components/touch_scroll.gd`.
+- **T-177 (2026-10-21): rolagem refeita (PC e celular) e DECORAÇÃO com seções.** A lista não segue mais o mouse sem botão; roda do mouse
+  rola; arrastar com botão/dedo rola até o fim; toque parado seleciona. DECORAÇÃO: barra fixa PEÇAS / PINTURA / LUZES / ADESIVOS e encaixes
+  em 2 colunas por lugar do caminhão. Falta o Marco confirmar no PC e no celular (APK novo).
 - **T-170 (som da seta):** jogar e tocar em < ou > (teclado A/D ou setas): deve ouvir o clique da alavanca e o
   tique-taque enquanto a seta pisca (agora mais devagar, ~1,5 vez por segundo, e acende na hora do toque). Ouvir
   `game/assets/audio/sfx/truck/turn_signal_tick.mp3` e `turn_signal_switch.mp3` (regerar: `python tools/gen_audio.py

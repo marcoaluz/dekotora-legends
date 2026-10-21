@@ -125,8 +125,8 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 
 # ---------------------------------------------------------------- decoracao (cabecalho e pintura)
 
-## Topo da aba DECORACAO: destaque total, peso e protecao por zona, e a escolha de pintura (cada cor soma destaque).
-func build_deco_header(box: VBoxContainer) -> void:
+## Resumo da aba DECORACAO: destaque total, peso e protecao por zona (fim da secao PECAS, T-177).
+func build_deco_summary(box: VBoxContainer) -> void:
 	var pv: Dictionary = preview.call({})
 	var cv: Array = card(UiTheme.PINK)
 	var v: VBoxContainer = cv[1]
@@ -138,6 +138,10 @@ func build_deco_header(box: VBoxContainer) -> void:
 		parts.append("%s %d" % [Tr.t("zone." + z), roundi(float(prot[z][0]))])
 	v.add_child(wl("%s: %s" % [Tr.t("garage.protection"), " · ".join(parts)], 13, UiTheme.CYAN))
 	box.add_child(cv[0])
+
+
+## Secao PINTURA da aba DECORACAO (cada cor soma destaque; as travadas por Fama so dao para ver).
+func build_paint(box: VBoxContainer) -> void:
 	box.add_child(UiKit.heading(Tr.t("garage.paint").to_upper(), 18, UiTheme.PINK))
 	var grid := GridContainer.new()
 	grid.columns = 4
@@ -172,6 +176,10 @@ func build_deco_header(box: VBoxContainer) -> void:
 			gs.profile_changed.emit())
 		grid.add_child(b)
 	box.add_child(wl(Tr.t("garage.paint_hint"), 12, UiTheme.TEXT_DIM))
+
+
+## Secao LUZES da aba DECORACAO (padrao de pisca das luzes do caminhao).
+func build_lights(box: VBoxContainer) -> void:
 	box.add_child(UiKit.heading(Tr.t("garage.lights").to_upper(), 18, UiTheme.PINK))
 	var cur_pat: String = String(gs.profile.get("light_pattern", "steady"))
 	var row := GridContainer.new()

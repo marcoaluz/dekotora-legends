@@ -414,3 +414,19 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 - **Pendente do Marco**: olhar `docs/capturas_t172/` e dizer se o nível de acabamento está bom e se seguimos para mais
   peças (frente: para-choque/viseira/grade; traseira: andon traseiro; laterais: painéis "uroko" no baú).
 
+## 2026-10-21 — T-177: rolagem das listas refeita (PC e celular) e DECORAÇÃO com seções
+
+- **Causa** (relato do Marco: "no PC a lista segue a seta do mouse e não o scroll"; "no celular não chego nas peças"): o
+  arraste nativo do `ScrollContainer` ficava preso em "arrastando" quando o botão clicado redesenhava a lista (a garagem
+  redesenha em todo clique; o "soltar" sumia junto com o botão). Depois disso a lista seguia o mouse sem botão e desfazia a
+  roda. No celular, os 28 encaixes de PEÇAS ficavam no fim de uma lista de ~2.700 unidades, depois de pintura, luzes e adesivos.
+- **Rolagem** (`TouchScroll`, vale para garagem, Mercado, Opções e lobby): o arraste agora é do próprio `TouchScroll`.
+  Só rola com botão esquerdo/dedo apertado; roda do mouse rola 1/8 da altura visível por clique e não mexe mais na câmera
+  da garagem quando o mouse está sobre a lista; arrastar com o mouse também rola no PC; soltar com o dedo correndo dá
+  embalo; tocar durante o embalo só para a lista. Toque parado (até 10 unidades) continua selecionando.
+- **Prévia (T-171)**: arrastar sobre um cartão de peça não abre mais a prévia (antes abria se o dedo andasse até 12 unidades).
+- **DECORAÇÃO** (mudança de tela, sem mudar regras do jogo): barra fixa **PEÇAS / PINTURA / LUZES / ADESIVOS** logo abaixo
+  das abas, fora da rolagem; abre em PEÇAS. Os encaixes vêm primeiro, em 2 colunas, agrupados por lugar (FRENTE, TETO,
+  LATERAIS, TRASEIRA), com ✔ e cor dourada quando há peça instalada (o nome da peça instalada aparece no painel da direita).
+  O resumo (destaque, massa, proteção) foi para o fim da seção PEÇAS. Decisão do Claude; o Marco confirma no aparelho.
+
