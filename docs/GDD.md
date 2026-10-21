@@ -116,7 +116,7 @@ Regras da sala: rota, dano (Real / Só na corrida), bots, tráfego, dia/noite.
 - Perfil único no servidor para celular e PC.
 - Atributos de peça: peso, durabilidade, Fama, zona, preço.
 - Slots decorativos: para-choque frontal, viseira, luzes de teto, saias laterais, andon, para-choque traseiro, mural, calotas, cor.
-- Peças de motor: motor (6 cil. padrão, 6 cil. preparado, V8), turbo (sem, simples, duplo), escape (padrão, direto),
+- Peças de motor: motor (6 cil. padrão, 6 cil. preparado, V8), turbo (sem, simples, duplo), escape (padrão, direto, chaminés verticais, cromado cortado — cada um com som próprio do motor, T-173),
   freio-motor, pneus, câmbio (automático no MVP).
 - Dano: inteira → amassada → quebrada. Reparo = preço × % de dano × fator.
 - Valores: `BALANCEAMENTO.md`.

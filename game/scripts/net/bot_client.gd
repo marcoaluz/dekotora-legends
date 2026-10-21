@@ -27,6 +27,8 @@ var _err_sum: float = 0.0
 var _err_n: int = 0
 var _err_big: int = 0                   # snapshots com erro acima de 1 m
 var _start_predicted_msec: int = 0      # T-156: hora da largada pelo relogio da abertura (setup + ping)
+var _horn: String = ""                  # T-173: --horn=ID
+var _exhaust: String = ""               # T-173: --exhaust=ID
 
 
 func _ready() -> void:
@@ -61,6 +63,10 @@ func _ready() -> void:
 			_max_runtime = float(a.substr(14))
 		elif a.begins_with("--body="):
 			_body = a.substr(7)
+		elif a.begins_with("--horn="):
+			_horn = a.substr(7)
+		elif a.begins_with("--exhaust="):
+			_exhaust = a.substr(10)
 	# perfil proprio e isolado para este bot (nao mexe no perfil real do Marco)
 	gs.save_path = "user://botclient_%s.json" % code
 	gs.new_profile()
@@ -104,7 +110,15 @@ func _ready() -> void:
 
 func _on_welcome(profile: Dictionary) -> void:
 	print("[botclient %s] conectado; dinheiro %d, codigo %s" % [_name, int(profile["money"]), profile["player_code"]])
-	var loadout: Dictionary = get_node("/root/GameState").truck_descriptor()
+	var gs: Node = get_node("/root/GameState")
+	# T-173: buzina e escapamento como um jogador faria na garagem online (acoes repassadas ao servidor, que valida)
+	if _horn != "":
+		gs.set_horn(_horn)
+	if _exhaust != "":
+		if not gs.owns_mech(_exhaust):
+			gs.buy_mech(_exhaust)
+		gs.install_mech(_exhaust)
+	var loadout: Dictionary = gs.truck_descriptor()
 	if host_mode:
 		var rules: Dictionary = Protocol.default_rules()
 		rules["route"] = route
@@ -145,6 +159,10 @@ func _on_setup(setup: Dictionary, my_truck: int) -> void:
 	_start_predicted_msec = Time.get_ticks_msec() + int(left0 * 1000.0)
 	print("[botclient %s] abertura %s, contagem total %.1f s, largada prevista em %d ms" % [_name, String(setup.get("intro", "?")), total, int(left0 * 1000.0)])
 	print("[botclient %s] corrida montada: %d caminhoes, meu indice %d, predicao %s" % [_name, sync.sim.trucks.size(), my_truck, sync.predict])
+	for entry in setup["grid"]:                 # T-173: o som que cada caminhao vai tocar (descritor da rede)
+		var lo: Dictionary = entry["loadout"]
+		print("[botclient %s] SOM: caminhao %d bot=%s buzina=%s escape=%s motor=%s" % [_name, int(entry["idx"]), str(bool(entry["bot"])),
+			String(lo.get("horn", "?")), String(lo.get("exhaust", "?")), String(EngineSounds.from_descriptor(lo)["set"])])
 
 
 func _on_events(events: Array) -> void:

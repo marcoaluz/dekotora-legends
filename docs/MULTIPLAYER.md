@@ -55,6 +55,12 @@ lobby; hoje a sala acaba no fim da corrida). **Grid** (`StartGrid`, igual no ser
 30 m do começo da pista. Medido no `tools/net_test.sh` (linha `LARGADA:`): o servidor larga X ms depois da hora que o
 cliente previu (ver STATUS, T-156).
 
+**Protocolo versão 7** (T-173): o descritor do caminhão (`loadout` de cada entrada do grid) leva `horn` (buzina
+escolhida na garagem, `HornCatalog.IDS`; o servidor monta pelo perfil guardado e aceita a do cliente, como a cabine,
+porque é só som). Os clientes tocam o motor dos outros pelo `engine`/`turbo`/`exhaust` do descritor
+(`EngineSounds.from_descriptor`; antes todos ouviam o 6 cilindros padrão). `tools/net_test.sh` confere (linha `SOM_REDE:`;
+`HORN=` e `EXH=` trocam o que o Beto usa).
+
 **Cliente → servidor (30 por segundo)**: `tick`, `steer` (−1..1), `throttle` (0..1), `brake` (0..1), `passing` (bool),
 `horn` (bool, buzina segurada, T-144). Cerca de 13 bytes.
 

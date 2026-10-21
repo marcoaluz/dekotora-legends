@@ -61,6 +61,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [P50] Preparar loops e importar áudio
 - [x] [P51] Som do motor em camadas
 - [x] [P52] Efeitos e música no jogo
+- [x] [T-173] Variedade de som: 3 escapamentos com som próprio do motor (reto rouco, chaminés graves, cromado com estalos), turbina com assobio e "pssh" de cada perfil, 3 buzinas novas escolhidas na aba MECÂNICA (botão OUVIR), rivais com som sorteado, online com buzina/escape do descritor (protocolo 7) (concluída em 2026-10-21, `tests/test_engine_sounds.gd`; Marco precisa OUVIR)
 
 ## Fase 6 — Multiplayer
 - [x] [P60] Servidor headless + salas por código (2 janelas no mesmo PC)

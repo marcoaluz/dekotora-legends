@@ -140,6 +140,8 @@ func _sanitize_loadout(player_code: String, requested: Dictionary) -> Dictionary
 		desc["paint"] = String(requested["paint"])
 	if requested.has("cab"):                       # cabine e so visual: aceita a do cliente (id antigo vira o novo)
 		desc["cab"] = CabCatalog.normalize(requested["cab"])
+	if requested.has("horn") and HornCatalog.is_valid(String(requested["horn"])):   # buzina e so som (T-173)
+		desc["horn"] = String(requested["horn"])
 	return desc
 
 

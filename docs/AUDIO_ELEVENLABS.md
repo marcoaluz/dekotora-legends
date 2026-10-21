@@ -51,6 +51,36 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `engine_damaged_rattle.wav` | 3 s | Damaged diesel engine knocking and rattling, metallic clatter and misfires, steady, seamless loop |
 | `engine_start.wav` | 3 s | Heavy diesel truck engine cranking and starting up, settling into idle |
 
+### Perfis de escapamento (T-173)
+
+Cada escapamento (exceto o padrão) tem o **próprio som do motor** em 3 camadas (marcha lenta, média e alta carga) e, com turbina,
+o **próprio assobio** (loop) e o **próprio "pssh"**. O escape padrão continua usando as camadas do motor (`i6_*`/`v8_*`).
+Mapa no código: `ExhaustDef.sound_profile` (`game/data/engines/exh_*.tres`) e `EngineSounds` (`game/scripts/audio/engine_sounds.gd`).
+
+| Arquivo | Duração | Prompt |
+| --- | --- | --- |
+| `exh_rasp_idle.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust idling, raspy crackling raw tone, steady constant RPM, recorded from behind near the tailpipe, no acceleration, seamless loop |
+| `exh_rasp_mid.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust at steady medium RPM under load, raspy aggressive snarl, recorded from behind near the tailpipe, no acceleration, seamless loop |
+| `exh_rasp_high.wav` | 4 s | Japanese diesel truck engine with a straight-pipe sport exhaust at steady high RPM near redline, loud raspy screaming rasp, recorded from behind near the tailpipe, no acceleration, seamless loop |
+| `exh_stack_idle.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks idling, deep booming bass burble, steady constant RPM, open air, no acceleration, seamless loop |
+| `exh_stack_mid.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks cruising at steady medium RPM, deep powerful thunder from the stacks, no acceleration, seamless loop |
+| `exh_stack_high.wav` | 4 s | Huge V8 diesel truck with tall vertical chrome exhaust stacks at steady high RPM, massive deep roaring bellow from the stacks, no acceleration, seamless loop |
+| `exh_pop_idle.wav` | 4 s | Diesel truck with a short cut chrome exhaust idling, choppy lumpy idle with irregular misfire pops and burbles, steady constant RPM, no acceleration, seamless loop |
+| `exh_pop_mid.wav` | 4 s | Diesel truck with a short cut chrome exhaust at steady medium RPM, punchy rhythmic exhaust note with occasional crackles and pops, no acceleration, seamless loop |
+| `exh_pop_high.wav` | 4 s | Diesel truck with a short cut chrome exhaust at steady high RPM, loud crackling exhaust with rapid pops and bangs, no acceleration, seamless loop |
+| `exh_rasp_turbo_whine.wav` | 3 s | Small high-revving sport turbocharger at steady boost, sharp bright metallic whistle, isolated, no engine, seamless loop |
+| `exh_stack_turbo_whine.wav` | 3 s | Big diesel truck turbocharger at steady high boost, deep loud jet-like whoosh with a low whine, isolated, no engine, seamless loop |
+| `exh_pop_turbo_whine.wav` | 3 s | Turbocharger whistling at steady boost with a fluttering chirp, mid-pitched siren-like whine, isolated, no engine, seamless loop |
+| `exh_rasp_blowoff.wav` | 1 s | Sport turbo blow-off valve, short sharp high pitched psssh air release |
+| `exh_stack_blowoff.wav` | 1 s | Huge diesel truck turbo dump valve, long deep loud whoosh of air release |
+| `exh_pop_blowoff.wav` | 1 s | Turbo wastegate flutter stu-tu-tu followed by a single exhaust backfire pop when lifting off throttle |
+
+> **T-173 (2026-10-21):** os 15 sons acima e as 3 buzinas novas da seção 2 (`horn_ship_deep`, `horn_dual_tone`,
+> `horn_musical_dekotora`) foram gerados com `tools/gen_audio.py` (**627 créditos**; conta em 61.873 de 131.000). Conferidos
+> por análise (duração 4/3/1 s, loops estáveis; `exh_pop_high` saiu ~6 dB mais baixo e ganha +5 dB no jogo,
+> `EngineSounds.LAYER_GAIN_DB`; `exh_stack_turbo_whine` saiu mais "whoosh" grave do que assobio). Marco: ouvir na
+> ferramenta `scenes/tools/engine_audio_test.tscn` e pedir regeração (`python tools/gen_audio.py --only nome --force`).
+
 ## 2. Caminhão (`game/assets/audio/sfx/truck/`)
 
 | Arquivo | Duração | Prompt |
@@ -64,6 +94,9 @@ Mesmos 4 prompts trocando o começo por: *"Tuned high-performance inline-six die
 | `horn_air_basic.wav` | 2 s | Loud deep truck air horn single blast |
 | `horn_musical_1.wav` | 3 s | Japanese decorated truck musical air horn playing a short cheerful melody of five notes |
 | `horn_musical_2.wav` | 3 s | Multi-tone train-style air horn chord on a big truck, dramatic |
+| `horn_ship_deep.wav` | 3 s | Extremely deep and loud air horn of a huge truck sounding like a ship foghorn, single long sustained low blast, steady |
+| `horn_dual_tone.wav` | 3 s | Two-tone truck air horn with a high trumpet and a low trumpet sounding together, long sustained loud blast, steady |
+| `horn_musical_dekotora.wav` | 3 s | Japanese dekotora truck musical air horn playing a fast festive melody of eight rising and falling notes, loud bright trumpets |
 | `passing_flash.wav` | 0,5 s | Quick electric click and whoosh of high beam headlights flashing |
 | `cargo_rattle_loop.wav` | 3 s | Loose cargo shaking and rattling inside a metal truck box, steady, seamless loop |
 | `steel_plate_clank.wav` | 0,5 s | Heavy truck tire rolling fast over a loose steel road plate at road works, loud metallic clank and bang |

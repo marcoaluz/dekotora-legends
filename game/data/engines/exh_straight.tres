@@ -9,3 +9,4 @@ display_key = "exhaust.exh_straight"
 torque_bonus = 0.03
 fame = 10
 price = 18000
+sound_profile = "exh_rasp"

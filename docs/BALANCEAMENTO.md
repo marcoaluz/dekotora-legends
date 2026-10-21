@@ -75,7 +75,14 @@ Murais não têm durabilidade: cada batida lateral **risca** (−10% de Fama do 
 | ID | Escape | Efeito | Preço (¥) |
 | --- | --- | --- | --- |
 | `exh_std` | Padrão | — | — |
-| `exh_straight` | Direto | +3% torque, +10 Fama | 18.000 |
+| `exh_straight` | Direto esportivo (som `exh_rasp`, rouco) | +3% torque, +10 Fama | 18.000 |
+| `exh_stack` | Chaminés verticais (som `exh_stack`, grave) — **proposta T-173** | +2% torque, +16 Fama | 28.000 |
+| `exh_chrome_cut` | Cromado cortado (som `exh_pop`, estalos) — **proposta T-173** | +2,5% torque, +12 Fama | 22.000 |
+
+> T-173: os dois escapes novos são **propostas** (o Marco pediu 3 escapes com som próprio; os números ficam entre o
+> padrão e o direto para nenhum virar a escolha óbvia: o direto continua o mais forte, as chaminés dão mais destaque).
+> Buzinas: escolha **grátis** na aba MECÂNICA (só som). Rivais offline: motor/turbo/escape/buzina sorteados **só no som**
+> (a simulação deles não muda).
 
 | ID | Outro | Efeito | Preço (¥) |
 | --- | --- | --- | --- |

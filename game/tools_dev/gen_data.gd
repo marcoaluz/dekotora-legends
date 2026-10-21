@@ -66,10 +66,12 @@ const TURBOS: Array = [
 	["turbo_single", 0.18, 1500.0, 0.8, 40000],
 	["turbo_twin", 0.30, 1300.0, 1.1, 85000],
 ]
-# id, bonus torque, fama, preco
+# id, bonus torque, fama, preco, perfil de som (T-173; "" = loops do motor)
 const EXHAUSTS: Array = [
-	["exh_std", 0.0, 0, 0],
-	["exh_straight", 0.03, 10, 18000],
+	["exh_std", 0.0, 0, 0, ""],
+	["exh_straight", 0.03, 10, 18000, "exh_rasp"],
+	["exh_stack", 0.02, 16, 28000, "exh_stack"],
+	["exh_chrome_cut", 0.025, 12, 22000, "exh_pop"],
 ]
 # id, efeito, valor, efeito colateral, valor, preco
 const UPGRADES: Array = [
@@ -143,6 +145,7 @@ func _initialize() -> void:
 		d.torque_bonus = float(x[1])
 		d.fame = int(x[2])
 		d.price = int(x[3])
+		d.sound_profile = String(x[4])
 		_save(d, "res://data/engines/%s.tres" % x[0])
 	for u in UPGRADES:
 		var d := UpgradeDef.new()
