@@ -91,9 +91,13 @@ func _box(z: float, lat_m: float, y: float, size: Vector3, col: Color) -> void:
 
 
 func _viaduct(L: float, deck: float) -> void:
-	var bo: float = RoadMesh.BARRIER_IN + RoadMesh.BARRIER_W
 	var concrete := Color("#8d9099", 0.0)
 	var z: float = 16.0
+	if PontesKit.enabled() and PierT.available():                        # T-163: pilar em T da Ponte A
+		var piers := ViaductPiers3D.new()
+		add_child(piers)
+		piers.build(path, deck, tod)
+		z = L                                                             # pula as caixas antigas
 	while z < L:                                                          # pilar em T sob o tabuleiro
 		var p: Vector3 = LaneSections.profile(path.track.events, z)        # T-153: viaduto antigo mais estreito
 		var w: float = p.x + p.y + 2.0 * RoadMesh.BARRIER_W

@@ -217,8 +217,11 @@ func _multi(mesh: Mesh, items: Array, mat: Material, shadows: bool) -> void:
 	add_child(mmi)
 
 
-## Montanhas: cones achatados bem longe (do lado da terra no litoral).
+## Montanhas: cones achatados bem longe (do lado da terra no litoral). T-169: com o kit, macicos de verdade.
 func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
+	if BackdropKit.mountains_available():
+		_massifs(rng, kind)
+		return
 	var mmesh := CylinderMesh.new()
 	mmesh.top_radius = 0.0
 	mmesh.bottom_radius = 1.0
@@ -239,6 +242,51 @@ func _mountains(rng: RandomNumberGenerator, kind: StringName) -> void:
 	_multi(mmesh, items, m, false)
 
 
+## T-169: macicos nevados (BackdropKit, "Fundo Montanha Gelo") no lugar dos cones: menos copias e maiores, um
+## MultiMesh por modelo (4 chamadas). Montanha: 16 macicos dos dois lados; litoral (so a terra): 10; cidade: 6.
+## Modo baixo: metade. Cada copia: 750-1250 m de largura (altura = 65-95% da do modelo: 20-37% da largura); o pe do
+## macico fica a 260-560 m da pista (420-560 fora da montanha).
+var massif_count: int = 0
+
+
+func _massifs(rng: RandomNumberGenerator, kind: StringName) -> void:
+	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
+	var count: int = 16 if kind == &"mountain" else (10 if kind == &"coast" else 6)   # cidade: os predios escondem
+	if q <= 0:
+		count /= 2
+	var L: float = path.track.length_m
+	var groups: Array = [[], [], [], []]
+	for i in count:
+		var zz: float = (float(i) + rng.randf_range(0.1, 0.9)) / float(count) * L       # espalhados ao longo da rota
+		var sd: float = -1.0 if (kind == &"coast" or i % 2 == 0) else 1.0
+		var w: float = rng.randf_range(750.0, 1250.0)
+		var dist: float = w * 0.5 + rng.randf_range(260.0 if kind == &"mountain" else 420.0, 560.0)   # pe longe da pista
+		var c2: Vector3 = path.world_point(zz, sd * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
+		for _k in 12:                                   # a pista faz curva: empurra para fora ate o pe ficar longe dela
+			if _min_track_dist(c2) >= w * 0.55 + 180.0:
+				break
+			dist += 120.0
+			c2 = path.world_point(zz, sd * dist / Track.ROAD_HALF_WIDTH_M, 0.0)
+		c2.y = -6.0 - _deck
+		var b := Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(w, w * rng.randf_range(0.65, 0.95), w))
+		groups[i % 4].append([Transform3D(b, c2), Color.WHITE])
+	var mat: ShaderMaterial = BackdropKit.mountain_material(tod, kind)
+	for k in 4:
+		_multi(BackdropKit.mountain_mesh(k), groups[k], mat, false)
+	massif_count = count
+
+
+## Menor distancia (no plano) de `p` a pista, amostrada a cada 40 m (so para posicionar o cenario de fundo).
+func _min_track_dist(p: Vector3) -> float:
+	var best: float = INF
+	var z: float = 0.0
+	while z <= path.track.length_m:
+		var q: Vector3 = path.world_point(z, 0.0, 0.0)
+		best = minf(best, Vector2(p.x - q.x, p.z - q.z).length())
+		z += 40.0
+	return best
+
+
 func _building_chance(kind: StringName) -> float:
 	match kind:
 		&"coast":
@@ -256,6 +304,14 @@ func _add_ground(kind: StringName) -> void:
 	mi.mesh = plane
 	if kind == &"coast":
 		var wm: ShaderMaterial = _shader_mat(WATER_SHADER)
+		if BackdropKit.water_available():           # T-169: ondas do pacote "Agua" (mapa de normais repetivel)
+			wm.set_shader_parameter("waves", BackdropKit.water_normal())
+			wm.set_shader_parameter("deep", tod.water_color)
+			mi.material_override = wm
+			mi.position = Vector3(0, -1.2 - RoadMesh.deck_height(kind), -1400)
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			add_child(mi)
+			return
 		var n := FastNoiseLite.new()
 		n.frequency = 0.04
 		var nt := NoiseTexture2D.new()

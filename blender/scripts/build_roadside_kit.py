@@ -528,4 +528,5 @@ def main() -> None:
     print("OK kit", len(items), "modelos")
 
 
-main()
+if __name__ == "__main__":      # T-163: build_road_pontes_kit.py importa as funcoes daqui
+    main()

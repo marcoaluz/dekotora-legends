@@ -145,19 +145,33 @@ func _ready() -> void:
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
+	var lane_signals := TunnelSignals3D.new()      # T-164: seta verde / X vermelho por faixa, ligados aos eventos
+	add_child(lane_signals)
+	lane_signals.build(path, tunnels, tod)
 	_tunnel.exited.connect(func() -> void:
 		_cinema.tunnel_flash(tod.day_amount)
 		_demo.queue_shot("saida_tunel", 0.12))
 	_rail = Railway3D.new()                        # T-154: ferrovia ao lado da pista, viadutos e trens (so visual)
 	add_child(_rail)
 	_rail.build(path, String(route.id) if route != null else "", scenery, tod)
+	var rid: String = String(route.id) if route != null else ""
+	var over_out: Array = OverpassLayout.keep_out(path, rid) if Overpass3D.enabled() else []   # T-164
+	var over := Overpass3D.new()                   # T-164: viaduto rodoviario cruzando por cima (Ponte A)
+	add_child(over)
+	over.build(path, rid, tod, -1.2 - RoadMesh.deck_height(scenery), _rail.lines)
 	var city := CityBuilder.new()
-	city.keep_out = RailwayLayout.keep_out(_rail.lines)
+	city.keep_out = RailwayLayout.keep_out(_rail.lines) + over_out
 	add_child(city)
 	city.build(path, 21, scenery, tod)
+	var power := PowerLines3D.new()                # T-163: postes de energia com fios (montanha, litoral)
+	add_child(power)
+	power.keep_out = over_out
+	power.build(path, rid, scenery, tod, tunnels)
 	var side := Roadside3D.new()
 	add_child(side)
+	side.overpass_out = over_out
 	side.bridges = bridges
+	side.pole_runs = PowerLineLayout.corridors(power.poles)
 	side.build(path, scenery, tod, tunnels)
 	_fx = Fx3D.new()
 	add_child(_fx)

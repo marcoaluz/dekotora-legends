@@ -15,6 +15,9 @@ const POOL := "pool"              # chave dos grupos das pocas de luz
 var path: TrackPath
 var tod: TimeOfDay
 var bridges: Array[Vector2] = []  # T-153 (RouteDef.bridges): nada de arvore/pedra em cima do mar
+var pole_runs: Array = []         # T-163 (PowerLineLayout.corridors): arvores saem do caminho dos fios
+var overpass_out: Array = []      # T-164 (OverpassLayout.keep_out): nada de poste/arvore/placa embaixo do viaduto
+const WIRE_LANE: Vector2 = Vector2(14.5, 20.0)   # T-163: faixa lateral (m) dos fios; a arvore vai para fora dela
 var _pool_mesh: PlaneMesh
 var _lamp_off: ArrayMesh
 
@@ -42,6 +45,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 				xu = signf(xu) * ((p.x if xu < 0.0 else p.y) + 0.35) / Track.ROAD_HALF_WIDTH_M
 		var outside: bool = absf(xu) * Track.ROAD_HALF_WIDTH_M > RoadMesh.BARRIER_IN
 		var base: Vector3 = path.world_point(z, xu, -deck if outside else 0.0)
+		if not overpass_out.is_empty() and k != "guardrail" and OverpassLayout.blocked(overpass_out, base, 1.5):
+			continue
 		var yaw: float = path.yaw_at(z)
 		var model: String = k
 		var b := Basis(Vector3.UP, yaw)
@@ -52,9 +57,15 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 				if tod.lamps_on and tod.pool_energy > 0.0:
 					_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, xu * 0.6, 0.06)))
 			"tree":
-				model = _tree_model(kind, rng)
+				model = _tree_model(kind, rng, xu)
+				base = _off_wires(z, xu, base, deck)
 				var sc: float = rng.randf_range(0.8, 1.5)
 				b = Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(sc, sc * rng.randf_range(0.9, 1.3), sc))
+			"guardrail":
+				if PontesKit.enabled():                   # T-163: guard-rail em W do kit (lamina para a pista)
+					model = "guardrail_w"
+					if xu < 0.0:
+						b = Basis(Vector3.UP, yaw + PI)
 			"sign_green":
 				if deck > 0.0:
 					continue                          # no viaduto as placas ficam nos porticos
@@ -68,18 +79,40 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 			_add_multi(_pool(), groups[key], pool_mat)
 		elif name == "lamp_post" and not tod.lamps_on:
 			_add_multi(_lamp_unlit(), groups[key])
+		elif name == "tree_leafy":
+			_add_multi(BackdropKit.tree_mesh(tod), groups[key])
+		elif name == "guardrail_w":
+			_add_multi(PontesKit.mesh("guardrail_w", PontesKit.guardrail(tod)), groups[key])
 		else:
 			_add_multi(GlbMesh.merged("%s%s.glb" % [DIR, name]), groups[key])
 
 
-func _tree_model(kind: StringName, rng: RandomNumberGenerator) -> String:
+## T-163: arvore no caminho dos fios dos postes de energia vai 6 m para fora (mesmo sorteio, so muda o lugar).
+func _off_wires(z: float, xu: float, base: Vector3, deck: float) -> Vector3:
+	var lat: float = absf(xu) * Track.ROAD_HALF_WIDTH_M
+	if lat < WIRE_LANE.x or lat > WIRE_LANE.y:
+		return base
+	for r in pole_runs:
+		if z >= float(r[0]) - 20.0 and z <= float(r[1]) + 20.0 and signf(xu) == float(r[2]):
+			return path.world_point(z, signf(xu) * (lat + 6.0) / Track.ROAD_HALF_WIDTH_M, -deck)
+	return base
+
+
+## T-169: com o kit, a arvore de folhas (Gleditsia, BackdropKit) entra no lugar da redonda na cidade, em 25% da
+## montanha (entre os pinheiros) e em 20% do litoral do lado da terra. Um sorteio so (a sequencia nao muda).
+func _tree_model(kind: StringName, rng: RandomNumberGenerator, xu: float = 0.0) -> String:
 	var r: float = rng.randf()
+	var leafy: bool = BackdropKit.tree_available()
 	match kind:
 		&"coast":
+			if leafy and xu < 0.0 and r >= 0.8:
+				return "tree_leafy"
 			return "palm" if r < 0.7 else "bush"
 		&"mountain":
+			if leafy and r >= 0.55 and r < 0.8:
+				return "tree_leafy"
 			return "tree_pine" if r < 0.8 else "rock"
-	return "tree_pine" if r < 0.45 else ("tree_round" if r < 0.85 else "bush")
+	return "tree_pine" if r < 0.45 else (("tree_leafy" if leafy else "tree_round") if r < 0.85 else "bush")
 
 
 func _put(groups: Dictionary, model: String, t: Transform3D) -> void:
