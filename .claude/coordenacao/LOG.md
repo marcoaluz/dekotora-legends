@@ -228,3 +228,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: sons de trem train_horn (3 s) e train_pass (6 s, loop) cadastrados na seção 4 e gerados no ElevenLabs.
 - Arquivos: docs/AUDIO_ELEVENLABS.md, game/assets/audio/sfx/ambient/train_horn.mp3 (+.import), game/assets/audio/sfx/ambient/train_pass.mp3 (+.import), .claude/coordenacao/LOG.md
 - Observação: gen_audio.py lê a lista da tabela do doc (não há lista no script). Créditos: 61.135/131.000 antes; contador de gasto mostrou 0, pode estar atrasado. Som ainda não ligado ao jogo.
+
+## 2026-10-20 23:20 · T-165 · especialista · CONCLUÍDA
+- Feito: causa achada (botões/cartões com mouse_filter STOP seguravam o toque; ScrollContainer do 4.7 só rolava nos vãos). Novo `TouchScroll` (descendentes em PASS, zona morta 10) usado nas 4 listas: garagem (2 colunas), mercado de fretes, opções, lobby.
+- Arquivos: game/scripts/ui/components/touch_scroll.gd (novo), garage_screen.gd, freight_market.gd, options_panel.gd, lobby_screen.gd, game/tests/test_touch_scroll.gd, docs/DECISOES.md, skill godot-dekotora. Commit d876229 na branch `t165-rolagem-toque` (worktree .claude/worktrees/t165), falta merge na main.
+- Validação: suíte completa 297 testes, 0 falhas (5 novos simulando ScreenTouch/ScreenDrag + mouse emulado); menu, mercado, opções, garagem (modelo e decoração) e lobby abrem headless sem ERROR. APK não gerado (falta testar no celular).
+- Decisão pendente: nenhuma. Obs.: matei sem querer processos python.exe durante a tarefa e o servidor MCP do Blender desconectou; precisa reabrir se for usado.

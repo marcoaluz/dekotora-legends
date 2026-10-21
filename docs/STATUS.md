@@ -154,6 +154,10 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-165 (2026-10-20): listas do menu/garagem rolam arrastando o dedo sobre os cartões (`TouchScroll`).** Falta o Marco confirmar no
+  celular com **APK novo** (garagem > MODELO: arrastar sobre um cartão rola sem selecionar; toque rápido seleciona; repetir em Mercado e
+  Opções). Se a rolagem demorar ou toques virarem rolagem, ajustar `DEADZONE` em `game/scripts/ui/components/touch_scroll.gd`.
+
 - **T-159 (análise de `docs/Modelos/Road_pontes`, nada no jogo ainda):** ler `docs/ANALISE_ROAD_PONTES.md` e as folhas
   em `docs/capturas_t159/`; ~~confirmar a licença do **túnel** (o mesmo `Tunnel.obj` da T-130) e dos outros~~ (licença LIBERADA pelo Marco em 2026-10-20, T-166); dizer se quer
   os postes de energia com fios e o viaduto cruzando por cima da pista; o semáforo de faixa do túnel deve acompanhar os
