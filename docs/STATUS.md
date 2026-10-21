@@ -13,7 +13,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 - **Android: JÁ INSTALADO, não instale de novo.** Em `D:\DEV\android-tools\` (sem administrador): JDK 17 Temurin
   (`jdk\jdk-17.0.20.1+1`), Android SDK (`sdk`: Platform 36, Build-Tools 36.0.0, Platform-Tools, command-line tools).
   O APK de teste já é gerado: `godot --headless --path game --export-debug "Android" ../builds/kaido-bakuso-debug.apk`
-  (**111 MB em 2026-10-21 11:36 (T-177/178/179), protocolo de rede 7**, chave de debug; antes 105 MB em 2026-10-19), usando uma **cópia temporária** do `export_presets.cfg` com "Min SDK"/"Target SDK"
+  (**111 MB em 2026-10-21 14:53 (T-182, com câmera livre T-181 e T-177/178/179), protocolo de rede 7**, chave de debug; antes 111 MB das 11:36 e 105 MB em 2026-10-19), usando uma **cópia temporária** do `export_presets.cfg` com "Min SDK"/"Target SDK"
   vazios (Gradle desligado) e restaurando depois; passo a passo em `docs/RELEASE_ANDROID.md`. Instalar no celular:
   `D:\DEV\android-tools\sdk\platform-tools\adb.exe install -r builds\kaido-bakuso-debug.apk`.
 - Python do sistema não tem numpy/Pillow (use o Python do Blender, ver `tools/image_resize.py`).

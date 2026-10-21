@@ -5,6 +5,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-182 | Gerar APK de teste novo com a câmera livre (docs/RELEASE_ANDROID.md) e atualizar linha do APK no STATUS | delegado da T-181 | fácil | ajudante-rapido | concluída (APK 111 MB; precisa Marco: instalar e testar) | 2026-10-21 | 2026-10-21 |
+| T-181 | Modo câmera livre (--freecam/F1): voo, sticks no celular, pausa da corrida, teleporte por km, overlay, mira com nome/.glb, print P, HUD H | pedido do Marco | difícil | especialista | concluída (349 testes ok; precisa Marco: testar no celular) | 2026-10-21 | 2026-10-21 |
 | T-180 | Garagem: câmera nunca gira sozinha (sem auto_rotate); só arrasto com inércia ~0,3 s; pinça e roda dão zoom com limites; abas só movem ao ângulo | pedido do Marco | médio | coordenador | concluída (343 testes ok; precisa Marco: testar no celular) | 2026-10-21 | 2026-10-21 |
 | T-179 | URGENTE: montanhas nevadas e árvores (T-169) não aparecem no jogo do Marco: investigar se é bug (APK/PC), flag, distância, cena ou rota, e corrigir | pedido do Marco | difícil | especialista | concluída (merge na main; causa: montanhas viradas do avesso, câmera 900 m, neblina; precisa Marco: confirmar docs/capturas_t179) | 2026-10-21 | 2026-10-21 |
 | T-178 | URGENTE: refazer sons de turbo simples/duplo (soam como música/remix disco); motores mais de caminhão; V8 como caminhão de corrida monstro (ElevenLabs) | pedido do Marco | difícil | especialista | concluída (merge na main; 328+ testes ok; 28 sons, 3.179 créditos; precisa Marco: ouvir) | 2026-10-21 | 2026-10-21 |
