@@ -333,3 +333,26 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   61.234 de 131.000).
 - **Só apresentação**: nada mudou em `sim/` nem na rede. Online os piscas dos outros já apareciam (o `signal_dir` vai no
   snapshot); o som é só da sua seta. Ideia anotada: ouvir baixinho a seta do rival ao lado.
+
+## 2026-10-21 — T-171: prévia de peças na garagem e pneus sobre a plataforma (pedido do Marco)
+
+- **Pneu "enterrado"**: os .glb estão certos (pneu em y = 0 nos 18 modelos, medido por
+  `tools_dev/measure_wheel_ground.gd`), mas a plataforma giratória do galpão (`garage_hall.glb`, malha `turntable`) tem
+  10 cm de altura e o caminhão nascia no piso (y = 0): o pneu afundava 10 cm dentro do disco. Agora o `GarageStage`
+  mede o topo da plataforma e o ponto mais baixo dos pneus (`TruckGround`) e sobe o caminhão (`floor_y`, ~0,10 m).
+  Vale para garagem, lobby e o fundo antigo do menu (todos usam o `GarageStage`). **A corrida não muda** (o
+  `TruckNode` continua com o pneu em y = 0 na pista).
+- **Prévia** (`ui/garage_preview.gd` = estado, `ui/garage_preview_ui.gd` = tela): tocar/clicar num cartão de peça não
+  instalada (ou chegar nele com setas/Tab/controle) monta a peça no caminhão no lugar da do mesmo encaixe, leva a câmera
+  para a vista dela (calotas: vista da roda, girando) e mostra a faixa **PRÉVIA** no topo do painel direito (fora da
+  rolagem, para não cobrir a peça) e a etiqueta "◉ PRÉVIA · nome" no alto da tela. Botões: **COMPRAR E EQUIPAR**
+  (compra e já instala; desligado com o motivo se faltar Fama/dinheiro), **EQUIPAR** (já é sua) e **VOLTAR AO ATUAL**
+  (ou Esc / B). Trocar de encaixe, de aba ou sair da garagem volta ao equipado. Nada entra no perfil até comprar.
+- Arrastar a lista sobre um cartão continua rolando (T-165): só conta como toque se o dedo soltar a até 12 unidades de
+  onde apertou; toque nos botões do cartão fica com o botão.
+- **Cores travadas por Fama** agora podem ser tocadas para ver no caminhão (antes ficavam desligadas); continuam sem poder
+  aplicar. Cores liberadas, luzes e adesivos já aplicavam na hora (grátis), então não precisam de prévia.
+- **Mecânica** (motor, turbo, escape, freio-motor, pneus esportivos) não tem peça visível no caminhão: a prévia continua
+  sendo o efeito em texto (peso, 0–100, destaque). Os escapamentos altos são peça de encaixe e têm prévia 3D.
+- Decisão do Claude (confirmar com o Marco): o botão da faixa compra **e instala** de uma vez; o cartão continua com
+  COMPRAR (só comprar) como antes.

@@ -28,6 +28,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
 | Testes automáticos (300) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Testes automáticos (301) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
+| Testes automáticos (309) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
@@ -154,6 +156,14 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-171 (garagem: prévia antes de comprar + pneu sobre o chão):** gerar o APK de novo e, na GARAGEM > DECORAÇÃO, tocar
+  num encaixe (ex.: Para-choque frontal) e depois num cartão de peça que você não tem: a peça aparece no caminhão, a
+  câmera vai até ela e no alto do painel da direita aparece **PRÉVIA** com COMPRAR E EQUIPAR / VOLTAR AO ATUAL (o
+  dinheiro não muda). Arrastar a lista por cima dos cartões deve continuar rolando sem ativar a prévia. No PC: clique no
+  cartão, ou Tab/setas até ele e Enter (Esc volta). Cores com "F30/F60" agora podem ser tocadas só para ver. Olhar
+  `docs/capturas_t171/folha_previa.png` e `zoom_*.png` (esquerda = antes, pneu cortado; direita = depois). Dizer se o
+  botão deve **comprar e já equipar** (como está) ou só comprar.
 
 - **T-165 (2026-10-20): listas do menu/garagem rolam arrastando o dedo sobre os cartões (`TouchScroll`).** Falta o Marco confirmar no
   celular com **APK novo** (garagem > MODELO: arrastar sobre um cartão rola sem selecionar; toque rápido seleciona; repetir em Mercado e
