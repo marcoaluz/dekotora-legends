@@ -430,3 +430,14 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
   LATERAIS, TRASEIRA), com ✔ e cor dourada quando há peça instalada (o nome da peça instalada aparece no painel da direita).
   O resumo (destaque, massa, proteção) foi para o fim da seção PEÇAS. Decisão do Claude; o Marco confirma no aparelho.
 
+## 2026-10-21 — T-178: turbina sem "som de música", motores mais caminhão, V8 de monster truck (pedido do Marco)
+
+- **Turbina**: o assobio é sopro de ar com um assobio metálico fraco por cima (não uma nota). O tom sobe só ~6 semitons
+  com o boost (0,85→1,2; antes 0,8→1,5). O "pssh" é um sopro pneumático, sem a vibração "stu-tu-tu".
+- **Motores**: 6 cilindros e perfis de escape = diesel de caminhão pesado (semi truck). **V8 = monster truck de corrida**
+  (marcha lenta picada, estalos e rasgado nos escapes abertos). Prompts em `docs/AUDIO_ELEVENLABS.md`.
+- **Regra para prompts de som**: não usar palavras que puxam tom ou ritmo (whine, constant pitch, siren, chirp, flutter,
+  rhythmic, drone). Gerar 2 a 3 versões em `--out-dir` e escolher por análise antes de pôr no jogo.
+- **Pendente do Marco**: ouvir (garagem > MECÂNICA > OUVIR, ou `audio_backup/t178_previas_ouvir/antes|depois`) e dizer
+  qual som ainda não está bom.
+

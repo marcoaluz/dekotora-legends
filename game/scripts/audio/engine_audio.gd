@@ -134,6 +134,16 @@ static func pitch_for(rpm01: float) -> float:
 	return 0.78 + clampf(rpm01, 0.0, 1.0) * 0.62
 
 
+## Tom da turbina pelo boost (T-178): sobe so ~6 semitons (0,85 -> 1,2). Antes ia de 0,8 a 1,5 (quase uma oitava),
+## e o assobio subindo soava como o "riser" de sintetizador de musica eletronica.
+const TURBO_PITCH_MIN: float = 0.85
+const TURBO_PITCH_MAX: float = 1.2
+
+
+static func turbo_pitch_for(boost: float) -> float:
+	return lerpf(TURBO_PITCH_MIN, TURBO_PITCH_MAX, clampf(boost, 0.0, 1.0))
+
+
 func _set_layer(name: String, weight: float, pitch: float, gain_db: float = 0.0) -> void:
 	var p: Node = _players.get(name)
 	if p == null:
@@ -146,6 +156,7 @@ func _set_layer(name: String, weight: float, pitch: float, gain_db: float = 0.0)
 ## Chame todo frame. rpm01 = (rpm - marcha lenta)/(corte - marcha lenta); throttle 0..1; boost 0..1;
 ## engine_health 0..1 (1 = saudavel).
 func update(dt: float, rpm01: float, throttle: float, boost: float, engine_health: float = 1.0, speed: float = 0.0) -> void:
+	boost = clampf(boost, 0.0, 1.0)                                # T-178: boost fora de 0..1 dava guincho agudo
 	_smooth_throttle = lerpf(_smooth_throttle, throttle, minf(6.0 * dt, 1.0))
 	_smooth_rpm = lerpf(_smooth_rpm, rpm01, minf(10.0 * dt, 1.0))
 	if synth_boost:
@@ -158,7 +169,7 @@ func update(dt: float, rpm01: float, throttle: float, boost: float, engine_healt
 	for i in _bands.size():
 		_set_layer("%s_%s" % [engine_set, _bands[i]], w[i] * load, pitch, -2.0)
 	if turbo_set != "":
-		_set_layer(turbo_set, boost * 0.75, (0.8 + boost * 0.7) * _turbo_pitch, -6.0 + _turbo_db)
+		_set_layer(turbo_set, boost * 0.75, turbo_pitch_for(boost) * _turbo_pitch, -6.0 + _turbo_db)
 	if straight_exhaust:
 		_set_layer("exhaust_straight_layer", _smooth_throttle * (0.3 + 0.7 * _smooth_rpm), 0.85 + _smooth_rpm * 0.4, -5.0)
 	if has_jake:
