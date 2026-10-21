@@ -143,6 +143,9 @@ func _ready() -> void:
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
+	var lane_signals := TunnelSignals3D.new()      # T-164: seta verde / X vermelho por faixa, ligados aos eventos
+	add_child(lane_signals)
+	lane_signals.build(path, tunnels, tod)
 	_tunnel.exited.connect(func() -> void:
 		_cinema.tunnel_flash(tod.day_amount)
 		_demo.queue_shot("saida_tunel", 0.12))

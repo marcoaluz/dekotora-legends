@@ -14,6 +14,7 @@ const COLOR := Color(0.78, 0.78, 0.8)
 var counts: Dictionary = {}
 var tris: int = 0
 var spans: Array = []                   # [s_min, s_max] de cada viaduto (para testes)
+var piers: PackedVector3Array = PackedVector3Array()   # pe de cada pilar colocado (para testes)
 
 
 static func enabled() -> bool:
@@ -120,6 +121,7 @@ func _pier(st: SurfaceTool, path: TrackPath, at: Vector3, lat: Vector3, top: flo
 				counts["pier_skip_rail"] = int(counts.get("pier_skip_rail", 0)) + 1
 				return
 	var foot := Vector3(at.x, ground_y, at.z)
+	piers.append(foot)
 	var h: float = top - OverpassLayout.BEAM_BOTTOM - ground_y
 	var b := Basis(lat, Vector3.UP, lat.cross(Vector3.UP))            # x do pilar = atravessando o tabuleiro
 	if t_shape:

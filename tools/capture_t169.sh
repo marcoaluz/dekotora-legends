@@ -26,10 +26,13 @@ for T in day dusk night; do
   shot cidade_horizonte kanto_2_viaduct 600 $T "-14,0,4,60,0,12" "$@"
 done
 for T in day night; do
-  shot viaduto_cidade kanto_2_viaduct 2040 $T "-14,0,5,100,0,8" "$@"
-  shot viaduto_cidade_lado kanto_2_viaduct 2040 $T "70,-60,4,100,0,8" "$@"
+  shot viaduto_cidade kanto_2_viaduct 1950 $T "-14,0,5,100,0,8" "$@"
+  shot viaduto_cidade_lado kanto_2_viaduct 1950 $T "70,-60,4,100,0,8" "$@"
   shot viaduto_montanha kanto_3_mountain 2480 $T "-14,0,5,100,0,8" "$@"
   shot viaduto_montanha_lado kanto_3_mountain 2480 $T "60,55,3,100,0,7" "$@"
+  shot sinal_tunel_cidade kanto_2_viaduct 975 $T "-10,0,2.6,40,0,6" --event=works:3@1180+170 "$@"
+  shot sinal_tunel_antigo kanto_3_mountain 800 $T "-10,0,2.6,40,0,5" "$@"
+  shot sinal_tunel_montanha kanto_3_mountain 2075 $T "-10,0,2.6,40,0,6" "$@"
   shot arvore_montanha kanto_3_mountain 1500 $T "-10,-4,3.5,30,14,5" "$@"
   shot arvore_litoral kanto_1_coast 1300 $T "-10,4,3.5,30,-18,5" "$@"
 done

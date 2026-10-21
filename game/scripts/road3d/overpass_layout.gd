@@ -20,7 +20,7 @@ const FOOTPRINT: float = 9.0        # meia largura do tabuleiro (6 m) + folga
 static func for_route(route_id: String) -> Array:
 	match route_id:
 		"kanto_2_viaduct":
-			return [{"z": 2140.0, "angle": 76.0}]       # via expressa cruzando via expressa (Shuto)
+			return [{"z": 2050.0, "angle": 76.0}]       # via expressa cruzando via expressa (Shuto); antes do trecho antigo (2.140 m)
 		"kanto_3_mountain":
 			return [{"z": 2580.0, "angle": 70.0}]       # desvio passando por cima da pista e da ferrovia
 	return []
@@ -33,7 +33,12 @@ static func axis(path: TrackPath, o: Dictionary) -> Dictionary:
 	var d: Vector3 = path.forward_at(z).rotated(Vector3.UP, -deg_to_rad(float(o["angle"])))
 	d.y = 0.0
 	d = d.normalized()
-	var top: float = road.y + CLEAR + BEAM_BOTTOM
+	var hi: float = road.y                      # a pista pode estar em rampa: vao livre medido no ponto mais alto embaixo
+	var zz: float = z - 25.0
+	while zz <= z + 25.0:
+		hi = maxf(hi, path.center_at(clampf(zz, 0.0, path.track.length_m)).y)
+		zz += 5.0
+	var top: float = hi + CLEAR + BEAM_BOTTOM
 	return {"c": Vector3(road.x, top, road.z), "d": d, "top": top}
 
 

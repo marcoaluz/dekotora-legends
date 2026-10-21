@@ -25,15 +25,7 @@ func build(path: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay, 
 	if not PontesKit.poles_enabled():
 		return
 	poles = PowerLineLayout.poles(route_id, kind, path.track, tunnels)
-	if not keep_out.is_empty():                  # T-164: tira os postes de baixo do viaduto (e corta os fios ali)
-		var kept: Array = []
-		var bump: int = 0
-		for p in poles:
-			if OverpassLayout.blocked(keep_out, transform_of(path, p).origin, 2.0):
-				bump += 1
-				continue
-			kept.append([p[0], p[1], p[2], int(p[3]) + bump * 1000])
-		poles = kept
+	poles = filter_overpass(path, poles, keep_out)   # T-164: nada de poste nem fio atravessando o viaduto
 	if poles.is_empty():
 		return
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
@@ -74,6 +66,29 @@ func build(path: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay, 
 		counts["wire_seg"] = int(counts.get("wire_seg", 0)) + (wires[bi] as PackedVector3Array).size() / 2
 	if "--fps-log" in OS.get_cmdline_user_args():
 		print("PONTES: postes de energia ", counts, "  triangulos=", tris)
+
+
+## T-164: tira os postes de baixo do viaduto e corta a corrida (sem fio) onde o vao passaria sob ele: um vao de 35 m
+## cruza o corredor do viaduto (>= 18 m) sempre com o poste ou o meio do vao dentro dele.
+static func filter_overpass(path: TrackPath, list: Array, corridors: Array) -> Array:
+	if corridors.is_empty():
+		return list
+	var kept: Array = []
+	var bump: int = 0
+	var prev: Array = []
+	for p in list:
+		var at: Vector3 = transform_of(path, p).origin
+		if OverpassLayout.blocked(corridors, at, 2.0):
+			bump += 1
+			prev = []
+			continue
+		if not prev.is_empty() and int(prev[3]) == int(p[3]):
+			var mid: Vector3 = (transform_of(path, prev).origin + at) * 0.5
+			if OverpassLayout.blocked(corridors, mid, 2.0):
+				bump += 1
+		kept.append([p[0], p[1], p[2], int(p[3]) + bump * 1000])
+		prev = p
+	return kept
 
 
 ## Transform do poste [z, lado, ...]: na lateral LATERAL_M do lado dele, travessa atravessando a pista.
