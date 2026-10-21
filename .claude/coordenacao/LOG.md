@@ -318,3 +318,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/{build_tree_kit,build_tree_species,build_t186_props,inventory_models}.py, lib/tree_atlas.py; game/scripts/road3d/{roadside_trees,people_kit}.gd (novos), roadside_3d/backdrop_kit/race_scene_3d/duel_stage/duel_intro.gd, ui/duel_band.gd, debug/freecam_tour.gd (+1 linha freecam.gd); tests/test_scenery_t186.gd (8); tools_dev/{model_sheet_t186,probe_groves}.gd; tools/{inventory_models,capture_t186,measure_t186}.sh; ~40 .glb/.png novos; docs (BIBLIOTECA_CENARIO, DECISOES, STATUS, ROADMAP, LICENCAS), skills.
 - Validação: 366 testes ok; --quit-after sem erro novo; capturas antes/depois com a câmera livre nas 3 rotas (+cidade de dia) e folha dos 16 modelos com materiais do jogo; abertura do duelo dia/noite; custo modo médio 6 pontos: +1 a +22 chamadas, FPS no ruído.
 - Decisão pendente: (1) Marco tinha outros arquivos (árvores/postes/personagens) que não chegaram em docs/Modelos? (2) retrato também para o jogador (feito, confirmar). APK novo para ver no celular.
+
+## 2026-10-21 19:35 · T-187 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste gerado com o cenário da T-186 (protocolo de rede 8), 114 MB (113.519.413 bytes); preset restaurado (git diff vazio).
+- Arquivos: builds/kaido-bakuso-debug.apk (sobrescrito); docs/STATUS.md (só a linha do APK).
+- Observação: nada. Sem commit. Log do export em scratchpad (export_t187.log).
