@@ -54,7 +54,7 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 				if tod.lamps_on and tod.pool_energy > 0.0:
 					_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, xu * 0.6, 0.06)))
 			"tree":
-				model = _tree_model(kind, rng)
+				model = _tree_model(kind, rng, xu)
 				base = _off_wires(z, xu, base, deck)
 				var sc: float = rng.randf_range(0.8, 1.5)
 				b = Basis(Vector3.UP, rng.randf() * TAU) * Basis.from_scale(Vector3(sc, sc * rng.randf_range(0.9, 1.3), sc))
@@ -76,6 +76,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 			_add_multi(_pool(), groups[key], pool_mat)
 		elif name == "lamp_post" and not tod.lamps_on:
 			_add_multi(_lamp_unlit(), groups[key])
+		elif name == "tree_leafy":
+			_add_multi(BackdropKit.tree_mesh(tod), groups[key])
 		elif name == "guardrail_w":
 			_add_multi(PontesKit.mesh("guardrail_w", PontesKit.guardrail(tod)), groups[key])
 		else:
@@ -93,14 +95,21 @@ func _off_wires(z: float, xu: float, base: Vector3, deck: float) -> Vector3:
 	return base
 
 
-func _tree_model(kind: StringName, rng: RandomNumberGenerator) -> String:
+## T-169: com o kit, a arvore de folhas (Gleditsia, BackdropKit) entra no lugar da redonda na cidade, em 25% da
+## montanha (entre os pinheiros) e em 20% do litoral do lado da terra. Um sorteio so (a sequencia nao muda).
+func _tree_model(kind: StringName, rng: RandomNumberGenerator, xu: float = 0.0) -> String:
 	var r: float = rng.randf()
+	var leafy: bool = BackdropKit.tree_available()
 	match kind:
 		&"coast":
+			if leafy and xu < 0.0 and r >= 0.8:
+				return "tree_leafy"
 			return "palm" if r < 0.7 else "bush"
 		&"mountain":
+			if leafy and r >= 0.55 and r < 0.8:
+				return "tree_leafy"
 			return "tree_pine" if r < 0.8 else "rock"
-	return "tree_pine" if r < 0.45 else ("tree_round" if r < 0.85 else "bush")
+	return "tree_pine" if r < 0.45 else (("tree_leafy" if leafy else "tree_round") if r < 0.85 else "bush")
 
 
 func _put(groups: Dictionary, model: String, t: Transform3D) -> void:
