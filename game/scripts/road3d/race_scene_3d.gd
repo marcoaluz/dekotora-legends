@@ -73,6 +73,7 @@ var _was_hard_braking: bool = false
 var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e tremor das batidas
 var _rail: Railway3D                    # T-154: ferrovia e trens
 var _speed_blur: SpeedBlur               # T-189: borrao de velocidade (Ultra, opcional; null = desligado)
+var _life: RaceLife                      # T-189: vida do cenario (so visual; null = Settings.fx_life desligado)
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
 var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
@@ -185,6 +186,10 @@ func _ready() -> void:
 	side.field = scenic.field                      # T-188: arvores e pedras sobre o terreno novo
 	side.build(path, scenery, tod, tunnels)
 	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
+	if RaceLife.enabled():                         # T-189: vento, passaros, fumaca, insetos, sombras de nuvem
+		_life = RaceLife.new()
+		add_child(_life)
+		_life.build(path, rid, scenery, tod, q, side, tunnels, bridges)
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_brake_fx = BrakeFx.new()
@@ -218,6 +223,8 @@ func _ready() -> void:
 	_cam.make_current()
 	_freecam = Freecam.attach(self, path, _cam, route, tod, online)    # T-181: F1 / --freecam / botao da pausa
 	_speed_blur = SpeedBlur.attach(_cam, q, Settings.fx_motion_blur)
+	if _life != null:
+		_life.attach_camera(_cam)
 	_speed_fx = SpeedFx.new()
 	add_child(_speed_fx)
 	var streaks := LightStreaks.new()
@@ -710,6 +717,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		_rail.update(dt, _player_z(), sim.trucks[player].speed, _cam.global_position)
 	if _speed_blur != null:
 		_speed_blur.update(sim.trucks[player].speed)
+	if _life != null and _cam != null:
+		_life.update(dt, _player_z(), _cam.global_position)
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
@@ -928,6 +937,8 @@ func _on_intro_finished() -> void:
 func _intro_frame(dt: float) -> void:
 	_cinema.update_flash(dt)
 	_traffic3d.refresh()
+	if _life != null:                      # T-189: passaros e fumaca seguem vivos na abertura
+		_life.update(dt, _player_z(), _cam.global_position)
 	_demo.update(get_viewport(), sim.trucks[player], dt)
 	if _intro.skipped:                     # online depois de pular: espera na largada, na tomada do alinhamento
 		_update_visuals(1.0, dt)

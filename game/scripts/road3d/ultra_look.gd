@@ -10,9 +10,9 @@ extends RefCounted
 const ULTRA: int = 3
 ## Volumetric fog per time of day: density (1/m), albedo, anisotropy (how much light goes forward = god rays).
 const VFOG: Dictionary = {
-	"dawn": [0.0075, Color(1.0, 0.86, 0.68), 0.72],
+	"dawn": [0.0040, Color(1.0, 0.88, 0.74), 0.65],
 	"day": [0.0010, Color(0.92, 0.95, 1.0), 0.55],
-	"dusk": [0.0060, Color(1.0, 0.80, 0.70), 0.70],
+	"dusk": [0.0022, Color(0.95, 0.85, 0.80), 0.55],
 	"night": [0.0040, Color(0.50, 0.52, 0.60), 0.35],
 }
 
@@ -118,7 +118,7 @@ static func apply_sun(sun: DirectionalLight3D, tod: TimeOfDay, q: int) -> void:
 	sun.directional_shadow_blend_splits = true
 	sun.light_angular_distance = 0.7                    # soft penumbra (the sun is not a point)
 	sun.shadow_blur = 1.2
-	sun.light_volumetric_fog_energy = 1.6 if tod.day_amount > 0.2 else 0.7
+	sun.light_volumetric_fog_energy = 1.4 if tod.day_amount > 0.5 else (0.8 if tod.day_amount > 0.2 else 0.6)
 
 
 ## Resolution and anti-aliasing of the 3D view (all qualities: Ultra and the old table for 0..2).
