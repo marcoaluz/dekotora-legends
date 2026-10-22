@@ -49,6 +49,8 @@ Loop: aceitar frete → correr a rota (bots ou amigos) → entregar → reparar 
 | Passing | Botão redondo | Espaço | A |
 | Buzina | Botão BUZINA (entre as setas) | H | X |
 | Pausa | Ícone | Esc | Start |
+| Trocar a câmera (T-198: perto, padrão, longe, cinema, órbita) | Ícone de câmera (canto de cima, à esquerda) | C | Y |
+| Retrovisor liga/desliga (T-198) | Tocar no espelho (desligado: aba pequena no topo) | R | Back |
 
 **Controle por faixas (decisão ATB-1):** 3 faixas + acostamento. O 1º toque para um lado liga a seta (pisca no caminhão e no HUD);
 o 2º toque no mesmo lado em até ~1,5 s executa a troca (~0,7 s, com leve inclinação). Não existe volante livre nem botão de bater:

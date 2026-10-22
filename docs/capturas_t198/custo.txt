@@ -1,0 +1,72 @@
+== kanto_1_coast start=1300 night media camera=standard retrovisor=off
+FPS medio: 193.5  (desenhos: 432, max 458 no periodo; triangulos: 284570, texturas: 87.3 MB, video: 150.7 MB)
+FPS medio: 200.8  (desenhos: 417, max 438 no periodo; triangulos: 255675, texturas: 87.3 MB, video: 150.7 MB)
+== kanto_1_coast start=1300 night media camera=standard retrovisor=on
+FPS medio: 189.4  (desenhos: 434, max 602 no periodo; triangulos: 284662, texturas: 87.5 MB, video: 155.0 MB)
+FPS medio: 193.1  (desenhos: 418, max 591 no periodo; triangulos: 255679, texturas: 87.5 MB, video: 155.0 MB)
+== kanto_1_coast start=1300 night media camera=near retrovisor=on
+FPS medio: 190.5  (desenhos: 415, max 571 no periodo; triangulos: 248940, texturas: 87.5 MB, video: 153.0 MB)
+FPS medio: 184.1  (desenhos: 419, max 577 no periodo; triangulos: 254334, texturas: 87.5 MB, video: 153.0 MB)
+== kanto_1_coast start=1300 night media camera=far retrovisor=on
+FPS medio: 175.1  (desenhos: 451, max 614 no periodo; triangulos: 291599, texturas: 87.5 MB, video: 157.0 MB)
+FPS medio: 179.5  (desenhos: 420, max 611 no periodo; triangulos: 254047, texturas: 87.5 MB, video: 161.1 MB)
+== kanto_1_coast start=1300 night media camera=cinema retrovisor=off
+FPS medio: 184.2  (desenhos: 375, max 388 no periodo; triangulos: 237235, texturas: 87.2 MB, video: 154.7 MB)
+FPS medio: 216.5  (desenhos: 265, max 377 no periodo; triangulos: 134619, texturas: 87.3 MB, video: 154.8 MB)
+== kanto_1_coast start=1300 night media camera=orbit retrovisor=on
+FPS medio: 199.7  (desenhos: 292, max 561 no periodo; triangulos: 181581, texturas: 87.4 MB, video: 152.9 MB)
+FPS medio: 212.0  (desenhos: 384, max 557 no periodo; triangulos: 206206, texturas: 87.5 MB, video: 153.0 MB)
+== kanto_1_coast start=1300 night ultra camera=standard retrovisor=off
+FPS medio: 63.6  (desenhos: 822, max 963 no periodo; triangulos: 498663, texturas: 946.9 MB, video: 1088.6 MB)
+FPS medio: 59.5  (desenhos: 904, max 905 no periodo; triangulos: 564143, texturas: 946.9 MB, video: 1088.6 MB)
+== kanto_1_coast start=1300 night ultra camera=standard retrovisor=on
+FPS medio: 61.4  (desenhos: 824, max 1403 no periodo; triangulos: 498679, texturas: 948.3 MB, video: 1094.8 MB)
+FPS medio: 57.8  (desenhos: 907, max 1191 no periodo; triangulos: 568647, texturas: 948.3 MB, video: 1094.8 MB)
+== kanto_1_coast start=1300 night ultra camera=near retrovisor=on
+FPS medio: 61.9  (desenhos: 1312, max 1422 no periodo; triangulos: 805694, texturas: 948.3 MB, video: 1094.8 MB)
+FPS medio: 58.0  (desenhos: 1016, max 1313 no periodo; triangulos: 644914, texturas: 948.3 MB, video: 1094.8 MB)
+== kanto_1_coast start=1300 night ultra camera=far retrovisor=on
+FPS medio: 65.2  (desenhos: 1132, max 1251 no periodo; triangulos: 670463, texturas: 948.3 MB, video: 1094.8 MB)
+FPS medio: 60.9  (desenhos: 1080, max 1123 no periodo; triangulos: 670097, texturas: 948.3 MB, video: 1094.8 MB)
+== kanto_1_coast start=1300 night ultra camera=cinema retrovisor=off
+FPS medio: 60.0  (desenhos: 492, max 647 no periodo; triangulos: 287884, texturas: 946.9 MB, video: 1088.8 MB)
+FPS medio: 61.7  (desenhos: 915, max 935 no periodo; triangulos: 516843, texturas: 946.9 MB, video: 1088.7 MB)
+== kanto_1_coast start=1300 night ultra camera=orbit retrovisor=on
+FPS medio: 52.6  (desenhos: 898, max 1177 no periodo; triangulos: 609701, texturas: 948.3 MB, video: 1094.8 MB)
+FPS medio: 50.8  (desenhos: 1141, max 1183 no periodo; triangulos: 859435, texturas: 948.3 MB, video: 1094.8 MB)
+== kanto_2_viaduct start=1400 night media camera=standard retrovisor=off
+FPS medio: 174.8  (desenhos: 449, max 488 no periodo; triangulos: 379380, texturas: 92.8 MB, video: 173.9 MB)
+FPS medio: 169.5  (desenhos: 448, max 456 no periodo; triangulos: 380018, texturas: 92.8 MB, video: 173.9 MB)
+== kanto_2_viaduct start=1400 night media camera=standard retrovisor=on
+FPS medio: 172.0  (desenhos: 450, max 645 no periodo; triangulos: 379384, texturas: 93.0 MB, video: 176.1 MB)
+FPS medio: 154.1  (desenhos: 449, max 634 no periodo; triangulos: 380022, texturas: 93.0 MB, video: 176.1 MB)
+== kanto_2_viaduct start=1400 night media camera=near retrovisor=on
+FPS medio: 172.8  (desenhos: 449, max 634 no periodo; triangulos: 378771, texturas: 93.0 MB, video: 176.1 MB)
+FPS medio: 169.0  (desenhos: 449, max 634 no periodo; triangulos: 374765, texturas: 93.0 MB, video: 176.1 MB)
+== kanto_2_viaduct start=1400 night media camera=far retrovisor=on
+FPS medio: 170.8  (desenhos: 449, max 671 no periodo; triangulos: 389464, texturas: 93.0 MB, video: 176.1 MB)
+FPS medio: 169.2  (desenhos: 448, max 636 no periodo; triangulos: 384767, texturas: 93.0 MB, video: 176.1 MB)
+== kanto_2_viaduct start=1400 night media camera=cinema retrovisor=off
+FPS medio: 196.6  (desenhos: 285, max 356 no periodo; triangulos: 258931, texturas: 92.8 MB, video: 173.9 MB)
+FPS medio: 184.5  (desenhos: 356, max 368 no periodo; triangulos: 305919, texturas: 92.8 MB, video: 177.9 MB)
+== kanto_2_viaduct start=1400 night media camera=orbit retrovisor=on
+FPS medio: 186.7  (desenhos: 335, max 610 no periodo; triangulos: 333324, texturas: 93.0 MB, video: 176.1 MB)
+FPS medio: 172.4  (desenhos: 446, max 632 no periodo; triangulos: 383369, texturas: 93.0 MB, video: 176.1 MB)
+== kanto_2_viaduct start=1400 night ultra camera=standard retrovisor=off
+FPS medio: 54.1  (desenhos: 1066, max 1180 no periodo; triangulos: 741495, texturas: 951.2 MB, video: 1118.7 MB)
+FPS medio: 53.9  (desenhos: 971, max 1078 no periodo; triangulos: 768569, texturas: 951.2 MB, video: 1118.7 MB)
+== kanto_2_viaduct start=1400 night ultra camera=standard retrovisor=on
+FPS medio: 50.4  (desenhos: 1065, max 1705 no periodo; triangulos: 741587, texturas: 952.6 MB, video: 1124.7 MB)
+FPS medio: 50.2  (desenhos: 1536, max 1737 no periodo; triangulos: 1173445, texturas: 952.6 MB, video: 1124.7 MB)
+== kanto_2_viaduct start=1400 night ultra camera=near retrovisor=on
+FPS medio: 50.6  (desenhos: 1797, max 1836 no periodo; triangulos: 1302275, texturas: 952.6 MB, video: 1124.7 MB)
+FPS medio: 51.0  (desenhos: 1091, max 1868 no periodo; triangulos: 849086, texturas: 952.6 MB, video: 1124.7 MB)
+== kanto_2_viaduct start=1400 night ultra camera=far retrovisor=on
+FPS medio: 50.9  (desenhos: 1610, max 1635 no periodo; triangulos: 1114572, texturas: 952.6 MB, video: 1124.7 MB)
+FPS medio: 49.3  (desenhos: 863, max 1658 no periodo; triangulos: 723152, texturas: 952.6 MB, video: 1124.7 MB)
+== kanto_2_viaduct start=1400 night ultra camera=cinema retrovisor=off
+FPS medio: 48.5  (desenhos: 1113, max 1322 no periodo; triangulos: 930650, texturas: 951.2 MB, video: 1120.3 MB)
+FPS medio: 48.7  (desenhos: 1566, max 1579 no periodo; triangulos: 860329, texturas: 951.2 MB, video: 1120.3 MB)
+== kanto_2_viaduct start=1400 night ultra camera=orbit retrovisor=on
+FPS medio: 49.2  (desenhos: 889, max 1682 no periodo; triangulos: 779196, texturas: 952.6 MB, video: 1124.7 MB)
+FPS medio: 48.3  (desenhos: 1682, max 2211 no periodo; triangulos: 816750, texturas: 952.6 MB, video: 1124.7 MB)

@@ -729,3 +729,37 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   chegada, com a cidade destino à vista), triângulos +6 a +30%, memória de vídeo +23 a +33 MB (buffers do MSAA 2x +
   prédios da chegada); Ultra 57–72 → 54–73 FPS (no ruído). A cidade destino só é desenhada a menos de 1,7 km
   (skyline 3,2 km). Arquivos: `docs/capturas_t195/custo_antes.txt`, `custo_depois.txt` (Ultra) e `custo_depois_media.txt`.
+
+## 2026-10-22 · T-198 · Câmeras da corrida e retrovisor (pedido do Marco)
+
+- **Retrovisor** (escolhas do Claude, A CONFIRMAR): espelho largo no topo, no meio, logo abaixo do painel do prazo
+  (144×42 no HUD de 480×270; imagem 288×84, espelhada). A câmera fica 0,4 m atrás das portas do baú, a 3 m de altura,
+  olhando 35 m para trás (FOV 24° vertical ≈ 70° de largura); vê só até 260 m. **Borda acende** quando um caminhão
+  chega a menos de 45 m atrás: dourada se for o rival da rota, laranja para os outros, rosa piscando a menos de ~14 m.
+  Some na abertura, na contagem, nos cortes de largada/chegada e na câmera cinema. **Automático**: ligado no PC
+  (média para cima) e no celular só na qualidade Alta; desligado no celular em média/baixa e em qualquer qualidade
+  baixa. R / tocar no espelho grava a escolha (Ligado/Desligado) nas opções. Celular com o espelho desligado: aba
+  pequena no topo (tocar liga).
+- **Câmeras** (C, ícone de câmera abaixo da POSIÇÃO, botão Y do controle), na ordem do ciclo: padrão → longe → cinema
+  → órbita → perto. **Padrão** = a de sempre (mesmos números). **Perto**: 7 m atrás, logo acima do baú, efeitos de
+  velocidade ×1,35. **Longe**: 30 m atrás e 11,5 m de altura (vê a pista e o rival), efeitos ×0,6. **Cinema**: corta
+  sozinha a cada 4,5–7 s entre tomada baixa lateral (o caminhão passa pela câmera), baixa na frente (cara do
+  caminhão), teleobjetiva de longe atrás, grua subindo e tomada do rival por cima do ombro (35% das vezes quando o
+  rival está a menos de 90 m); **corte automático na ultrapassagem** (câmera do lado de fora da dupla); sem tremor;
+  faixas pretas (Opções > Gráficos, ligadas por padrão). **Órbita**: uma volta de 14 s com início/fim suaves, para 4 s
+  atrás do caminhão (o "retorno automático") e repete. Troca de câmera com mistura de 0,8 s.
+- **Sem atravessar cenário** (sem física): toda câmera nova fica entre as muretas (os trechos de 2 faixas contam),
+  abaixo de 5,6 m dentro dos túneis com descida/subida suave perto das bocas e fora do baú do jogador. Não checa
+  viaduto por cima nem prédio (ficam do lado de fora da mureta).
+- **Memória**: a câmera usada por último em cada rota volta na próxima corrida dela; sem histórico, a última escolhida.
+  Opções > Gráficos > Câmera da corrida vale para todas as rotas (zera a memória por rota).
+- **Câmera de cabine: NÃO incluída.** O Marco decidiu em 2026-10-17 "primeira pessoa: descartada". Se ele quiser rever,
+  é barato (mais um modo no rig + `EngineAudio.interior` já existe da T-197).
+- Nada em `scripts/sim/` nem na rede: é tudo local (online também funciona, cada um com a sua câmera).
+- **Custo medido** (RX 580, 1920×1080, sem vsync, noite, `tools/measure_t198.sh`, médias de 5 s; arquivo
+  `docs/capturas_t198/custo.txt`). Retrovisor ligado × desligado na câmera padrão: média/Compatibility (o que o
+  celular usa) litoral 197 → 191 FPS (−3%), cidade 172 → 163 (−5%, com ruído); Ultra litoral 61,5 → 59,6 (−3%),
+  cidade 54,0 → 50,3 (−7%); memória de vídeo +4 a +6 MB. Câmeras (com retrovisor): perto ≈ padrão; longe −1 a −7%
+  (vê mais cenário); cinema (sem retrovisor) igual ou mais rápida; órbita igual na média e −5 a −16% no Ultra (de lado
+  vê muito mais cenário). **Celular não medido**: por isso o retrovisor automático fica desligado no celular em
+  média/baixa.

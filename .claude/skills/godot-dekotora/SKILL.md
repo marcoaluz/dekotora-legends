@@ -427,3 +427,21 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   rugosidade (`RoadMesh.soft_spec`): era o "chuvisco" de pontos brilhantes à noite (aliasing especular).
 - Prints: `bash tools/capture_t195.sh PASTA chegada|unico|serra|trem [day night]` (`Q=3` = Ultra); custo
   `bash tools/measure_t195.sh` (`MEASURE_EXTRA="--msaa=0 --no-arrival"` = antes). Um processo por vez (memória).
+
+## Câmeras da corrida e retrovisor (T-198)
+
+- Só apresentação: `road3d/race_cam_rig.gd` (modos, limite pela geometria, blend, órbita), `race_cam_director.gd`
+  (tomadas do cinema), `race_cam_view.gd` (cola: teclas, letterbox, opções), `rear_mirror.gd` (SubViewport),
+  `ui/race_cam_button.gd`. O `race_scene_3d` só chama `_camv`. A PADRÃO usa os números de sempre (não é limitada).
+- Pose montada em coordenadas da pista `Vector3(z, lateral_m, altura)` → `RaceCamRig.clamp_point` (mureta e trechos de
+  2 faixas via `LaneSections.profile`, túnel com descida suave perto da boca, fora do baú do jogador) → `to_world`.
+- Flags (não gravam nas opções): `--race-cam=near|standard|far|cinema|orbit`, `--mirror=on|off`, `--cine-shot=NOME`
+  (side_low, front_low, tele_rear, crane, rival, overtake), `--letterbox=off`.
+- Retrovisor: SubViewport compartilha o World3D; câmera com `environment` cópia leve (sem SSAO/SSIL/SSR/SDFGI/névoa
+  volumétrica), sem sombra de poste (`positional_shadow_atlas_size = 0`), `far` 260 m, atualização `UPDATE_ONCE` a
+  25 fps (30 no Ultra). Efeito preso na câmera principal (chuva, folhas, borrão) vai para a camada 20 com
+  `RearMirror.hide_from_mirror(_cam)`: senão aparece como retângulo flutuando no espelho.
+- Botão de HUD clicável: `_gui_input` com `InputEventMouseButton` (o toque chega como clique emulado; não trate os dois).
+- Testes que mexem na câmera da corrida de verdade: ponha `_camv._save = false` (senão grava no settings.cfg do jogador).
+- Prints `bash tools/capture_t198.sh PASTA [day night]` (`CAMS=`, `ROUTE=`, `Q=`), folha `bash tools/sheet_t198.sh`,
+  custo `bash tools/measure_t198.sh [3000] [night]` (`CASES="standard:off standard:on ..."`). Um processo por vez.

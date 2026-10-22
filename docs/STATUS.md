@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-22** (T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-22** (T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -30,11 +30,12 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Cenário novo na rota inteira (T-188 + T-192) | padrão na corrida normal, nas 3 rotas do km 0 ao fim: `-- --route=kanto_3_mountain --start=300 --time=night`; só o antigo trecho-piloto `-- --t188=segment`; antigo `-- --t188=off`; prints da rota inteira `bash tools/capture_t192.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t192.sh` (em `docs/capturas_t192/`); custo `bash tools/measure_t192.sh [3000] [night]`; árvores `blender -b --factory-startup -P blender/scripts/build_foliage_t192.py -- --preview`; testes `-- --only=scenery_t192`; T-188: prints `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t188.sh` (em `docs/capturas_t188/`); custo `bash tools/measure_t188.sh [quadros] [day ou night]` (`MEASURE_EXTRA="--t188=off"`); texturas `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` e `godot --path game -s res://tools_dev/make_neon_atlas.gd` (janela); testes `-- --only=scenery_t188`; no log aparece `SCENIC_T188 ...` |
 | Modelos novos (T-193) | corrida normal; desligar `-- --no-city-models` (prédios texturizados e skyline), `--no-unique-car`; trens `--train=freight`; prints `bash tools/capture_t193.sh PASTA [day night]` (em `docs/capturas_t193/`, folhas `folha_day/night/trens/modelos.png`); custo `MEASURE_Q=media bash tools/measure_t192.sh 3000 night` (antes: `MEASURE_EXTRA="--no-city-models --no-unique-car"`, em `docs/capturas_t193/custo_*.txt`); carro único `-s res://tools_dev/probe_unique_t193.gd`; regerar: ver `docs/BIBLIOTECA_CENARIO.md` seção 4; testes `-- --only=scenery_t193` |
 | PC Ultra + vida do cenário (T-189) | PC abre em Forward+/Ultra; Opções > Gráficos: Qualidade (Ultra só no PC), "Vida do cenário", "Borrão de velocidade", "Chuva"; forçar `-- --quality=3`, `--life=off\|on`, `--rain`/`--no-rain`, `--motion-blur`, `--time=dawn`; média como no celular: `godot --path game --rendering-method gl_compatibility ... -- --quality=1 --life=off`; prints `GODOT=... bash tools/capture_t189.sh PASTA [day night]` (em `docs/capturas_t189/`, folhas `folha_day/night.png`: esquerda média, direita Ultra); FPS `bash tools/measure_t189.sh [quadros] [day\|night] [1920x1080]`; testes `-- --only=ultra_look` e `-- --only=race_life`; no log `LIFE_T189 ...` |
+| Câmeras da corrida e retrovisor (T-198) | na corrida: **C** (ou ícone de câmera no canto de cima à esquerda) troca perto → padrão → longe → cinema → órbita; **R** (ou tocar no espelho) liga/desliga o retrovisor; Opções > Gráficos: Câmera da corrida, Retrovisor (Automático/Ligado/Desligado), Faixas pretas; forçar `-- --race-cam=cinema --mirror=on` (`--cine-shot=side_low`, `--letterbox=off`); prints `bash tools/capture_t198.sh PASTA [day night]` + `bash tools/sheet_t198.sh`; custo `bash tools/measure_t198.sh [3000] [night]`; testes `-- --only=race_cameras` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
-| Testes automáticos (395) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (420) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
-| Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
+| Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, H = buzina, C = câmera, R = retrovisor, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
 | Demonstração dos acessórios | `godot --path game res://scenes/tools/accessory_viewer.tscn` |
 | Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` (T-173: escapamentos, turbinas, buzinas; sem tela: `--headless ... -- --cycle-profiles`). T-197: botão DIRIGIR (roteiro lenta → marchas → freio-motor → freada), Leve (Canter), Som antigo, Cabine |
@@ -229,6 +230,12 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-198 (2026-10-22): câmeras da corrida e retrovisor.** No PC: `godot --path game res://scenes/race/race3d.tscn --
+  --route=kanto_1_coast`, apertar **C** várias vezes (padrão → longe → cinema → órbita → perto) e **R** (retrovisor).
+  Ver `docs/capturas_t198/folha_cameras.png` (esquerda dia, direita noite). Dizer: tamanho/lugar do espelho, se a
+  câmera perto devia ser mais baixa (hoje fica logo acima do baú para ainda ver a pista), ritmo dos cortes do cinema,
+  velocidade da órbita. Câmera de cabine ficou fora (decisão de 2026-10-17 "primeira pessoa: descartada"): quer rever?
+  **Gerar o APK de novo** para testar no celular (ícone de câmera e tocar no espelho; o espelho não foi medido no celular).
 - **T-197 (2026-10-22): som dos caminhões e do bonde.** Ouvir `docs/audio_t197/` (fone ou caixa; no celular o grave
   some): `antes_*.wav` × `depois_*.wav` com o mesmo roteiro (lenta 2,5 s, acelera trocando marchas até 15,5 s, solta,
   freia até parar em ~23 s, lenta). `depois_bonde_passando.wav` = bonde passando a 25 m. Dizer qual parte ainda soa
