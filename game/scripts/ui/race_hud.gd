@@ -21,6 +21,7 @@ var banner: String = ""
 var banner_time: float = 0.0
 var rival_idx: int = -1                  # indice do rival da rota (marcador dourado na barra de progresso)
 var cargo_notice: Array[String] = []     # aviso da carga antes da largada (linhas)
+var fps_y: float = 66.0                  # T-198: o contador de FPS desce quando o retrovisor esta na tela
 var _hf: Font
 var _bf: Font
 var _panel_sb: StyleBoxFlat
@@ -91,7 +92,7 @@ func _draw() -> void:
 	_draw_timer(w)
 	_draw_dash(t, w)
 	if Settings.show_fps:
-		_lbl(Vector2(w * 0.5 - 20, 66), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
+		_lbl(Vector2(w * 0.5 - 20, fps_y), "FPS %d" % Engine.get_frames_per_second(), 8, Color(1, 1, 1, 0.6), HORIZONTAL_ALIGNMENT_CENTER, 40.0)
 	if countdown > 0.0:
 		var low: float = 0.58 if cargo_notice.is_empty() else 0.6
 		_num(Vector2(0, size.y * low), "%d" % int(ceil(countdown)), 56, GOLD, HORIZONTAL_ALIGNMENT_CENTER, w)

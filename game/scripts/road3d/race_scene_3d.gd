@@ -79,6 +79,7 @@ var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so 
 var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
+var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrovisor (R); so apresentacao, local
 
 
 func _ready() -> void:
@@ -296,10 +297,18 @@ func _ready() -> void:
 				sim.trucks[k].speed = v0
 				_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 			_countdown = 0.0
-	if DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false):
+	var touch: bool = DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false)
+	if touch:
 		var tc := TouchControls.new()
 		tc.target = input
 		layer.add_child(tc)
+	_camv = RaceCamView.new()
+	add_child(_camv)
+	_camv.anchor_node = _trucks[player]
+	_camv.setup(path, sim.track.events, tunnels, String(route.id) if route != null else "", layer, self,
+			62.0 if sim.deadline > 0.0 else 40.0, q, touch, world["env"])
+	_camv.layout(get_viewport().get_visible_rect().size.x / 2.0)
+	get_viewport().size_changed.connect(func() -> void: _camv.layout(get_viewport().get_visible_rect().size.x / 2.0))
 	_build_pause_menu()
 	_fps_log = "--fps-log" in args
 	if _fps_log:
@@ -756,6 +765,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
 	var k: float = sim.trucks[player].length / Collision.LEN       # Canter (7 m): camera um pouco mais perto e baixa
+	if _camv != null:
+		return _camv.rig.chase_target(z, x, k)                      # T-198: perto / padrao / longe (padrao = a de baixo)
 	var pos: Vector3 = path.world_point(z - (10.0 + 4.5 * k), x * 0.85, 4.6 + 1.0 * k)
 	var look: Vector3 = path.world_point(z + 14.0, x * 0.45, 1.8)
 	return [pos, look]
@@ -770,6 +781,9 @@ func _snap_camera() -> void:
 
 func _update_camera(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
+	var racing: bool = _countdown <= 0.0 and not _result_shown
+	var ext: bool = _demo.cam_mode != "" or _cinema.active()
+	_update_cam_view(dt, racing, ext)
 	if _demo.camera(_cam, path, _player_z(), _player_x(), t.length):
 		return
 	if _align_camera():
@@ -778,6 +792,11 @@ func _update_camera(dt: float) -> void:
 		_speed_fx.update(t.speed, dt)
 		return
 	var z: float = _player_z()
+	if racing and _camv.apply_free(dt, _cam, Vector3(z, _player_x() * Track.ROAD_HALF_WIDTH_M, t.length), t.speed,
+			_cam_rival()):                                        # T-198: cinema / orbita
+		_speed_fx.update(t.speed, dt)
+		_scrape_sparks(t, dt)
+		return
 	var ex: Array = _speed_fx.camera_extra(t.speed, sim.track.curve_at(z + 30.0), dt)   # atraso na curva + tremor
 	var c: Array[Vector3] = _cam_target(z + t.speed * 0.02, _player_x())
 	var right: Vector3 = path.right_at(z) * Track.ROAD_HALF_WIDTH_M
@@ -790,11 +809,48 @@ func _update_camera(dt: float) -> void:
 	if s > 0.0:
 		_cam.global_position += Vector3(randf_range(-s, s), randf_range(-s, s), randf_range(-s, s))
 	_cam.look_at(look, Vector3.UP)
-	_cam.global_position += _cam.global_basis * (ex[2] as Vector3)
+	_cam.global_position += _cam.global_basis * ((ex[2] as Vector3) * _camv.rig.fx_scale())
 	_cam.global_position += _cam.global_basis * _impact.sway_camera(player)     # T-152: a camera sente o tranco
-	_cam.fov = lerpf(_cam.fov, 56.0 + _speed_fx.fov_extra(t.speed) + t.draft * 6.0, minf(3.0 * dt, 1.0))
+	var fov: float = _camv.rig.chase_fov() + (_speed_fx.fov_extra(t.speed) + t.draft * 6.0) * _camv.rig.fx_scale()
+	_cam.fov = lerpf(_cam.fov, fov, minf(3.0 * dt, 1.0))
+	if _camv.rig.blending():                                     # T-198: troca de camera suave
+		var b: Array = _camv.rig.blend(_cam.global_position, look, fov, _trucks[player].global_position, dt)
+		_cam.global_position = b[0]
+		_cam.look_at(b[1], Vector3.UP)
+		_cam.fov = b[2]
 	_speed_fx.update(t.speed, dt)
 	_scrape_sparks(t, dt)
+
+
+## T-198: letterbox, retrovisor (com o caminhao mais perto atras) e estado das cameras.
+func _update_cam_view(dt: float, racing: bool, external_cut: bool) -> void:
+	var pz: float = _player_z()
+	var gap: float = INF
+	var is_rival: bool = false
+	for k in sim.trucks.size():
+		if k == player or sim.trucks[k].z >= pz:
+			continue
+		var g: float = maxf(pz - (sim.trucks[k].z + sim.trucks[k].length), 0.0)
+		if g < gap:
+			gap = g
+			is_rival = k in _rival_idx
+	_camv.update(dt, racing, external_cut, path, pz, _player_x(), gap, is_rival)
+	_hud.fps_y = _camv.mirror.position.y + RearMirror.RECT_SIZE.y + 10.0 if _camv.mirror.active() else 66.0
+
+
+## Rival da camera cinema: o da rota, ou o caminhao mais perto (corrida rapida). Vector3(z, lateral m, comprimento).
+func _cam_rival() -> Vector3:
+	var best: int = _rival_idx[0] if not _rival_idx.is_empty() else -1
+	if best < 0:
+		var d: float = INF
+		for k in sim.trucks.size():
+			if k != player and absf(sim.trucks[k].z - _player_z()) < d:
+				d = absf(sim.trucks[k].z - _player_z())
+				best = k
+	if best < 0:
+		return Vector3(NAN, 0.0, 0.0)
+	var r: TruckSim = sim.trucks[best]
+	return Vector3(r.z, r.x * Track.ROAD_HALF_WIDTH_M, r.length)
 
 
 ## Faiscas ao raspar na mureta (a sim prende o caminhao no limite lateral |x| = 1,6).

@@ -23,6 +23,10 @@ var menu_bg: String = "a"               # fundo da tela inicial: "a" posto a noi
 var explorer_mode: bool = false         # T-181: camera livre (F1 / pausa) tambem fora da build de debug
 var fx_life: bool = true                # T-189: vida do cenario (vento, passaros, insetos, vapor, transito contrario, pessoas, som ambiente)
 var fx_motion_blur: bool = false        # T-189: borrao de velocidade (so Ultra; opcional)
+var race_cam: String = "standard"       # T-198: camera da corrida (RaceCamRig.IDS); a ultima escolhida
+var race_cam_routes: Dictionary = {}    # T-198: rota -> camera usada nela da ultima vez
+var mirror_mode: int = 0                # T-198: retrovisor 0 automatico (RaceCamView.mirror_auto_on), 1 ligado, 2 desligado
+var cam_letterbox: bool = true          # T-198: faixas pretas da camera cinema
 ## T-189: versao do arquivo de opcoes. Quem vinha de antes (sem a chave) e estava em Alta num PC com Forward+ sobe uma vez para Ultra.
 const GRAPHICS_VERSION: int = 2
 
@@ -79,6 +83,11 @@ func load_settings(path: String = PATH) -> void:
 	explorer_mode = bool(cfg.get_value("advanced", "explorer_mode", explorer_mode))
 	fx_life = bool(cfg.get_value("graphics", "fx_life", fx_life))
 	fx_motion_blur = bool(cfg.get_value("graphics", "fx_motion_blur", fx_motion_blur))
+	race_cam = String(cfg.get_value("camera", "race_cam", race_cam))
+	var per_route: Variant = cfg.get_value("camera", "race_cam_routes", {})
+	race_cam_routes = per_route if per_route is Dictionary else {}
+	mirror_mode = clampi(int(cfg.get_value("camera", "mirror_mode", mirror_mode)), 0, 2)
+	cam_letterbox = bool(cfg.get_value("camera", "letterbox", cam_letterbox))
 
 
 func save_settings(path: String = PATH) -> void:
@@ -103,6 +112,10 @@ func save_settings(path: String = PATH) -> void:
 	cfg.set_value("graphics", "fx_life", fx_life)
 	cfg.set_value("graphics", "fx_motion_blur", fx_motion_blur)
 	cfg.set_value("graphics", "version", GRAPHICS_VERSION)
+	cfg.set_value("camera", "race_cam", race_cam)
+	cfg.set_value("camera", "race_cam_routes", race_cam_routes)
+	cfg.set_value("camera", "mirror_mode", mirror_mode)
+	cfg.set_value("camera", "letterbox", cam_letterbox)
 	cfg.save(path)
 
 

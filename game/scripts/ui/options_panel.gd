@@ -102,6 +102,15 @@ func _show(id: String) -> void:
 			if UltraLook.available():
 				_toggle(Tr.t("options.fx_motion_blur"), _s.fx_motion_blur, func(on: bool) -> void: _s.fx_motion_blur = on)
 			_hint(Tr.t("options.fx_hint"))
+			var cams: Array[String] = RaceCamRig.IDS                 # T-198: camera da corrida e retrovisor
+			_choice(Tr.t("options.race_cam"), cams.map(func(k: String) -> String: return Tr.t("options.race_cam_" + k)),
+					maxi(cams.find(_s.race_cam), 0), func(i: int) -> void:
+						_s.race_cam = cams[i]
+						_s.race_cam_routes = {})                       # a escolha aqui vale para todas as rotas
+			_choice(Tr.t("options.mirror"), [Tr.t("options.mirror_auto"), Tr.t("options.mirror_on"), Tr.t("options.mirror_off")],
+					_s.mirror_mode, func(i: int) -> void: _s.mirror_mode = i)
+			_toggle(Tr.t("options.cam_letterbox"), _s.cam_letterbox, func(on: bool) -> void: _s.cam_letterbox = on)
+			_hint(Tr.t("options.cam_hint"))
 		"audio":
 			_slider(Tr.t("options.music"), _s.music_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.music_volume = v, true)
 			_slider(Tr.t("options.sfx"), _s.sfx_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.sfx_volume = v, true)
