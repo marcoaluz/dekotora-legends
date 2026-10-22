@@ -1,0 +1,7 @@
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_litoral_day.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_cidade_day.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_montanha_day.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_litoral_night.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_cidade_night.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_montanha_night.png
+/d/DEV/dekotora-legends/dekotora-legends/docs/capturas_t192/folha_resumo.png
