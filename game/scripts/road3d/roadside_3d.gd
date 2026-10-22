@@ -97,7 +97,7 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 			_add_multi(_pool(), groups[key], pool_mat)
 		elif name in LAMPS and not tod.lamps_on:
 			_add_multi(_lamp_unlit(name), groups[key])
-		elif name.begins_with("tree_leafy"):
+		elif BackdropKit.is_card_tree(name):          # Gleditsias + T-192 pinheiro/cedro/redonda/arbusto/coqueiros
 			var far: ArrayMesh = BackdropKit.tree_mesh_of(name + "_lod1", tod) if ResourceLoader.exists("%s%s_lod1.glb" % [DIR, name]) else null
 			_add_multi(BackdropKit.tree_mesh_of(name, tod), groups[key], null, far)
 		elif name == RockKit.MODEL:
@@ -224,10 +224,14 @@ func _add_multi(mesh: Mesh, xforms: Array, mat: Material = null, far: Mesh = nul
 func _multi_node(mesh: Mesh, xforms: Array, mat: Material, begin: float, end: float) -> void:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
+	var tint: bool = BackdropKit.is_card_tree(String(mesh.resource_name).get_file().get_basename())
+	mm.use_colors = tint                           # T-192: cada arvore com um tom de verde (cor por copia x cor por vertice)
 	mm.mesh = mesh
 	mm.instance_count = xforms.size()
 	for i in xforms.size():
 		mm.set_instance_transform(i, xforms[i])
+		if tint:
+			mm.set_instance_color(i, tree_tint((xforms[i] as Transform3D).origin))
 	var mi := MultiMeshInstance3D.new()
 	mi.multimesh = mm
 	mi.visibility_range_begin = begin
@@ -240,6 +244,15 @@ func _multi_node(mesh: Mesh, xforms: Array, mat: Material, begin: float, end: fl
 		mi.material_override = mat
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+
+
+## T-192: tom de cada arvore (deterministico pela posicao): mais amarelada, mais azulada, mais clara ou escura.
+static func tree_tint(p: Vector3) -> Color:
+	var h: int = absi(hash(Vector2i(int(p.x * 3.0), int(p.z * 3.0))))
+	var a: float = float(h % 1000) / 999.0
+	var b: float = float((h / 1000) % 1000) / 999.0
+	var k: float = 0.84 + 0.16 * b
+	return Color(k * (0.84 + 0.16 * a), k * (0.96 + 0.04 * (1.0 - 2.0 * absf(a - 0.5))), k * (0.9 - 0.15 * a), 1.0)
 
 
 func _pool() -> PlaneMesh:

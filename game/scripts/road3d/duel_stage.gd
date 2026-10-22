@@ -202,9 +202,12 @@ func _toll_plaza(tod: TimeOfDay) -> void:
 	for i in 12:                                                                      # tree line closing the view
 		var ang: float = float(i) / 12.0 * TAU
 		var r: float = 38.0 + float(i % 3) * 6.0
-		var tree: String = "res://assets/scenery/%s.glb" % kinds[i % 3]
-		_glb(tree if ResourceLoader.exists(tree) else "res://assets/scenery/tree_pine.glb",
-			Transform3D(Basis(Vector3.UP, ang).scaled(Vector3.ONE * (1.8 + 0.3 * float(i % 3))), Vector3(sin(ang) * r, 0.0, cos(ang) * r)))
+		var tree := MeshInstance3D.new()                                            # T-192: folhagem em camadas
+		tree.mesh = BackdropKit.tree_mesh_of(kinds[i % 3], _tod)
+		tree.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		tree.transform = Transform3D(Basis(Vector3.UP, ang).scaled(Vector3.ONE * (1.8 + 0.3 * float(i % 3))),
+			Vector3(sin(ang) * r, 0.0, cos(ang) * r))
+		add_child(tree)
 	_billboard(Vector3(26.0, 0.0, -24.0), 1)
 
 

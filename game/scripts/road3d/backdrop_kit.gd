@@ -15,6 +15,9 @@ const MOUNTAINS: Array[String] = ["mountain_a", "mountain_b", "mountain_c", "mou
 const TREE := "res://assets/scenery/tree_leafy.glb"
 const WATER_NRM := TEX_DIR + "water_waves_nrm.png"
 const LEAVES_TEX := TEX_DIR + "tree_leafy_leaves.png"
+const FOLIAGE_TEX := TEX_DIR + "foliage_leaves.png"     # T-192: pine, cedar, round tree, bush, palms (atlas)
+## T-192: code-made trees with layered card foliage (build_foliage_t192.py); materials by name like the Gleditsias.
+const FOLIAGE: Array[String] = ["tree_pine", "tree_cedar", "tree_round", "bush", "palm", "palm_tall", "palm_bent"]
 
 ## T-179: as montanhas ficam a 1-4 km da pista. A neblina do jogo (feita para 300-600 m) apagava tudo isso na tarde e
 ## na noite, entao o shader tem a PROPRIA neblina leve (`haze`, pela distancia de verdade, com teto `haze_max`) e
@@ -65,6 +68,11 @@ static func mountains_available() -> bool:
 
 static func water_available() -> bool:
 	return enabled() and ResourceLoader.exists(WATER_NRM)
+
+
+## T-192: tree model drawn with the built materials (Gleditsias and the redone code-made trees).
+static func is_card_tree(name: String) -> bool:
+	return name.begins_with("tree_leafy") or name.trim_suffix("_lod1") in FOLIAGE
 
 
 static func tree_available() -> bool:
@@ -126,7 +134,8 @@ static func tree_mesh_of(name: String, tod: TimeOfDay) -> ArrayMesh:
 	var src: ArrayMesh = GlbMesh.merged(glb)
 	var out := ArrayMesh.new()
 	out.resource_name = glb                   # T-181: source shown by the explorer camera
-	var leaves: StandardMaterial3D = _leaves(day, TEX_DIR + name.trim_suffix("_lod1") + "_leaves.png")
+	var base: String = name.trim_suffix("_lod1")
+	var leaves: StandardMaterial3D = _leaves(day, FOLIAGE_TEX if base in FOLIAGE else TEX_DIR + base + "_leaves.png")
 	var bark: StandardMaterial3D = _bark(day)
 	for s in src.get_surface_count():
 		var mname: String = src.surface_get_material(s).resource_name if src.surface_get_material(s) != null else ""
