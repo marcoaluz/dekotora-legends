@@ -165,6 +165,16 @@ func _ready() -> void:
 	var over := Overpass3D.new()                   # T-164: viaduto rodoviario cruzando por cima (Ponte A)
 	add_child(over)
 	over.build(path, rid, tod, -1.2 - RoadMesh.deck_height(scenery), _rail.lines)
+	var uniq_z: float = -1.0                       # T-193: the "only one car" (parked once per race, scenery only)
+	if UniqueCar.enabled():
+		var busy: Array[Vector2] = []
+		for t in tunnels + bridges:
+			busy.append(Vector2(t.x, t.x + t.y))
+		for o in OverpassLayout.for_route(rid):
+			busy.append(Vector2(float(o["z"]), float(o["z"])))
+		uniq_z = UniqueCar.spot_z(sim.track, rid, busy)
+		var spot: Array = UniqueCar.SPOTS.get(rid, UniqueCar.DEFAULT_SPOT)
+		over_out = over_out + UniqueCar.keep_out(path, uniq_z, float(spot[1]) * float(spot[2]))
 	var city := CityBuilder.new()
 	city.keep_out = RailwayLayout.keep_out(_rail.lines) + over_out
 	var scenic := ScenicStretch.new()              # T-188: terreno, montanhas em camadas, quarteiroes, floresta
@@ -173,6 +183,12 @@ func _ready() -> void:
 	city.zone = zone
 	add_child(city)
 	city.build(path, 21, scenery, tod)
+	if scenery == &"city" and zone.y > zone.x:      # T-193: far block of towers (docs/Modelos/Cidade)
+		CityModels.add_skyline(scenic, path, tod, city.keep_out)
+	if uniq_z >= 0.0:
+		var uniq := UniqueCar.new()
+		add_child(uniq)
+		uniq.build(path, rid, tod, uniq_z, scenic.field)
 	var power := PowerLines3D.new()                # T-163: postes de energia com fios (montanha, litoral)
 	add_child(power)
 	power.keep_out = over_out

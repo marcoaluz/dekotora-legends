@@ -34,6 +34,7 @@ var _props: Array = []
 var _roofs: Array = []
 var _lines: Array = []
 var _neon: NeonSigns
+var models: CityModels                   # T-193: textured buildings (docs/Modelos/Cidade) on some lots
 
 
 func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -> void:
@@ -43,6 +44,8 @@ func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -
 	_rng.seed = seed_ + 55
 	_neon = NeonSigns.new()
 	add_child(_neon)
+	if field.kind == &"city" and CityModels.enabled():
+		models = CityModels.new(tod, seed_, int(Settings.quality))
 	if field.kind == &"city":
 		_city()
 	elif field.kind == &"coast":
@@ -97,11 +100,12 @@ func _block(za: float, zb: float, side: float, la: float, lb: float, row: int) -
 			var ld: float = along / float(n_al)
 			var off: Vector3 = right * side * (-across * 0.5 + lw * (float(i) + 0.5)) + fwd * (-along * 0.5 + ld * (float(j) + 0.5))
 			var front: bool = row == 0 and i == 0
-			_building(c + off + Vector3.UP * SLAB_H, by, right * -side, fwd, lw, ld, row, front)
+			_building(c + off + Vector3.UP * SLAB_H, by, right * -side, fwd, lw, ld, row, front, zc)
 
 
 ## A building on a lot of lw (across) x ld (along) metres; `to_road` = horizontal direction of the road.
-func _building(base: Vector3, by: Basis, to_road: Vector3, fwd: Vector3, lw: float, ld: float, row: int, front: bool) -> void:
+func _building(base: Vector3, by: Basis, to_road: Vector3, fwd: Vector3, lw: float, ld: float, row: int, front: bool,
+		z: float = 0.0) -> void:
 	var w: float = maxf(snappedf(lw - SETBACK_M * 2.0, 3.0), 9.0)
 	var d: float = maxf(snappedf(ld - SETBACK_M * 2.0, 3.0), 9.0)
 	var lo: int = [3, 5, 8][mini(row, 2)]
@@ -112,18 +116,30 @@ func _building(base: Vector3, by: Basis, to_road: Vector3, fwd: Vector3, lw: flo
 	var shop: bool = front or _rng.randf() < 0.25
 	var wall: Color = WALLS[_rng.randi() % WALLS.size()]
 	wall.a = (float(style) + 0.5) / 16.0 + (0.5 if shop else 0.0)
-	_b.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), base + Vector3.UP * h * 0.5), wall])
+	var model := Vector3.ZERO                                        # T-193: a textured building on this lot?
+	if models != null:
+		model = models.try_place(base, by, w, d, row, float(hi + 12) * FLOOR_M, z)
+	if model != Vector3.ZERO:
+		w = model.x
+		d = model.z
+		h = model.y
+		floors = int(h / FLOOR_M)
+	else:
+		_b.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), base + Vector3.UP * h * 0.5), wall])
 	building_count += 1
 	var face_lat: float = _lat_of(base - to_road * w * 0.5)
 	nearest_facade_m = minf(nearest_facade_m, face_lat)
 	var top: float = h
-	if floors > 10 and _rng.randf() < 0.35:                          # tier on top
+	if model != Vector3.ZERO:
+		pass                                                         # the model has its own roof
+	elif floors > 10 and _rng.randf() < 0.35:                        # tier on top
 		var f2: int = _rng.randi_range(2, 6)
 		var h2: float = float(f2) * FLOOR_M + 1.0
 		_b.append([Transform3D(by * Basis.from_scale(Vector3(snappedf(w * 0.6, 3.0), h2, snappedf(d * 0.6, 3.0))),
 			base + Vector3.UP * (h + h2 * 0.5)), Color(wall.r, wall.g, wall.b, (float(style) + 0.5) / 16.0)])   # no shops up there
 		top += h2
-	_roof_props(base + Vector3.UP * top, by, w * (0.6 if top > h else 1.0), d * (0.6 if top > h else 1.0))
+	if model == Vector3.ZERO:
+		_roof_props(base + Vector3.UP * top, by, w * (0.6 if top > h else 1.0), d * (0.6 if top > h else 1.0))
 	if front and _rng.randf() < 0.6:                                 # vertical neon on the face toward the road
 		var sh: float = clampf(float(floors) * 1.1, 4.5, 9.0)
 		var at: Vector3 = base + to_road * (w * 0.5 + 0.6) + fwd * (d * 0.5 - 1.6) * (1.0 if _rng.randf() < 0.5 else -1.0)
@@ -231,6 +247,8 @@ func _commit(tod: TimeOfDay) -> void:
 	_multi(box, _props, CityLook.props())
 	_multi(CityLook.prism(), _roofs, CityLook.roof())
 	_multi(plane, _lines, CityLook.props())
+	if models != null:
+		models.commit(self, tod)
 
 
 func _multi(mesh: Mesh, items: Array, mat: Material) -> void:

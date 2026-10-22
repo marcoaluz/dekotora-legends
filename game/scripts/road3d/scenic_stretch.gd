@@ -34,5 +34,8 @@ func build(path: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay, 
 		blocks = CityBlocks.new()
 		add_child(blocks)
 		blocks.build(field, tod, keep_out, seed_)
-	print("SCENIC_T188 %s zona=%d-%d terreno=%d tri cordilheira=%d floresta=%d predios=%d" % [route_id, int(zone.x),
-		int(zone.y), terrain.tri_count, ridge_count, forest_count, blocks.building_count if blocks != null else 0])
+	print("SCENIC_T188 %s zona=%d-%d terreno=%d tri cordilheira=%d floresta=%d predios=%d modelos_t193=%d (%d tri)" % [
+		route_id, int(zone.x), int(zone.y), terrain.tri_count, ridge_count, forest_count,
+		blocks.building_count if blocks != null else 0,
+		blocks.models.placed if blocks != null and blocks.models != null else 0,
+		blocks.models.tris if blocks != null and blocks.models != null else 0])
