@@ -3,13 +3,16 @@ extends Node3D
 ## T-189: the "life" of the race scenery, everything only visual (no sim, no network, never an obstacle) and behind
 ## Settings.fx_life (off by default on the phone):
 ##   wind on trees and bushes (LifeWind), falling leaves near the camera, bird flocks by day (LifeBirds),
-##   factory/village smoke, drain steam and insects at the lamps (LifeEmitters), cloud shadows (CloudShadows, PC).
+##   factory/village smoke, drain steam and insects at the lamps (LifeEmitters), cloud shadows (CloudShadows, PC),
+##   cars and people on the city streets beside the viaduct (LifeStreets), train horn and rumble (LifeTrainSounds).
 ## The race calls build() once, attach_camera() once and update() every frame.
 
 var wind_nodes: int = 0
 var _birds: LifeBirds
 var _emit: LifeEmitters
 var _clouds: CloudShadows
+var _streets: LifeStreets
+var _trains: LifeTrainSounds
 var _leaves: CPUParticles3D
 var _tod: TimeOfDay
 var _scenery: StringName
@@ -21,8 +24,10 @@ static func enabled() -> bool:
 	return s != null and bool(s.get("fx_life"))
 
 
+## `field`/`zone` = T-188 terrain and stretch (null / NONE without it); `rail` = the T-154 railway (or null).
 func build(path: TrackPath, route_id: String, scenery: StringName, tod: TimeOfDay, q: int, roadside: Node,
-		tunnels: Array[Vector2], bridges: Array[Vector2]) -> void:
+		tunnels: Array[Vector2], bridges: Array[Vector2], field: TerrainField = null, zone: Vector2 = Vector2.ZERO,
+		rail: Railway3D = null) -> void:
 	name = "RaceLife"
 	_tod = tod
 	_scenery = scenery
@@ -45,8 +50,19 @@ func build(path: TrackPath, route_id: String, scenery: StringName, tod: TimeOfDa
 		_clouds.name = "CloudShadows"
 		add_child(_clouds)
 		_clouds.setup(path, route_id, tod)
-	print("LIFE_T189 %s wind=%d flocks=%d smoke=%d steam=%d insects=%d clouds=%s" % [route_id, wind_nodes, flocks,
-		_emit.sources["smoke"].size(), _emit.sources["steam"].size(), _emit.sources["insects"].size(), _clouds != null])
+	if scenery == &"city" and zone.y > zone.x:
+		_streets = LifeStreets.new()
+		_streets.name = "Streets"
+		add_child(_streets)
+		_streets.setup(path, field, zone, route_id, tod, q)
+	if rail != null:
+		_trains = LifeTrainSounds.new()
+		_trains.name = "TrainSounds"
+		add_child(_trains)
+		_trains.setup(rail)
+	print("LIFE_T189 %s wind=%d flocks=%d smoke=%d steam=%d insects=%d clouds=%s street_cars=%d street_people=%d" % [route_id,
+		wind_nodes, flocks, _emit.sources["smoke"].size(), _emit.sources["steam"].size(), _emit.sources["insects"].size(),
+		_clouds != null, _streets._cars.size() if _streets != null else 0, _streets.people_count if _streets != null else 0])
 
 
 ## Falling leaves ahead of the camera (day/dusk, not on the city viaduct).
@@ -100,3 +116,7 @@ func update(dt: float, player_z: float, cam_pos: Vector3) -> void:
 		_emit.update(dt, cam_pos)
 	if _clouds != null:
 		_clouds.update(dt, player_z)
+	if _streets != null:
+		_streets.update(dt)
+	if _trains != null:
+		_trains.update(cam_pos)

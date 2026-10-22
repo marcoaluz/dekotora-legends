@@ -70,3 +70,22 @@ func test_birds_and_clouds() -> void:
 	check(img.get_pixel(64, 64).a > 0.8, "cloud shadow is dense in the middle")
 	check(img.get_pixel(1, 1).a < 0.05, "and soft at the border")
 	check(not CloudShadows.available(TimeOfDay.by_id(&"night")), "no cloud shadows at night")
+
+
+func test_city_streets() -> void:
+	check(LifeStreets.streets_for(Vector2.ZERO).is_empty(), "no stretch = no streets")
+	var path: TrackPath = _path()
+	var zone := Vector2(300.0, 900.0)
+	var st := LifeStreets.new()
+	st.setup(path, null, zone, "kanto_2_viaduct", TimeOfDay.by_id(&"night"), 2)
+	check_eq(st.lanes.size(), 4, "two streets, two ways each")
+	for l in st.lanes:
+		var c: float = float(l["lat"]) + float(l["dir"]) * LifeStreets.LANE_OFF     # street centre line
+		check(LifeStreets.streets_for(zone).has(c), "cars keep to the left of the street (Japan)")
+		check(absf(float(l["lat"])) > 30.0, "streets are far from the expressway (never an obstacle)")
+	for c in st._cars:
+		check(float(c["z"]) >= zone.x and float(c["z"]) <= zone.y, "cars stay on the streets of the stretch")
+	st.update(30.0)
+	for c in st._cars:
+		check(float(c["z"]) >= zone.x and float(c["z"]) <= zone.y, "and wrap around inside it")
+	st.free()

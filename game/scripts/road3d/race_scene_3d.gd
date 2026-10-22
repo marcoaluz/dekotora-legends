@@ -189,7 +189,7 @@ func _ready() -> void:
 	if RaceLife.enabled():                         # T-189: vento, passaros, fumaca, insetos, sombras de nuvem
 		_life = RaceLife.new()
 		add_child(_life)
-		_life.build(path, rid, scenery, tod, q, side, tunnels, bridges)
+		_life.build(path, rid, scenery, tod, q, side, tunnels, bridges, scenic.field, zone, _rail)
 	_fx = Fx3D.new()
 	add_child(_fx)
 	_brake_fx = BrakeFx.new()
