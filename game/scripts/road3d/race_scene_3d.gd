@@ -80,6 +80,7 @@ var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
 var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrovisor (R); so apresentacao, local
+var _drawn: Array[Vector2] = []         # T-198: (z, x) interpolados de cada caminhao no ultimo quadro (cameras sem tranco)
 
 
 func _ready() -> void:
@@ -308,6 +309,7 @@ func _ready() -> void:
 	_camv.setup(path, sim.track.events, tunnels, String(route.id) if route != null else "", layer, self,
 			62.0 if sim.deadline > 0.0 else 40.0, q, touch, world["env"])
 	_camv.layout(get_viewport().get_visible_rect().size.x / 2.0)
+	RearMirror.hide_from_mirror(_cam)              # chuva, folhas e borrao presos na camera nao aparecem no espelho
 	get_viewport().size_changed.connect(func() -> void: _camv.layout(get_viewport().get_visible_rect().size.x / 2.0))
 	_build_pause_menu()
 	_fps_log = "--fps-log" in args
@@ -741,6 +743,9 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			z = _player_z() if k == player else t.z
 			x = _player_x() if k == player else t.x
 		var node: TruckNode = _trucks[k]
+		if _drawn.size() != sim.trucks.size():
+			_drawn.resize(sim.trucks.size())
+		_drawn[k] = Vector2(z, x)
 		var al: Vector2 = Vector2.ZERO                  # T-156: manobra de alinhamento no comeco da contagem
 		if _intro != null and _intro.kind != DuelPlan.NONE and _countdown > 0.0:
 			al = DuelShots.align_offset(t.x, DuelShots.align_progress(_countdown))
@@ -792,7 +797,8 @@ func _update_camera(dt: float) -> void:
 		_speed_fx.update(t.speed, dt)
 		return
 	var z: float = _player_z()
-	if racing and _camv.apply_free(dt, _cam, Vector3(z, _player_x() * Track.ROAD_HALF_WIDTH_M, t.length), t.speed,
+	var me: Vector2 = _drawn[player] if _drawn.size() > player else Vector2(z, _player_x())
+	if racing and _camv.apply_free(dt, _cam, Vector3(me.x, me.y * Track.ROAD_HALF_WIDTH_M, t.length), t.speed,
 			_cam_rival()):                                        # T-198: cinema / orbita
 		_speed_fx.update(t.speed, dt)
 		_scrape_sparks(t, dt)
@@ -834,7 +840,8 @@ func _update_cam_view(dt: float, racing: bool, external_cut: bool) -> void:
 		if g < gap:
 			gap = g
 			is_rival = k in _rival_idx
-	_camv.update(dt, racing, external_cut, path, pz, _player_x(), gap, is_rival)
+	var me: Vector2 = _drawn[player] if _drawn.size() > player else Vector2(pz, _player_x())
+	_camv.update(dt, racing, external_cut, path, me.x, me.y, gap, is_rival)
 	_hud.fps_y = _camv.mirror.position.y + RearMirror.RECT_SIZE.y + 10.0 if _camv.mirror.active() else 66.0
 
 
@@ -850,7 +857,8 @@ func _cam_rival() -> Vector3:
 	if best < 0:
 		return Vector3(NAN, 0.0, 0.0)
 	var r: TruckSim = sim.trucks[best]
-	return Vector3(r.z, r.x * Track.ROAD_HALF_WIDTH_M, r.length)
+	var d2: Vector2 = _drawn[best] if _drawn.size() > best else Vector2(r.z, r.x)
+	return Vector3(d2.x, d2.y * Track.ROAD_HALF_WIDTH_M, r.length)
 
 
 ## Faiscas ao raspar na mureta (a sim prende o caminhao no limite lateral |x| = 1,6).

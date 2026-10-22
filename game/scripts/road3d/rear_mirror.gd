@@ -19,6 +19,7 @@ const LOOK_BACK_M: float = 35.0
 const ALERT_M: float = 45.0                # border lights up when a truck is this close behind
 const CLOSE_M: float = 14.0
 const ENV_SYNC_S: float = 0.25
+const MAIN_CAM_ONLY_LAYER: int = 20        # render layer of the effects glued to the race camera (rain, leaves, blur)
 const GOLD := Color("#f5cc5a")
 const PINK := Color("#ff2e88")
 const TAB_SIZE := Vector2(30, 10)
@@ -64,6 +65,7 @@ func setup(top: float, q: int) -> void:
 	_cam.fov = FOV
 	_cam.near = 0.4
 	_cam.far = FAR_M
+	_cam.set_cull_mask_value(MAIN_CAM_ONLY_LAYER, false)
 	_vp.add_child(_cam)
 	_cam.current = true
 	_tex = TextureRect.new()
@@ -92,6 +94,16 @@ func use_environment(src: Environment) -> void:
 	_env.sdfgi_enabled = false
 	_env.volumetric_fog_enabled = false
 	_cam.environment = _env
+
+
+## Effects that hang in front of the race camera (rain sheet, leaves, motion blur quad) would show up in the mirror as
+## floating rectangles 15 m behind the truck: move them to a layer the mirror camera does not draw.
+static func hide_from_mirror(root: Node) -> void:
+	for c in root.get_children():
+		var g: GeometryInstance3D = c as GeometryInstance3D
+		if g != null:
+			g.layers = 1 << (MAIN_CAM_ONLY_LAYER - 1)
+		hide_from_mirror(c)
 
 
 func set_enabled(on: bool) -> void:
