@@ -72,7 +72,7 @@ func build(path_: TrackPath, kind_: StringName = &"city", tod_: TimeOfDay = null
 	tunnels = tunnels_
 	_deck = deck_height(kind)
 	_make_materials()
-	var total: int = path.track.segment_count()
+	var total: int = path.seg_total()                  # T-195: + a continuacao depois da chegada (TrackPath.runout)
 	_prof.resize(total + 1)
 	for i in total + 1:
 		_prof[i] = LaneSections.profile(path.track.events, float(i) * Track.SEG_LEN)
@@ -333,7 +333,7 @@ func _build_chunk(s0: int, s1: int) -> void:
 		var shoulder: Color = Color(0.86, 0.86, 0.88) * (_lane_tint(i, 9) if tunnel else Color.WHITE)
 		_strip(rs, i, j, -gw, -asph, 0.0, 0.0, shoulder)                     # acostamento (sem zebra)
 		_strip(rs, i, j, asph, gw, 0.0, 0.0, shoulder)
-		var sharp: bool = absf(path.track.curves[i]) >= RoadFurniture.SHARP_CURVE
+		var sharp: bool = absf(path.curve_seg(i)) >= RoadFurniture.SHARP_CURVE
 		for lane in [-1.0, 1.0]:                                            # divisao de faixas (entre as 3)
 			var c: float = lane * LANE_W * 0.5
 			if _lane_ends(z, lane):

@@ -26,6 +26,7 @@ var rails: Array = []             # T-186: Array[RailLine] (Railway3D.lines): ar
 var route_seed: int = 0           # T-186: semente dos bosques (mesma rota -> mesmas arvores)
 var tree_count: int = 0           # T-186: quantas arvores foram plantadas (testes/medidas)
 var field: TerrainField           # T-188: chao do trecho-piloto (null = chao plano de antes)
+var extra_objects: Array[Dictionary] = []   # T-195: lamps of the arrival avenue (after the finish line; no rng)
 var _pool_mesh: PlaneMesh
 var _lamp_off: Dictionary = {}
 
@@ -37,7 +38,7 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 	var groups: Dictionary = {}     # nome do modelo -> Array[Transform3D]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
-	for o in path.track.objects:
+	for o in path.track.objects + extra_objects:
 		var z: float = float(o["z"])
 		var xu: float = float(o["x"])
 		if RoadMesh.in_tunnel(z, tunnels, 6.0):

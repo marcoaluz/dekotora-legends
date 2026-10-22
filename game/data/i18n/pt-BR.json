@@ -71,6 +71,7 @@
  "hud.deadline": "PRAZO",
  "hud.lane_hint": "TOQUE: LIGA A SETA  ·  TOQUE DE NOVO: TROCA DE FAIXA",
  "hud.finish": "CHEGADA! %dº LUGAR",
+ "race.arrival_gate": "CHEGADA",
  "hud.event.accident": "ACIDENTE À FRENTE",
  "hud.event.works": "OBRAS À FRENTE",
  "hud.event.narrow": "PISTA ESTREITA À FRENTE",

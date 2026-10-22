@@ -75,9 +75,10 @@ const SKYLINE_LAT: float = 820.0
 const SKYLINE_SCALE: float = 0.7
 
 
-static func add_skyline(parent: Node3D, path: TrackPath, tod: TimeOfDay, keep_out: Array) -> int:
+## T-195: the skyline mesh with its material (shared by the city route and ArrivalCity); null if missing.
+static func skyline_mesh(tod: TimeOfDay) -> ArrayMesh:
 	if not enabled() or not ResourceLoader.exists(SKYLINE) or not ResourceLoader.exists(SKYLINE_TEX):
-		return 0
+		return null
 	var src: ArrayMesh = GlbMesh.merged(SKYLINE)
 	var mesh := ArrayMesh.new()
 	mesh.resource_name = SKYLINE
@@ -85,6 +86,13 @@ static func add_skyline(parent: Node3D, path: TrackPath, tod: TimeOfDay, keep_ou
 	for s in src.get_surface_count():
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))
 		mesh.surface_set_material(s, mat)
+	return mesh
+
+
+static func add_skyline(parent: Node3D, path: TrackPath, tod: TimeOfDay, keep_out: Array) -> int:
+	var mesh: ArrayMesh = skyline_mesh(tod)
+	if mesh == null:
+		return 0
 	var n: int = 0
 	var length: float = path.track.length_m
 	for i in SKYLINE_AT.size():

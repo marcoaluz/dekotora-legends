@@ -24,6 +24,8 @@ func build(field_: TerrainField, tod: TimeOfDay) -> void:
 	path = field.path
 	var z0: float = field.zone.x
 	var z1: float = minf(field.zone.y, path.track.length_m - 1.0)
+	if field.zone.y >= path.track.length_m - 1.0:
+		z1 = path.end_m() - 1.0                        # T-195: o chao segue pela continuacao (cidade destino)
 	if z1 <= z0:
 		return
 	var mat: ShaderMaterial = ScenicShaders.terrain(tod)

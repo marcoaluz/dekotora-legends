@@ -40,7 +40,7 @@ static func parse_km(text: String) -> float:
 
 ## Track distance (m) for a km typed by the player, kept inside the route.
 static func teleport_z(path: TrackPath, km: float) -> float:
-	return clampf(km * 1000.0, 0.0, maxf(path.track.length_m - 0.01, 0.0))
+	return clampf(km * 1000.0, 0.0, maxf(path.end_m() - 0.01, 0.0))
 
 
 ## Camera pose for a teleport to track distance `z`: [position, yaw, pitch]. Centre of the road, 6 m up,
@@ -92,7 +92,7 @@ static func nearest(path: TrackPath, p: Vector3) -> Vector3:
 		if d2 <= best_d:
 			best_d = d2
 			z = (float(i) + t) * Track.SEG_LEN
-	z = clampf(z, 0.0, path.track.length_m)
+	z = clampf(z, 0.0, path.end_m())
 	var c: Vector3 = path.center_at(z)
 	return Vector3(z, (p - c).dot(path.right_at(z)), p.y - c.y)
 

@@ -30,9 +30,9 @@ fi
 # pose = nome@km,lateral_m,altura_m,giro_graus,inclinacao_graus (giro positivo = para a esquerda)
 case "$GROUP" in
   chegada)
-    COAST="chegada@2.70,0,4.5,0,-3;linha@2.96,0,4.5,0,-3;pos@3.10,0,4.5,0,-3;alto@2.85,0,40,0,-12"
-    CITY="chegada@2.45,0,4.5,0,-3;linha@2.71,0,4.5,0,-3;pos@2.85,0,4.5,0,-3;alto@2.60,0,40,0,-12"
-    MOUNT="chegada@2.50,0,4.5,0,-3;linha@2.76,0,4.5,0,-3;pos@2.90,0,4.5,0,-3;alto@2.65,0,40,0,-12" ;;
+    COAST="chegada@2.70,0,4.5,0,-3;linha@2.96,0,4.5,0,-3;pos@3.10,0,4.5,0,-3;alto@2.85,0,40,0,-12;avenida@3.40,0,4.5,0,-3;portal@3.72,0,4.5,0,-3"
+    CITY="chegada@2.45,0,4.5,0,-3;linha@2.71,0,4.5,0,-3;pos@2.85,0,4.5,0,-3;alto@2.60,0,40,0,-12;avenida@3.15,0,4.5,0,-3;portal@3.47,0,4.5,0,-3"
+    MOUNT="chegada@2.50,0,4.5,0,-3;linha@2.76,0,4.5,0,-3;pos@2.90,0,4.5,0,-3;alto@2.65,0,40,0,-12;avenida@3.20,0,4.5,0,-3;portal@3.52,0,4.5,0,-3" ;;
   unico)
     COAST="unico@1.31,8,3.5,-28,-6;unico_perto@1.335,10,2.5,-60,-10"
     CITY="unico@0.61,8,6,-45,-28;unico_perto@0.63,10,9,-60,-14"

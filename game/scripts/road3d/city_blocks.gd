@@ -35,6 +35,8 @@ var _roofs: Array = []
 var _lines: Array = []
 var _neon: NeonSigns
 var models: CityModels                   # T-193: textured buildings (docs/Modelos/Cidade) on some lots
+var sides: Array[float] = [-1.0, 1.0]       # T-195: ArrivalCity (coast: only the land side)
+var force_city: bool = false              # T-195: ArrivalCity builds city blocks on any route
 
 
 func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -> void:
@@ -44,9 +46,9 @@ func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -
 	_rng.seed = seed_ + 55
 	_neon = NeonSigns.new()
 	add_child(_neon)
-	if field.kind == &"city" and CityModels.enabled():
+	if (field.kind == &"city" or force_city) and CityModels.enabled():
 		models = CityModels.new(tod, seed_, int(Settings.quality))
-	if field.kind == &"city":
+	if field.kind == &"city" or force_city:
 		_city()
 	elif field.kind == &"coast":
 		_coast_town()
@@ -57,7 +59,7 @@ func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -
 func _city() -> void:
 	var z0: float = field.zone.x
 	var z1: float = field.zone.y
-	for side in [-1.0, 1.0]:
+	for side in sides:
 		var lat: float = START_L if side < 0.0 else START_R
 		_street_line(z0, z1, side * (lat - STREET_M * 0.6))
 		var row: int = 0

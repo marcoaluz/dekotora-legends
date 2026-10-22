@@ -45,7 +45,7 @@ func _init(path_: TrackPath, kind_: StringName, zone_: Vector2, keep_out_: Array
 	_side.seed = seed_ + 2
 	_side.frequency = 0.0025
 	var z: float = 0.0
-	while z <= path.track.length_m:
+	while z <= path.end_m():                               # T-195: + continuacao depois da chegada
 		var c: Vector3 = path.center_at(z)
 		var key := Vector2i(floori(c.x / CELL), floori(c.z / CELL))
 		if not _cells.has(key):
@@ -81,7 +81,7 @@ func nearest(p: Vector2) -> Vector3:
 	var r: Vector3 = path.right_at(z)
 	var lat: float = (p.x - c.x) * r.x + (p.y - c.z) * r.z
 	var along: float = (p.x - c.x) * r.z - (p.y - c.z) * r.x        # forward = (r.z, -r.x) in the x/z plane
-	z = clampf(z + along, 0.0, path.track.length_m)
+	z = clampf(z + along, 0.0, path.end_m())
 	return Vector3(absf(lat), z, signf(lat) if lat != 0.0 else 1.0)
 
 

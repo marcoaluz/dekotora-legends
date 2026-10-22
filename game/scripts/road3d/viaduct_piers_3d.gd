@@ -21,7 +21,7 @@ var _cube: Array = TrackEvents3D.CUBE
 
 func build(path: TrackPath, deck: float, tod: TimeOfDay) -> void:
 	var sts: Dictionary = {}            # bloco -> SurfaceTool
-	var L: float = path.track.length_m
+	var L: float = path.end_m()                       # T-195: pilares tambem na continuacao
 	var z: float = 16.0
 	while z < L:
 		var p: Vector3 = LaneSections.profile(path.track.events, z)   # T-153: viaduto antigo mais estreito
@@ -61,7 +61,7 @@ func build(path: TrackPath, deck: float, tod: TimeOfDay) -> void:
 
 ## Laje por baixo do tabuleiro (antes, de baixo se via o ceu pelo viaduto): pedacos de SLAB_M que seguem a pista.
 func _slab(path: TrackPath, sts: Dictionary) -> void:
-	var L: float = path.track.length_m
+	var L: float = path.end_m()                       # T-195: pilares tambem na continuacao
 	var z: float = 0.0
 	while z < L - 0.5:
 		var zm: float = minf(z + SLAB_M * 0.5, L - 0.5)

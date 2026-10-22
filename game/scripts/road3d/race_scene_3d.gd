@@ -115,7 +115,7 @@ func _ready() -> void:
 			sim.deadline = route.deadline()
 		if sim.deadline > 0.0:
 			sim.deadline += track.events.time_allowance()     # T-139: o prazo estica com os eventos de pista
-	path = TrackPath.new(sim.track)
+	path = TrackPath.new(sim.track, ArrivalLayout.runout(String(route.id) if route != null else ""))   # T-195: a estrada segue depois da chegada
 	var q: int = int(Settings.quality)
 	UltraLook.apply_viewport(get_viewport(), q)    # escala 3D e antisserrilhado (T-189: FSR2 nativo no Ultra)
 	tod = _resolve_time_of_day()
@@ -130,6 +130,8 @@ func _ready() -> void:
 	road.bridges = bridges
 	var zone: Vector2 = ScenicZone.zone(String(route.id) if route != null else "", path.track.length_m)   # T-188
 	road.bare = zone
+	if zone.y >= path.track.length_m - 1.0:
+		road.bare = Vector2(zone.x, path.end_m() + 1.0)   # T-195: o TerrainPatch tambem cobre a continuacao
 	road.soft_spec = not UltraLook.active(q)        # T-195: sem pontos brilhantes no asfalto molhado
 	road.build(path, scenery, tod, tunnels)
 	if not bridges.is_empty():
@@ -202,6 +204,10 @@ func _ready() -> void:
 	side.rails = _rail.lines                       # T-186: bosques fora da ferrovia, semente pela rota
 	side.route_seed = rid.hash()
 	side.field = scenic.field                      # T-188: arvores e pedras sobre o terreno novo
+	if path.end_m() > path.track.length_m + 1.0:      # T-195: cidade destino depois da chegada (so visual)
+		var arrival := ArrivalCity.new()
+		add_child(arrival)
+		arrival.build(path, rid, scenery, tod, city.keep_out, side)
 	side.build(path, scenery, tod, tunnels)
 	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
 	if RaceLife.enabled():                         # T-189: vento, passaros, fumaca, insetos, sombras de nuvem
