@@ -95,6 +95,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-189] PC em Forward+ com qualidade Ultra (SDFGI, SSR, névoa volumétrica, LUT por hora) + vida do cenário; celular segue Compatibility (não medido no aparelho)
 - [x] [T-188/T-192] Cenário novo (terreno com morros, montanhas em 3 camadas, quarteirões com neon, litoral com casas, pedras, placas com texto, céu/noite) nas 3 rotas inteiras; pinheiro/cedro/árvore redonda/arbusto/coqueiros refeitos com folhagem em camadas; pintura 速度落とせ dentro da faixa (concluída em 2026-10-22, `tests/test_scenery_t188.gd` e `test_scenery_t192.gd`, `docs/capturas_t192/`; celular não medido)
 - [x] [T-193] Modelos das pastas novas de docs/Modelos: trens com locomotiva/vagões variados, 2 carros no trânsito, 8 prédios texturizados + skyline na cidade, neon kanji, carro único 1 vez por corrida (2026-10-22, `tests/test_scenery_t193.gd`, `docs/capturas_t193/`; celular não medido)
+- [x] [T-195] Trem do Marco (locomotiva azul refeita sem derreter, 1º trem de cada rota), antisserrilhado MSAA + folhas suaves, asfalto molhado sem chuvisco, fim da pista contínuo até a cidade destino (pórtico CHEGADA, avenida, prédio-portal, skyline), sujeira na mureta, morro da ferrovia sem triângulo preto (2026-10-22, `tests/test_scenery_t195.gd`, `docs/capturas_t195/`; celular não medido)
 - [ ] [T-192b] Pendências do Marco (não agora): copas ralas das Gleditsias adultas (d/e/f) e boneco com cara de manequim no retrato do duelo
 - [ ] [V8] Medir no celular — PRECISA MARCO (Android SDK + JDK 17 para gerar o APK)
 

@@ -193,3 +193,12 @@ um problema visual não puder ser entendido pelos renders.
   frente/traseira). Ver a frente pela prévia: os 3 carros do CARS e o Skyline vieram com a frente em -Y/-X.
 - Vagões: colapso com **solda antes** rasga contêineres; sem solda e com simetria em X fica limpo. Na prévia, cada .glb
   importado cria uma cópia do material (`rail_train.001`...): aplique a textura em todas.
+
+## Reduzir sem derreter (T-195, locomotiva do Marco)
+
+- `DECIMATE COLLAPSE` em peça de máquina (capô, cabine) derrete a silhueta: a `train_loco_b` com 5,2 mil tri virou
+  uma cunha que o Marco não reconheceu. Primeiro `bmesh.ops.dissolve_limit` (planar, 2°, `delimit={"MATERIAL"}`) e
+  depois COLLAPSE só num grupo de vértices das partes pequenas (truques/rodas, abaixo de `LOCO_LOW_Z`).
+- Pintura por face com polígonos grandes (laterais inteiras) dá manchas diagonais. Use uma tira vertical no atlas e
+  UV por vértice = altura (`livery_uv`); a célula é escrita no PNG pelo próprio script (mesmos pixels sempre).
+- PNG de 8 bits: `Image.pixels` já vem em sRGB / 255 (não converter de linear).

@@ -692,3 +692,40 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   Volume médio igualado ao antigo (acelerando −21,5 dBFS × −22,2 antes; lenta −30 × −28; o V8 com freio-motor fica
   ~2 dB mais alto que antes ao soltar, de propósito). `espectrogramas.png`: uma linha por arquivo, na ordem de
   `espectrogramas.txt` (antes primeiro); no novo dá para ver as harmônicas seguindo o giro e a queda em cada troca.
+
+## 2026-10-22 · T-195 · Trem do Marco, serrilhado, fim da pista "infinito" e polimento
+
+- **Trem do Marco** (`docs/Modelos/train/3d-model.fbx`, locomotiva diesel americana): já estava no jogo desde a T-193
+  (`train_loco_b`), mas a redução para 5,2 mil triângulos tinha **derretido** o capô e a cabine (virou uma cunha azul
+  irreconhecível) e ela só puxava metade dos trens. Refeita: corpo com a forma exata do arquivo (só truques/rodas
+  reduzidos, 6 mil tri), pintura azul com faixa creme e filete vermelho seguindo a altura (antes manchas diagonais).
+  Agora **lidera o 1º trem de cada rota** (inclusive na cidade, onde o trem principal é o bonde), o trem do viaduto que
+  cruza a pista e 75% dos outros trens de carga; 35% vêm com 2 locomotivas dela. Intervalo entre trens 22–40 s → 18–32 s.
+  Na cidade o 1º trem passa a ser de carga (o bonde vem depois, 40%). Como reconhecer: a locomotiva AZUL com faixa
+  creme na frente do trem (a vermelha é a da T-154). Os vagões das pastas `Vagoes` continuam como na T-193.
+  `Rail+Track` continua sem uso (a via do jogo é contínua e texturizada).
+- **"Serragem"** = interpretado como (1) o chuvisco de pontinhos brilhantes no asfalto molhado à noite (aliasing
+  especular: rugosidade baixa × textura de rugosidade com grão) e (2) bordas serrilhadas (sem antisserrilhado na média,
+  que é a do celular). Correções: sem Ultra o asfalto molhado não usa a textura de rugosidade (cor do asfalto aprovado
+  igual; o Ultra já tinha o limitador do Forward+); MSAA na média 2x e na alta 4x (antes só a alta, 2x); folhas,
+  cartões da floresta e treliça com alpha-to-coverage (bordas suaves com MSAA). `--msaa=0|2|4` para comparar.
+  **Celular não medido**: MSAA 2x é o nível que a documentação do Godot considera usável em celular; se pesar, a
+  qualidade baixa continua sem MSAA.
+- **Fim da pista**: a estrada **continua ~1 km depois da chegada** (só desenho: a corrida termina igual, a simulação e a
+  rede não mudaram) e entra na **cidade destino**: pórtico de chegada com faixa xadrez e "ゴール CHEGADA" (aceso à noite),
+  avenida com postes e poças de luz, quarteirões dos dois lados (os mesmos prédios/neon da rota da cidade; no litoral só
+  do lado da terra, o mar fica à direita), a avenida faz uma curva e passa por baixo de um prédio-portal, com o skyline
+  da cidade atrás e chão largo até a neblina (sem borda do mundo nem vazio preto). O caminhão segue andando na avenida
+  depois de cruzar a linha. Curva: litoral para a esquerda (terra), cidade e montanha para a direita. `--no-arrival` =
+  fim antigo.
+- **Bugs visuais corrigidos**: morro da boca do túnel da ferrovia (montanha km 1,24, ao lado do carro único) aparecia
+  como um triângulo preto à noite (sem o luar do terreno); disco de chão provisório da chegada que cortava morros
+  (substituído por faixas que seguem a estrada, antes de ir para o Git).
+- **Polimento** (sem mexer no asfalto aprovado): sujeira acumulada no pé da mureta e desgaste leve na faixa entre o
+  acostamento e a mureta (cor por vértice, sem custo).
+- **Carro único**: os 3 lugares não mudaram (litoral km 1,35, cidade 0,645, montanha 1,26); conferidos nos prints.
+- **Custo** (RX 580, 1920×1080, sem vsync, noite, 6 pontos = meio da rota e chegada; `tools/measure_t195.sh`; antes =
+  `--msaa=0 --no-arrival`): média/Compatibility FPS 195–223 → 177–221 (−0 a −9%), chamadas +11 a +57 (o máximo na
+  chegada, com a cidade destino à vista), triângulos +6 a +30%, memória de vídeo +23 a +33 MB (buffers do MSAA 2x +
+  prédios da chegada); Ultra 57–72 → 54–73 FPS (no ruído). A cidade destino só é desenhada a menos de 1,7 km
+  (skyline 3,2 km). Arquivos: `docs/capturas_t195/custo_antes.txt`, `custo_depois.txt` (Ultra) e `custo_depois_media.txt`.

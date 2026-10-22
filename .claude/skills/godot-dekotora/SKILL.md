@@ -404,3 +404,26 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   --fixed-fps 30 CENA -- ...` grava `X.wav` (32 bits estéreo 48 kHz) + um PNG por quadro. Script pronto:
   `tools/render_t197_audio.sh`; análise/espectrograma: `tools/audio_t197_report.py` (Python do sistema).
 - O executor de testes não roda o `_ready` dos autoloads: para barramentos novos chame `AudioBus._setup_buses()` no teste.
+
+## Chegada "infinita", trem do Marco e serrilhado (T-195)
+
+- **Continuação só visual depois da chegada**: `TrackPath.new(track, ArrivalLayout.runout(rota))` estende a linha
+  central ~1 km (`ArrivalLayout.RUNOUT`: reta, curva, reta). `path.track` continua sendo a pista da SIM: quem distribui
+  coisas pela rota usa `track.length_m` (nada muda antes da chegada). Quem desenha a continuação usa `path.end_m()`,
+  `path.seg_total()` e `path.curve_seg(i)`: RoadMesh, TerrainField/TerrainPatch, ViaductPiers3D, câmera livre e
+  `ArrivalCity` (pórtico ゴール/CHEGADA, quarteirões via `CityBlocks.force_city/sides`, postes via
+  `Roadside3D.extra_objects`, prédio-portal, skyline, faixas largas de chão). `--no-arrival` = fim antigo.
+  Linha no console: `ARRIVAL_T195 rota fim=... continuacao=... predios=... skyline=...`. Teste `-- --only=scenery_t195`.
+- **Armadilha (chão plano grande)**: um disco plano na altura do fim da rota cortava os morros da montanha no meio da
+  rota (as rotas sobem e descem). Chão extra tem que seguir a estrada (faixas por `path.world_point`).
+- **Armadilha (Roadside3D.extra_objects)**: só objetos que NÃO sorteiam (postes). Árvores consomem o `rng` e mudariam
+  arbustos/pedras da rota inteira (`_extras` roda depois).
+- Trem do Marco = `train_loco_b` (docs/Modelos/train): `build_t193_rail.py -- --only train_loco_b` (dissolve planar +
+  redução só nos truques abaixo de `LOCO_LOW_Z`; pintura em faixas pela altura na célula 32 do `rail_atlas.png`, escrita
+  pelo próprio script). Lidera o 1º trem de cada rota e o do cruzamento; 75% dos demais (`RailTraffic.LEAD_MARCO`).
+- Antisserrilhado: `UltraLook.MSAA_BY_QUALITY` (baixa 0, média 2x, alta 4x; Ultra = FSR2). Folhas/cartões/treliça com
+  alpha-to-coverage (StandardMaterial: `alpha_antialiasing_mode`; shader: `ALPHA_ANTIALIASING_EDGE` +
+  `ALPHA_TEXTURE_COORDINATE`). Depuração/medida: `--msaa=0|2|4`. Sem Ultra o asfalto molhado não usa textura de
+  rugosidade (`RoadMesh.soft_spec`): era o "chuvisco" de pontos brilhantes à noite (aliasing especular).
+- Prints: `bash tools/capture_t195.sh PASTA chegada|unico|serra|trem [day night]` (`Q=3` = Ultra); custo
+  `bash tools/measure_t195.sh` (`MEASURE_EXTRA="--msaa=0 --no-arrival"` = antes). Um processo por vez (memória).

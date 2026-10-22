@@ -1,0 +1,18 @@
+== kanto_1_coast start=1300 night media 1920x1080 --msaa=0
+FPS medio: 190.8  (desenhos: 431, max 445 no periodo; triangulos: 255072, texturas: 63.0 MB, video: 114.5 MB)
+FPS medio: 202.8  (desenhos: 421, max 446 no periodo; triangulos: 247022, texturas: 63.1 MB, video: 118.7 MB)
+== kanto_1_coast start=2700 night media 1920x1080 --msaa=0
+FPS medio: 230.8  (desenhos: 346, max 368 no periodo; triangulos: 203876, texturas: 63.0 MB, video: 120.6 MB)
+FPS medio: 247.1  (desenhos: 308, max 348 no periodo; triangulos: 189219, texturas: 63.0 MB, video: 120.6 MB)
+== kanto_2_viaduct start=1400 night media 1920x1080 --msaa=0
+FPS medio: 188.6  (desenhos: 439, max 482 no periodo; triangulos: 325198, texturas: 71.6 MB, video: 138.4 MB)
+FPS medio: 189.6  (desenhos: 437, max 444 no periodo; triangulos: 325892, texturas: 71.6 MB, video: 138.4 MB)
+== kanto_2_viaduct start=2450 night media 1920x1080 --msaa=0
+FPS medio: 212.8  (desenhos: 382, max 406 no periodo; triangulos: 276268, texturas: 71.6 MB, video: 138.3 MB)
+FPS medio: 216.1  (desenhos: 359, max 382 no periodo; triangulos: 270109, texturas: 71.6 MB, video: 138.3 MB)
+== kanto_3_mountain start=1200 night media 1920x1080 --msaa=0
+FPS medio: 200.8  (desenhos: 445, max 491 no periodo; triangulos: 262714, texturas: 67.0 MB, video: 119.4 MB)
+FPS medio: 200.3  (desenhos: 441, max 456 no periodo; triangulos: 252744, texturas: 67.0 MB, video: 119.4 MB)
+== kanto_3_mountain start=2500 night media 1920x1080 --msaa=0
+FPS medio: 188.3  (desenhos: 415, max 442 no periodo; triangulos: 269507, texturas: 67.2 MB, video: 119.6 MB)
+FPS medio: 209.2  (desenhos: 386, max 413 no periodo; triangulos: 268298, texturas: 67.2 MB, video: 119.5 MB)

@@ -50,6 +50,7 @@ func build(path_: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay,
 	_skyline(end, deck, tod)
 	_apron(L, end, kind, deck, tod)
 	_commit(tod)
+	_limit_range(self)
 	print("ARRIVAL_T195 %s fim=%.0f m continuacao=%.0f m predios=%d skyline=%d" % [route_id, end, end - L, block_count,
 		skyline_count])
 
@@ -206,3 +207,18 @@ func _multi(mesh: Mesh, items: Array, mat: Material) -> void:
 	mi.material_override = mat
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+
+
+## Nothing of the destination city is drawn from the middle of the route (it cost +40-50 draw calls there): every
+## piece without its own range stops at VIEW_M (distance to the centre of its box; the skyline goes farther).
+const VIEW_M: float = 1700.0
+const SKYLINE_VIEW_M: float = 3200.0
+func _limit_range(n: Node) -> void:
+	for c in n.get_children():
+		if c is GeometryInstance3D:
+			var g: GeometryInstance3D = c
+			if g.visibility_range_end <= 0.0:
+				var sky: bool = g is MeshInstance3D and (g as MeshInstance3D).mesh != null \
+					and (g as MeshInstance3D).mesh.resource_name == CityModels.SKYLINE
+				g.visibility_range_end = SKYLINE_VIEW_M if sky else VIEW_M
+		_limit_range(c)

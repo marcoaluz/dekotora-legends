@@ -99,6 +99,15 @@ viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminh�
 (galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore; pendente (Marco,
 não agora): copas ralas das Gleditsias adultas e boneco-manequim do retrato.
 
+## Chegada, trem do Marco e serrilhado (T-195)
+
+A estrada continua ~1 km depois da chegada (só desenho) até a cidade destino: pórtico "ゴール CHEGADA", avenida com
+postes, quarteirões, prédio-portal e skyline (`road3d/arrival_layout.gd`, `road3d/arrival_city.gd`; `--no-arrival` = antes).
+O trem do Marco (`train_loco_b`, locomotiva azul com faixa creme) foi refeito e puxa o 1º trem de cada rota.
+MSAA na média (2x) e na alta (4x), folhas com alpha-to-coverage, asfalto molhado sem pontinhos brilhantes fora do Ultra.
+Prints e folhas em `docs/capturas_t195/` (`folha_chegada_day/night`, `folha_pos_chegada`, `folha_trem_do_marco`,
+`folha_carro_unico`), custo em `custo_antes.txt` / `custo_depois.txt`. **Celular não medido** (MSAA 2x na média).
+
 ## Carro acidentado no trânsito (T-183)
 
 Carro arremessado por caminhão não volta mais a andar: desliza, para torto (atravessado ou no acostamento), pisca-alerta
