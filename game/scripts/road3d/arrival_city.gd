@@ -13,7 +13,8 @@ extends Node3D
 const GANTRY_H: float = 7.2
 const GATE_H: float = 46.0
 const GATE_SPAN: float = 34.0
-const DISC_R: float = 3600.0
+const APRON_IN: float = 340.0
+const APRON_M: float = 2600.0
 
 var block_count: int = 0          # tests / log
 var skyline_count: int = 0
@@ -47,7 +48,7 @@ func build(path_: TrackPath, route_id: String, kind: StringName, tod: TimeOfDay,
 			z += ArrivalLayout.LAMP_EVERY_M
 	_gate(end - ArrivalLayout.GATE_BEFORE_END_M, deck)
 	_skyline(end, deck, tod)
-	_disc(end, kind, deck, tod)
+	_apron(L, end, kind, deck, tod)
 	_commit(tod)
 	print("ARRIVAL_T195 %s fim=%.0f m continuacao=%.0f m predios=%d skyline=%d" % [route_id, end, end - L, block_count,
 		skyline_count])
@@ -141,27 +142,45 @@ func _skyline(end: float, deck: float, tod: TimeOfDay) -> void:
 		skyline_count += 1
 
 
-## Wide flat ground under everything around the arrival (below the terrain and the sea): beyond the terrain grid the
-## camera sees ground fading into the fog, not the dark bottom of the sky.
-func _disc(end: float, kind: StringName, deck: float, tod: TimeOfDay) -> void:
-	var c: Vector3 = path.center_at(lerpf(path.track.length_m, end, 0.6))
-	var y: float = c.y - deck - (6.0 if kind == &"coast" else 2.5)
+## Wide flat ground around the arrival, following the drawn road (not one flat disc: the routes climb and drop, a
+## disc at the height of the end cut through the hills of the mountain route). Strips from the edge of the terrain grid
+## (TerrainPatch, 345 m) out to APRON_M on each side of the runout, plus a cap ahead of the end of the road, a little
+## below the ground (coast: below the sea, which covers it). Beyond the terrain the camera sees ground fading into the
+## fog, not the dark bottom of the sky.
+func _apron(L: float, end: float, kind: StringName, deck: float, tod: TimeOfDay) -> void:
+	var drop: float = deck + (6.0 if kind == &"coast" else 1.5)
+	var col: Color = Color(0.0, 0.0, 1.0, 1.0) if kind == &"city" else Color(0.0, 0.25, 0.0, 1.0)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var col: Color = Color(0.0, 0.0, 1.0, 1.0) if kind == &"city" else Color(0.0, 0.25, 0.0, 1.0)
-	var n: int = 24
-	for i in n:
-		var a0: float = TAU * float(i) / float(n)
-		var a1: float = TAU * float(i + 1) / float(n)
-		for v in [Vector3.ZERO, Vector3(cos(a1), 0.0, sin(a1)), Vector3(cos(a0), 0.0, sin(a0))]:
-			st.set_color(col)
-			st.set_normal(Vector3.UP)
-			st.add_vertex(Vector3(c.x, y, c.z) + v * DISC_R)
+	st.set_color(col)
+	st.set_normal(Vector3.UP)
+	var lats: Array = [[-APRON_M, -APRON_IN]] if kind == &"coast" else [[-APRON_M, -APRON_IN], [APRON_IN, APRON_M]]
+	var z: float = L
+	while z < end:
+		var z2: float = minf(z + 40.0, end)
+		for lr in lats:
+			var a: Vector3 = path.world_point(z, float(lr[0]) / Track.ROAD_HALF_WIDTH_M, -drop)
+			var b: Vector3 = path.world_point(z, float(lr[1]) / Track.ROAD_HALF_WIDTH_M, -drop)
+			var c: Vector3 = path.world_point(z2, float(lr[1]) / Track.ROAD_HALF_WIDTH_M, -drop)
+			var d: Vector3 = path.world_point(z2, float(lr[0]) / Track.ROAD_HALF_WIDTH_M, -drop)
+			_quad_up(st, a, b, c, d)
+		z = z2
+	var e: Vector3 = path.center_at(end) + Vector3.DOWN * drop          # cap ahead of the end of the road
+	var f: Vector3 = path.forward_at(end)
+	var r: Vector3 = path.right_at(end)
+	_quad_up(st, e - r * APRON_M - f * 20.0, e + r * APRON_M - f * 20.0, e + r * APRON_M + f * APRON_M, e - r * APRON_M + f * APRON_M)
 	var mi := MeshInstance3D.new()
 	mi.mesh = st.commit()
 	mi.material_override = ScenicShaders.terrain(tod)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+
+
+## Quad a-b-c-d (a/b at the near edge, left to right) facing up whatever the winding: Godot's front face is clockwise.
+func _quad_up(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
+	var up: bool = (b - a).cross(d - a).y > 0.0
+	for v in ([a, b, c, a, c, d] if not up else [a, c, b, a, d, c]):
+		st.add_vertex(v)
 
 
 func _commit(tod: TimeOfDay) -> void:

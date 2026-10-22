@@ -78,6 +78,11 @@ static func material(id: String, tod: TimeOfDay) -> Material:
 			m.vertex_color_use_as_albedo = true
 			m.roughness = 0.95
 			m.uv1_scale = Vector3(0.125, 0.125, 1.0)
+			if night > 0.3:                             # T-195: luar como o do terreno (antes: triangulo preto a noite)
+				m.emission_enabled = true
+				m.emission_texture = m.albedo_texture
+				m.emission = Color(0.3, 0.42, 0.5)
+				m.emission_energy_multiplier = 0.12 * night
 		"rail_station":                                 # cidade: o trem entra num predio de concreto
 			var p: String = "res://assets/textures/concrete_streaks.png"
 			m.albedo_texture = load(p) as Texture2D if ResourceLoader.exists(p) else null

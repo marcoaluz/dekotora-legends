@@ -345,11 +345,11 @@ func _build_chunk(s0: int, s1: int) -> void:
 		for side in [-1.0, 1.0]:                                            # linhas continuas de borda
 			var e: float = side * (asph - 0.25)
 			_strip(sts["line"], i, j, e - 0.1, e + 0.1, 0.02, 0.02)
-		_strip(sts["road"], i, j, -BARRIER_IN, -gw, 0.0, 0.0, Color(0.7, 0.7, 0.72))   # faixa ate a mureta
+		_verge(sts["road"], i, j, -BARRIER_IN, -gw)   # faixa ate a mureta
 		if not tunnel:
 			_barrier(sts["barrier"], i, j, BARRIER_IN, -1.0)
 		if _deck > 0.0:                                                     # viaduto: mureta dos dois lados, chao la embaixo
-			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
+			_verge(sts["road"], i, j, gw, BARRIER_IN)
 			if not tunnel:
 				_barrier(sts["barrier"], i, j, BARRIER_IN, 1.0)
 			if not _bare(z):
@@ -362,7 +362,7 @@ func _build_chunk(s0: int, s1: int) -> void:
 		if not _bare(z):
 			_strip(sts["ground"], i, j, -bo - GRASS_WIDTH, -BARRIER_IN)    # grama do lado esquerdo
 		if coast:                                                           # lado do mar: guard-rail, grama curta e praia
-			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
+			_verge(sts["road"], i, j, gw, BARRIER_IN)
 			if PontesKit.enabled():                                         # T-163: guard-rail em W, um anel a cada 4 m
 				if i >= _wr_until:
 					var j2: int = i + GuardrailW.STEP_SEGS
@@ -377,7 +377,7 @@ func _build_chunk(s0: int, s1: int) -> void:
 				_strip(sts["ground"], i, j, BARRIER_IN, gw + COAST_GRASS)
 				_strip(sts["sand"], i, j, gw + COAST_GRASS, gw + COAST_GRASS + COAST_SAND, 0.0, -SEA_DROP)
 		else:
-			_strip(sts["road"], i, j, gw, BARRIER_IN, 0.0, 0.0, Color(0.7, 0.7, 0.72))
+			_verge(sts["road"], i, j, gw, BARRIER_IN)
 			if not tunnel:
 				_barrier(sts["barrier"], i, j, BARRIER_IN, 1.0)
 			if not _bare(z):
@@ -395,3 +395,18 @@ func _build_chunk(s0: int, s1: int) -> void:
 	mi.mesh = mesh
 	mi.visibility_range_end = 520.0 if int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1 else 380.0
 	add_child(mi)
+
+
+## Faixa entre o acostamento e a mureta (l0 < l1; um dos lados e a mureta). T-195: sujeira acumulada no pe da mureta
+## (VERGE_GRIME m mais escuros) e um desgaste leve que varia devagar ao longo da pista (cor por vertice, sem textura nova).
+const VERGE_GRIME: float = 0.85
+func _verge(st: SurfaceTool, i: int, j: int, l0: float, l1: float) -> void:
+	var wear: float = 0.04 * sin(float(i) * 0.045) + 0.03 * sin(float(i) * 0.013 + 1.7)
+	var base := Color(0.7 + wear, 0.7 + wear, 0.72 + wear)
+	var grime := Color(0.44, 0.43, 0.42)
+	if l0 <= -BARRIER_IN + 0.01:
+		_strip(st, i, j, l0, l0 + VERGE_GRIME, 0.0, 0.0, grime)
+		_strip(st, i, j, l0 + VERGE_GRIME, l1, 0.0, 0.0, base)
+	else:
+		_strip(st, i, j, l0, l1 - VERGE_GRIME, 0.0, 0.0, base)
+		_strip(st, i, j, l1 - VERGE_GRIME, l1, 0.0, 0.0, grime)
