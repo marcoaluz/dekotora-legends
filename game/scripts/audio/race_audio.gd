@@ -33,7 +33,7 @@ func setup(truck: TruckSim, engine_spec: Dictionary, music_name: String) -> void
 	player_engine = EngineAudio.new()
 	add_child(player_engine)
 	player_engine.setup_spec(engine_spec, truck.engine.has_jake)
-	for n in ["wind_speed_loop", "tire_screech_loop", "tire_gravel_loop", "cargo_rattle_loop"]:
+	for n in ["wind_speed_loop", "tyre_road_loop", "tire_screech_loop", "tire_gravel_loop", "cargo_rattle_loop"]:
 		var p := AudioStreamPlayer.new()
 		p.bus = "SFX"
 		p.stream = audio.stream(n)
@@ -60,14 +60,20 @@ func make_rival_engine(parent: Node3D, engine_spec: Dictionary, synth_boost: boo
 
 func update(dt: float, t: TruckSim, countdown: float) -> void:
 	var rpm01: float = clampf((t.rpm - EngineModel.IDLE_RPM) / (t.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
-	player_engine.update(dt, rpm01, t.engine.throttle_now, t.boost, float(t.systems["engine"]) / 100.0, t.speed)
+	# T-197: na troca de marcha o motor perde a carga (queda e retomada do ronco); so leitura do estado da sim
+	var thr: float = 0.0 if t.engine.shifting > 0.0 else t.engine.throttle_now
+	player_engine.update(dt, rpm01, thr, t.boost, float(t.systems["engine"]) / 100.0, t.speed)
 	if t.engine.blowoff:
 		player_engine.blowoff()
 	if t.gear != _last_gear:
 		_shift_idx = 1 - _shift_idx
 		get_node("/root/AudioBus").play_sfx("gear_shift_%d" % (_shift_idx + 1), -6.0)
+		if t.gear > _last_gear:
+			get_node("/root/AudioBus").play_sfx("gear_air_pfft", -14.0, randf_range(0.95, 1.05))   # cambio a ar
 		_last_gear = t.gear
-	_set_loop("wind_speed_loop", clampf(t.speed / 38.9, 0.0, 1.0) * 0.55, -8.0)
+	var v01: float = clampf(t.speed / 38.9, 0.0, 1.0)
+	_set_loop("wind_speed_loop", v01 * 0.55, -8.0, 0.85 + 0.3 * v01)
+	_set_loop("tyre_road_loop", clampf(t.speed / 6.0, 0.0, 1.0) * (0.25 + 0.5 * v01), -9.0, 0.75 + 0.55 * v01)   # T-197: rodagem dos pneus
 	# pneu cantando: so quando passa da velocidade segura da curva (TruckSim.skid); escapando, no maximo
 	_set_loop("tire_screech_loop", 1.0 if t.escaping else t.skid * 0.85, -6.0)
 	_set_loop("tire_gravel_loop", (clampf(t.speed / 20.0, 0.0, 1.0) * 0.8) if t.offroad else 0.0, -4.0)
@@ -91,11 +97,12 @@ func intro_engine(dt: float, rpm01: float, throttle: float) -> void:
 		_set_loop(String(n), 0.0, 0.0)
 
 
-func _set_loop(name: String, weight: float, gain_db: float) -> void:
+func _set_loop(name: String, weight: float, gain_db: float, pitch: float = 1.0) -> void:
 	var p: AudioStreamPlayer = _loops.get(name)
 	if p == null or p.stream == null:
 		return
 	p.volume_db = (linear_to_db(clampf(weight, 0.0, 1.0)) + gain_db) if weight > 0.01 else -80.0
+	p.pitch_scale = pitch
 
 
 ## Evento da simulacao (RaceSim.drain_events). `me` = indice do jogador.

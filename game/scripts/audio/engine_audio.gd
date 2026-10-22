@@ -5,12 +5,17 @@ extends Node
 ## seguindo o boost, "pssh" ao soltar o acelerador com turbo cheio, freio-motor, escape direto e chacoalho de dano.
 ## Use: setup_spec(EngineSounds.spec("eng_v8", "turbo_single", "exh_stack"), jake) e update(...) a cada frame.
 ## setup("i6_std", "turbo_single", true, false) continua valendo (formato antigo, sem perfil de escapamento).
+## T-197: spec com "voice" = diesel sintetizado (DieselMix): loops por RPM real com carga (ON/OFF), troca de marcha
+## (queda e retomada, derivada do RPM), freio-motor por RPM, ronco de escape aberto, estalos, cabine e Doppler.
 
 const BANDS: Array[String] = ["idle", "low", "mid", "high"]
 const CENTERS: Array[float] = [0.0, 0.3, 0.62, 0.95]       # rpm normalizado (0..1) onde cada camada e mais forte
 const WIDTH: float = 0.34
 const CENTERS_3: Array[float] = [0.0, 0.5, 0.95]            # perfis com 3 camadas (T-173)
 const WIDTH_3: float = 0.5
+## T-197: nivel do diesel sintetizado para ficar no mesmo volume medio dos loops antigos (medido nas gravacoes
+## de docs/audio_t197: acelerando -22 dBFS, lenta -28/-30 dBFS).
+const DIESEL_DB: float = -4.5
 
 var engine_set: String = "i6_std"
 var turbo_set: String = ""            # loop do turbo ("turbo_single_whine", "exh_stack_turbo_whine"...) ou ""
@@ -22,6 +27,8 @@ var max_distance: float = 120.0
 ## Rival offline: a simulacao dele nao tem turbo, entao o boost do som e estimado pelo acelerador e RPM (T-173).
 var synth_boost: bool = false
 var spec: Dictionary = {}
+## T-197: som de dentro da cabine (barramento EngineCab: abafado, grave). So vale antes do setup_spec.
+var interior: bool = false
 
 var _bands: Array[String] = []
 var _centers: Array[float] = CENTERS
@@ -36,6 +43,22 @@ var _smooth_throttle: float = 0.0
 var _smooth_rpm: float = 0.0
 var _synth: float = 0.0
 var _blowoff_idx: int = 0
+# T-197 (diesel sintetizado)
+var _voice: String = ""
+var _redline: float = 2400.0
+var _open_db: float = -80.0
+var _gain_db: float = 0.0
+var _pops: bool = false
+var _lazy: Dictionary = {}            # camadas que so tocam com peso > 0 (economiza vozes)
+var _load: float = 0.0
+var _jake: float = 0.0
+var _shift_t: float = 0.0
+var _prev_rpm: float = -1.0
+var _prev_throttle: float = 0.0
+var _pop_t: float = 0.0
+var _pop_rng := RandomNumberGenerator.new()
+var _doppler: float = 1.0
+var _prev_dist: float = -1.0
 
 
 ## Formato antigo (engine_set = prefixo dos loops de 4 camadas).
@@ -68,15 +91,40 @@ func setup_spec(s: Dictionary, jake: bool = false) -> void:
 	for c in get_children():
 		c.queue_free()
 	_players.clear()
-	for b in _bands:
-		_add_layer("%s_%s" % [engine_set, b])
+	_lazy.clear()
+	_voice = String(s.get("voice", ""))
+	if _voice != "":
+		_setup_diesel(s)
+	else:
+		for b in _bands:
+			_add_layer("%s_%s" % [engine_set, b])
+		if straight_exhaust:
+			_add_layer("exhaust_straight_layer")
+		if has_jake:
+			_add_layer("jake_brake")
 	if turbo_set != "":
 		_add_layer(turbo_set)
-	if straight_exhaust:
-		_add_layer("exhaust_straight_layer")
-	if has_jake:
-		_add_layer("jake_brake")
 	_add_layer("engine_damaged_rattle")
+
+
+func _setup_diesel(s: Dictionary) -> void:
+	_redline = float(s.get("redline", 2400.0))
+	_open_db = float(s.get("open_db", -80.0))
+	_gain_db = float(s.get("gain_db", 0.0)) + DIESEL_DB
+	_pops = bool(s.get("pops", false))
+	_pop_rng.seed = hash(_voice) + get_instance_id()
+	for r in DieselMix.RPM_POINTS:
+		_add_layer(DieselMix.layer(_voice, "on", r), true)
+		_add_layer(DieselMix.layer(_voice, "off", r), true)
+	if _open_db > -60.0:
+		for r in DieselMix.OPEN_POINTS:
+			_add_layer(DieselMix.layer(_voice, "open", r), true)
+	if has_jake:
+		for r in DieselMix.JAKE_POINTS:
+			_add_layer(DieselMix.layer(_voice, "jake", r), true)
+	if _pops:
+		_add_layer("syn_exh_pop_1", true)
+		_add_layer("syn_exh_pop_2", true)
 
 
 ## Camadas tocando (testes / ferramenta de teste).
@@ -87,7 +135,16 @@ func layer_names() -> Array[String]:
 	return out
 
 
-func _add_layer(sound: String) -> void:
+## Camadas com volume agora (T-197: as do diesel so tocam com peso > 0). Vale tambem sem audio (testes).
+func active_layers() -> Array[String]:
+	var out: Array[String] = []
+	for k in _players:
+		if float(_players[k].get("volume_db")) > -79.0:
+			out.append(String(k))
+	return out
+
+
+func _add_layer(sound: String, lazy: bool = false) -> void:
 	var audio: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("AudioBus")   # vale fora da arvore tambem
 	if audio == null:
 		return
@@ -95,21 +152,25 @@ func _add_layer(sound: String) -> void:
 	if s == null:
 		return
 	var p: Node
+	var b: String = "EngineCab" if interior and AudioServer.get_bus_index("EngineCab") >= 0 else bus
 	if positional:
 		var p3 := AudioStreamPlayer3D.new()
 		p3.max_distance = max_distance
 		p3.unit_size = 14.0
-		p3.bus = bus
+		p3.bus = b
 		p = p3
 	else:
 		var p2 := AudioStreamPlayer.new()
-		p2.bus = bus
+		p2.bus = b
 		p = p2
 	p.stream = s
 	p.volume_db = -80.0
 	add_child(p)
 	_players[sound] = p
-	p.play()
+	if lazy:
+		_lazy[sound] = true
+	else:
+		p.play()
 
 
 ## Pesos das camadas para um RPM normalizado (0..1). Funcao pura (testavel). Sem `centers` = as 4 camadas antigas.
@@ -149,8 +210,14 @@ func _set_layer(name: String, weight: float, pitch: float, gain_db: float = 0.0)
 	if p == null:
 		return
 	gain_db += float(_gains.get(name, 0.0))
-	p.volume_db = linear_to_db(clampf(weight, 0.0, 1.0)) + gain_db if weight > 0.003 else -80.0
-	p.pitch_scale = pitch
+	var on: bool = weight > 0.003
+	p.volume_db = linear_to_db(clampf(weight, 0.0, 1.0)) + gain_db if on else -80.0
+	p.pitch_scale = pitch * _doppler
+	if _lazy.has(name) and on != bool(p.get("playing")) and p.is_inside_tree():
+		if on:
+			p.call("play")
+		else:
+			p.call("stop")
 
 
 ## Chame todo frame. rpm01 = (rpm - marcha lenta)/(corte - marcha lenta); throttle 0..1; boost 0..1;
@@ -163,19 +230,93 @@ func update(dt: float, rpm01: float, throttle: float, boost: float, engine_healt
 		var target: float = 1.0 if throttle > 0.6 and rpm01 > 0.45 else 0.0
 		_synth = move_toward(_synth, target, dt / (1.0 if target > _synth else 0.6))
 		boost = maxf(boost, _synth)
+	if positional:
+		_update_doppler(dt)
+	if _voice != "":
+		_update_diesel(dt, throttle, speed)
+	else:
+		_update_legacy(throttle, speed)
+	if turbo_set != "":
+		_set_layer(turbo_set, boost * 0.75, turbo_pitch_for(boost) * _turbo_pitch, -6.0 + _turbo_db)
+	_set_layer("engine_damaged_rattle", clampf((0.65 - engine_health) / 0.65, 0.0, 1.0) * 0.9, 1.0 + (1.0 - engine_health) * 0.1, -4.0)
+
+
+## Loops do ElevenLabs (T-173/T-178): camadas por faixa de RPM normalizado com ajuste de tom.
+func _update_legacy(throttle: float, speed: float) -> void:
 	var w: Array[float] = band_weights(_smooth_rpm, _centers, _width)
 	var load: float = lerpf(0.55, 1.0, _smooth_throttle)          # soltando o acelerador o motor "abaixa"
 	var pitch: float = pitch_for(_smooth_rpm) * _pitch_mul
 	for i in _bands.size():
 		_set_layer("%s_%s" % [engine_set, _bands[i]], w[i] * load, pitch, -2.0)
-	if turbo_set != "":
-		_set_layer(turbo_set, boost * 0.75, turbo_pitch_for(boost) * _turbo_pitch, -6.0 + _turbo_db)
 	if straight_exhaust:
 		_set_layer("exhaust_straight_layer", _smooth_throttle * (0.3 + 0.7 * _smooth_rpm), 0.85 + _smooth_rpm * 0.4, -5.0)
 	if has_jake:
 		var braking: bool = throttle < 0.05 and _smooth_rpm > 0.35 and speed > 3.0
 		_set_layer("jake_brake", 0.8 if braking else 0.0, 0.9 + _smooth_rpm * 0.3, -4.0)
-	_set_layer("engine_damaged_rattle", clampf((0.65 - engine_health) / 0.65, 0.0, 1.0) * 0.9, 1.0 + (1.0 - engine_health) * 0.1, -4.0)
+
+
+## T-197: diesel sintetizado. RPM real (rpm01 -> marcha lenta..corte do motor), carga ON/OFF pelo acelerador, corte
+## na troca de marcha, freio-motor e escape aberto em pontos proprios, estalos ao tirar o pe (cromado cortado).
+func _update_diesel(dt: float, throttle: float, speed: float) -> void:
+	var rpm: float = lerpf(DieselMix.IDLE_RPM, _redline, _smooth_rpm)
+	var rate: float = (rpm - _prev_rpm) / maxf(dt, 0.001) if _prev_rpm > 0.0 else 0.0
+	_prev_rpm = rpm
+	if DieselMix.is_shift_drop(rate, throttle):
+		_shift_t = DieselMix.SHIFT_CUT_S
+	_shift_t = maxf(_shift_t - dt, 0.0)
+	var target: float = 0.0 if _shift_t > 0.0 else clampf(throttle, 0.0, 1.0)
+	_load = move_toward(_load, target, dt * (5.0 if target > _load else 10.0))
+	_jake = move_toward(_jake, 1.0 if DieselMix.jake_active(has_jake, throttle, rpm, speed) else 0.0, dt * 8.0)
+	var lw: Vector2 = DieselMix.load_weights(_load)
+	var pw: Array[float] = DieselMix.point_weights(rpm, DieselMix.RPM_POINTS)
+	for i in DieselMix.RPM_POINTS.size():
+		var r: float = DieselMix.RPM_POINTS[i]
+		var p: float = DieselMix.point_pitch(rpm, r) * _pitch_mul
+		_set_layer(DieselMix.layer(_voice, "on", r), pw[i] * lw.x, p, _gain_db)
+		_set_layer(DieselMix.layer(_voice, "off", r), pw[i] * lw.y * (1.0 - _jake), p, _gain_db)
+	if _open_db > -60.0:
+		var ow: Array[float] = DieselMix.point_weights(rpm, DieselMix.OPEN_POINTS)
+		for i in DieselMix.OPEN_POINTS.size():
+			var r2: float = DieselMix.OPEN_POINTS[i]
+			_set_layer(DieselMix.layer(_voice, "open", r2), ow[i] * lw.x, DieselMix.point_pitch(rpm, r2), _gain_db + _open_db)
+	if has_jake:
+		var jw: Array[float] = DieselMix.point_weights(rpm, DieselMix.JAKE_POINTS)
+		for i in DieselMix.JAKE_POINTS.size():
+			var r3: float = DieselMix.JAKE_POINTS[i]
+			_set_layer(DieselMix.layer(_voice, "jake", r3), jw[i] * _jake, DieselMix.point_pitch(rpm, r3), _gain_db - 2.0)
+	if _pops:
+		if throttle < 0.05 and _prev_throttle > 0.5 and rpm > 1300.0:
+			_pop_t = 0.9
+		_pop_t = maxf(_pop_t - dt, 0.0)
+		if _pop_t > 0.0 and _pop_rng.randf() < dt * 7.0:
+			_fire_pop()
+	_prev_throttle = throttle
+
+
+func _fire_pop() -> void:
+	var p: Node = _players.get("syn_exh_pop_%d" % _pop_rng.randi_range(1, 2))
+	if p == null or not p.is_inside_tree():
+		return
+	p.set("volume_db", _gain_db - 3.0 - _pop_rng.randf() * 6.0)
+	p.set("pitch_scale", _pop_rng.randf_range(0.85, 1.15) * _doppler)
+	p.call("play")
+
+
+## Doppler dos outros caminhoes (T-197): pela velocidade com que a distancia ate a camera muda. Feito a mao (nao pelo
+## doppler do Godot) para ignorar cortes de camera (salto grande = sem Doppler naquele quadro) e limitar a +-6%.
+func _update_doppler(dt: float) -> void:
+	var host: Node3D = get_parent() as Node3D
+	var cam: Camera3D = get_viewport().get_camera_3d() if is_inside_tree() else null
+	if host == null or cam == null or dt <= 0.0:
+		return
+	var d: float = host.global_position.distance_to(cam.global_position)
+	var target: float = 1.0
+	if _prev_dist >= 0.0:
+		var radial: float = (d - _prev_dist) / dt
+		if absf(radial) < 90.0:
+			target = DieselMix.doppler(radial)
+	_prev_dist = d
+	_doppler = lerpf(_doppler, target, minf(5.0 * dt, 1.0))
 
 
 ## "pssh" do turbo ao soltar o acelerador com boost cheio (o do perfil do escapamento, se houver).

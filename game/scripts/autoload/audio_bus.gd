@@ -41,6 +41,20 @@ func _setup_buses() -> void:
 			var idx: int = AudioServer.bus_count - 1
 			AudioServer.set_bus_name(idx, name)
 			AudioServer.set_bus_send(idx, "Master")
+	# T-197: motor ouvido de dentro da cabine (abafado e grave); manda para Engine (segue o volume dos efeitos)
+	if AudioServer.get_bus_index("EngineCab") < 0:
+		AudioServer.add_bus()
+		var cab: int = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(cab, "EngineCab")
+		AudioServer.set_bus_send(cab, "Engine")
+		var lp := AudioEffectLowPassFilter.new()
+		lp.cutoff_hz = 900.0
+		lp.resonance = 0.6
+		AudioServer.add_bus_effect(cab, lp)
+		var eq := AudioEffectEQ6.new()
+		eq.set_band_gain_db(0, 5.0)              # 32 Hz: a cabine treme
+		eq.set_band_gain_db(1, 4.0)              # 100 Hz
+		AudioServer.add_bus_effect(cab, eq)
 
 
 func apply_settings() -> void:
@@ -86,6 +100,11 @@ func stream(name: String) -> AudioStream:
 			(found as AudioStreamMP3).loop = looping
 		elif found is AudioStreamOggVorbis:
 			(found as AudioStreamOggVorbis).loop = looping
+		elif found is AudioStreamWAV and looping and (found as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_DISABLED:
+			var w: AudioStreamWAV = found as AudioStreamWAV           # T-197: .wav sem loop no arquivo
+			w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			w.loop_begin = 0
+			w.loop_end = int(round(w.get_length() * float(w.mix_rate)))
 	_streams[name] = found
 	return found
 

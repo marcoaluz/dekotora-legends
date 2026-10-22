@@ -7,6 +7,7 @@ extends Node
 ##    arquivo); musical (horn_musical_1/2, da peca instalada) = toca a melodia, e para quando solta.
 ##  - Freada forte: brake_squeal com volume pela intensidade (para ao soltar) e air_brake_hiss ao soltar, mais
 ##    alto quanto mais velocidade perdeu.
+##  - T-197: ao parar (depois de andar) o "tssss" do freio a ar estacionando (air_brake_park, sintetizado).
 
 ## Janela de loop (volta para / comeca a outra voz) de cada buzina: HornCatalog.loop_window (T-173).
 const HORN_FADE: float = 0.12             # s de cruzamento / de soltar
@@ -21,6 +22,8 @@ var _voice: int = 0
 var _horn_on: bool = false
 var _squeal: Node
 var _hiss: Node
+var _park: Node
+var _moving: bool = false
 var _was_braking: bool = false
 var _squeal_gain: float = 0.0
 var _fade: Array[float] = [0.0, 0.0]      # alvo de volume linear por voz
@@ -38,6 +41,7 @@ func setup(parent: Node, player: bool, horn: String) -> void:
 		_horn.append(p)
 	_squeal = _make(audio.stream("brake_squeal"), 14.0, 150.0)
 	_hiss = _make(audio.stream("air_brake_hiss"), 14.0, 150.0)
+	_park = _make(audio.stream("air_brake_park"), 14.0, 120.0)
 
 
 func _make(s: AudioStream, unit: float, max_d: float) -> Node:
@@ -70,6 +74,19 @@ func horn_playing() -> bool:
 func update(t: TruckSim, dt: float) -> void:
 	_update_horn(t.horn, dt)
 	_update_brake(t, dt)
+	_update_park(t.speed)
+
+
+## Parou depois de andar: "tssss" do freio a ar (T-197).
+func _update_park(speed: float) -> void:
+	if speed > 4.0:
+		_moving = true
+	elif _moving and speed < 0.3:
+		_moving = false
+		if _park.get("stream") != null:
+			_park.set("volume_db", -8.0)
+			_park.set("pitch_scale", randf_range(0.95, 1.05))
+			_park.call("play")
 
 
 func _update_horn(held: bool, dt: float) -> void:

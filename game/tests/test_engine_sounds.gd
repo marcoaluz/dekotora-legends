@@ -32,22 +32,22 @@ func test_profile_layers_exist_and_loop() -> void:
 
 
 func test_spec_uses_profile_and_turbo_of_profile() -> void:
-	var s: Dictionary = EngineSounds.spec("eng_v8", "turbo_twin", "exh_stack")
+	var s: Dictionary = EngineSounds.spec("eng_v8", "turbo_twin", "exh_stack", true, "", true)    # som antigo (T-197)
 	check_eq(String(s["set"]), "exh_stack", "chamines: loops do perfil")
 	check_eq((s["bands"] as Array).size(), 3, "3 camadas (lenta, media, alta)")
 	check_eq(String(s["turbo"]), "exh_stack_turbo_whine", "turbina com o assobio do perfil")
 	check(float(s["turbo_pitch"]) > 1.0, "turbo duplo mais agudo")
 	check_eq(s["blowoffs"], ["exh_stack_blowoff"], "pssh do perfil")
 	check(float(s["pitch"]) < 1.0, "V8 deixa o perfil mais grave")
-	var std: Dictionary = EngineSounds.spec("eng_i6_tuned", "turbo_single", "exh_std")
+	var std: Dictionary = EngineSounds.spec("eng_i6_tuned", "turbo_single", "exh_std", true, "", true)
 	check_eq(String(std["set"]), "i6_tuned", "escape padrao: loops do proprio motor")
 	check_eq((std["bands"] as Array).size(), 4, "motor: 4 camadas")
 	check_eq(String(std["turbo"]), "turbo_single_whine", "escape padrao: turbo antigo")
 	check(not bool(std["straight"]), "sem a camada de escape direto")
-	var none: Dictionary = EngineSounds.spec("eng_i6_std", "turbo_none", "exh_chrome_cut")
+	var none: Dictionary = EngineSounds.spec("eng_i6_std", "turbo_none", "exh_chrome_cut", true, "", true)
 	check_eq(String(none["turbo"]), "", "sem turbina: sem assobio")
 	check_eq(String(none["set"]), "exh_pop", "cromado cortado: perfil com estalos")
-	var d: Dictionary = EngineSounds.from_descriptor({"engine": "eng_i6_std", "turbo": "turbo_single", "exhaust": "exh_straight"})
+	var d: Dictionary = EngineSounds.from_descriptor({"engine": "eng_i6_std", "turbo": "turbo_single", "exhaust": "exh_straight"}, true)
 	check_eq(String(d["set"]), "exh_rasp", "descritor -> perfil do escape direto")
 	check_eq(String(d["turbo"]), "exh_rasp_turbo_whine", "descritor -> turbo do perfil")
 
@@ -65,7 +65,7 @@ func test_three_band_weights() -> void:
 func test_engine_audio_builds_profile_layers() -> void:
 	var e := EngineAudio.new()
 	Engine.get_main_loop().root.add_child(e)
-	e.setup_spec(EngineSounds.spec("eng_i6_std", "turbo_single", "exh_chrome_cut"), true)
+	e.setup_spec(EngineSounds.spec("eng_i6_std", "turbo_single", "exh_chrome_cut", true, "", true), true)
 	var names: Array[String] = e.layer_names()
 	for n in ["exh_pop_idle", "exh_pop_mid", "exh_pop_high", "exh_pop_turbo_whine", "jake_brake", "engine_damaged_rattle"]:
 		check(n in names, "camada %s tocando" % n)
@@ -110,7 +110,7 @@ func test_server_keeps_chosen_horn_and_exhaust() -> void:
 	p.profile["exhaust"] = "exh_stack"
 	var desc: Dictionary = p.truck_descriptor()
 	check_eq(String(desc["horn"]), "horn_musical_dekotora", "descritor do servidor com a buzina do perfil")
-	check_eq(String(EngineSounds.from_descriptor(desc)["set"]), "exh_stack", "os outros tocam o perfil do escape")
+	check_eq(String(EngineSounds.from_descriptor(desc)["profile"]), "exh_stack", "os outros tocam o perfil do escape")
 	store.release_all()
 
 
@@ -122,7 +122,8 @@ func test_rival_draw_is_deterministic_and_varied() -> void:
 	for s in 40:
 		var lo: Dictionary = EngineSounds.rival_loadout(s * 7919)
 		check(String(lo["exhaust"]) in EngineSounds.EXHAUST_IDS, "escape sorteado valido")
-		sets[String(EngineSounds.from_descriptor(lo)["set"])] = true
+		var sp: Dictionary = EngineSounds.from_descriptor(lo)
+		sets[String(sp["set"]) + "/" + String(sp.get("exhaust", sp["profile"]))] = true
 		horns[HornCatalog.rival_horn(s * 7919)] = true
 	check(sets.size() >= 4, "rivais variam o som (%d perfis/motores em 40)" % sets.size())
 	check(horns.size() >= 4, "rivais variam a buzina (%d em 40)" % horns.size())
