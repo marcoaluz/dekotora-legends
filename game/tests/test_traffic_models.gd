@@ -12,6 +12,8 @@ const NEW_MODELS: Dictionary = {
 	"car_jeep": [TrafficSim.Kind.CAR, 6000],
 	"car_fumi": [TrafficSim.Kind.SPORT, 6000],
 	"car_bus": [TrafficSim.Kind.BUS, 9000],
+	"car_lp_coupe": [TrafficSim.Kind.CAR, 6000],      # T-193
+	"car_lp_hatch": [TrafficSim.Kind.CAR, 6000],
 }
 const MAX_SURFACES: int = 4      # pintura + atlas no corpo, 1 por eixo de roda
 

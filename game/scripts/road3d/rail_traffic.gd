@@ -21,6 +21,13 @@ const LRT_LEN: float = 35.0
 const COUPLER: float = 0.6
 const WAGONS: Array[String] = ["train_wagon_a", "train_wagon_b", "train_wagon_c", "train_wagon_a", "train_wagon_c",
 	"train_wagon_b", "train_wagon_a", "train_wagon_b"]
+## T-193: locomotives and wagons of the Marco's folders (docs/Modelos/train, Vagoes; build_t193_rail.py). Length (m)
+## of every model that is not WAGON_LEN. Each freight train draws its locomotive and 6-9 wagons from these lists.
+const LOCOS: Array[String] = ["train_loco", "train_loco_b"]
+const WAGON_POOL: Array[String] = ["train_wagon_a", "train_wagon_b", "train_wagon_c", "train_wagon_log", "train_wagon_flat",
+	"train_wagon_semi", "train_wagon_box", "train_wagon_box_b"]
+const LENS := {"train_loco": LOCO_LEN, "train_loco_b": 18.9, "train_lrt": LRT_LEN, "train_wagon_log": 16.1,
+	"train_wagon_flat": 15.9, "train_wagon_semi": 16.1, "train_wagon_box": 18.9, "train_wagon_box_b": 18.9}
 const DESPAWN_M: float = 900.0
 
 
@@ -56,18 +63,25 @@ func _init(lines_: Array[RailLine], seed_: int, main_type_: int = Type.FREIGHT) 
 	main_type = main_type_
 
 
-static func make_train(type: int) -> Train:
+## `rng` = null: the old fixed composition (loco + WAGONS). With an rng (T-193): random locomotive and 6-9 wagons
+## (runs of 1-3 equal wagons, like a real freight train), always the same for the same seed.
+static func make_train(type: int, rng: RandomNumberGenerator = null) -> Train:
 	var t := Train.new()
 	t.type = type
 	t.speed = float(SPEED[type])
 	if type == Type.LRT:                                   # 2 bondes engatados
 		t.models.assign(["train_lrt", "train_lrt"])
-		t.lens = PackedFloat32Array([LRT_LEN, LRT_LEN])
-	else:
+	elif rng == null:
 		t.models.assign(["train_loco"] + WAGONS)
-		t.lens.append(LOCO_LEN)
-		for w in WAGONS:
-			t.lens.append(WAGON_LEN)
+	else:
+		t.models.append(LOCOS[rng.randi() % LOCOS.size()])
+		var n: int = rng.randi_range(6, 9)
+		while t.models.size() < n + 1:
+			var w: String = WAGON_POOL[rng.randi() % WAGON_POOL.size()]
+			for _k in mini(rng.randi_range(1, 3), n + 1 - t.models.size()):
+				t.models.append(w)
+	for m in t.models:
+		t.lens.append(float(LENS.get(m, WAGON_LEN)))
 	var total: float = 0.0
 	for l in t.lens:
 		total += l
@@ -110,7 +124,7 @@ func _parallel_pass(player_z: float, player_speed: float) -> void:
 		type = force_type
 	if force_dir != 0.0:
 		dir = force_dir
-	var t: Train = make_train(type)
+	var t: Train = make_train(type, _rng)
 	t.line = li
 	t.dir = dir
 	t.track = -dir                                         # anda pela via da esquerda
@@ -136,7 +150,7 @@ func _crossings(player_z: float, player_speed: float) -> void:
 		if d / maxf(player_speed, 1.0) > 12.0 and d > 160.0:
 			continue                                       # ainda longe/devagar: espera chegar mais perto
 		_crossed[i] = true
-		var t: Train = make_train(Type.FREIGHT if force_type < 0 else force_type)
+		var t: Train = make_train(Type.FREIGHT if force_type < 0 else force_type, _rng)
 		t.line = i
 		t.dir = 1.0 if _rng.randf() < 0.5 else -1.0
 		t.track = -t.dir

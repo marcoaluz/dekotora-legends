@@ -9,7 +9,8 @@ Este script só LÊ os originais e grava o .glb final, reduzido e re-texturizado
 Uso:
   blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model all \
       [--src-dir "docs/Modelos/Modelos Melhorados"] [--out game/assets/vehicles/traffic] [--preview <pasta absoluta>]
-  --model: ascona | falcon | suv | fumi | bus | police | jeep | wreck | all
+  --model: ascona | falcon | suv | fumi | bus | police | jeep | wreck | lp_coupe | lp_hatch | skyline | all
+  (T-193: lp_* vem de docs/Modelos/CARS (--cars-file), skyline de docs/Modelos/Unico, apenas um carro (--unique-dir))
   (o jipe vem de docs/Modelos/Novos modelos/ (--new-dir); o carro batido de docs/Modelos/Novas Melhorias/ (--wreck-dir))
 
 Saída: game/assets/vehicles/traffic/car_<modelo>.glb, cada um com:
@@ -29,6 +30,7 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import mesh3d as M, scene  # noqa: E402
 from lib import traffic_classify as C  # noqa: E402
+from lib import traffic_groups as G  # noqa: E402
 from lib import traffic_jeep as J  # noqa: E402
 from lib import traffic_kit as K  # noqa: E402
 from lib import traffic_police as PO  # noqa: E402
@@ -172,6 +174,18 @@ SPECS = {
     "wreck": dict(src_wreck="Carro batido/model_download+(24).obj", importer=WR.import_wreck, rotz=-90, length=4.75,
                   prep=WR.prep_wreck, body_tris=5400, voxel=0.03, smooth=8, tire_w=0.24, hem_z=0.34, majority=3, static=True,
                   paint="#d8dce2"),
+    # T-193: "Low Poly Cars Set" (docs/Modelos/CARS; 3 carros, cada um repetido 3-4 vezes no arquivo: usamos 1 de cada)
+    # e o carro unico (Skyline, docs/Modelos/Unico...). Materiais sem cor: classe por peca (lib/traffic_groups.py).
+    "lp_coupe": dict(src_cars="desirefx.me_001", importer_args="pick", rotz=-90, length=4.45, prep=G.prep_groups,
+                     body_tris=5200, own_wheels=True, paint="#2a5cc0", badge_m=0.34),
+    "lp_hatch": dict(src_cars="desirefx.me_003", importer_args="pick", rotz=-90, length=4.15, prep=G.prep_groups,
+                     body_tris=5000, own_wheels=True, paint="#c8202f"),
+    # lp_suv (desirefx.me_002, SUV de 163 mil tri) NAO entra: a malha rasga ao reduzir para ~5 mil tri (T-193)
+    "skyline": dict(src_unique="Skyline+-+Allen+North+-+FBX.fbx", importer_args="per_object", rotz=0, length=4.6,
+                    prep=G.prep_groups, default=K.PAINT, body_tris=9000, own_wheels=True, paint="#1f4fa8",
+                    drop_words=("seat", "logo", "sw_", "steering", "interior", "dash", "pedal", "engine"),
+                    name_cls={"window": "glass", "glass": "glass", "windshield": "glass", "tire": "rubber",
+                              "brake": "rim_dark", "disc": "rim_dark", "exhaust": "chrome"}),
 }
 
 
@@ -225,6 +239,12 @@ def build(key: str, spec: dict, args) -> None:
         src = os.path.join(os.path.abspath(args.new_dir), spec["src_new"])
     elif "src_wreck" in spec:
         src = os.path.join(os.path.abspath(args.wreck_dir), spec["src_wreck"])
+    elif "src_cars" in spec:                    # T-193
+        src = os.path.abspath(args.cars_file)
+        spec["importer"] = lambda p, _k=spec["src_cars"]: G.import_pick(p, _k)
+    elif "src_unique" in spec:                  # T-193
+        src = os.path.join(os.path.abspath(args.unique_dir), spec["src_unique"])
+        spec["importer"] = lambda p, _w=spec["drop_words"]: G.import_per_object(p, _w)
     else:
         src = os.path.join(os.path.abspath(args.src_dir), spec["src"])
     if not os.path.isfile(src):
@@ -248,8 +268,8 @@ def build(key: str, spec: dict, args) -> None:
     bodies, wheels = spec["prep"](spec, objs, dims, to_final)
 
     body = K.join(bodies, "body")
-    K.weld(body, 1e-5)
-    K.decimate(body, spec["body_tris"], spec.get("border_weight", 0.0))
+    K.weld(body, spec.get("weld", 1e-5))
+    K.decimate(body, spec["body_tris"], spec.get("border_weight", 0.0), spec.get("symmetry", False))
     if spec.get("static"):                     # parado (carro batido): sem rodas separadas
         if wheels:                             # T-155: rodas redondas nossas entram no corpo (sem reduzir)
             body = K.join([body] + list(wheels), "body")
@@ -314,6 +334,8 @@ def main():
     ap.add_argument("--src-dir", default=_pasta("Modelos Melhorados"))
     ap.add_argument("--new-dir", default=_pasta("Novos modelos"))
     ap.add_argument("--wreck-dir", default=_pasta("Novas Melhorias"))
+    ap.add_argument("--cars-file", default="docs/Modelos/CARS/Low_Poly_Cars_Set/Low Poly Cars Set/Low Poly Cars Set.fbx")
+    ap.add_argument("--unique-dir", default="docs/Modelos/Unico, apenas um carro")
     ap.add_argument("--out", default="game/assets/vehicles/traffic")
     ap.add_argument("--preview", default="", help="pasta ABSOLUTA para os renders de conferência (opcional)")
     args = ap.parse_args(argv)

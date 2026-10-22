@@ -1,13 +1,15 @@
 class_name Trains3D
 extends Node3D
-## Desenha os trens do RailTraffic (T-154): um MultiMesh por modelo (locomotiva, 3 vagoes, bonde) = no maximo 5
-## chamadas de desenho com trem a vista (+1 do brilho dos farois a noite). Vagao a mais de CUT_M da camera nao entra.
+## Desenha os trens do RailTraffic (T-154): um MultiMesh por modelo (2 locomotivas, 8 vagoes, bonde) = uma chamada de
+## desenho por modelo A VISTA (o MultiMesh sem copia fica invisivel), +1 do brilho dos farois a noite. Vagao a mais de
+## CUT_M da camera nao entra. T-193: locomotiva e vagoes novos (RailTraffic.LOCOS / WAGON_POOL).
 ## A AABB do MultiMesh e recalculada a cada quadro: sem trem na tela, o Godot nem desenha.
 
-const MODELS: Array[String] = ["train_loco", "train_wagon_a", "train_wagon_b", "train_wagon_c", "train_lrt"]
+const MODELS: Array[String] = ["train_loco", "train_loco_b", "train_wagon_a", "train_wagon_b", "train_wagon_c",
+	"train_wagon_log", "train_wagon_flat", "train_wagon_semi", "train_wagon_box", "train_wagon_box_b", "train_lrt"]
 const MAX_PER_MODEL: int = 12
 const CUT_M: float = 700.0
-const HALF_LEN := {"train_loco": 9.0, "train_lrt": 17.5}
+const HALF_LEN := {"train_loco": 9.0, "train_loco_b": 9.45, "train_lrt": 17.5}
 
 var traffic: RailTraffic
 var tod: TimeOfDay

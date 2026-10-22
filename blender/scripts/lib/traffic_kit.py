@@ -308,7 +308,7 @@ def _border_group(o, name: str = "keep_border"):
     return vg
 
 
-def decimate(o, target: int, border_weight: float = 0.0) -> None:
+def decimate(o, target: int, border_weight: float = 0.0, symmetry: bool = False) -> None:
     """Reduz para `target` triângulos e copia as normais da peça ORIGINAL (Data Transfer): a lataria
     continua lisa em vez de ficar 'amassada' pelos triângulos longos da redução.
     `border_weight` > 0 (T-143): a redução evita mexer nas divisas entre classes (ex. preto/branco da viatura)."""
@@ -322,6 +322,9 @@ def decimate(o, target: int, border_weight: float = 0.0) -> None:
     md.decimate_type = "COLLAPSE"
     md.ratio = target / cur
     md.use_collapse_triangulate = True
+    if symmetry:                             # T-193: lataria espelhada (evita rasgos de um lado so)
+        md.use_symmetry = True
+        md.symmetry_axis = "X"
     vg = None
     if border_weight > 0.0:
         vg = _border_group(o)

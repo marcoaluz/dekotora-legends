@@ -5,7 +5,8 @@ extends Node3D
 ## obstacle (the streets are 9 m below the expressway). Cars keep to the left (Japan). Fixed seed per route.
 ## The streets exist only in the city stretch of ScenicZone; outside it there is nothing to drive on.
 
-const MODELS: Array[String] = ["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_suv", "car_van01"]
+const MODELS: Array[String] = ["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_suv", "car_van01", "car_lp_coupe",
+	"car_lp_hatch"]
 const CARS_PER_LANE: int = 3
 const CAR_LEN: float = 4.3
 const LANE_OFF: float = 3.0          # m from the street centre line

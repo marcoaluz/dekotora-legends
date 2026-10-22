@@ -10,7 +10,8 @@ extends Node3D
 ## Modelos por tipo (indice = TrafficSim.Kind). Os 4 primeiros carros sao os genericos feitos por codigo;
 ## os outros vem de modelos de terceiros reduzidos (blender/scripts/build_traffic_*.py, creditos em LICENCAS.md).
 const MODELS_BY_KIND: Array = [
-	["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_van01", "car_ascona", "car_falcon", "car_suv", "car_jeep"],
+	["car_hatch", "car_sedan", "car_van", "car_kei_truck", "car_van01", "car_ascona", "car_falcon", "car_suv", "car_jeep",
+		"car_lp_coupe", "car_lp_hatch"],                  # T-193: docs/Modelos/CARS (build_traffic_cars.py)
 	["car_bus"],
 	["car_fumi"],
 ]
@@ -20,7 +21,8 @@ const DIR := "res://assets/vehicles/traffic/"
 const PLATE_Y: Dictionary = {
 	"car_hatch": [0.45, 0.65], "car_sedan": [0.45, 0.6], "car_van": [0.45, 0.6], "car_kei_truck": [0.45, 0.62],
 	"car_van01": [0.42, 0.55], "car_ascona": [0.48, 0.55], "car_falcon": [0.5, 0.62], "car_suv": [0.55, 0.62],
-	"car_bus": [0.48, 0.75], "car_fumi": [0.32, 0.57], "car_jeep": [0.58, 0.6]}
+	"car_bus": [0.48, 0.75], "car_fumi": [0.32, 0.57], "car_jeep": [0.58, 0.6], "car_lp_coupe": [0.42, 0.62],
+	"car_lp_hatch": [0.45, 0.6]}
 const KEI_MODELS: Array[String] = ["car_hatch", "car_kei_truck"]
 const BODY_COLORS: Array[Color] = [
 	Color("#2a5cc0"), Color("#c8202f"), Color("#2c9a5a"), Color("#d29a2e"), Color("#aeb8c8"), Color("#8a3fd0")]

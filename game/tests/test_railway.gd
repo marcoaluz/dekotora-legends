@@ -182,7 +182,9 @@ func test_city_keeps_buildings_off_the_crossing() -> void:
 func test_models_are_light_and_textures_small() -> void:
 	var day: TimeOfDay = TimeOfDay.by_id(&"day")
 	var caps := {"rail_mast": 300, "rail_pier": 50, "rail_pier_cap": 50, "rail_portal": 200, "train_loco": 1500,
-		"train_wagon_a": 800, "train_wagon_b": 800, "train_wagon_c": 800, "train_lrt": 8000}
+		"train_wagon_a": 800, "train_wagon_b": 800, "train_wagon_c": 800, "train_lrt": 8000,
+		"train_loco_b": 5500, "train_wagon_log": 2400, "train_wagon_flat": 2400, "train_wagon_semi": 2400,
+		"train_wagon_box": 2400, "train_wagon_box_b": 2400}
 	for m in caps:
 		var mesh: ArrayMesh = RailKit.mesh(m, day)
 		check(mesh != null, m + ": modelo carregado")
@@ -195,3 +197,24 @@ func test_models_are_light_and_textures_small() -> void:
 	for t in ["rail_bed", "rail_atlas", "rail_atlas_emit", "lrt_body", "lrt_door"]:
 		var tex: Texture2D = load(RailKit.TEX + t + ".png") as Texture2D
 		check(tex != null and tex.get_width() <= 1024, t + ": textura de no maximo 1024 px")
+
+
+## T-193: freight trains mix the 2 locomotives and the 8 wagons, always the same for the same seed.
+func test_freight_composition_varies_and_is_deterministic() -> void:
+	var a := RandomNumberGenerator.new()
+	a.seed = 77
+	var b := RandomNumberGenerator.new()
+	b.seed = 77
+	var seen: Dictionary = {}
+	for _i in 40:
+		var t: RailTraffic.Train = RailTraffic.make_train(RailTraffic.Type.FREIGHT, a)
+		var u: RailTraffic.Train = RailTraffic.make_train(RailTraffic.Type.FREIGHT, b)
+		check_eq(t.models, u.models, "mesma semente, mesma composicao")
+		check(RailTraffic.LOCOS.has(t.models[0]), "1o vagao e uma locomotiva")
+		check(t.models.size() >= 7 and t.models.size() <= 10, "locomotiva + 6 a 9 vagoes (%d)" % t.models.size())
+		check_eq(t.lens.size(), t.models.size(), "um comprimento por vagao")
+		for m in t.models:
+			seen[m] = true
+	for m in RailTraffic.LOCOS + RailTraffic.WAGON_POOL:
+		check(seen.has(m), m + " aparece em 40 trens")
+		check(Trains3D.MODELS.has(m), m + " tem MultiMesh no Trains3D")
