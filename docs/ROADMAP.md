@@ -93,6 +93,8 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [V7] Caminhão com cara de Dekotora (luzes, andons, mural trocável)
 - [x] [T-106] Cabine realista (portas, vidros curvos, para-lamas, degraus, faróis e grade com perfil) + texturas por código (sujeira, normal, colmeia, pneu)
 - [x] [T-189] PC em Forward+ com qualidade Ultra (SDFGI, SSR, névoa volumétrica, LUT por hora) + vida do cenário; celular segue Compatibility (não medido no aparelho)
+- [x] [T-188/T-192] Cenário novo (terreno com morros, montanhas em 3 camadas, quarteirões com neon, litoral com casas, pedras, placas com texto, céu/noite) nas 3 rotas inteiras; pinheiro/cedro/árvore redonda/arbusto/coqueiros refeitos com folhagem em camadas; pintura 速度落とせ dentro da faixa (concluída em 2026-10-22, `tests/test_scenery_t188.gd` e `test_scenery_t192.gd`, `docs/capturas_t192/`; celular não medido)
+- [ ] [T-192b] Pendências do Marco (não agora): copas ralas das Gleditsias adultas (d/e/f) e boneco com cara de manequim no retrato do duelo
 - [ ] [V8] Medir no celular — PRECISA MARCO (Android SDK + JDK 17 para gerar o APK)
 
 ## Fase 8 — Publicação (opcional)

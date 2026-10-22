@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-21** (T-188 etapa 1, aguardando o Marco aprovar os prints). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-22** (T-192: cenário novo nas 3 rotas inteiras, árvores refeitas, pintura do asfalto; aguardando o Marco ver os prints). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -27,7 +27,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | --- | --- |
 | Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
 | Biblioteca de cenário (T-186) | inventário `bash tools/inventory_models.sh`; corrida com as árvores/postes/pessoas novas é a normal; antigo: `-- --old-trees --old-lamps --no-people`; `--no-tree-lod`; prints com a câmera livre sem teclado `GODOT=... bash tools/capture_t186.sh PASTA [extras]` (`--freecam --freecam-tour=PASTA --tour=nome@km,lat,alt,giro,incl;...`); custo `bash tools/measure_t186.sh [quadros] [day|night]` (`MEASURE_EXTRA="--old-trees --old-lamps --no-people"`); folha dos modelos `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t186.gd -- --out=PASTA_ABS`; contagem de árvores `-s res://tools_dev/probe_groves.gd`; testes `-- --only=scenery_t186`; detalhes em `docs/BIBLIOTECA_CENARIO.md` |
-| Cenário novo no trecho-piloto (T-188, etapa 1) | já liga na corrida normal (litoral km 0,6–1,6; cidade 1,3–2,05; montanha 1,1–2,05): `-- --route=kanto_3_mountain --start=1150 --time=night`; antigo `-- --t188=off`; prints `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t188.sh` (em `docs/capturas_t188/`); custo `bash tools/measure_t188.sh [quadros] [day ou night]` (`MEASURE_EXTRA="--t188=off"`); texturas `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` e `godot --path game -s res://tools_dev/make_neon_atlas.gd` (janela); testes `-- --only=scenery_t188`; no log aparece `SCENIC_T188 ...` |
+| Cenário novo na rota inteira (T-188 + T-192) | padrão na corrida normal, nas 3 rotas do km 0 ao fim: `-- --route=kanto_3_mountain --start=300 --time=night`; só o antigo trecho-piloto `-- --t188=segment`; antigo `-- --t188=off`; prints da rota inteira `bash tools/capture_t192.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t192.sh` (em `docs/capturas_t192/`); custo `bash tools/measure_t192.sh [3000] [night]`; árvores `blender -b --factory-startup -P blender/scripts/build_foliage_t192.py -- --preview`; testes `-- --only=scenery_t192`; T-188: prints `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t188.sh` (em `docs/capturas_t188/`); custo `bash tools/measure_t188.sh [quadros] [day ou night]` (`MEASURE_EXTRA="--t188=off"`); texturas `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` e `godot --path game -s res://tools_dev/make_neon_atlas.gd` (janela); testes `-- --only=scenery_t188`; no log aparece `SCENIC_T188 ...` |
 | PC Ultra + vida do cenário (T-189) | PC abre em Forward+/Ultra; Opções > Gráficos: Qualidade (Ultra só no PC), "Vida do cenário", "Borrão de velocidade", "Chuva"; forçar `-- --quality=3`, `--life=off\|on`, `--rain`/`--no-rain`, `--motion-blur`, `--time=dawn`; média como no celular: `godot --path game --rendering-method gl_compatibility ... -- --quality=1 --life=off`; prints `GODOT=... bash tools/capture_t189.sh PASTA [day night]` (em `docs/capturas_t189/`, folhas `folha_day/night.png`: esquerda média, direita Ultra); FPS `bash tools/measure_t189.sh [quadros] [day\|night] [1920x1080]`; testes `-- --only=ultra_look` e `-- --only=race_life`; no log `LIFE_T189 ...` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
 | Testes automáticos (387) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
@@ -93,7 +93,9 @@ código) em bosques por bioma (`road3d/roadside_trees.gd`, desenhados por `Roads
 `lamp_bridge` no viaduto/serra/pontes e `lamp_post` no pedágio/litoral; pessoas (`road3d/people_kit.gd`) no pedágio, no
 viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminhão); retrato do motorista na faixa do duelo
 (`ui/duel_band.gd`). Custo medido: +1 a +22 chamadas, FPS no ruído (DECISOES, T-186). Capturas e folhas em
-`docs/capturas_t186/`. Não validado no celular (APK novo).
+`docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
+(galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore; pendente (Marco,
+não agora): copas ralas das Gleditsias adultas e boneco-manequim do retrato.
 
 ## Carro acidentado no trânsito (T-183)
 

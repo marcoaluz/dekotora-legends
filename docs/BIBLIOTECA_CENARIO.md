@@ -60,8 +60,15 @@ Custo = triângulos por cópia e chamadas de desenho (modo médio). Todas só vi
 | Peça | Arquivo | Triângulos perto / longe | Onde | Observação |
 | --- | --- | --- | --- | --- |
 | 6 Gleditsias | `scenery/tree_leafy[_b.._f].glb` + `_lod1` + `textures/backdrop/tree_leafy*_leaves.png` | 279–655 / 36 | litoral (terra), cidade, montanha | recorte por alfa; atlas próprio de cada uma |
-| Coqueiros: palm, palm_tall, palm_bent | `scenery/palm*.glb` + `_lod1` | 1.200–1.416 / 237–278 | litoral (os dois lados) | por código |
-| Pinheiro, cedro (sugi), árvore redonda, arbusto | `scenery/tree_pine/tree_cedar/tree_round/bush.glb` + `_lod1` | 124–1.272 / 56–108 | montanha (pinheiro, cedro), cidade (redonda), todos (arbusto) | por código |
+| Coqueiros: palm, palm_tall, palm_bent | `scenery/palm*.glb` + `_lod1` | 512–690 / 104–112 | litoral (os dois lados) | por código, **refeitos na T-192**: tronco com anéis, 12–16 folhas em V com textura de folíolos, cocos, folhas secas embaixo |
+| Pinheiro, cedro (sugi), árvore redonda, arbusto | `scenery/tree_pine/tree_cedar/tree_round/bush.glb` + `_lod1` | 152–738 / 50–84 | montanha (pinheiro, cedro), cidade (redonda), todos (arbusto) | por código, **refeitos na T-192**: galhos em cartões (agulhas/tufos de folhas) em volta de um miolo escuro, silhueta irregular |
+
+**T-192 (folhagem em camadas)**: `blender -b --factory-startup -P blender/scripts/build_foliage_t192.py -- [--only nome] [--preview]`
+gera os 7 modelos acima + `_lod1` e o atlas `textures/backdrop/foliage_leaves.png` (512 px: ramo de agulhas, tufo de
+folhas, folha de coqueiro; pintado com numpy em `lib/tex_foliage.py`). No jogo eles usam os mesmos materiais das
+Gleditsias (`BackdropKit.tree_mesh_of`: casca = cor por vértice, folhas = atlas × cor por vértice, recorte por alfa) e
+cada árvore ganha um tom próprio (`Roadside3D.tree_tint`, cor por cópia do MultiMesh). Prévia:
+`blender/renders/t192/foliage_sheet.png`. Os antigos (cones/esferas) estão no histórico do Git (commit anterior a 96187ed).
 | Pedra | `scenery/rock.glb` | 124 | pé da mureta (montanha), praia | sem LOD |
 
 Mistura (`RoadsideTrees.MIX`, pesos): **litoral** palm 16, palm_tall 14, palm_bent 10, arbusto 14, Gleditsia a/b/c

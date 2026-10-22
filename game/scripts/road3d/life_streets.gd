@@ -37,6 +37,8 @@ func setup(path_: TrackPath, field_: TerrainField, zone_: Vector2, route_id: Str
 		lanes.append({"lat": c - LANE_OFF, "dir": 1.0})          # keep left: going +z = left side of the street
 		lanes.append({"lat": c + LANE_OFF, "dir": -1.0})
 	var per_lane: int = CARS_PER_LANE if q >= 2 else 2
+	# T-192: the streets now run along the whole route: same density as the ~750 m pilot stretch (capped)
+	per_lane = mini(int(ceil(float(per_lane) * maxf(1.0, (zone.y - zone.x) / 750.0))), 4 * per_lane)
 	var scenes: Dictionary = {}
 	for li in lanes.size():
 		for k in per_lane:

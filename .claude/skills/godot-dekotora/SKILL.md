@@ -338,9 +338,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 ## Cenário trecho-piloto (T-188)
 
 - Opção da corrida (depois de `--`): `--t188=off|segment|all` (código em `game/scripts/road3d/scenic_zone.gd`).
+  - `all`: **padrão desde a T-192** (etapa 2 aprovada): cenário novo na rota inteira.
+  - `segment`: só o antigo trecho-piloto (`ScenicZone.pilot(rota)`), para comparar com os prints da T-188.
   - `off`: volta ao visual antigo em todas as rotas (use para os "antes" das capturas e medições).
-  - `segment`: padrão. Só o trecho-piloto novo de cada rota.
-  - `all`: existe, mas **não foi validada**. Não use para aprovar nada.
+- T-192 (rota inteira): prints `bash tools/capture_t192.sh PASTA [day night] [-- extras]` (8 poses por rota: início,
+  emendas, túneis, ponte, viaduto antigo, fim, pintura do asfalto), folhas `bash tools/sheet_t192.sh`, custo em 3 pontos
+  por rota (média Compatibility x Ultra) `bash tools/measure_t192.sh [QUADROS=3000] [day|night]`
+  (`MEASURE_EXTRA="--t188=segment"` = antes; `MEASURE_Q=media` só a média). Testes `-- --only=scenery_t192`.
+- **Armadilha (medida)**: na qualidade média o PC passa de 200 FPS; com poucos quadros (`--quit-after 1200`) a corrida
+  acaba antes da 1a média de 5 s e não sai nenhuma linha `FPS medio`. Use 3000 quadros.
+- **Armadilha (pintura do asfalto)**: as curvas guardam `curve` em float32; `0.9 >= SHARP_CURVE (0.9)` dá falso. Curva
+  de 0,9 não ganha "速度落とせ/80" (só as de 1,0 ou mais).
+- Árvores por código (T-192): `BackdropKit.FOLIAGE` + `is_card_tree(nome)` decidem quem usa o material de cartões; o
+  MultiMesh dessas árvores liga `use_colors` (tom por árvore, `Roadside3D.tree_tint`). Trocar o .glb exige
+  `godot --headless --path game --import` antes de rodar o jogo.
 - Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]`. Para o "antes": `bash tools/capture_t188.sh PASTA_ANTES day night -- --t188=off`.
 - Folhas antes | depois: `bash tools/sheet_t188.sh [PASTA]` (usa `PASTA/antes` e `PASTA/depois`; padrão `docs/capturas_t188`).
 - Custo: `GODOT=... bash tools/measure_t188.sh [QUADROS] [day|night]`. Para o "antes": `MEASURE_EXTRA="--t188=off" bash tools/measure_t188.sh [QUADROS] [day|night]`.

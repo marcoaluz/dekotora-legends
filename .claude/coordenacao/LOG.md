@@ -347,3 +347,10 @@ Formato em `docs/AGENTES.md`.
 - Validação: 387 testes ok; capturas média×Ultra 3 rotas dia/noite; FPS 1920×1080 RX 580: Ultra 56–61, média (Compatibility) 243–276; export-pack Android ok (pack com rendering_method.mobile e texturas ETC2/ASTC). Celular não medido.
 - Decisão pendente: pista contrária não existe na rodovia (criar? onde?); usar o amanhecer (dawn) em alguma rota?; 7 sons de ambiente para o Marco gerar (AUDIO_ELEVENLABS seção 8).
 - Armadilhas: o editor apaga `renderer/rendering_method` do project.godot (é o padrão = Forward+); captura às vezes trava/não grava com a tela do PC desligada (scripts têm timeout e nova tentativa); opções salvas do Marco (chuva, borrão) vazam nas capturas: passar --no-rain --no-motion-blur.
+
+## 2026-10-22 · T-192 · especialista · PARCIAL (parou por falta de memoria do PC)
+- Feito: cenario T-188 na rota inteira (padrao --t188=all; segment/off p/ comparar); pinheiro/cedro/arvore redonda/arbusto/3 coqueiros refeitos (cartoes com atlas foliage_leaves.png, 2 LODs, tom por arvore); 速度落とせ empilhado dentro da faixa; ruas da T-189 com densidade de carros proporcional a zona; docs.
+- Arquivos: road3d/scenic_zone.gd, backdrop_kit.gd, roadside_3d.gd, duel_stage.gd, road_furniture.gd, life_streets.gd; blender/scripts/build_foliage_t192.py, lib/tex_foliage.py; tests/test_scenery_t192.gd; tools/capture_t192.sh, measure_t192.sh, sheet_t192.sh
+- Validacao: suite 391 ok (antes da mudanca em life_streets; depois dela race_life 6 ok). Capturas antes (dia/noite) completas; depois so dia e PRELIMINAR (cores antigas do arbusto/miolo). Medida depois interrompida pelo sistema (memoria baixa) apos 2 de 9 pontos.
+- Pendente: rodar capture_t192 depois (day night), sheet_t192, measure_t192 depois, suite inteira, commit dos docs/capturas.
+- Decisao pendente: nenhuma nova (pista contraria segue com o Marco).

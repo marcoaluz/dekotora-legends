@@ -611,3 +611,23 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   existir. Vale também no celular (só se o jogador ligar, como antes).
 - **Custo medido** (RX 580, 1920×1080, sem vsync; `tools/measure_t189.sh`): ver `docs/capturas_t189/custo.txt`.
   Celular **não medido** (sem aparelho).
+
+## 2026-10-22 — T-192 (T-188 etapa 2): cenário novo nas 3 rotas inteiras, árvores refeitas, pintura do asfalto
+- **Rota inteira** (`ScenicZone`): `--t188=all` virou o padrão; `--t188=segment` (só o antigo trecho-piloto,
+  `ScenicZone.pilot`) e `--t188=off` (visual antigo) ficam para comparar. Terreno com morros, cordilheira do meio,
+  floresta das encostas, quarteirões/ruas/fachadas/neon, casas do litoral, pedras e placas com texto agora vão do km 0
+  ao fim; o relevo nasce e morre suave nos 140 m da largada e da chegada (as emendas do meio sumiram). O morro continua
+  achatado perto de qualquer parte da pista e dos corredores de ferrovia/viaduto (teste da T-188 roda agora na rota
+  inteira); túneis, ponte e viaduto antigo intactos (a "caixa" de morro em cima da boca do túnel já existia e não foi mexida).
+- **Vida da T-189 na rota inteira**: as ruas da cidade (carros/pessoas) seguem a zona; a quantidade de carros por faixa
+  cresce com o comprimento (mesma densidade do trecho-piloto, no máximo 4x). Nomes `CityBlocks.START_L/START_R/STREET_M`,
+  `AtmosTune`/"dawn" e `UltraLook.tune_tod` mantidos.
+- **Árvores por código refeitas** (`build_foliage_t192.py`): pinheiro, cedro, árvore redonda, arbusto e os 3 coqueiros
+  trocaram cones/esferas por galhos e tufos em cartões com textura (agulhas, folhas, folíolos) em volta de um miolo
+  escuro, silhueta irregular, cor por galho e um tom por árvore (cor por cópia do MultiMesh). Continuam com 2 LODs e
+  MultiMesh; mesmas alturas e mesma distribuição dos bosques da T-186. As 6 Gleditsias não mudaram (só ganharam o tom
+  por árvore). **Pendências anotadas (não feitas):** copas ralas das Gleditsias adultas e o boneco-manequim do retrato.
+- **Pintura "速度落とせ"**: era uma linha deitada de ~6,4 m numa faixa de 3,6 m (invadia as vizinhas). Agora as letras
+  vão empilhadas no sentido da pista, 1a letra mais perto do motorista (como no Japão), fonte 80, dentro da faixa.
+  Asfalto e "80"/setas inalterados. Observação: curvas de 0,9 exatos (cidade, km 0,4 e 0,7) não ganham a pintura nem a
+  faixa amarela (float32 < 0,9); não mexi (muda o visual da faixa).
