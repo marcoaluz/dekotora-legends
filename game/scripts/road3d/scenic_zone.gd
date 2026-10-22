@@ -1,11 +1,11 @@
 class_name ScenicZone
 extends RefCounted
-## T-188 (etapa 1): the new scenery (terrain with relief, layered mountains, city blocks, signs with text, rocks,
-## slope forest) is built only on ONE pilot stretch per route until Marco approves the prints.
-## Sky, night light and aerial perspective are global (they cannot be cut per km).
+## T-188: the new scenery (terrain with relief, layered mountains, city blocks, signs with text, rocks, slope forest).
+## Etapa 1 built it on ONE pilot stretch per route (ZONES); T-192 (etapa 2, approved by Marco) turns it on along the
+## WHOLE route by default. Sky, night light and aerial perspective are global (they cannot be cut per km).
+##   --t188=all      default (T-192): whole route
+##   --t188=segment  only the old pilot stretch below (compare with the T-188 prints)
 ##   --t188=off      old look everywhere (before/after prints, cost comparison)
-##   --t188=segment  default: only the pilot stretch below
-##   --t188=all      whole route (not approved yet; for tests only)
 ## Pure data (no nodes): used by RoadMesh, CityBuilder, Roadside3D, RoadFurniture and the new builders.
 
 const ZONES: Dictionary = {
@@ -21,7 +21,7 @@ static func mode() -> String:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--t188="):
 			return a.substr(7)
-	return "segment"
+	return "all"
 
 
 static func enabled() -> bool:
@@ -35,6 +35,11 @@ static func zone(route_id: String, length_m: float = 1.0e9) -> Vector2:
 			return NONE
 		"all":
 			return Vector2(0.0, length_m)
+	return ZONES.get(route_id, NONE)
+
+
+## The old pilot stretch of the route (T-188 etapa 1), whatever the mode (tests, --t188=segment).
+static func pilot(route_id: String) -> Vector2:
 	return ZONES.get(route_id, NONE)
 
 

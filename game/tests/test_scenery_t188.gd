@@ -16,10 +16,11 @@ func _field(rid: String) -> TerrainField:
 	return TerrainField.new(path, route.scenery, ScenicZone.zone(rid, path.track.length_m), [], 188)
 
 
-func test_zone_default_is_one_stretch_per_route() -> void:
-	check_eq(ScenicZone.mode(), "segment", "padrao: so o trecho-piloto")
+func test_zone_default_is_the_whole_route() -> void:
+	check_eq(ScenicZone.mode(), "all", "padrao (T-192): rota inteira")
 	for rid in ROUTES:
-		var z: Vector2 = ScenicZone.zone(rid)
+		check_eq(ScenicZone.zone(rid, 2750.0), Vector2(0.0, 2750.0), "%s: zona = rota inteira" % rid)
+		var z: Vector2 = ScenicZone.pilot(rid)
 		check(z.y - z.x >= 700.0 and z.y - z.x <= 1100.0, "%s: trecho de ~1 km (%d-%d)" % [rid, int(z.x), int(z.y)])
 		check_near(ScenicZone.weight(z, z.x), 0.0, 0.001, "%s: relevo comeca do zero" % rid)
 		check_near(ScenicZone.weight(z, (z.x + z.y) * 0.5), 1.0, 0.001, "%s: relevo cheio no meio" % rid)
@@ -75,7 +76,7 @@ func test_mid_ridges_far_from_every_part_of_the_route() -> void:
 		var route: RouteDef = load("res://data/routes/%s.tres" % rid) as RouteDef
 		var path := TrackPath.new(route.build_track())
 		var r := MountainRidges.new()
-		r.build(path, route.scenery, null, ScenicZone.zone(rid), 188)
+		r.build(path, route.scenery, null, ScenicZone.zone(rid, path.track.length_m), 188)
 		check(r.piece_count >= 3, "%s: cordilheira do meio (%d pedacos)" % [rid, r.piece_count])
 		for c in r.centres:
 			var best: float = INF
