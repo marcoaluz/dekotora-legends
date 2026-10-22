@@ -73,11 +73,19 @@ func _gantry(z: float, tod: TimeOfDay) -> void:
 	band.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	band.transform = Transform3D(b, beam + b * Vector3(0.0, 0.0, 0.27))      # +Z local = toward the driver
 	add_child(band)
-	var col: Color = Color(1.0, 0.86, 0.35) if tod == null or tod.day_amount > 0.5 else Color(1.0, 0.55, 0.2)
-	var top: Vector3 = beam + Vector3.UP * 2.1 + b * Vector3(0.0, 0.0, 0.3)
-	var t: Label3D = MenuBackdrop.neon(self, "ゴール  " + Tr.t("race.arrival_gate"), top, col, 0.035, 64, 0.0)
+	var day: bool = tod == null or tod.day_amount > 0.5
+	var col: Color = Color(1.0, 0.86, 0.35) if day else Color(1.0, 0.55, 0.2)
+	var top: Vector3 = beam + Vector3.UP * 2.75 + b * Vector3(0.0, 0.0, 0.3)
+	# T-199: dark sign board on the beam + bigger letters (by day the yellow neon on the bright sky read small/washed)
+	_dark.append([Transform3D(b * Basis.from_scale(Vector3(half * 1.9, 3.6, 0.35)), top + b * Vector3(0.0, 0.0, -0.3)), Color("#15171c")])
+	for sx in [-0.42, 0.42]:                                 # board struts on the beam
+		_dark.append([Transform3D(b * Basis.from_scale(Vector3(0.3, 1.0, 0.3)), beam + b * Vector3(sx * half * 1.4, 1.2, 0.0)), steel])
+	var t: Label3D = MenuBackdrop.neon(self, "ゴール  " + Tr.t("race.arrival_gate"), top, col, 0.05, 64, 0.0)
 	t.basis = b
-	t.outline_size = 6
+	t.outline_size = 8
+	if day:
+		t.modulate = col * 1.15
+		t.outline_modulate = Color(0.05, 0.04, 0.02, 0.9)
 
 
 static func _checker_material(tod: TimeOfDay) -> StandardMaterial3D:

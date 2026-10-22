@@ -15,23 +15,28 @@ var poses: Array = []          # [name, km, lat, h, yaw_deg, pitch_deg]
 var _i: int = -1
 var _frame: int = 0
 var _acc: Vector3 = Vector3.ZERO   # draw calls, triangles, fps
+var clean: bool = false            # T-199: --tour-clean hides the overlay (prints without the panel)
 
 
 ## Creates the tour under the free camera when --freecam-tour= is given.
 static func maybe_attach(fc_: Freecam) -> void:
 	var out: String = ""
 	var spec: String = ""
+	var t_clean: bool = false
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--freecam-tour="):
 			out = a.substr(15)
 		elif a.begins_with("--tour="):
 			spec = a.substr(7)
+		elif a == "--tour-clean":
+			t_clean = true
 	if out == "" or spec == "":
 		return
 	var t := FreecamTour.new()
 	t.fc = fc_
 	t.out_dir = out
 	t.poses = parse(spec)
+	t.clean = t_clean
 	fc_.add_child(t)
 
 
@@ -75,6 +80,8 @@ func _go(p: Array) -> void:
 	fc.cam.global_position = path.world_point(z, float(p[2]) / Track.ROAD_HALF_WIDTH_M, float(p[3]))
 	fc.cam.global_basis = FreecamMath.basis_from(path.yaw_at(z) + deg_to_rad(float(p[4])), deg_to_rad(float(p[5])))
 	fc.update_pick()
+	if clean and fc._layer != null:
+		fc._layer.visible = false
 
 
 func _finish_pose() -> void:

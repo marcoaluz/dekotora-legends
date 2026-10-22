@@ -89,7 +89,9 @@ func _ready() -> void:
 	_headlight.rotation_degrees = Vector3(-4, 0, 0)
 	_headlight.spot_range = 70.0
 	_headlight.spot_angle = 32.0
-	_headlight.light_energy = 3.0
+	_headlight.light_energy = 1.6                 # T-199: was 3.0 (white blown-out pool on the wet asphalt at night)
+	_headlight.light_specular = 0.3              # T-199: softer glare of the wet asphalt / sign panels
+	_headlight.spot_angle_attenuation = 1.8      # T-199: soft edge instead of a hard bright disc
 	_headlight.light_color = Color(1.0, 0.93, 0.78)
 	_headlight.shadow_enabled = false
 	_headlight.visible = int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1

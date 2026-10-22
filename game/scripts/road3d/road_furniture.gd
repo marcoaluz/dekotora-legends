@@ -23,12 +23,17 @@ const SHARP_CURVE: float = 0.9          # curva a partir da qual a faixa vira am
 const BOX_SHADER := """
 shader_type spatial;
 uniform float glow = 0.0;
+uniform float night = 0.0;
 varying vec4 tint;
 void vertex() { tint = COLOR; }
 void fragment() {
-	ALBEDO = tint.rgb;
-	ROUGHNESS = 0.55;
-	EMISSION = tint.rgb * glow * tint.a;
+	// T-199: sign panels (alpha 0.12) barely take the truck headlights at night: they washed out to a white/cyan
+	// blot up close (Forward+/Ultra + glow). They are lit by their own small emission instead (retroreflective look).
+	float panel = step(0.01, tint.a) * step(tint.a, 0.5);
+	ALBEDO = tint.rgb * (1.0 - 0.75 * panel * night);
+	ROUGHNESS = mix(0.55, 0.95, panel);
+	SPECULAR = mix(0.5, 0.05, panel);
+	EMISSION = tint.rgb * glow * tint.a * (1.0 + 0.5 * panel * night);
 }
 """
 
@@ -137,7 +142,9 @@ func _gantry(z: float, places: PackedStringArray, k: int, L: float) -> void:
 	for b in 2:
 		var lat: float = -4.6 if b == 0 else 4.6
 		var place: String = String(places[(k + b + 1) % n]) if places.size() > 0 else "Tokyo"
-		_box(z - 0.35, lat, 6.6, Vector3(6.8, 2.7, 0.14), Color("#0d6a3b", 0.12))   # na frente da viga (lado de quem chega)
+		_box(z - 0.35, lat, 6.6, Vector3(6.8, 2.7, 0.14), Color("#0b5a32", 0.12))   # na frente da viga (lado de quem chega)
+		for sx in [-2.4, 2.4]:                                                  # T-199: suportes da placa na viga
+			_box(z - 0.2, lat + sx, 7.75, Vector3(0.12, 0.7, 0.12), Color("#6d737c", 0.0))
 		_box(z - 0.43, lat, 6.6, Vector3(6.5, 2.4, 0.02), Color("#e8f0ea", 0.12))   # borda branca
 		_box(z - 0.45, lat, 6.6, Vector3(6.3, 2.2, 0.02), Color("#0d6a3b", 0.12))
 		if ScenicZone.contains(zone, z, 60.0) and SignAtlas.has("place_" + place):
@@ -247,6 +254,7 @@ func _commit() -> void:
 	sh.code = BOX_SHADER
 	mat.shader = sh
 	mat.set_shader_parameter("glow", tod.line_emission * 2.2)
+	mat.set_shader_parameter("night", 1.0 - tod.day_amount)
 	var box := BoxMesh.new()
 	box.size = Vector3.ONE
 	for bi in _blocks:

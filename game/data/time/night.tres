@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_tod")
 id = &"night"
+glow_threshold = 1.1

@@ -98,10 +98,10 @@ static func apply_env(env: Environment, tod: TimeOfDay, q: int) -> void:
 	env.volumetric_fog_ambient_inject = 0.0
 	env.volumetric_fog_sky_affect = 0.0
 	env.glow_intensity = tod.glow_intensity * 1.25      # stronger bloom on the truck lights and the neon
-	env.glow_bloom = tod.glow_bloom + 0.03
+	env.glow_bloom = tod.glow_bloom + 0.01             # T-199: was +0.03 (whole image bloomed: white sign/road blots)
 	env.set_glow_level(3, 1.0)
-	env.set_glow_level(4, 0.6)
-	env.set_glow_level(5, 1.0)
+	env.set_glow_level(4, 0.45)
+	env.set_glow_level(5, 0.25)                         # T-199: was 1.0 (level 6 = huge halos around the truck lights)
 	env.set_glow_level(6, 0.5)
 	env.adjustment_color_correction = ColorGrade.lut(id)
 

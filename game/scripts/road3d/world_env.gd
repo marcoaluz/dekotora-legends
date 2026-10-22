@@ -157,6 +157,7 @@ static func _finish_env(env: Environment, tod: TimeOfDay, q: int) -> void:
 	env.glow_strength = 0.9
 	env.glow_bloom = tod.glow_bloom
 	env.glow_hdr_threshold = tod.glow_threshold
+	env.set_glow_level(4, 0.55)                         # T-199: level 5 (wide) was 1.0: big halos around the lights
 
 
 static func _create_indoor(parent: Node3D) -> void:
