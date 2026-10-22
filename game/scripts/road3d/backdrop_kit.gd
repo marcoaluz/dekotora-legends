@@ -139,7 +139,10 @@ static func tree_mesh_of(name: String, tod: TimeOfDay) -> ArrayMesh:
 	var bark: StandardMaterial3D = _bark(day)
 	for s in src.get_surface_count():
 		var mname: String = src.surface_get_material(s).resource_name if src.surface_get_material(s) != null else ""
-		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, src.surface_get_arrays(s))
+		var arrays: Array = src.surface_get_arrays(s)
+		if mname.begins_with("tree_leaves") and base.begins_with("tree_leafy"):
+			arrays = TreeCrown.thicken(arrays)        # T-199: Gleditsia crowns were too sparse
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 		out.surface_set_material(out.get_surface_count() - 1, leaves if mname.begins_with("tree_leaves") else bark)
 	_cache[k] = out
 	return out

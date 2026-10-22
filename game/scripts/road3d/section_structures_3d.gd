@@ -14,6 +14,7 @@ const SLOPE_M: float = 14.0               # comprimento do aterro das cabeceiras
 const PIER_TOP_FRAC: float = 0.74         # T-163: topo do pilar em T = 74% da largura do tabuleiro (pega as 3 longarinas)
 const CONCRETE := Color(0.66, 0.65, 0.62)
 const DARK := Color(0.46, 0.45, 0.43)
+const FASCIA := Color(0.58, 0.57, 0.54)
 
 var path: TrackPath
 var counts: Dictionary = {}
@@ -57,6 +58,9 @@ func _piers(st: SurfaceTool, br: Vector2) -> void:
 			var foot: Vector3 = _pt(z, c, 0.0)
 			foot.y = FOOT_Y
 			PierT.append(st, foot, b, top - FOOT_Y, w * PIER_TOP_FRAC, CONCRETE)
+			var pipe: Vector3 = _pt(z, c + 1.1, 0.0)               # T-199: drain pipe down the pier
+			pipe.y = (top + FOOT_Y) * 0.5
+			_box(st, b, pipe + b.z * 1.02, Vector3(0.18, top - FOOT_Y, 0.18), Color(0.3, 0.31, 0.33))
 			counts["pier"] = int(counts.get("pier", 0)) + 1
 			z += PIER_EVERY
 			continue
@@ -85,6 +89,9 @@ func _deck(st: SurfaceTool, br: Vector2) -> void:
 		_box(st, b, _pt(zm, c, -DECK_DROP + 0.12), Vector3(w, 0.24, len_), CONCRETE)
 		for k in [-1.0, 0.0, 1.0]:
 			_box(st, b, _pt(zm, c + k * w * 0.32, -DECK_DROP - 0.45), Vector3(0.7, 0.9, len_), DARK)
+		for ex in [e.x - 0.12, e.y + 0.12]:                     # T-199: fascia beam with a drip line on both edges
+			_box(st, b, _pt(zm, ex, -DECK_DROP * 0.5 - 0.1), Vector3(0.24, DECK_DROP + 0.2, len_ - 0.06), FASCIA)
+			_box(st, b, _pt(zm, ex + signf(ex) * 0.1, -DECK_DROP - 0.16), Vector3(0.12, 0.12, len_ - 0.06), DARK)
 		z += PIECE_M
 
 

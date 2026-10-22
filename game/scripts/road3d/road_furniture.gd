@@ -83,6 +83,7 @@ func build(path_: TrackPath, kind: StringName, tod_: TimeOfDay, tunnels: Array[V
 			k += 1
 		gz += 650.0
 	_markings(L, tunnels)
+	RoadDetails.add(self, kind, tunnels)                                  # T-199: juntas, km, telefones, refletores
 	_commit()
 	if _faces != null:
 		_faces.commit()
@@ -159,10 +160,7 @@ func _gantry(z: float, places: PackedStringArray, k: int, L: float) -> void:
 ## T-188: panel text from the sign atlas (kanji + romaji of the place, distance in green digits + "km"). Mipmapped
 ## texture instead of Label3D: readable from 300+ m (the labels vanished beyond 380 m and were thin up close).
 func _panel_faces(z: float, lat: float, place: String, km: int) -> void:
-	if _faces == null:
-		_faces = AtlasQuads.new()
-		add_child(_faces)
-		_faces.setup(load(SignAtlas.ATLAS) as Texture2D, AtlasQuads.level_for(tod))
+	faces_layer()
 	var b := Basis(Vector3.UP, path.yaw_at(z))
 	var c: Vector3 = path.world_point(z, lat / Track.ROAD_HALF_WIDTH_M, 6.6)
 	_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(4.4, 1.65, 1.0)), c - b.x * 0.85 + b.y * 0.1), SignAtlas.uv("place_" + place))
@@ -172,6 +170,15 @@ func _panel_faces(z: float, lat: float, place: String, km: int) -> void:
 		_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(0.44, 0.88, 1.0)), c + b.x * x + b.y * 0.05), SignAtlas.uv("g" + ch))
 		x += 0.44
 	_faces.add_quad(Transform3D(b * Basis.from_scale(Vector3(0.6, 0.6, 1.0)), c + b.x * (x + 0.12) - b.y * 0.1), SignAtlas.uv("km"))
+
+
+## Atlas quads of the sign atlas (created on first use; committed at the end of build).
+func faces_layer() -> AtlasQuads:
+	if _faces == null:
+		_faces = AtlasQuads.new()
+		add_child(_faces)
+		_faces.setup(load(SignAtlas.ATLAS) as Texture2D, AtlasQuads.level_for(tod))
+	return _faces
 
 
 func _label(text: String, z: float, lat_m: float, y: float, size: int, px: float) -> void:

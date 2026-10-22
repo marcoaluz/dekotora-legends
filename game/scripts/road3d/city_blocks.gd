@@ -37,6 +37,7 @@ var _neon: NeonSigns
 var models: CityModels                   # T-193: textured buildings (docs/Modelos/Cidade) on some lots
 var sides: Array[float] = [-1.0, 1.0]       # T-195: ArrivalCity (coast: only the land side)
 var force_city: bool = false              # T-195: ArrivalCity builds city blocks on any route
+var details: CityDetails                  # T-199: cornices, masts, AC units, balconies, fire escapes, awnings, signs
 
 
 func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -> void:
@@ -46,6 +47,7 @@ func build(field_: TerrainField, tod: TimeOfDay, keep_out_: Array, seed_: int) -
 	_rng.seed = seed_ + 55
 	_neon = NeonSigns.new()
 	add_child(_neon)
+	details = CityDetails.new(seed_)
 	if (field.kind == &"city" or force_city) and CityModels.enabled():
 		models = CityModels.new(tod, seed_, int(Settings.quality))
 	if field.kind == &"city" or force_city:
@@ -151,6 +153,8 @@ func _building(base: Vector3, by: Basis, to_road: Vector3, fwd: Vector3, lw: flo
 		var roof_at: Vector3 = base + Vector3.UP * (top + 1.2 + bw * 0.25) + to_road * (w * 0.5 - 1.0)
 		_neon.add(roof_at, to_road, Vector2(bw, bw * 0.5), _rng.randi() % 8, false)
 		_props.append([Transform3D(by * Basis.from_scale(Vector3(0.3, 1.2, bw * 0.9)), roof_at - Vector3.UP * (bw * 0.25 + 0.6) - to_road * 0.3), Color("#3a3c40")])
+	if model == Vector3.ZERO:
+		details.building(base, by, to_road, fwd, w, d, h, top, wall, row, shop, front, z)
 
 
 ## AC units, water tank and machine room on a flat roof (top centre `at`).
@@ -208,6 +212,7 @@ func _house(z: float, lat: float, w: float, d: float, floors: int, flat: bool, r
 	wall.a = (float(style) + 0.5) / 16.0
 	_b.append([Transform3D(by * Basis.from_scale(Vector3(w, h, d)), base + Vector3.UP * h * 0.5), wall])
 	building_count += 1
+	details.house(base, by, w, d, h, flat, z, 1.0 if lat < 0.0 else -1.0)
 	if flat:
 		_roof_props(base + Vector3.UP * h, by, w, d)
 	else:
@@ -251,6 +256,7 @@ func _commit(tod: TimeOfDay) -> void:
 	_multi(plane, _lines, CityLook.props())
 	if models != null:
 		models.commit(self, tod)
+	details.commit(self)
 
 
 func _multi(mesh: Mesh, items: Array, mat: Material) -> void:

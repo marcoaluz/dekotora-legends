@@ -131,8 +131,8 @@ def sign_green(m):
          M.box("post_r", (0.14, 0.14, 4.6), (2.1, 0, 2.3), m["steel"], bevel=0.02, seg=1),
          M.box("border", (4.9, 0.1, 2.5), (0, -0.02, 3.55), m["paint_white"], bevel=0.05, seg=1),
          M.box("panel", (4.7, 0.12, 2.3), (0, 0.0, 3.55), m["sign_green"], bevel=0.04, seg=1),
-         M.text3d("text_main", "東京 TOKYO", 0.55, (0, 0.08, 3.9), m["paint_white"], font_path=FONT, rot=(90, 0, 180), resolution=2),
-         M.text3d("text_dist", "12 km", 0.45, (0, 0.08, 3.1), m["paint_white"], font_path=FONT, rot=(90, 0, 180), resolution=2)]
+         M.text3d("text_main", "東京 TOKYO", 1.85, (0, 0.08, 4.02), m["paint_white"], font_path=FONT, rot=(90, 0, 180), resolution=2, offset=0.008),
+         M.text3d("text_dist", "12 km", 1.5, (0, 0.08, 3.0), m["paint_white"], font_path=FONT, rot=(90, 0, 180), resolution=2, offset=0.012)]
     return o
 
 

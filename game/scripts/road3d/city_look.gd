@@ -22,6 +22,12 @@ varying vec3 sz;
 varying vec4 tint;
 varying float bid;
 float hh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vn(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hh(i), hh(i + vec2(1.0, 0.0)), f.x), mix(hh(i + vec2(0.0, 1.0)), hh(i + vec2(1.0, 1.0)), f.x), f.y);
+}
 void vertex() {
 	sz = vec3(length(MODEL_MATRIX[0].xyz), length(MODEL_MATRIX[1].xyz), length(MODEL_MATRIX[2].xyz));
 	lp = VERTEX * sz;
@@ -49,6 +55,14 @@ void fragment() {
 		vec4 t = textureGrad(facade, auv, dFdx(cont) * vec2(0.25, 0.5), dFdy(cont) * vec2(0.25, 0.5));
 		vec3 wall = t.rgb * mix(vec3(1.0), tint.rgb * 1.6, 0.55) * mix(0.3, 1.0, day);   // night: the moon must not light walls white
 		float glass = t.a;
+		// T-199: weathering without textures: rain streaks hanging from the parapet (length per 0.6 m column),
+		// grime at the foot, soft blotches; stronger on some buildings (bid).
+		float col_h = hh(vec2(floor(u * 1.7), bid * 13.0));
+		float drip = smoothstep(0.62, 1.0, col_h) * (1.0 - smoothstep(0.0, 3.0 + 14.0 * hh(vec2(floor(u * 1.7), 3.0)), sz.y - v));
+		float foot = 1.0 - smoothstep(0.2, 2.4, v);
+		float blot = vn(vec2(u, v) * 0.22 + bid * 40.0);
+		float dirt = clamp(drip * 0.32 + foot * 0.3 + smoothstep(0.55, 0.95, blot) * 0.16, 0.0, 0.55) * (0.55 + 0.45 * bid);
+		wall *= 1.0 - dirt;
 		float floor_i = floor(vv / 3.5);
 		float bay = floor(u / 3.0);
 		float on = step(0.62, hh(vec2(floor_i, bay) + bid * 91.0)) * step(0.18, hh(vec2(floor_i, bid * 17.0)));
@@ -75,11 +89,18 @@ void fragment() {
 }
 """
 
+## T-199: darker toward the foot of each box (soft contact shadow) and a little noise per metre (dirt/paint).
 const PROPS := """
 shader_type spatial;
 varying vec4 tint;
-void vertex() { tint = COLOR; }
-void fragment() { ALBEDO = tint.rgb; ROUGHNESS = 0.8; }
+varying float ly;
+varying vec3 wp;
+void vertex() { tint = COLOR; ly = VERTEX.y; wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	float n = fract(sin(dot(floor(wp.xz * 1.3) + floor(wp.y * 0.8), vec2(12.9898, 78.233))) * 43758.5453);
+	ALBEDO = tint.rgb * (0.8 + 0.2 * smoothstep(-0.5, 0.5, ly)) * (0.93 + 0.07 * n);
+	ROUGHNESS = 0.8;
+}
 """
 
 static var _prism: ArrayMesh

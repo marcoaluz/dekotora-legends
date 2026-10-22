@@ -149,6 +149,7 @@ func _crest(c: Vector2, r: float, col: Color, kanji: String, edge: Color, right:
 		var art := Rect2(-sq.size * 0.5 + Vector2(1, 1), sq.size - Vector2(2, 2))
 		draw_texture_rect(_bust_base, art, false)
 		draw_texture_rect(_bust_shirt, art, false, col.lerp(Color.WHITE, 0.08))
+		DuelBust.features(self, art, col.lerp(Color.WHITE, 0.08))   # T-199: face, headband, collar (was a mannequin)
 		draw_set_transform(Vector2.ZERO)
 		draw_rect(sq, edge, false, 1.5)
 		var b := Vector2(sq.position.x + 8.0, sq.end.y - 8.0) if right else Vector2(sq.end.x - 8.0, sq.end.y - 8.0)
