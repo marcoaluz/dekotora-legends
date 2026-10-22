@@ -2,7 +2,7 @@ class_name SpeedBlur
 extends MeshInstance3D
 ## T-189: optional "motion blur" of the Ultra quality (Settings.fx_motion_blur). Godot 4 has no built-in motion blur,
 ## so this is a radial speed blur: a full-screen quad that samples the screen towards the centre, stronger at the
-## edges and only above ~70 km/h. The centre (truck and road ahead) stays sharp.
+## edges and only above ~80 km/h. The centre (truck and road ahead) stays sharp.
 
 const SHADER := """
 shader_type spatial;
@@ -18,7 +18,7 @@ void fragment() {
 	float edge = smoothstep(0.12, 0.62, length(d));
 	vec3 c = vec3(0.0);
 	for (int i = 0; i < 8; i++) {
-		c += textureLod(screen_tex, uv - d * amount * edge * float(i) * 0.012, 0.0).rgb;
+		c += textureLod(screen_tex, uv - d * amount * edge * float(i) * 0.007, 0.0).rgb;
 	}
 	ALBEDO = c / 8.0;
 	ALPHA = edge * clamp(amount * 4.0, 0.0, 1.0);
@@ -50,4 +50,4 @@ static func attach(cam: Camera3D, q: int, on: bool) -> SpeedBlur:
 
 ## `speed` in m/s.
 func update(speed: float) -> void:
-	_mat.set_shader_parameter("amount", clampf((speed - 19.0) / 22.0, 0.0, 1.0))
+	_mat.set_shader_parameter("amount", clampf((speed - 22.0) / 26.0, 0.0, 1.0))   # from ~80 km/h, full at ~170

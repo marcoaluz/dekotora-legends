@@ -24,9 +24,12 @@ for T in "${TIMES[@]}"; do
       else FLAGS=(); EX=(--quality=3 --life=on); fi
       D="$TMP/${R}_${T}_$Q"
       rm -rf "${D:?}"
-      "$GODOT" --path game "${FLAGS[@]}" --resolution 1280x720 --quit-after 900 res://scenes/race/race3d.tscn -- \
-          --route="$R" --start="$Z" --start-speed=22 --autoplay --event-seed=7 --no-intro --nohud --no-rain \
+      for TRY in 1 2; do                     # as vezes a janela nao grava nenhum quadro: tenta de novo uma vez
+      [ -f "$D/t02_1.png" ] && break
+      timeout 240 "$GODOT" --path game "${FLAGS[@]}" --resolution 1280x720 --quit-after 900 res://scenes/race/race3d.tscn -- \
+          --route="$R" --start="$Z" --start-speed=22 --autoplay --event-seed=7 --no-intro --nohud --no-rain --no-motion-blur \
           --time="$T" "${EX[@]}" --shots="$D" --snap-every=4 "$@" 2>&1 | grep -E "SCRIPT ERROR|Parse Error" || true
+      done
       if [ -f "$D/t02_1.png" ]; then cp "$D/t02_1.png" "$OUT/${R}_${T}_$Q.png"; else echo "FALTOU $D/t02_1.png"; fi
       SHEET+=("$OUT/${R}_${T}_$Q.png")
     done

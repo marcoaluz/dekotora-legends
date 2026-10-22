@@ -14,9 +14,9 @@ for SPOT in "kanto_1_coast 650" "kanto_2_viaduct 1350" "kanto_3_mountain 1150"; 
     if [ "$Q" = media ]; then FLAGS=(--rendering-method gl_compatibility); EX=(--quality=1 --life=off)
     else FLAGS=(); EX=(--quality=3 --life=on); fi
     echo "== $1 start=$2 $TOD $Q $RES ${MEASURE_EXTRA:-}"
-    "$GODOT" --path game "${FLAGS[@]}" --resolution "$RES" --disable-vsync --quit-after "$FRAMES" \
+    timeout 300 "$GODOT" --path game "${FLAGS[@]}" --resolution "$RES" --disable-vsync --quit-after "$FRAMES" \
         res://scenes/race/race3d.tscn -- --fps-log "${EX[@]}" --route="$1" --start="$2" --start-speed=22 --autoplay \
-        --event-seed=7 --no-intro --no-rain --time="$TOD" $MEASURE_EXTRA 2>&1 \
+        --event-seed=7 --no-intro --no-rain --no-motion-blur --time="$TOD" $MEASURE_EXTRA 2>&1 \
         | grep -E "FPS medio|SCRIPT ERROR|Parse Error" | tail -n 2 || true
   done
 done

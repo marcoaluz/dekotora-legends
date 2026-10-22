@@ -222,3 +222,22 @@ Mapa no código: `ExhaustDef.sound_profile` (`game/data/engines/exh_*.tres`) e `
 
 ## Chave da API
 A chave fica em `.chaves.env` (raiz do projeto, fora do git) na variavel `ELEVENLABS_API_KEY`. Nunca escreva o valor em docs ou commits.
+
+## 8. Ambiente por bioma e chuva — T-189 (`game/assets/audio/sfx/ambient/`)
+
+Ainda **faltam** (o jogo funciona sem eles: o som é pulado; a cidade usa `highway_night_loop` até chegar o dela).
+Todos são loops: gere 20–30 s, sem começo/fim marcado, volume constante. O nome precisa terminar em `_loop`.
+Use "Sound Effects" do ElevenLabs, duração máxima, "Prompt influence" alto.
+
+| Arquivo | Duração | Prompt |
+| --- | --- | --- |
+| `amb_cicadas_day_loop.mp3` | 25 s | Loopable ambience of Japanese summer cicadas (minminzemi and aburazemi) in a mountain forest, steady dense chorus, distant, no wind, no voices, no music |
+| `amb_sea_waves_loop.mp3` | 25 s | Loopable ambience of gentle ocean waves on a sandy beach heard from a coastal highway, soft surf and wash, distant seagulls very faint, no voices, no music |
+| `amb_city_day_loop.mp3` | 25 s | Loopable daytime Japanese city ambience heard from an elevated expressway, distant traffic hum, faint crosswalk chime, far construction, no clear voices, no music |
+| `amb_city_night_loop.mp3` | 25 s | Loopable night Japanese city ambience under an elevated expressway, low traffic hum, distant train, faint neon buzz, no clear voices, no music |
+| `amb_night_frogs_crickets_loop.mp3` | 25 s | Loopable summer night ambience in Japanese rice fields, frogs croaking and crickets chirping, calm, distant, no wind, no voices, no music |
+| `amb_birds_day_loop.mp3` | 25 s | Loopable daytime countryside ambience, small birds chirping in trees, occasional distant crow, calm, no wind, no voices, no music |
+| `amb_rain_loop.mp3` | 25 s | Loopable steady medium rain on asphalt and on a truck roof, close and wide, light splashes, no thunder, no music |
+
+Já existem e passaram a tocar (T-189): `train_horn.mp3` (buzina distante quando um trem entra no alcance) e
+`train_pass.mp3` (passagem perto), ambos posicionais.

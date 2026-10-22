@@ -92,6 +92,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [V6] Cromo por matcap
 - [x] [V7] Caminhão com cara de Dekotora (luzes, andons, mural trocável)
 - [x] [T-106] Cabine realista (portas, vidros curvos, para-lamas, degraus, faróis e grade com perfil) + texturas por código (sujeira, normal, colmeia, pneu)
+- [x] [T-189] PC em Forward+ com qualidade Ultra (SDFGI, SSR, névoa volumétrica, LUT por hora) + vida do cenário; celular segue Compatibility (não medido no aparelho)
 - [ ] [V8] Medir no celular — PRECISA MARCO (Android SDK + JDK 17 para gerar o APK)
 
 ## Fase 8 — Publicação (opcional)

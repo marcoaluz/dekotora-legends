@@ -10,7 +10,7 @@ extends Node3D
 const KINDS: Dictionary = {        # pool size, range (m) in which a source may get an emitter
 	"smoke": [4, 1600.0],
 	"steam": [3, 160.0],
-	"insects": [6, 130.0],
+	"insects": [6, 70.0],
 }
 const CHIMNEY_H: float = 62.0
 const LAMP_HEAD_H: float = 8.6     # m above the light pool (lamp_post / lamp_bridge heads)
@@ -246,12 +246,14 @@ static func _make(kind: String, tod: TimeOfDay) -> CPUParticles3D:
 			p.tangential_accel_max = 3.0
 			p.damping_min = 0.4
 			p.damping_max = 0.8
-			p.scale_amount_min = 0.10
-			p.scale_amount_max = 0.16
+			p.scale_amount_min = 0.07
+			p.scale_amount_max = 0.11
 			quad.size = Vector2(1, 1)
-			ramp.set_color(0, Color(3.0, 2.6, 1.6, 1.0))
-			ramp.add_point(0.8, Color(3.0, 2.6, 1.6, 0.9))
-			ramp.set_color(1, Color(3.0, 2.6, 1.6, 0.0))
+			ramp.set_color(0, Color(1.6, 1.4, 0.9, 1.0))
+			ramp.add_point(0.8, Color(1.6, 1.4, 0.9, 0.9))
+			ramp.set_color(1, Color(1.6, 1.4, 0.9, 0.0))
+			p.visibility_range_end = 60.0                # tiny bugs: invisible from far (no "fireworks" over the hills)
+			p.visibility_range_end_margin = 10.0
 			p.visibility_aabb = AABB(Vector3(-4, -4, -4), Vector3(8, 8, 8))
 	p.color_ramp = ramp
 	return p

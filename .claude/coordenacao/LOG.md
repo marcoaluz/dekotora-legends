@@ -340,3 +340,10 @@ Formato em `docs/AGENTES.md`.
 - Feito: notas da T-188 nas duas skills (opção `--t188`, `capture/sheet/measure_t188.sh`, teste `scenery_t188`, linha `SCENIC_T188`, duas armadilhas; comando `build_t188_textures.py` e `fix_alpha_border=false`). Commit 1e89321.
 - Arquivos: .claude/skills/godot-dekotora/SKILL.md, .claude/skills/blender-pixelart/SKILL.md
 - Observação: a linha `SCENIC_T188` sai no console (print em `scenic_stretch.gd`), não em arquivo de log. Commit usou trailer Co-Authored-By: Claude Haiku 5.5 (modelo real deste agente); a tarefa pedia Sonnet 5.5. `game/project.godot` está modificado no working tree e não foi tocado por mim.
+
+## 2026-10-22 00:55 · T-189 · especialista · CONCLUÍDA (com decisões pendentes)
+- Feito: PC em Forward+ (celular segue Compatibility); qualidade Ultra (SDFGI, SSAO+SSIL, SSR, sombra suave 4 cortes, FSR2 nativo, glow forte, névoa volumétrica, DOF na abertura, borrão de velocidade opcional, LUT por hora); vida do cenário (vento, folhas, pássaros, chaminés/fumaça, vapor, insetos, sombras de nuvem, carros e pessoas nas ruas da cidade, buzina dos trens, som ambiente por bioma); chuva com spray/respingos/céu cinza. Commits deefe03, c7cd92b, 22a08e6, bd201ad + docs.
+- Arquivos: game/scripts/road3d/{ultra_look,color_grade,speed_blur,race_life,life_*,cloud_shadows,rain_fx}.gd, settings.gd, options_panel.gd, world_env.gd, race_scene_3d.gd, data/time/dawn.tres, tools/{capture,measure}_t189.sh, docs/capturas_t189/
+- Validação: 387 testes ok; capturas média×Ultra 3 rotas dia/noite; FPS 1920×1080 RX 580: Ultra 56–61, média (Compatibility) 243–276; export-pack Android ok (pack com rendering_method.mobile e texturas ETC2/ASTC). Celular não medido.
+- Decisão pendente: pista contrária não existe na rodovia (criar? onde?); usar o amanhecer (dawn) em alguma rota?; 7 sons de ambiente para o Marco gerar (AUDIO_ELEVENLABS seção 8).
+- Armadilhas: o editor apaga `renderer/rendering_method` do project.godot (é o padrão = Forward+); captura às vezes trava/não grava com a tela do PC desligada (scripts têm timeout e nova tentativa); opções salvas do Marco (chuva, borrão) vazam nas capturas: passar --no-rain --no-motion-blur.

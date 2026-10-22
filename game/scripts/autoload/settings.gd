@@ -49,6 +49,8 @@ func _ready() -> void:
 			fx_life = true
 		elif a == "--motion-blur":
 			fx_motion_blur = true
+		elif a == "--no-motion-blur":
+			fx_motion_blur = false
 	quality = UltraLook.clamp_quality(quality)    # Ultra so com Forward+ (celular: Compatibility -> Alta no maximo)
 
 

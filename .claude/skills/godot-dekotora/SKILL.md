@@ -350,3 +350,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - **Armadilha 2 (cores do terreno)**: as cores do shader do terreno (`scenic_shaders.gd`, `TERRAIN`) precisam ser bem escuras, porque as cores são sRGB. A noite também precisa do `night_lift` (uniform do shader, luz de lua), porque o céu noturno é escuro demais para iluminar o terreno.
 
 
+
+## PC Forward+ / Ultra e vida do cenário (T-189)
+
+- PC = Forward+ (padrão do 4.7: o editor APAGA `renderer/rendering_method` do `project.godot`; sem a linha = Forward+),
+  celular = `rendering_method.mobile="gl_compatibility"`. Tudo que é só Forward+ (SDFGI, SSR, névoa volumétrica, Decal,
+  FSR2) passa por `UltraLook.available()` / `UltraLook.active(q)` (`road3d/ultra_look.gd`). Qualidade 3 = Ultra.
+- Simular o celular no PC: `godot --path game --rendering-method gl_compatibility ... -- --quality=1 --life=off`.
+- Vida do cenário: `road3d/race_life.gd` (atrás de `Settings.fx_life`, desligado no celular por padrão). Nunca entra na
+  sim nem na rede. Novo efeito de partícula: pool perto do jogador (`LifeEmitters`), não um emissor por fonte.
+- Vento: `LifeWind.apply(roadside)` troca a malha de cada MultiMesh de árvore por uma CÓPIA com shader (o .glb em cache
+  fica intacto). Não chame funções de `convert` etc.: `convert` é função global do GDScript (erro de parse).
+- `--rain`/`--no-rain`, `--life=on|off`, `--motion-blur` (não gravam). As opções salvas no PC do Marco podem ter chuva
+  ligada: nas capturas passe `--no-rain`.
+- Captura que às vezes não grava nenhum quadro: rode de novo (o `tools/capture_t189.sh` já tenta 2 vezes).

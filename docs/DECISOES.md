@@ -577,3 +577,37 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
 - **Personalização (T-190, docs/REFERENCIA_PERSONALIZACAO.md)**: cada lado do baú pode ter mural diferente; a loja terá **temas prontos** (Retrô, Kansai, Kanto, Gundam) além das peças soltas; **mestre da oficina** que conversa e dá dicas (texto); origem dos murais figurativos **em aberto** (IA, código/Blender ou arte livre); peças ficam para depois (algumas serão trocadas, outras acrescentadas).
 - **Ideia de câmera/retrovisor (Marco)**: retrovisor para ver o rival atrás e câmeras de corrida estilo cinema (longe, média, com zoom). Registrada para o futuro; ainda não é tarefa.
 - **Andon (texto)**: pendente de explicação ao Marco (é a placa luminosa do teto da cabine com texto, ex.: 一番星).
+
+## 2026-10-22 — T-189: PC com Forward+ e qualidade Ultra; celular continua Compatibility; vida do cenário
+- **Renderizador por plataforma**: PC = **Forward+** (`renderer/rendering_method`; é o padrão do Godot 4.7, por isso o
+  editor apaga a linha do `project.godot` ao salvar: sem a linha = Forward+); celular = **Compatibility**
+  (`rendering_method.mobile`, inalterado). O export Windows usa o do PC, o Android o `.mobile`. PC sem Vulkan cai sozinho
+  para Compatibility e o Ultra some das Opções.
+- **Qualidade Ultra** (`Settings.quality = 3`, `road3d/ultra_look.gd`): só existe com Forward+ (`UltraLook.available()`);
+  no celular a qualidade é limitada a Alta e nada do Ultra roda. Liga: SDFGI (luz rebatida; VoxelGI não serve porque o
+  cenário é gerado na hora), SSAO + SSIL, SSR, sombra suave do sol em 4 cortes (atlas 8192, 260 m), **FSR2 na
+  resolução nativa** como antisserrilhado temporal (escolhido no lugar do TAA puro: mais nítido), glow mais forte,
+  névoa volumétrica por hora (raios de sol no amanhecer/entardecer, halo nos postes à noite), profundidade de campo
+  leve só na abertura do duelo, borrão de velocidade opcional (`fx_motion_blur`, desligado; o Godot 4 não tem motion
+  blur de verdade: é um borrão radial nas bordas acima de ~80 km/h).
+- **Cor por hora do dia** (`road3d/color_grade.gd`): LUT 3D (33³) em `adjustment_color_correction`, só no Ultra:
+  amanhecer dourado, dia vívido/saturado, entardecer laranja/rosa, noite azul com neon. **Não existe amanhecer em
+  nenhuma rota**: criei `data/time/dawn.tres` só para `--time=dawn` (decisão do Marco: usar em alguma rota?).
+- **PC começa no Ultra**: instalação nova com Forward+ abre em Ultra; quem tinha Alta salvo sobe UMA vez para Ultra
+  (chave `graphics/version = 2` no `settings.cfg`). Pode voltar em Opções.
+- **Vida do cenário** (`Settings.fx_life`, "Vida do cenário" nas Opções; **desligada por padrão no celular**, ligada no
+  PC), tudo só visual, determinístico por rota, fora da simulação e da rede, nunca obstáculo (`road3d/race_life.gd`):
+  vento nas árvores/palmeiras/arbustos (cópia da malha com balanço no shader, sem mexer nos construtores), folhas
+  caindo, bandos de pássaros de dia (gaivotas no litoral), chaminés de fábrica vermelho/branco com fumaça (litoral e
+  cidade) e fumaça de vila (montanha), vapor de bueiro no acostamento, insetos nos postes à noite, sombras de nuvem
+  (Decal; só Forward+), carros nos dois sentidos e pessoas nas calçadas das ruas da cidade ao lado do viaduto (trecho
+  da T-188), buzina distante e ronco dos trens da T-154, som ambiente por bioma (cigarras, mar, cidade, sapos/grilos,
+  pássaros; arquivo ausente = pulado; prompts em `docs/AUDIO_ELEVENLABS.md` seção 8).
+- **Trânsito "do outro lado do canteiro"**: a rodovia do jogo **não tem pista contrária** (só 3 faixas num sentido,
+  com mureta dos dois lados; postes e árvores ficam onde ela estaria). Não inventei a pista contrária: o trânsito
+  contrário entrou onde já existe rua (cidade). **Decisão pendente do Marco** (ver resposta da T-189).
+- **Chuva** (`fx_rain`, opcional, já existia): agora com céu cinza, pista mais molhada (no Ultra reflete as luzes),
+  spray atrás de cada caminhão pela velocidade e respingos na pista (`road3d/rain_fx.gd`), som `amb_rain_loop` quando
+  existir. Vale também no celular (só se o jogador ligar, como antes).
+- **Custo medido** (RX 580, 1920×1080, sem vsync; `tools/measure_t189.sh`): ver `docs/capturas_t189/custo.txt`.
+  Celular **não medido** (sem aparelho).
