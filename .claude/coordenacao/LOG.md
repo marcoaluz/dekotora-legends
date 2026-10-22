@@ -385,3 +385,15 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: game/scripts/road3d/{race_cam_rig,race_cam_director,race_cam_view,rear_mirror}.gd, ui/race_cam_button.gd, race_scene_3d.gd, race_hud.gd, settings.gd, options_panel.gd, project.godot (camera_next, rear_mirror), pt-BR.json, tests/test_race_cameras*.gd, tools/{capture,sheet,measure}_t198.sh, docs.
 - Validação: suíte 420/420 ok (14 novos); capturas dia/noite das 5 câmeras com retrovisor em docs/capturas_t198 (folha_cameras.png, folha_retrovisor.png); FPS média/Ultra em custo.txt (retrovisor −3 a −7%).
 - Decisão pendente: Marco confirmar lugar/tamanho do espelho, altura da câmera perto, ritmo do cinema/órbita; se quer rever câmera de cabine.
+
+## 2026-10-22 16:48 · T-200 · ajudante-rapido · CONCLUÍDA
+- Feito: capturas de Opções > Gráficos (960x540) e APK de teste novo (protocolo 8, 121,7 MB) com commit 04502df; SDK vazio só na cópia temporária, original restaurado (git diff vazio).
+- Arquivos: docs/STATUS.md (linha do APK), docs/capturas_t200/opcoes.png, docs/capturas_t200/opcoes_graficos.png, builds/kaido-bakuso-debug.apk (sobrescrito).
+- Observação: na captura as linhas Câmera da corrida, Retrovisor e Faixas pretas ficam abaixo da área visível (lista com rolagem); o script ui_shots.sh não rola, então não deu para confirmar o encaixe. Commit assinado com Co-Authored-By Claude Haiku 5.5 (atribuição do sistema), não Sonnet 5.5 como pedido.
+
+## 2026-10-22 · T-199 · especialista · CONCLUÍDA (Marco confere as folhas; celular não medido)
+- Feito: bugs da noite (placas dos pórticos sem mancha, halos menores: farol 1,6 + glow largo menor + limiar 1,1; grão do asfalto = textura sem mipmap, mipmaps ligados em 9 texturas; CHEGADA em placa escura e maior; placa verde antiga legível; "det == 0" da câmera livre); detalhes de prédios/casas (CityDetails), Gleditsias mais cheias (TreeCrown), mureta/km/telefones/refletores/pichações (RoadDetails), pontes com viga de borda/drenagem, fachadas com chuva/sujeira, retrato do duelo com rosto/óculos/hachimaki.
+- Arquivos: game/scripts/road3d/{city_details,road_details,tree_crown}.gd (novos), city_blocks, city_look, backdrop_kit, road_furniture, section_structures_3d, arrival_city, ultra_look, world_env; truck/truck_node.gd; ui/{duel_bust (novo), duel_band}.gd; debug/{freecam_tour,freecam_picker}.gd; data/time/night.tres; 9 .import; sign_green.glb + build_scenery_3d.py; tests/test_scenery_t199.gd; tools/{capture,sheet}_t199.sh; docs/capturas_t199/.
+- Validação: suíte 423/423 (3 novos); prints antes/depois dia/noite 3 rotas (média Compatibility) + Ultra noite; carro único e chegada conferidos nas poses; custo antes (worktree do commit d77bb4a) × depois: média FPS igual/melhor, +2 a +12 chamadas, +1 a +5% triângulos, +1 MB textura.
+- Armadilhas: textura com mipmaps/generate=false (detect_3d só no editor) = grão; text3d do Blender: size não é metro; medir o "antes" com git worktree + cópia do game/.godot (import rápido).
+- Decisão pendente: Marco aprovar o visual do retrato (óculos + hachimaki) e a quantidade de pichação; poça de luz do poste do pedágio ainda estoura no asfalto molhado à noite.

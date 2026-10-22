@@ -202,3 +202,11 @@ um problema visual não puder ser entendido pelos renders.
 - Pintura por face com polígonos grandes (laterais inteiras) dá manchas diagonais. Use uma tira vertical no atlas e
   UV por vértice = altura (`livery_uv`); a célula é escrita no PNG pelo próprio script (mesmos pixels sempre).
 - PNG de 8 bits: `Image.pixels` já vem em sRGB / 255 (não converter de linear).
+
+## Texto 3D em placas (T-199)
+
+- `M.text3d(..., size, ...)` (`lib/mesh3d.py`): `size` NÃO é a altura da letra em metros (size 0,55 deu kanji de ~0,3 m
+  e "東京 TOKYO" de ~1,3 m de largura). Confira na prévia (`previews/scenery_<nome>_34.png`). Com size grande, baixe
+  `offset` (engrossa o traço proporcional ao tamanho; 0,04 vira borrão; use 0,008–0,012).
+- Regerar só um modelo do cenário: `blender -b --factory-startup -P blender/scripts/build_scenery_3d.py -- --only sign_green`
+  e depois `godot --headless --path game --import`.

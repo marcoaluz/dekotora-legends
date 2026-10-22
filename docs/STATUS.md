@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-22** (T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-22** (T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -30,6 +30,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Cenário novo na rota inteira (T-188 + T-192) | padrão na corrida normal, nas 3 rotas do km 0 ao fim: `-- --route=kanto_3_mountain --start=300 --time=night`; só o antigo trecho-piloto `-- --t188=segment`; antigo `-- --t188=off`; prints da rota inteira `bash tools/capture_t192.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t192.sh` (em `docs/capturas_t192/`); custo `bash tools/measure_t192.sh [3000] [night]`; árvores `blender -b --factory-startup -P blender/scripts/build_foliage_t192.py -- --preview`; testes `-- --only=scenery_t192`; T-188: prints `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t188.sh` (em `docs/capturas_t188/`); custo `bash tools/measure_t188.sh [quadros] [day ou night]` (`MEASURE_EXTRA="--t188=off"`); texturas `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` e `godot --path game -s res://tools_dev/make_neon_atlas.gd` (janela); testes `-- --only=scenery_t188`; no log aparece `SCENIC_T188 ...` |
 | Modelos novos (T-193) | corrida normal; desligar `-- --no-city-models` (prédios texturizados e skyline), `--no-unique-car`; trens `--train=freight`; prints `bash tools/capture_t193.sh PASTA [day night]` (em `docs/capturas_t193/`, folhas `folha_day/night/trens/modelos.png`); custo `MEASURE_Q=media bash tools/measure_t192.sh 3000 night` (antes: `MEASURE_EXTRA="--no-city-models --no-unique-car"`, em `docs/capturas_t193/custo_*.txt`); carro único `-s res://tools_dev/probe_unique_t193.gd`; regerar: ver `docs/BIBLIOTECA_CENARIO.md` seção 4; testes `-- --only=scenery_t193` |
 | PC Ultra + vida do cenário (T-189) | PC abre em Forward+/Ultra; Opções > Gráficos: Qualidade (Ultra só no PC), "Vida do cenário", "Borrão de velocidade", "Chuva"; forçar `-- --quality=3`, `--life=off\|on`, `--rain`/`--no-rain`, `--motion-blur`, `--time=dawn`; média como no celular: `godot --path game --rendering-method gl_compatibility ... -- --quality=1 --life=off`; prints `GODOT=... bash tools/capture_t189.sh PASTA [day night]` (em `docs/capturas_t189/`, folhas `folha_day/night.png`: esquerda média, direita Ultra); FPS `bash tools/measure_t189.sh [quadros] [day\|night] [1920x1080]`; testes `-- --only=ultra_look` e `-- --only=race_life`; no log `LIFE_T189 ...` |
+| Polimento do cenário (T-199) | corrida normal (detalhes sempre ligados); prints sem painel `bash tools/capture_t199.sh PASTA [day night]` (`Q=3` Ultra, `ROUTES=`, `POSES=`) e folhas `bash tools/sheet_t199.sh` (em `docs/capturas_t199/`: `folha_<rota>_<hora>.png`, `folha_ultra_noite.png`, `folha_resumo.png`, `retrato_duelo_depois.png`); custo `bash tools/measure_t195.sh 3000 night` (`custo_antes/depois.txt`); testes `-- --only=scenery_t199` |
 | Câmeras da corrida e retrovisor (T-198) | na corrida: **C** (ou ícone de câmera no canto de cima à esquerda) troca perto → padrão → longe → cinema → órbita; **R** (ou tocar no espelho) liga/desliga o retrovisor; Opções > Gráficos: Câmera da corrida, Retrovisor (Automático/Ligado/Desligado), Faixas pretas; forçar `-- --race-cam=cinema --mirror=on` (`--cine-shot=side_low`, `--letterbox=off`); prints `bash tools/capture_t198.sh PASTA [day night]` + `bash tools/sheet_t198.sh`; custo `bash tools/measure_t198.sh [3000] [night]`; testes `-- --only=race_cameras` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
 | Testes automáticos (420) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
@@ -97,8 +98,16 @@ código) em bosques por bioma (`road3d/roadside_trees.gd`, desenhados por `Roads
 viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminhão); retrato do motorista na faixa do duelo
 (`ui/duel_band.gd`). Custo medido: +1 a +22 chamadas, FPS no ruído (DECISOES, T-186). Capturas e folhas em
 `docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
-(galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore; pendente (Marco,
-não agora): copas ralas das Gleditsias adultas e boneco-manequim do retrato.
+(galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore. **T-199**: copas das Gleditsias
+engrossadas (`TreeCrown`) e retrato do duelo com rosto/óculos/hachimaki (`ui/duel_bust.gd`).
+
+## Polimento do cenário (T-199)
+
+Detalhe e desgaste nas 3 rotas sem mexer no asfalto aprovado: prédios/casas (`road3d/city_details.gd`), Gleditsias
+(`road3d/tree_crown.gd`), mureta/km/telefones/pichações/refletores (`road3d/road_details.gd`), pontes
+(`section_structures_3d.gd`), fachadas com chuva/sujeira (`city_look.gd`), retrato do duelo (`ui/duel_bust.gd`).
+Bugs da noite: placas dos pórticos, halos (farol e glow), grão do asfalto (textura sem mipmap), CHEGADA maior,
+placa verde antiga legível. Prints, folhas e custo em `docs/capturas_t199/` (DECISOES, T-199). **Celular não medido.**
 
 ## Chegada, trem do Marco e serrilhado (T-195)
 

@@ -445,3 +445,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Testes que mexem na câmera da corrida de verdade: ponha `_camv._save = false` (senão grava no settings.cfg do jogador).
 - Prints `bash tools/capture_t198.sh PASTA [day night]` (`CAMS=`, `ROUTE=`, `Q=`), folha `bash tools/sheet_t198.sh`,
   custo `bash tools/measure_t198.sh [3000] [night]` (`CASES="standard:off standard:on ..."`). Um processo por vez.
+
+## Polimento do cenário (T-199)
+
+- Detalhes dos prédios/casas: `road3d/city_details.gd` (`CityDetails`, RNG próprio: lotes e prédios da `CityBlocks`
+  não mudam). Caixas em MultiMesh por trecho de 200 m: camada PERTO (ar-condicionado, varandas, escadas de incêndio,
+  marquises, letreiros verticais; some a 360 m) e LONGE (beiral, rodapé, antenas; 1,1 km). Material `CityLook.props`.
+- Beira da pista: `road3d/road_details.gd` (`RoadDetails.add`, chamado no fim do `RoadFurniture.build`): juntas da
+  mureta, refletores do guard-rail do litoral, marcos de km (dígitos do `SignAtlas` via `RoadFurniture.faces_layer()`),
+  telefones de emergência, pichações discretas (Label3D até 140 m).
+- Gleditsias: `road3d/tree_crown.gd` (`TreeCrown.thicken`) duplica os cartões de folha girados e encolhidos dentro do
+  mesmo surface (sem chamada nova). Retrato do duelo: `ui/duel_bust.gd` desenha rosto/óculos/hachimaki/gola por cima.
+- **Armadilha (textura sem mipmap)**: textura 3D importada com `mipmaps/generate=false` (o `detect_3d` só converte no
+  editor, não no `--import` sem tela) vira grão/chuvisco à distância. Toda textura de chão/parede/folha precisa
+  `mipmaps/generate=true` no `.import` (T-199 corrigiu asfalto, grama, areia, concreto, folhas).
+- Glow: na noite o limiar é 1,1 (`night.tres`); nível 5 do glow 0,55 na média, Ultra 4=0,45/6=0,25 (antes halos enormes).
+- Prints sem painel: `--tour-clean` na câmera livre; `bash tools/capture_t199.sh PASTA [day night]` (`Q=3` Ultra,
+  `ROUTES=`, `POSES=`), folhas `bash tools/sheet_t199.sh` (`GRID=rota/hora` = grade rápida). Testes `-- --only=scenery_t199`.

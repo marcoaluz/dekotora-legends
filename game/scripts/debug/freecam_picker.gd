@@ -82,6 +82,8 @@ func pick(from: Vector3, dir: Vector3) -> Dictionary:
 
 
 func _candidate(cands: Array, node: GeometryInstance3D, xf: Transform3D, aabb: AABB, idx: int, from: Vector3, dir: Vector3) -> void:
+	if is_zero_approx(xf.basis.determinant()):
+		return                                               # T-199: hidden pool copy (scale 0): "det == 0" spam
 	var inv: Transform3D = xf.affine_inverse()
 	var lf: Vector3 = inv * from
 	var hit: Variant = aabb.grow(0.01).intersects_ray(lf, inv.basis * dir)

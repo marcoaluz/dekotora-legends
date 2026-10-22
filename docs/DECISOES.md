@@ -763,3 +763,37 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   (vê mais cenário); cinema (sem retrovisor) igual ou mais rápida; órbita igual na média e −5 a −16% no Ultra (de lado
   vê muito mais cenário). **Celular não medido**: por isso o retrovisor automático fica desligado no celular em
   média/baixa.
+
+## 2026-10-22 · T-199 · Polimento do cenário: mais detalhe, desgaste e bugs da noite (pedido do Marco)
+
+- **Bugs da noite**: (a) placas verdes dos pórticos viravam mancha branca/ciano de perto à noite (o farol do caminhão
+  + glow no Forward+/Ultra): as placas quase não recebem mais o farol (são "refletivas": brilho próprio pequeno),
+  limiar do glow da noite 0,9 → 1,1, Ultra com menos bloom. (b) halos grandes das luzes: farol 3,0 → 1,6 com borda
+  suave e menos reflexo especular; nível largo do glow (5) 1,0 → 0,55 na média; no Ultra nível 6 1,0 → 0,25.
+  (c) **grão do asfalto à noite fora do Ultra**: a causa era a textura do asfalto importada **sem mipmap** (o
+  `detect_3d` do Godot só converte no editor); mipmaps ligados em asfalto, grama, areia, concreto e folhas. A cor do
+  asfalto aprovado não mudou (só some o chuvisco à distância; o Ultra escondia com o FSR2). (d) CHEGADA: letras 43%
+  maiores numa placa escura em cima da viga (de dia o neon amarelo sumia no céu). (e) placa verde antiga
+  (`sign_green.glb`) com "東京 TOKYO / 12 km" minúsculo: texto refeito ~2,4× maior (Blender `--only sign_green`);
+  erro "det == 0" repetido no console da câmera livre (cópias escondidas com escala 0) corrigido.
+- **Geometria** (só cenário, sem sim/rede): prédios com beiral, rodapé, antenas, ar-condicionado na fachada,
+  varandas com guarda-corpo, escadas de incêndio, marquises das lojas e letreiros verticais; casas do litoral com
+  rodapé, cobertura da porta, ar-condicionado, varanda/chaminé; Gleditsias com a copa mais cheia (cartões de folha
+  duplicados, girados e mais escuros por dentro, mesma chamada de desenho); mureta com juntas e chapas a cada 9 m,
+  refletores âmbar no guard-rail do litoral, marcos de km (キロポスト) a cada 100 m, telefone de emergência (非常電話)
+  a cada ~1 km; pontes com viga de borda e pingadeira e tubo de drenagem nos pilares; pórticos com suportes das placas.
+  Os lotes e prédios da cidade **não mudaram de lugar** (RNG próprio para os detalhes).
+- **Textura/variação sem memória nova**: fachadas com escorrido de chuva a partir do topo, sujeira no pé e manchas
+  (shader), cor variando por cópia nos detalhes, sombra de contato nos objetos de caixa, pichações discretas na
+  mureta (夜露死苦, 爆走, BAKUSO... Label3D só até 140 m, poucas por rota).
+- **Retrato do duelo**: o boneco-manequim ganhou rosto (óculos escuros, sobrancelha, nariz, boca, orelha), hachimaki
+  (faixa na cabeça) e gola/mangas na camisa, desenhados em 2D por cima da arte (sem textura nova). Escolha do Claude:
+  óculos escuros + hachimaki (visual de motorista de dekotora); trocar é fácil (`ui/duel_bust.gd`).
+- **Custo** (RX 580, 1920×1080, noite, 6 pontos, `tools/measure_t195.sh`; `docs/capturas_t199/custo_antes.txt` e
+  `custo_depois.txt`): média/Compatibility (a do celular) FPS 199–255 → 229–278 (igual ou melhor, ruído), chamadas
+  +2 a +12, triângulos +1 a +5%, textura +1 MB (mipmaps), vídeo −3 a +1 MB. Ultra FPS 54–75 → 54–78 (ruído); no ponto
+  da cidade (km 1,4) o Ultra contou +600 chamadas e +60% triângulos (passadas extras do Forward+), sem perder FPS.
+  **Celular não medido.**
+- **Não resolvido**: a poça de luz do poste da praça do pedágio (km 0) ainda estoura branca no asfalto molhado à
+  noite (é luz do poste, não do caminhão); detalhes ficam pequenos na câmera da corrida porque os prédios estão a
+  46 m+ da pista (regra da T-188).

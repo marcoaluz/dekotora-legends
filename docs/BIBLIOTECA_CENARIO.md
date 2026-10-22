@@ -170,3 +170,13 @@ prévias de cada modelo em `blender/renders/t193/inspect/`). Nada foi alterado e
 - Neon: `blender -b --factory-startup -P blender/scripts/build_t193_neon.py` (abre o .blend só para ler).
 - Folha dos modelos (precisa de janela): `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t193.gd -- --out=PASTA_ABS`.
 - Onde fica o carro único: `godot --headless --path game -s res://tools_dev/probe_unique_t193.gd`.
+
+## 5. T-199 (2026-10-22): detalhe feito por código (sem modelo novo)
+
+- Prédios e casas: `CityDetails` (beiral, rodapé, antenas, ar-condicionado, varandas, escadas de incêndio, marquises,
+  letreiros verticais; casas: cobertura da porta, varanda, chaminé). Caixas em MultiMesh por 200 m, PERTO até 360 m e
+  LONGE até 1,1 km.
+- Gleditsias: `TreeCrown.thicken` (cartões de folha duplicados por dentro da copa, sem chamada nova).
+- Beira da pista: `RoadDetails` (juntas da mureta, refletores do guard-rail, marcos de km, telefones de emergência,
+  pichações). Placa verde antiga (`sign_green.glb`): texto maior em `build_scenery_3d.py -- --only sign_green`.
+
