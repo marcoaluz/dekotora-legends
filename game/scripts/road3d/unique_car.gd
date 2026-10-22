@@ -5,7 +5,7 @@ extends Node3D
 ## barrier. Only scenery: not in the simulation, not an obstacle, not on the network (every player sees it in the same
 ## place because the spot only depends on the route). Discreet highlight: a soft warm pool of light on the ground
 ## (stronger at night), glossy paint and its lamps lit.
-## Spot: the first stretch after FRACTION of the route that is straight, outside tunnels/bridges and the overpass
+## Spot: the first place after FRACTION of the route with a gentle curve (<= 1.0), outside tunnels/bridges and the overpass
 ## corridors; side and distance per route (SPOTS).
 
 const MODEL := "res://assets/vehicles/traffic/car_skyline.glb"
@@ -13,8 +13,9 @@ const PAINT := Color("#1f4fa8")                 # "Bayside" style blue
 ## route: [fraction of the route, side (+1 right / -1 left), lateral distance (m) of the car centre]
 const SPOTS := {
 	"kanto_1_coast": [0.45, 1.0, 17.5],          # sea side, on the grass before the sand: lookout over the bay
-	"kanto_2_viaduct": [0.55, 1.0, 26.0],        # city: on the ground under the viaduct, before the first street
-	"kanto_3_mountain": [0.6, -1.0, 17.0],       # mountain: lay-by on the hill side
+	"kanto_2_viaduct": [0.22, 1.0, 26.0, true],  # city: on the ground beside the viaduct, before the first street,
+	                                             # where the viaduct has no sound wall (seen from the deck)
+	"kanto_3_mountain": [0.45, -1.0, 17.0],       # mountain: lay-by on the hill side
 }
 const DEFAULT_SPOT: Array = [0.5, 1.0, 17.0]
 const PAD := Vector2(9.0, 6.5)                   # paved lookout (along x across), metres
@@ -31,17 +32,31 @@ static func enabled() -> bool:
 ## z of the spot: first z after the fraction with low curvature and nothing in the way (pure: also used by tests).
 static func spot_z(track: Track, route_id: String, blocked: Array[Vector2]) -> float:
 	var spot: Array = SPOTS.get(route_id, DEFAULT_SPOT)
-	var zz: float = track.length_m * float(spot[0])
-	while zz < track.length_m - 300.0:
-		var ok: bool = absf(track.curve_at(zz)) < 0.35 and absf(track.curve_at(zz + 40.0)) < 0.35 \
-			and absf(track.curve_at(zz - 40.0)) < 0.35
-		for b in blocked:
-			if zz > b.x - 120.0 and zz < b.y + 120.0:
-				ok = false
-		if ok:
+	var start: float = track.length_m * float(spot[0])
+	var zz: float = start
+	while true:                                   # from the fraction to the end, then from 300 m to the fraction
+		if _free(track, spot, blocked, zz):
 			return zz
 		zz += 10.0
-	return track.length_m * float(spot[0])
+		if zz > track.length_m - 300.0:
+			zz = 300.0
+		if absf(zz - start) < 5.0:
+			break
+	return start
+
+
+static func _free(track: Track, spot: Array, blocked: Array[Vector2], zz: float) -> bool:
+	for dz in [-40.0, 0.0, 40.0]:
+		if absf(track.curve_at(zz + dz)) > 1.0:
+			return false
+	for b in blocked:
+		if zz > b.x - 120.0 and zz < b.y + 120.0:
+			return false
+	if spot.size() > 3 and bool(spot[3]):         # city: a gap in the sound walls of the viaduct
+		for dz in [-45.0, 0.0, 45.0]:
+			if RoadMesh.sound_wall_at(zz + dz):
+				return false
+	return true
 
 
 ## Keep-out corridor [a, b, radius] (same format as OverpassLayout.keep_out) so trees/buildings leave the spot free.

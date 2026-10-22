@@ -119,3 +119,54 @@ tem esqueleto). `--no-people` tira tudo.
 - Espécies por código e LOD1 das antigas: `blender -b --factory-startup -P blender/scripts/build_tree_species.py -- [--only nome,...] [--preview]`
 - Poste da Ponte A e pessoa (+ retrato): `blender -b --factory-startup -P blender/scripts/build_t186_props.py -- [--root PASTA_PRINCIPAL] [--only lamp,person]`
 - Folha de contato dos modelos com os materiais do jogo: `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t186.gd -- --out=PASTA_ABS [--only=a,b]`
+
+## 4. T-193 (2026-10-22): pastas novas de docs/Modelos
+
+Inventário por script (`blender/scripts/inventory_models.py`, um `.json` por arquivo em `blender/renders/t193/inventory/`;
+prévias de cada modelo em `blender/renders/t193/inspect/`). Nada foi alterado em `docs/Modelos`. Tamanho em metros
+(largura x comprimento x altura) **depois** de corrigir a escala. Folha dos modelos com os materiais do jogo:
+`docs/capturas_t193/folha_modelos.png`.
+
+| Pasta / arquivo | Modelo | Tipo | Triângulos (original → jogo) | Tamanho (m) | Textura | Anim. | Onde está no jogo |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `train/3d-model.fbx` (= `.obj`) | locomotiva diesel americana (cabine + capô longo) | trem | 10,6 mil → 5,2 mil | 3,1 x 18,9 x 3,9 (arquivo em escala errada: 2,3 m / OBJ 92 m) | não (cores lisas) | não | `scenery/rail/train_loco_b.glb`: 2ª locomotiva dos trens de carga (azul com faixa creme) |
+| `train/Rail+Track.FBX` (= `.obj`) | trilho em 551 peças de 4 m | via | 57 mil | 4 x 0,5 m por peça (OBJ 400 m) | não ligada | não | **não usado**: a via do jogo já é uma malha contínua com textura (1 chamada por bloco) |
+| `Vagoes/wagons.fbx/Logging car.fbx` (= `.obj`) | vagão de toras (vazio) | vagão | 12,9 mil → 2,3 mil | 2,9 x 16,1 x 4,3 (×1,87) | `Strips.png` (falta no pacote) | não | `train_wagon_log.glb`, carga de toras feita por código |
+| `Vagoes/…/Platform car.fbx` | vagão plataforma com 2 contêineres | vagão | 18,8 mil → 2,2 mil | 2,9 x 15,8 x 4,7 | idem | não | `train_wagon_flat.glb` (contêineres verde-água) |
+| `Vagoes/…/Semi - platform car.fbx` | gôndola de bordas baixas | vagão | 13,2 mil → 2,0 mil | 3,0 x 16,1 x 2,3 | idem | não | `train_wagon_semi.glb` (marrom) |
+| `Vagoes/…/Transporter car.fbx` | vagão rebaixado com contêiner grande | vagão | 16,6 mil → 2,2 mil | 2,9 x 18,9 x 4,0 | idem | não | `train_wagon_box.glb` (vermelho) e `train_wagon_box_b.glb` (azul) |
+| `Vagoes/…/Rails.fbx` + `Textures/Sleepers.png` | trilho + dormentes | via | 812 | 1,7 x 12,2 | sim | não | **não usado** (mesmo motivo do Rail+Track) |
+| `CARS/…/Low Poly Cars Set.fbx` (= `.obj`, `.max`) | 3 carros, cada um repetido 3-4 vezes (10 objetos) | carro | 2,6 mi no total | — | jpg soltos (não ligados; um é logotipo Land Rover) | não | ver as 3 linhas abaixo |
+| ↳ `desirefx.me_001` | cupê 4 portas | carro | 341 mil → 5,7 mil | 1,9 x 4,45 x 1,3 | cores lisas (atlas) | não | `car_lp_coupe.glb`: trânsito e ruas da cidade; emblemas apagados |
+| ↳ `desirefx.me_003` | hatch arredondado | carro | 249 mil → 5,5 mil | 2,0 x 4,15 x 1,45 | idem | não | `car_lp_hatch.glb`: trânsito e ruas da cidade |
+| ↳ `desirefx.me_002` | SUV | carro | 163 mil | 2,2 x 4,6 x 1,7 | — | não | **não usado**: a malha rasga ao reduzir para ~5 mil tri (o jogo já tem `car_suv`) |
+| `Unico, apenas um carro/Skyline…FBX.fbx` (= `.obj`) | cupê esportivo azul estilo R34 (526 peças) | carro | 222 mil → 9,5 mil | 2,1 x 4,6 x 1,3 (arquivo ×2; OBJ com um plano de 20 km) | não (cores lisas) | não | `car_skyline.glb`: **carro único** (`UniqueCar`), estacionado 1 vez por corrida; bancos, volante e emblemas apagados |
+| `Cidade/Buildings-FBX/*.fbx` (= `Buildings-OBJ`, falta o `Building-Big-01.obj`) | 8 prédios com textura assada 4K | prédio | 40 mil – 752 mil → 770 – 1,6 mil | 12–38 x 12–26 x 28–103 | sim (`Textures_no`, 4096 px 16 bits; também AO, normal, alpha...) | ações vazias | `scenery/city/bldg_*.glb` + `textures/city/bldg_atlas.png`: quarteirões da cidade (`CityModels`) |
+| `Cidade/city.fbx` + `texture/cty1, cty2x.jpg` | "The City": bloco de torres low poly | cidade | 10,5 mil | 620 x 606 x 314 (×251; jogo ×0,7) | sim (fachadas) | não | `scenery/city/city_skyline.glb`: 3 blocos a ~820 m da pista na rota da cidade |
+| `Cidade/The+City.obj` | o mesmo "The City" sem textura (com chão) | cidade | 11,8 mil | 2.277 x 2.124 x 871 | não | não | **não usado** (repete o city.fbx, sem textura) |
+| `Cidade/FBX/CIT.fbx` (= `OBJ/CIT.obj`) + jpgs | cidade gerada de mapa OSM + céu em plano | cidade | 403 mil | 469 x 588 x 244 | 9 jpgs TexturesCom (não ligados no FBX) | não | **não usado**: pesado, layout de mapa real que não casa com a pista, e o jogo já tem quarteirões + os 8 prédios |
+| `Letras Japones e neon/NeonText.blend` | painel com letreiros neon (texto, curvas, gato da sorte) | neon | 180 mil (+ textos/curvas) | 16 x 13 m o painel | `lines_albedo.png` + materiais neon | não | `textures/scenic/neon_t193_atlas.png` (1024): 大切に思ってる, 幻想通り, 夜空, 無限, 招き猫, 祈, 人 renderizados com os materiais neon do próprio arquivo; 1 em 3 letreiros da cidade |
+| `Letras Japones e neon/…Neon Sign Pack Volume.1/Neon Signs.c4d` | pacote de neons (Cinema 4D + Octane) | neon | — | — | — | — | **não usado**: formato .c4d não abre no Blender nem no Godot |
+
+### Peças novas no jogo (T-193)
+
+| Peça | Arquivo | Custo | Onde | Desliga |
+| --- | --- | --- | --- | --- |
+| Locomotiva b + 5 vagões | `scenery/rail/train_loco_b`, `train_wagon_log/flat/semi/box/box_b.glb` (material único `rail_train`, atlas da T-154) | 2,0–5,2 mil tri; 1 MultiMesh por modelo, só desenha o que está à vista | trens de carga: locomotiva sorteada + 6–9 vagões em grupos de 1–3 iguais (`RailTraffic.make_train(tipo, rng)`) | `--no-rail` |
+| 2 carros | `vehicles/traffic/car_lp_coupe/hatch.glb` | 5,5–5,7 mil tri, 4 superfícies | trânsito (`Traffic3D.MODELS_BY_KIND`), acidentados da T-183 (mesmo visual), ruas da cidade (`LifeStreets`) | `--traffic-classic` |
+| 8 prédios | `scenery/city/bldg_*.glb` + `textures/city/bldg_atlas.png` (2048 x 1024) | 770–1,6 mil tri; 1 chamada por trecho de 250 m (até 420 m); depois caixa com o shader de fachada | lotes dos quarteirões (`CityModels`, 30/40/45% dos lotes nas fileiras 0/1/2+, metade no celular); janelas escuras acendem à noite | `--no-city-models` |
+| Skyline | `scenery/city/city_skyline.glb` + `textures/city/skyline_facades.png` (1024) | 10,5 mil tri, 1 chamada cada (3) | rota da cidade, a 820 m da pista | `--no-city-models` |
+| Neon kanji | `textures/scenic/neon_t193_atlas.png` | +1 chamada (2º MultiMesh do `NeonSigns`) | 1 em 3 letreiros (vertical, telhado, quadrado) | — |
+| Carro único | `vehicles/traffic/car_skyline.glb` | 9,5 mil tri, 1 vez por corrida | litoral km 1,35 (lado do mar), cidade km 0,645 (no chão ao lado do viaduto, onde não há muro), montanha km 1,26 (lado do morro) | `--no-unique-car` |
+
+### Como regerar (T-193)
+
+- Carros: `blender -b --factory-startup -P blender/scripts/build_traffic_cars.py -- --model lp_coupe,lp_hatch,skyline [--preview PASTA_ABS]`
+  (classe de cada peça pela geometria: `lib/traffic_groups.py`, porque os materiais do FBX vêm sem cor).
+- Trens: `blender -b --factory-startup -P blender/scripts/build_t193_rail.py -- [--only nome] [--preview]`.
+- Prédios (um processo por prédio: a textura 4K de 16 bits ocupa ~270 MB):
+  `for k in big01 bigwide01 bigwide02 med01 med02 small sky01 sky02; do blender -b --factory-startup -P blender/scripts/build_t193_city.py -- --building $k; done`,
+  depois `-- --atlas` e `-- --skyline`.
+- Neon: `blender -b --factory-startup -P blender/scripts/build_t193_neon.py` (abre o .blend só para ler).
+- Folha dos modelos (precisa de janela): `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t193.gd -- --out=PASTA_ABS`.
+- Onde fica o carro único: `godot --headless --path game -s res://tools_dev/probe_unique_t193.gd`.

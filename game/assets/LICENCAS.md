@@ -54,3 +54,9 @@ Vale para `Tunnel.obj`, `van.abc`, o túnel de `docs/Modelos/Road_pontes` e o bo
 **T-188:** `assets/textures/scenic/` (detalhe do terreno, fachadas, cartões de árvore) é gerado por código
 (`blender/scripts/build_t188_textures.py`, numpy); `neon_atlas.png` é desenhado pelo Godot com a fonte Noto Sans JP
 (OFL, já listada) em `tools_dev/make_neon_atlas.gd`. Nada baixado.
+
+**T-193 (2026-10-22):** modelos das pastas novas de `docs/Modelos` (fora do Git; "Royalty Free, sem IA, sem crédito",
+decisão do Marco): locomotiva (`train/`), vagões (`Vagoes/`), 2 carros do "Low Poly Cars Set" (`CARS/`), o carro único
+(`Unico, apenas um carro/`), 8 prédios e "The City" (`Cidade/`) e os letreiros do `NeonText.blend`
+(`Letras Japones e neon/`). Todos reduzidos/re-texturizados pelos scripts `build_t193_*.py` e `build_traffic_cars.py`
+(carros com pintura lisa, emblemas apagados). O pacote "Animated Neon Sign Pack" (C4D) não foi usado.

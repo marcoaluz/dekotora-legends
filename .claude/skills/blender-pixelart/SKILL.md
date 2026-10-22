@@ -179,3 +179,17 @@ um problema visual não puder ser entendido pelos renders.
 
 - Comando: `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` (gera as texturas da T-188 por código; por padrão grava em `game/assets/textures/scenic`, e `-- --out PASTA` troca a saída).
 - Armadilha (alfa como máscara): ao salvar um PNG com alfa que o Godot usa como máscara, crie o `.import` com `process/fix_alpha_border=false`.
+
+## Modelos de terceiros difíceis (T-193)
+
+- **Prédio feito de milhares de painéis soltos** (vidro em planos com alfa): o Decimate Collapse para num piso (4–80 mil
+  tri) e apagar peças pequenas abre buracos. Faça uma casca (Remesh voxel ~1/45 do tamanho, ou caixa subdividida se as
+  paredes são planos finos) e **asse** a cor do original nela (Cycles, DIFFUSE só COLOR, selected-to-active, cage
+  ~1,6 voxel): `build_t193_city.py`. Cuidado: casco convexo + Subsurf explodiu para 14 milhões de tri.
+- **PNG de 16 bits** no Blender: `image.pixels` vem em valores LINEARES (é float); converta para sRGB antes de salvar
+  com `save_png` (Non-Color). JPG/8 bits vêm já em sRGB. Use `image.scale()` antes de ler (4096² float = 270 MB).
+- **FBX do 3ds Max sem cor nos materiais**: classifique por peça/slot pela geometria (`lib/traffic_groups.py`:
+  pneu = slot que toca o chão, vidro = alto e comprido, lanterna = pequeno na ponta, emblema = peça miúda no centro da
+  frente/traseira). Ver a frente pela prévia: os 3 carros do CARS e o Skyline vieram com a frente em -Y/-X.
+- Vagões: colapso com **solda antes** rasga contêineres; sem solda e com simetria em X fica limpo. Na prévia, cada .glb
+  importado cria uma cópia do material (`rail_train.001`...): aplique a textura em todas.

@@ -631,3 +631,33 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   vão empilhadas no sentido da pista, 1a letra mais perto do motorista (como no Japão), fonte 80, dentro da faixa.
   Asfalto e "80"/setas inalterados. Observação: curvas de 0,9 exatos (cidade, km 0,4 e 0,7) não ganham a pintura nem a
   faixa amarela (float32 < 0,9); não mexi (muda o visual da faixa).
+
+## 2026-10-22 · T-193 · Modelos novos (Vagoes, train, CARS, Cidade, Letras Japones e neon, Unico)
+
+- **Trens**: a locomotiva americana (`train/`) vira a 2ª locomotiva de carga (azul, faixa creme; pintura nossa, o
+  arquivo não tem cor). Os 4 vagões (`Vagoes/`, escala ~1:1,87 corrigida, rodas puxadas para os nossos trilhos) entram
+  com 5 variações (toras feitas por código, contêineres de 3 cores). Todos usam o MESMO material/atlas da T-154
+  (`rail_train`): nada de material novo. Cada trem de carga sorteia a locomotiva e 6–9 vagões (grupos de 1–3 iguais)
+  pela semente da corrida (`RailTraffic.make_train(tipo, rng)`); sem rng = composição antiga (testes antigos). Som igual.
+- **CARS**: 2 dos 3 carros entram no **trânsito** (e, por tabela, nos acidentados da T-183 e nas ruas da cidade da
+  T-189); cabem no comprimento de 4,5 m da sim (4,45 e 4,15 m), a sim não muda. Escolha: trânsito e ruas, não carros
+  estacionados (as ruas da cidade já são o "cenário" com carros). O SUV não entra (rasga ao reduzir). Os 3 vêm de um
+  arquivo com nome "desirefx.me" e um logotipo Land Rover solto; usamos só a forma, pintura lisa, emblemas apagados.
+- **Prédios (Cidade)**: os 8 prédios são milhares de painéis soltos (vidro em planos com alfa): nenhuma redução os
+  mantém inteiros. Solução: casca leve (voxel remesh ou caixa) com a textura original ASSADA (Cycles) num atlas único.
+  Entram em 30/40/45% dos lotes (fileiras 0/1/2+; metade em qualidade ≤ média), sempre dentro do lote com o recuo da
+  T-188 (START_L/START_R/STREET_M iguais); o gerador próprio deixa ruas/lotes iguais, mas os lotes que viram modelo
+  pulam os enfeites de telhado, então os prédios-caixa seguintes mudam um pouco (e mudam entre PC e celular). Longe
+  (420 m) o trecho troca para caixas com o shader de fachada. Janelas escuras acendem à noite.
+  "The City" (city.fbx, com textura) vira um bloco de torres ao longe (3 cópias a 820 m) só na rota da cidade.
+  Não usados: The+City.obj (repete sem textura) e CIT.fbx (cidade OSM pesada que não casa com a pista).
+- **Neon**: o pacote C4D não abre (formato Cinema 4D/Octane). Do `NeonText.blend` entram só os letreiros japoneses
+  (o "Text messege"/"TEXT" do pacote ficam de fora), renderizados com os materiais neon do próprio arquivo num 2º atlas
+  do `NeonSigns`: 1 em 3 letreiros usa o atlas novo (escolha sem número aleatório extra). Acendem à noite como os da
+  T-188. **Placas de estrada não mudaram** (o pacote é de letreiros de loja).
+- **Carro único** (`UniqueCar`): o Skyline aparece **uma vez por corrida, em cada rota**, estacionado num pátio de
+  asfalto fora da mureta, com uma mancha de luz quente no chão (mais forte à noite), pintura azul brilhante e lanternas
+  acesas. Só cenário (sem sim, sem rede, sem colisão): todo jogador vê no mesmo lugar porque depende só da rota.
+  Lugar: primeiro ponto depois de 45% (litoral, lado do mar, 17,5 m), 22% (cidade, chão ao lado do viaduto onde não há
+  muro de som, 26 m) e 45% (montanha, lado do morro, 17 m) da rota, com curva ≤ 1,0 e longe de túnel/ponte/viaduto;
+  árvores e prédios ficam fora do pátio. Hoje: km 1,35 / 0,645 / 1,26.

@@ -375,3 +375,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - `--rain`/`--no-rain`, `--life=on|off`, `--motion-blur` (não gravam). As opções salvas no PC do Marco podem ter chuva
   ligada: nas capturas passe `--no-rain`.
 - Captura que às vezes não grava nenhum quadro: rode de novo (o `tools/capture_t189.sh` já tenta 2 vezes).
+
+## Modelos novos de docs/Modelos (T-193)
+
+- Trens: `RailTraffic.make_train(tipo, rng)` sorteia locomotiva (`LOCOS`) e 6–9 vagões (`WAGON_POOL`); comprimento por
+  modelo em `RailTraffic.LENS`. Modelo novo de trem precisa entrar em `Trains3D.MODELS` (o teste `railway` acusa).
+- Prédios texturizados: `road3d/city_models.gd` (`CityModels`, chamado por `CityBlocks._building`): 1 malha por trecho de
+  250 m até `LOD_M` (420 m), depois caixas. `--no-city-models` desliga (também o skyline). Linha `SCENIC_T188 ... modelos_t193=N (tri)`.
+- Neon: `NeonSigns` tem 2º atlas (`neon_t193_atlas.png`, filho "NeonT193"); 1 em 3 letreiros, sem número aleatório extra.
+- Carro único: `road3d/unique_car.gd` (`UniqueCar.spot_z`, `--no-unique-car`, linha `UNIQUE_T193 rota z=... lateral=...`);
+  sonda `godot --headless --path game -s res://tools_dev/probe_unique_t193.gd`.
+- Prints: `bash tools/capture_t193.sh PASTA [day night] [-- extras]`; folha dos modelos `tools_dev/model_sheet_t193.gd` (janela).
+- Testes `-- --only=scenery_t193`.
+- **Armadilha (RoadMesh.sound_wall_at)**: o viaduto da cidade tem muro de som em blocos alternados de 300 m; o que fica
+  ao lado, no chão, só aparece da pista onde não há muro.
