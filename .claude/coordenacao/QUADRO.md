@@ -5,7 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-201 | APK de teste com T-199 (polimento do mapa) e linha do APK no STATUS | delegado da T-199 | fácil | ajudante-rapido | em andamento | 2026-10-22 | |
+| T-201 | APK de teste com T-199 (polimento do mapa) e linha do APK no STATUS | delegado da T-199 | fácil | ajudante-rapido | concluída (APK 123 MB, commit 1adae35; precisa Marco: instalar e testar) | 2026-10-22 | 2026-10-22 |
 | T-200 | APK de teste com T-195/T-197/T-198 (som novo, câmeras, retrovisor, cenário) + conferir telas de Opções > Gráficos com as linhas novas | delegado da T-195/T-197/T-198 | fácil | ajudante-rapido | concluída (APK 122 MB, commit 04502df; precisa Marco: instalar/testar; linhas novas de Opções não conferidas por estarem abaixo da rolagem) | 2026-10-22 | 2026-10-22 |
 | T-199 | Polimento do mapa (mais polígonos/texturas em prédios, árvores de código, postes, muretas) — a T-195 fez pouco neste item; incluir manchas brancas de brilho nas placas dos pórticos à noite, halos das luzes dos caminhões e grão do asfalto à noite fora do Ultra | pedido do Marco | difícil | especialista | concluída (commits 3694e39, 0047ab3, e36e404; 423 testes ok; precisa Marco: 3 decisões e medir no celular) | 2026-10-22 | 2026-10-22 |
 | T-198 | Retrovisor para ver o outro caminhão + câmeras de corrida (perto, longe, cinema, orbitando o caminhão) | pedido do Marco | difícil | especialista | concluída (commits aabfd2f, bdd0817, 37c34a9; 420 testes ok; precisa Marco: 4 decisões e testar no celular) | 2026-10-22 | 2026-10-22 |

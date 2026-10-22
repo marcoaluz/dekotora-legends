@@ -397,3 +397,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 423/423 (3 novos); prints antes/depois dia/noite 3 rotas (média Compatibility) + Ultra noite; carro único e chegada conferidos nas poses; custo antes (worktree do commit d77bb4a) × depois: média FPS igual/melhor, +2 a +12 chamadas, +1 a +5% triângulos, +1 MB textura.
 - Armadilhas: textura com mipmaps/generate=false (detect_3d só no editor) = grão; text3d do Blender: size não é metro; medir o "antes" com git worktree + cópia do game/.godot (import rápido).
 - Decisão pendente: Marco aprovar o visual do retrato (óculos + hachimaki) e a quantidade de pichação; poça de luz do poste do pedágio ainda estoura no asfalto molhado à noite.
+
+## 2026-10-22 20:31 · T-201 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste gerado (protocolo de rede 8, polimento do mapa T-199), commit 1adae35 com a linha do APK no STATUS.md.
+- Arquivos: builds/kaido-bakuso-debug.apk (123 MB, 123.055.738 bytes), docs/STATUS.md; game/export_presets.cfg restaurado (git diff vazio).
+- Observação: nada apagado em builds/; não foi feito push; QUADRO.md não mexido. Este log ficou sem commit.
