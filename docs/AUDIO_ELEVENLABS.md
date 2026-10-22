@@ -241,3 +241,33 @@ Use "Sound Effects" do ElevenLabs, duração máxima, "Prompt influence" alto.
 
 Já existem e passaram a tocar (T-189): `train_horn.mp3` (buzina distante quando um trem entra no alcance) e
 `train_pass.mp3` (passagem perto), ambos posicionais.
+
+## 9. Motor diesel sintetizado, bonde e freio a ar — T-197 (não precisa do ElevenLabs)
+
+O som dos caminhões e do bonde agora é **gerado por código** (`python tools/synth_truck_audio.py`, só numpy, sempre
+igual). Nada para gerar no ElevenLabs: tudo já está no jogo. Os arquivos ficam ao lado dos antigos, em `.wav`:
+
+| Arquivo(s) | O que é |
+| --- | --- |
+| `engines/syn_<voz>_on_<rpm>.wav` / `_off_<rpm>` | motor acelerando / sem acelerar (a 700 rpm o "off" é a marcha lenta). Vozes: `i6` (6 cil. padrão), `i6t` (preparado), `v8`, `i4` (Canter). RPM: 700, 1000, 1400, 1900, 2500 |
+| `engines/syn_<voz>_jake_<rpm>.wav` | freio-motor (jake brake) em 1300, 1800, 2400 rpm |
+| `engines/syn_<voz>_open_<rpm>.wav` | ronco rasgado de escape aberto (reto, chaminés, cromado) em 1000, 1600, 2300 rpm |
+| `engines/syn_exh_pop_1/2.wav` | estalos do cromado cortado ao tirar o pé |
+| `sfx/truck/gear_air_pfft.wav`, `air_brake_park.wav`, `tyre_road_loop.wav` | "pfft" do câmbio a ar, "tssss" ao parar, rodagem dos pneus |
+| `sfx/ambient/tram_bell.wav`, `tram_run_loop.wav` | sino "chin-chin" do bonde e o rodar leve dele (zumbido elétrico, trilho, rangido) |
+
+- O jogo usa o **mp3 primeiro** se existir um com o mesmo nome. Então, se o Marco quiser trocar um destes por um do
+  ElevenLabs, basta gerar com o nome abaixo: o `.wav` sintetizado fica só como reserva.
+- Som antigo para comparar: `-- --engine-sound=old` na linha de comando, ou "Som antigo" na cena de teste.
+
+**Opcional** (só se o sintetizado não agradar; gere 2–3 versões e escolha):
+
+| Arquivo | Duração | Prompt |
+| --- | --- | --- |
+| `tram_bell.mp3` | 2 s | Japanese streetcar bell, two quick light metallic dings "chin chin" from a small bell on a tram, close, dry, no music, no voices |
+| `tram_run_loop.mp3` | 20 s | Loopable sound of a modern light rail tram running at steady medium speed heard from the roadside, soft electric motor hum, light steel wheels on rails, occasional rail joint clicks, faint flange squeal, no horn, no bell, no voices, no music |
+| `air_brake_park.mp3` | 1 s | Heavy truck parking air brake release, short sharp pneumatic hiss "pssht" when the truck stops, close, no engine, no music |
+| `tyre_road_loop.mp3` | 20 s | Loopable heavy truck tyre roll noise on dry asphalt at highway speed, steady low road roar, no engine, no wind gusts, no music |
+
+Não recomendo voltar a gerar **motores** no ElevenLabs: o gerador não segura um giro fixo (o tom e o ritmo mudam
+dentro do arquivo), e o jogo precisa de loops em RPM exato para a troca de marcha e o freio-motor soarem certos.

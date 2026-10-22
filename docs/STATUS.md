@@ -37,7 +37,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, Esc = pausa) |
 | Garagem | menu → GARAGEM (debug: `-- --demo --damage --tab=repair --slot=front_bumper`) |
 | Demonstração dos acessórios | `godot --path game res://scenes/tools/accessory_viewer.tscn` |
-| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` (T-173: escapamentos, turbinas, buzinas; sem tela: `--headless ... -- --cycle-profiles`) |
+| Som do motor | `godot --path game res://scenes/tools/engine_audio_test.tscn` (T-173: escapamentos, turbinas, buzinas; sem tela: `--headless ... -- --cycle-profiles`). T-197: botão DIRIGIR (roteiro lenta → marchas → freio-motor → freada), Leve (Canter), Som antigo, Cabine |
+| Gravar o som do jogo em .wav (T-197) | `GODOT=... bash tools/render_t197_audio.sh [PASTA]` (Movie Maker, uma janela por vez, ~50 s cada; espectrogramas e análise com `tools/audio_t197_report.py`). Regerar os sons sintetizados: `python tools/synth_truck_audio.py` e depois `--import` |
 | Multiplayer ponta a ponta | `bash tools/net_test.sh` e `bash tools/net_test.sh 150 0.02` |
 | Servidor (PC) | `tools\run_server.bat` (guia: `docs/REDE_WIFI.md`) |
 | Eventos de pista (T-139) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_2_viaduct --start=1650` (acidente fixo em 2.000 m); forçar: `--event=accident:2-3@900`, `--event=works:3@700+170`, `--event=narrow:1@800`; `--no-events`; `--event-seed=N` |
@@ -219,6 +220,11 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
 
 ## PENDENTE — precisa do Marco
 
+- **T-197 (2026-10-22): som dos caminhões e do bonde.** Ouvir `docs/audio_t197/` (fone ou caixa; no celular o grave
+  some): `antes_*.wav` × `depois_*.wav` com o mesmo roteiro (lenta 2,5 s, acelera trocando marchas até 15,5 s, solta,
+  freia até parar em ~23 s, lenta). `depois_bonde_passando.wav` = bonde passando a 25 m. Dizer qual parte ainda soa
+  falsa (lenta, aceleração, troca, freio-motor, escape, freio a ar, bonde). No jogo: GARAGEM > MECÂNICA > OUVIR, ou a
+  cena de teste (DIRIGIR). Som antigo: `-- --engine-sound=old`. **Gerar o APK de novo** para ouvir no celular.
 - **T-181 (2026-10-21): câmera livre de exploração.** No PC: `godot --path game res://scenes/race/race3d.tscn --
   --route=kanto_3_mountain --freecam`, voar com WASD + botão direito, T e digitar `1,2`, mirar num poste e apertar P.
   No celular: **gerar o APK de novo**, pausar a corrida e tocar CÂMERA LIVRE (sticks e SOBE/DESCE). Dizer se os

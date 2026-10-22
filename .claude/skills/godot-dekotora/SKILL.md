@@ -389,3 +389,18 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Testes `-- --only=scenery_t193`.
 - **Armadilha (RoadMesh.sound_wall_at)**: o viaduto da cidade tem muro de som em blocos alternados de 300 m; o que fica
   ao lado, no chão, só aparece da pista onde não há muro.
+
+## Som do motor e do bonde (T-197)
+
+- Motor = **diesel sintetizado** (`tools/synth_truck_audio.py`, numpy do sistema): loops `syn_<voz>_<on|off|jake|open>_<rpm>.wav`
+  com chunk `smpl` (o Godot importa já em loop; `AudioBus` também liga o loop de `.wav` sem `smpl` pelo nome). Regras de
+  mistura em `audio/diesel_mix.gd` (puras); `EngineAudio` usa o ramo diesel quando o spec tem `"voice"`.
+  Camadas diesel são "preguiçosas" (só tocam com peso > 0): teste com `active_layers()` (volume), não `playing`
+  (no executor de testes os nós não tocam: "Playback can only happen when a node is inside the scene tree").
+- Som antigo (ElevenLabs): `EngineSounds.spec(..., legacy = true)` ou `-- --engine-sound=old`; arquivos sintetizados ausentes = antigo.
+- Troca de marcha vista pelo áudio: RPM caindo > 1500 rpm/s com o pé no fundo (sem tocar na sim). Doppler dos rivais/bonde
+  é feito à mão (`DieselMix.doppler`, ±6%), não pelo `doppler_tracking` do Godot (cortes de câmera dariam pulos).
+- **Gravar o som exato do jogo**: Movie Maker com janela (headless trava): `godot --path game --write-movie X.png
+  --fixed-fps 30 CENA -- ...` grava `X.wav` (32 bits estéreo 48 kHz) + um PNG por quadro. Script pronto:
+  `tools/render_t197_audio.sh`; análise/espectrograma: `tools/audio_t197_report.py` (Python do sistema).
+- O executor de testes não roda o `_ready` dos autoloads: para barramentos novos chame `AudioBus._setup_buses()` no teste.

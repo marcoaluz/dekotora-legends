@@ -366,3 +366,10 @@ Formato em `docs/AGENTES.md`.
 - Feito: placas de car_lp_coupe/car_lp_hatch conferidas com measure_plates.gd (superfície plana nas alturas usadas, sem mudança); APK de teste novo gerado (120 MB, protocolo 8) e STATUS.md atualizado.
 - Arquivos: docs/STATUS.md (commit e6e27bd); builds/kaido-bakuso-debug.apk (ignorado pelo Git); game/export_presets.cfg restaurado (diff vazio).
 - Observação: game/tools_dev/probe_unique_t193.gd.uid apareceu sem estar no Git (gerado pelo Godot; não commitado). APK não testado no celular.
+
+## 2026-10-22 · T-197 · especialista · CONCLUÍDA (Marco precisa ouvir)
+- Feito: bonde (LRT) com som próprio (sino "chin-chin" + rodar leve com Doppler); trem de carga igual. Motor dos caminhões virou diesel sintetizado por RPM real (6 cil., preparado, V8, 4 cil. do Canter): lenta irregular, carga ON/OFF, troca de marcha com queda e retomada + pfft, freio-motor por RPM, escape aberto/estalos, freio a ar ao parar, rodagem dos pneus, Doppler dos rivais, barramento de cabine. Som antigo com `--engine-sound=old` ou se faltar arquivo.
+- Arquivos: tools/{synth_truck_audio.py,render_t197_audio.sh,audio_t197_report.py}; game/scripts/audio/{diesel_mix,audio_drive_demo,engine_audio,engine_sounds,race_audio,truck_sfx}.gd, autoload/audio_bus.gd, road3d/life_train_sounds.gd, ui/engine_audio_test.gd; 75 .wav novos em game/assets/audio; tests/test_t197_audio.gd; docs/audio_t197/.
+- Validação: 403 testes ok; cena de teste --cycle-profiles 0 erros; corrida kanto_2_viaduct headless com bonde sem erro novo; gravações reais do jogo (Movie Maker) antes/depois + espectrogramas; volume médio igualado ao antigo.
+- Armadilhas: Movie Maker trava em --headless (precisa janela); no executor de testes os players não tocam (use active_layers) e o _ready do AudioBus não roda; editar um .sh enquanto o bash o executa quebra o fim do script.
+- Decisão pendente: Marco ouvir docs/audio_t197 e dizer o que ainda soa falso; não há câmera de cabine (o som de cabine fica pronto para a T-198).

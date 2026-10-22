@@ -668,3 +668,27 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
 - **Fim da pista**: não pode acabar no "borrão preto"; deve parecer que chegou à cidade destino (cenário contínuo/"infinito"). Tarefa T-195.
 - **Som dos caminhões**: mais próximo do real (T-197). **Bonde** com som diferente do trem (T-197).
 - **Retrovisor + câmeras** (perto, longe, cinema, orbitando o caminhão): T-198.
+
+## 2026-10-22 — T-197: motor diesel sintetizado e bonde com som próprio (pedido do Marco)
+
+- **Bonde ≠ trem**: o bonde amarelo (`RailTraffic.Type.LRT`) toca o sino "chin-chin" (`tram_bell`) ao chegar perto
+  (170 m) e um loop leve que acompanha o bonde com Doppler (`tram_run_loop`: zumbido elétrico, rodas no trilho, juntas,
+  rangido fraco; toca até 260 m). O trem de carga continua com a buzina grave e o ronco (`train_horn`/`train_pass`).
+- **Motor**: os loops do ElevenLabs (tom e ritmo mudando dentro do arquivo, esticados 0,78–1,40×) viraram **diesel
+  sintetizado** (`tools/synth_truck_audio.py`): cada explosão de cada cilindro no tempo certo (6 em linha, V8 com o
+  ronco irregular das bancadas, 4 cilindros no Canter), batida irregular da marcha lenta, estalido de diesel,
+  ressonâncias do escapamento. Loops em 5 RPM fixos × acelerando/sem acelerar; o jogo mistura os 2 vizinhos e muda o
+  tom no máximo ~±20% (o ritmo segue o RPM real do motor da sim).
+- Troca de marcha: o ronco cai e volta (o motor perde a carga durante a troca) + "pfft" do câmbio a ar. Freio-motor
+  (só com a peça) tem loops próprios por RPM. Escapes: reto/chaminés/cromado ganham o ronco rasgado; o cromado
+  cortado estala ao tirar o pé. Ao parar: "tssss" do freio a ar. Pneus: rodagem que sobe com a velocidade; o vento
+  muda de tom com a velocidade. Rivais: Doppler (±6%, feito à mão para ignorar cortes de câmera) e distância.
+- **Cabine**: há o barramento `EngineCab` (abafado e grave) e a opção na cena de teste, mas **o jogo não tem câmera
+  de cabine** (só atrás do caminhão). Se a T-198 criar uma câmera de dentro, é só ligar `EngineAudio.interior`.
+- **Sem custo de ElevenLabs.** Prompts opcionais em `docs/AUDIO_ELEVENLABS.md` seção 9 (um `.mp3` com o mesmo nome
+  substitui o sintetizado). Som antigo para comparar: `-- --engine-sound=old` ou "Som antigo" na cena de teste.
+- Nada mudou na simulação nem na rede (o áudio só lê `rpm`, `throttle_now`, `shifting`, `boost`, `speed`).
+- **Para o Marco ouvir e decidir**: `docs/audio_t197/` (antes × depois, mesmo roteiro de direção).
+  Volume médio igualado ao antigo (acelerando −21,5 dBFS × −22,2 antes; lenta −30 × −28; o V8 com freio-motor fica
+  ~2 dB mais alto que antes ao soltar, de propósito). `espectrogramas.png`: uma linha por arquivo, na ordem de
+  `espectrogramas.txt` (antes primeiro); no novo dá para ver as harmônicas seguindo o giro e a queda em cada troca.
