@@ -5,6 +5,9 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-198 | Retrovisor para ver o outro caminhão + câmeras de corrida (perto, longe, cinema, orbitando o caminhão) | pedido do Marco | difícil | especialista | fila (depois da T-195) | 2026-10-22 | |
+| T-197 | Som dos caminhões mais próximo do real; bonde com som próprio (diferente do trem) | pedido do Marco | difícil | especialista | em andamento | 2026-10-22 | |
+| T-195 | Mapa: usar o modelo `train` do Marco, mais detalhe/polígonos/textura, corrigir serrilhado e bugs visuais, e fim de pista "infinito" (chegada à cidade destino, sem borrão preto) | pedido do Marco | difícil | especialista | em andamento | 2026-10-22 | |
 | T-194 | APK de teste com T-189/T-192/T-193 + conferir altura das placas dos carros novos (PLATE_Y em traffic_3d.gd) | delegado da T-193 | fácil | ajudante-rapido | concluída (placas ok sem mudança; APK 120 MB, commit e6e27bd; precisa Marco: instalar e testar) | 2026-10-22 | 2026-10-22 |
 | T-193 | Novos modelos em docs/Modelos (Vagoes, CARS, Letras Japones e neon, Cidade, train, Unico): inventário, importar, usar no jogo; o carro da pasta Unico aparece UMA vez na pista | pedido do Marco | difícil | especialista | concluída (commits 09ee424, fb4c306, 4a0044e; 395 testes ok; precisa Marco: aprovar lugares do carro único) | 2026-10-22 | 2026-10-22 |
 | T-192 | T-188 etapa 2: aplicar cenário novo nas 3 rotas inteiras + refazer árvores/palmeiras de código + corrigir pintura sobreposta no asfalto 速度落とせ | pedido do Marco (aprovou etapa 1) | difícil | especialista | concluída (código e capturas commitados; 391 testes ok; falta medida FPS completa e T-192b) | 2026-10-22 | 2026-10-22 |

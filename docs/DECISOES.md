@@ -661,3 +661,10 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   Lugar: primeiro ponto depois de 45% (litoral, lado do mar, 17,5 m), 22% (cidade, chão ao lado do viaduto onde não há
   muro de som, 26 m) e 45% (montanha, lado do morro, 17 m) da rota, com curva ≤ 1,0 e longe de túnel/ponte/viaduto;
   árvores e prédios ficam fora do pátio. Hoje: km 1,35 / 0,645 / 1,26.
+
+## 2026-10-22 — Pedidos do Marco após a T-193
+- **Todos os arquivos de docs/Modelos são royalty free** (inclui CARS); só é vetado o extraído de outro jogo.
+- **Carro único (3 lugares)**: o Marco aprova DEPOIS do ajuste do mapa (T-195).
+- **Fim da pista**: não pode acabar no "borrão preto"; deve parecer que chegou à cidade destino (cenário contínuo/"infinito"). Tarefa T-195.
+- **Som dos caminhões**: mais próximo do real (T-197). **Bonde** com som diferente do trem (T-197).
+- **Retrovisor + câmeras** (perto, longe, cinema, orbitando o caminhão): T-198.
