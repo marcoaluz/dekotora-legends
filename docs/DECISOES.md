@@ -569,3 +569,11 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   litoral/cidade 0,8 → 0,5; recuo dos prédios; quantidade de janelas acesas; nomes dos letreiros.
 - **Custo** (`tools/measure_t188.sh`, `docs/capturas_t188/custo.txt`): chamadas −1 a +10, triângulos +10 a +14 mil
   (+5%), textura +0,5 a +1,4 MB, FPS −3% a +3% no PC. Celular não medido.
+
+## 2026-10-22 — Respostas do Marco (T-188 etapa 1, T-186, T-190)
+- **T-188 etapa 1 aprovada**: prints, tamanho dos morros (montanha ~110 m, litoral ~50 m), neve dos maciços 0,8→0,5, prédios (44/62 m, janelas, letreiros) e refazer árvores/palmeiras de código + corrigir a pintura sobreposta no asfalto na etapa 2 (T-192).
+- **Gleditsias adultas ralas / boneco com cara de manequim**: melhorar, mas NÃO agora (pendência anotada; ver ROADMAP).
+- **Retrato do duelo**: mantido nos dois lados da faixa (jogador espelhado), decisão do coordenador por simetria e leitura do "frente a frente".
+- **Personalização (T-190, docs/REFERENCIA_PERSONALIZACAO.md)**: cada lado do baú pode ter mural diferente; a loja terá **temas prontos** (Retrô, Kansai, Kanto, Gundam) além das peças soltas; **mestre da oficina** que conversa e dá dicas (texto); origem dos murais figurativos **em aberto** (IA, código/Blender ou arte livre); peças ficam para depois (algumas serão trocadas, outras acrescentadas).
+- **Ideia de câmera/retrovisor (Marco)**: retrovisor para ver o rival atrás e câmeras de corrida estilo cinema (longe, média, com zoom). Registrada para o futuro; ainda não é tarefa.
+- **Andon (texto)**: pendente de explicação ao Marco (é a placa luminosa do teto da cabine com texto, ex.: 一番星).
