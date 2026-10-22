@@ -361,3 +361,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: 395 testes ok; --quit-after nas 3 rotas sem erro novo (o aviso "17 resources still in use" já existia); folha dos modelos + prints dia/noite + trens em docs/capturas_t193/; custo modo médio noite 9 pontos (custo_antes/depois.txt): chamadas +0 a +16, triângulos +0 a +15%, textura +0,2 a +2,2 MB, FPS no ruído (240–294).
 - Não usados: SUV do CARS (rasga ao reduzir), Neon Signs.c4d (formato Cinema 4D), The+City.obj (repete city.fbx sem textura), CIT.fbx (cidade OSM pesada), Rail+Track/Rails (o jogo já tem a via contínua).
 - Decisão pendente: Marco confirmar os lugares do carro único e o destaque (mancha de luz); placas de estrada não mudaram. Celular não medido (APK novo).
+
+## 2026-10-22 12:12 · T-194 · ajudante-rapido · CONCLUÍDA
+- Feito: placas de car_lp_coupe/car_lp_hatch conferidas com measure_plates.gd (superfície plana nas alturas usadas, sem mudança); APK de teste novo gerado (120 MB, protocolo 8) e STATUS.md atualizado.
+- Arquivos: docs/STATUS.md (commit e6e27bd); builds/kaido-bakuso-debug.apk (ignorado pelo Git); game/export_presets.cfg restaurado (diff vazio).
+- Observação: game/tools_dev/probe_unique_t193.gd.uid apareceu sem estar no Git (gerado pelo Godot; não commitado). APK não testado no celular.
