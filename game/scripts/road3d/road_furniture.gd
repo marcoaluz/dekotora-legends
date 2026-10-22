@@ -183,9 +183,12 @@ func _label(text: String, z: float, lat_m: float, y: float, size: int, px: float
 
 
 ## Pintura no asfalto deitada e esticada no sentido da pista (como no Japao), legivel para quem vem atras.
+## T-192: texto de varias letras (速度落とせ) vai EMPILHADO no sentido da pista, a 1a letra mais perto do motorista
+## (como no Japao); deitado numa linha so ele tinha ~6,4 m de largura e invadia as faixas vizinhas (3,6 m cada).
 func _road_text(text: String, z: float, lane_x: float, size: int, stretch: float) -> void:
 	var l := Label3D.new()
-	l.text = text
+	l.text = road_text_lines(text)
+	l.line_spacing = -float(size) * 0.18
 	l.font = _font
 	l.font_size = size
 	l.pixel_size = 0.02
@@ -199,6 +202,17 @@ func _road_text(text: String, z: float, lane_x: float, size: int, stretch: float
 	add_child(l)
 
 
+## T-192: kanji/kana empilhados (1 por linha, ultima linha = 1a letra = mais perto de quem vem); numeros e setas
+## continuam numa linha (cabem na faixa).
+static func road_text_lines(text: String) -> String:
+	if text.length() <= 2 or text.is_valid_int():
+		return text
+	var lines: PackedStringArray = PackedStringArray()
+	for i in range(text.length() - 1, -1, -1):
+		lines.append(text[i])
+	return "\n".join(lines)
+
+
 func _markings(L: float, tunnels: Array[Vector2]) -> void:
 	var lanes: Array[float] = Lanes.ROAD
 	var prev_sharp: bool = false
@@ -208,7 +222,7 @@ func _markings(L: float, tunnels: Array[Vector2]) -> void:
 		if sharp and not prev_sharp and z > 140.0:
 			for lx in lanes:
 				if not _lane_gone(lx, z - 110.0):
-					_road_text("速度落とせ", z - 110.0, lx, 64, 3.2)
+					_road_text("速度落とせ", z - 110.0, lx, 80, 2.6)
 				if not _lane_gone(lx, z - 60.0):
 					_road_text("80", z - 60.0, lx, 96, 2.6)
 		prev_sharp = sharp
