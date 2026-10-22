@@ -72,6 +72,8 @@ static func material(id: String, tod: TimeOfDay) -> Material:
 			t.albedo_color = Color(1.0, 1.0, 1.0) if day > 0.5 else Color(0.7, 0.72, 0.78)
 			t.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 			t.alpha_scissor_threshold = 0.5
+			t.alpha_antialiasing_mode = BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE   # T-195
+			t.alpha_antialiasing_edge = 0.3
 			t.cull_mode = BaseMaterial3D.CULL_DISABLED
 			t.metallic = 0.35
 			t.roughness = 0.6

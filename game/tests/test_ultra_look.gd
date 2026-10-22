@@ -61,9 +61,11 @@ func test_viewport_table() -> void:
 	UltraLook.apply_viewport(vp, 1)
 	check_near(vp.scaling_3d_scale, 0.8, 0.001, "media renders at 80%")
 	check_eq(vp.scaling_3d_mode, Viewport.SCALING_3D_MODE_BILINEAR, "media: bilinear")
-	check_eq(vp.msaa_3d, Viewport.MSAA_DISABLED, "media: no MSAA")
+	check_eq(vp.msaa_3d, Viewport.MSAA_2X, "media: MSAA 2x (T-195)")
 	UltraLook.apply_viewport(vp, 2)
-	check_eq(vp.msaa_3d, Viewport.MSAA_2X, "alta: MSAA 2x")
+	check_eq(vp.msaa_3d, Viewport.MSAA_4X, "alta: MSAA 4x (T-195)")
+	UltraLook.apply_viewport(vp, 0)
+	check_eq(vp.msaa_3d, Viewport.MSAA_DISABLED, "baixa: no MSAA")
 	if UltraLook.available():
 		UltraLook.apply_viewport(vp, 3)
 		check_eq(vp.scaling_3d_mode, Viewport.SCALING_3D_MODE_FSR2, "ultra: FSR2 native")

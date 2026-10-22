@@ -130,6 +130,7 @@ func _ready() -> void:
 	road.bridges = bridges
 	var zone: Vector2 = ScenicZone.zone(String(route.id) if route != null else "", path.track.length_m)   # T-188
 	road.bare = zone
+	road.soft_spec = not UltraLook.active(q)        # T-195: sem pontos brilhantes no asfalto molhado
 	road.build(path, scenery, tod, tunnels)
 	if not bridges.is_empty():
 		var structures := SectionStructures3D.new()  # T-153: pilares, longarinas e cabeceiras da ponte

@@ -43,6 +43,8 @@ void fragment() {
 	if (scissor >= 0.0) {
 		ALPHA = c.a;
 		ALPHA_SCISSOR_THRESHOLD = scissor;
+		ALPHA_ANTIALIASING_EDGE = 0.3;                       // T-195: alpha to coverage with MSAA
+		if (use_tex) { ALPHA_TEXTURE_COORDINATE = UV * vec2(textureSize(albedo_tex, 0)); }
 	}
 	ROUGHNESS = rough;
 	SPECULAR = 0.3;

@@ -120,6 +120,8 @@ void fragment() {
 	EMISSION = c.rgb * shade * night_lift * vec3(0.55, 0.68, 1.0);
 	ALPHA = c.a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
+	ALPHA_ANTIALIASING_EDGE = 0.3;                           // T-195: alpha to coverage with MSAA
+	ALPHA_TEXTURE_COORDINATE = UV * vec2(textureSize(cards, 0));
 	ROUGHNESS = 0.95;
 	SPECULAR = 0.1;
 	NORMAL = mix(NORMAL, vec3(0.0, 1.0, 0.0), 0.5);

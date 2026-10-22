@@ -11,8 +11,8 @@ enum Type { FREIGHT, LRT }
 
 const FIRST_PASS: float = 3.0
 const MEET_S: float = 7.0
-const GAP_MIN: float = 22.0
-const GAP_MAX: float = 40.0
+const GAP_MIN: float = 18.0             # T-195: 22-40 -> 18-32 s (o trem do Marco aparece mais)
+const GAP_MAX: float = 32.0
 const MAX_TRAINS: int = 3
 const SPEED := {Type.FREIGHT: 21.0, Type.LRT: 18.0}
 const LOCO_LEN: float = 18.0
@@ -29,6 +29,9 @@ const WAGON_POOL: Array[String] = ["train_wagon_a", "train_wagon_b", "train_wago
 const LENS := {"train_loco": LOCO_LEN, "train_loco_b": 18.9, "train_lrt": LRT_LEN, "train_wagon_log": 16.1,
 	"train_wagon_flat": 15.9, "train_wagon_semi": 16.1, "train_wagon_box": 18.9, "train_wagon_box_b": 18.9}
 const DESPAWN_M: float = 900.0
+const MARCO_LOCO: String = "train_loco_b"
+const LEAD_MARCO: float = 0.75
+const DOUBLE_HEAD: float = 0.35
 
 
 class Train:
@@ -65,7 +68,9 @@ func _init(lines_: Array[RailLine], seed_: int, main_type_: int = Type.FREIGHT) 
 
 ## `rng` = null: the old fixed composition (loco + WAGONS). With an rng (T-193): random locomotive and 6-9 wagons
 ## (runs of 1-3 equal wagons, like a real freight train), always the same for the same seed.
-static func make_train(type: int, rng: RandomNumberGenerator = null) -> Train:
+## T-195: the Marco's locomotive (MARCO_LOCO, docs/Modelos/train) leads LEAD_MARCO of the trains (`marco` = true: always)
+## and DOUBLE_HEAD of those carry a 2nd one right behind (double heading); the total stays 7-10 cars.
+static func make_train(type: int, rng: RandomNumberGenerator = null, marco: bool = false) -> Train:
 	var t := Train.new()
 	t.type = type
 	t.speed = float(SPEED[type])
@@ -74,8 +79,11 @@ static func make_train(type: int, rng: RandomNumberGenerator = null) -> Train:
 	elif rng == null:
 		t.models.assign(["train_loco"] + WAGONS)
 	else:
-		t.models.append(LOCOS[rng.randi() % LOCOS.size()])
+		var lead: String = MARCO_LOCO if marco or rng.randf() < LEAD_MARCO else LOCOS[0]
+		t.models.append(lead)
 		var n: int = rng.randi_range(6, 9)
+		if lead == MARCO_LOCO and rng.randf() < DOUBLE_HEAD:
+			t.models.append(MARCO_LOCO)
 		while t.models.size() < n + 1:
 			var w: String = WAGON_POOL[rng.randi() % WAGON_POOL.size()]
 			for _k in mini(rng.randi_range(1, 3), n + 1 - t.models.size()):
@@ -118,13 +126,15 @@ func _parallel_pass(player_z: float, player_speed: float) -> void:
 	if li < 0 or trains.size() >= MAX_TRAINS:
 		_next_pass = time + 3.0                           # ninguem por perto: tenta de novo daqui a pouco
 		return
-	var type: int = main_type if passes == 0 or _rng.randf() < 0.7 else (Type.LRT if main_type == Type.FREIGHT else Type.FREIGHT)
+	# T-195: the 1st pass of every route is a freight train led by the Marco's locomotive (also in the city, where the
+	# main train is the tram); then the main type 60% of the time.
+	var type: int = Type.FREIGHT if passes == 0 else (main_type if _rng.randf() < 0.6 else (Type.LRT if main_type == Type.FREIGHT else Type.FREIGHT))
 	var dir: float = 1.0 if _rng.randf() < 0.5 else -1.0
 	if force_type >= 0:
 		type = force_type
 	if force_dir != 0.0:
 		dir = force_dir
-	var t: Train = make_train(type, _rng)
+	var t: Train = make_train(type, _rng, passes == 0)
 	t.line = li
 	t.dir = dir
 	t.track = -dir                                         # anda pela via da esquerda
@@ -150,7 +160,7 @@ func _crossings(player_z: float, player_speed: float) -> void:
 		if d / maxf(player_speed, 1.0) > 12.0 and d > 160.0:
 			continue                                       # ainda longe/devagar: espera chegar mais perto
 		_crossed[i] = true
-		var t: Train = make_train(Type.FREIGHT if force_type < 0 else force_type, _rng)
+		var t: Train = make_train(Type.FREIGHT if force_type < 0 else force_type, _rng, true)   # T-195: Marco's loco on the bridge
 		t.line = i
 		t.dir = 1.0 if _rng.randf() < 0.5 else -1.0
 		t.track = -t.dir

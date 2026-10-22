@@ -183,7 +183,7 @@ func test_models_are_light_and_textures_small() -> void:
 	var day: TimeOfDay = TimeOfDay.by_id(&"day")
 	var caps := {"rail_mast": 300, "rail_pier": 50, "rail_pier_cap": 50, "rail_portal": 200, "train_loco": 1500,
 		"train_wagon_a": 800, "train_wagon_b": 800, "train_wagon_c": 800, "train_lrt": 8000,
-		"train_loco_b": 5500, "train_wagon_log": 2400, "train_wagon_flat": 2400, "train_wagon_semi": 2400,
+		"train_loco_b": 6500, "train_wagon_log": 2400, "train_wagon_flat": 2400, "train_wagon_semi": 2400,
 		"train_wagon_box": 2400, "train_wagon_box_b": 2400}
 	for m in caps:
 		var mesh: ArrayMesh = RailKit.mesh(m, day)

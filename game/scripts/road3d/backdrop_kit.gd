@@ -162,5 +162,7 @@ static func _leaves(day: float, tex: String = LEAVES_TEX) -> StandardMaterial3D:
 	m.alpha_scissor_threshold = 0.5
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	m.roughness = 0.95
+	m.alpha_antialiasing_mode = BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE   # T-195: soft leaf edges with MSAA
+	m.alpha_antialiasing_edge = 0.3
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	return m

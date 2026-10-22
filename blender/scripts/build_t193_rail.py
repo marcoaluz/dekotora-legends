@@ -43,6 +43,7 @@ COLORS = {"steel": (0.62, 0.64, 0.66), "dark": (0.13, 0.13, 0.14), "black": (0.0
           "flatcar": (0.27, 0.22, 0.19), "c_green": (0.21, 0.46, 0.31), "c_gray": (0.56, 0.58, 0.59),
           "c_white": (0.86, 0.87, 0.85), "glass": (0.10, 0.14, 0.19)}
 GAUGE_X = 0.70            # outer face of the wheels (train_loco: wheels at +-0.62, 0.14 wide)
+LOCO_LOW_Z = 1.15         # T-195: running gear of train_loco_b (bogies, tanks) = the only part decimated
 WAGON_SCALE = 1.87
 WAGON_PARTS = {"Cylinder": "dark", "Cart": "bogie", "Coupling": "dark"}      # objects of the Vagoes files
 
@@ -55,8 +56,52 @@ SPECS = {
                             container="c_red"),
     "train_wagon_box_b": dict(src="Vagoes/wagons.fbx/Transporter car.fbx", recolor={"c_green": "dark"}, tris=2200,
                               container="c_blue"),
-    "train_loco_b": dict(src="train/3d-model.fbx/3d-model.fbx", length=19.0, tris=5200, loco=True),
+    "train_loco_b": dict(src="train/3d-model.fbx/3d-model.fbx", length=19.0, tris=6500, loco=True),   # T-195: body intact, only the bogies reduced
 }
+
+
+# T-195: livery of the Marco's locomotive (train_loco_b). The body sides are big polygons that cross every band, so a
+# colour per face painted diagonal patches. The body now samples a vertical strip (cell LIVERY_CELL of the atlas) with
+# v = height: dark blue skirt, blue body, cream band with a red pinstripe, blue top. Written into rail_atlas.png here
+# (same pixels every run; the cell was empty).
+LIVERY_CELL = 32
+LIVERY_BANDS = [(0.00, (0.09, 0.17, 0.32)), (0.36, (0.17, 0.36, 0.66)), (0.47, (0.88, 0.84, 0.70)),
+                (0.555, (0.70, 0.12, 0.10)), (0.575, (0.88, 0.84, 0.70)), (0.60, (0.17, 0.36, 0.66)),
+                (0.86, (0.14, 0.30, 0.56))]
+LIVERY_BODY = ("c_blue", "loco_cream")
+
+
+def paint_livery_cell() -> None:
+    path = os.path.join(ROOT, "game", "assets", "textures", "rail", "rail_atlas.png")
+    img = bpy.data.images.load(path)
+    w, h = img.size
+    px = np.array(img.pixels[:], np.float32).reshape(h, w, 4)        # row 0 = bottom of the image
+    cs = w // 8
+    row, col = divmod(LIVERY_CELL, 8)
+    y0 = h - (row + 1) * cs                                            # bottom row of the cell (Blender: bottom-up)
+    rng = np.random.default_rng(195)
+    for j in range(cs):
+        t = (j + 0.5) / cs                                             # 0 = bottom of the locomotive
+        rgb = LIVERY_BANDS[0][1]
+        for t0, c in LIVERY_BANDS:
+            if t >= t0:
+                rgb = c
+        lin = rgb                                                      # byte PNG: pixels[] are the sRGB values / 255
+        grain = 1.0 + 0.05 * (rng.random(cs) - 0.5)
+        for k in range(3):
+            px[y0 + j, col * cs:(col + 1) * cs, k] = lin[k] * grain
+        px[y0 + j, col * cs:(col + 1) * cs, 3] = 1.0
+    img.pixels[:] = px.ravel()
+    img.filepath_raw = path
+    img.file_format = "PNG"
+    img.save()
+    print("LIVERY cell %d escrita em %s" % (LIVERY_CELL, path))
+
+
+def livery_uv(z_frac: float) -> tuple:
+    row, col = divmod(LIVERY_CELL, 8)
+    v0 = 1.0 - (row + 1) / 8.0
+    return (col + 0.5) / 8.0, v0 + (0.04 + 0.92 * min(max(z_frac, 0.0), 1.0)) / 8.0
 
 
 def cell_uv(name: str) -> tuple:
@@ -201,6 +246,11 @@ def decimate(o, target: int, loco: bool = False) -> None:
         bm = bmesh.new()
         bm.from_mesh(o.data)
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
+        # T-195: planar dissolve (merges only coplanar faces of the SAME colour class: the silhouette stays exact;
+        # the old collapse to 5,2 mil tri melted the hood and the cab)
+        bmesh.ops.dissolve_limit(bm, angle_limit=math.radians(2.0), verts=bm.verts, edges=bm.edges,
+                                 delimit={"MATERIAL"})
+        bmesh.ops.triangulate(bm, faces=bm.faces)
         bm.to_mesh(o.data)
         bm.free()
     cur = sum(len(p.vertices) - 2 for p in o.data.polygons)
@@ -209,6 +259,13 @@ def decimate(o, target: int, loco: bool = False) -> None:
     md = o.modifiers.new("dec", "DECIMATE")
     md.decimate_type = "COLLAPSE"
     md.ratio = target / cur
+    if loco:                                                    # T-195: only the running gear (below LOCO_LOW_Z) loses
+        vg = o.vertex_groups.new(name="low")                    # triangles; the body keeps its exact shape
+        vg.add([v.index for v in o.data.vertices if v.co.z < LOCO_LOW_Z], 1.0, "REPLACE")
+        low = sum(len(p.vertices) - 2 for p in o.data.polygons
+                  if all(o.data.vertices[i].co.z < LOCO_LOW_Z for i in p.vertices))
+        md.vertex_group = vg.name
+        md.ratio = max(0.25, 1.0 - (cur - target) / max(low, 1))
     md.use_collapse_triangulate = True
     md.use_symmetry = not loco
     md.symmetry_axis = "X"
@@ -316,10 +373,15 @@ def build(name: str, spec: dict, src_root: str) -> tuple:
             while me.uv_layers:
                 me.uv_layers.remove(me.uv_layers[0])
             layer = me.uv_layers.new(name="UVMap")
+            livery = bool(spec.get("loco"))                      # T-195: body = vertical livery strip
+            zl, zh = lo.z, max(hi.z - lo.z, 1e-6)
             for p, c in zip(me.polygons, cl):
                 u = cell_uv(c)
                 for li in p.loop_indices:
-                    layer.data[li].uv = u
+                    if livery and c in LIVERY_BODY:
+                        layer.data[li].uv = livery_uv((me.vertices[me.loops[li].vertex_index].co.z - zl) / zh)
+                    else:
+                        layer.data[li].uv = u
         ob.data.materials.clear()
         ob.data.materials.append(bpy.data.materials.get("rail_train") or bpy.data.materials.new("rail_train"))
     bpy.ops.object.select_all(action="DESELECT")
@@ -383,6 +445,8 @@ def main() -> None:
     only = a[a.index("--only") + 1].split(",") if "--only" in a else list(SPECS)
     os.makedirs(WORK, exist_ok=True)
     done = []
+    if "train_loco_b" in only and "--preview-only" not in a:
+        paint_livery_cell()
     for name in ([] if "--preview-only" in a else only):
         n, _o, _l = build(name, SPECS[name], src)
         done.append(n)

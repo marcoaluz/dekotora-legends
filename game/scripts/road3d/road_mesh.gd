@@ -44,6 +44,8 @@ var _used: Dictionary = {}                  # SurfaceTool com algum vertice nest
 var _prof: PackedVector3Array = PackedVector3Array()   # T-153: perfil da pista no inicio de cada segmento (LaneSections.profile)
 var _wr_until: int = -1                    # T-163: ultimo segmento ja coberto pelo guard-rail em W (anel a cada 4 m)
 var bare: Vector2 = ScenicZone.NONE         # T-188: trecho sem grama/areia (o TerrainPatch desenha o chao ali)
+var soft_spec: bool = false                  # T-195: sem Ultra, asfalto molhado sem textura de rugosidade (tira o "chuvisco"
+                                            # de pontos brilhantes = aliasing especular; o Ultra tem o limitador do Forward+)
 
 
 ## Altura do tabuleiro (viaduto) do cenario; 0 = estrada no chao.
@@ -99,6 +101,8 @@ func _make_materials() -> void:
 	road.roughness = tod.road_roughness       # noite: asfalto umido (reflete mais)
 	road.metallic_specular = 0.6
 	road.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	if soft_spec and road.roughness < 0.8:
+		road.roughness_texture = null
 	_mats["road"] = road
 	var troad: StandardMaterial3D = road.duplicate() as StandardMaterial3D   # tunel: asfalto pre-iluminado pelo sodio
 	troad.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

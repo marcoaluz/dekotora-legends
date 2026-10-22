@@ -125,6 +125,11 @@ static func apply_sun(sun: DirectionalLight3D, tod: TimeOfDay, q: int) -> void:
 	sun.light_volumetric_fog_energy = 1.4 if tod.day_amount > 0.5 else (0.8 if tod.day_amount > 0.2 else 0.6)
 
 
+## T-195: MSAA per quality below Ultra (Compatibility has no FXAA/TAA; MSAA + alpha-to-coverage on the leaves is
+## what removes the jagged edges). Before: only Alta had 2x.
+const MSAA_BY_QUALITY: Array[int] = [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X, Viewport.MSAA_4X]
+
+
 ## Resolution and anti-aliasing of the 3D view (all qualities: Ultra and the old table for 0..2).
 static func apply_viewport(vp: Viewport, q: int) -> void:
 	var qq: int = clamp_quality(q)
@@ -134,7 +139,10 @@ static func apply_viewport(vp: Viewport, q: int) -> void:
 		vp.msaa_3d = Viewport.MSAA_DISABLED
 	else:
 		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
-		vp.msaa_3d = Viewport.MSAA_2X if qq >= 2 else Viewport.MSAA_DISABLED
+		vp.msaa_3d = MSAA_BY_QUALITY[qq]   # T-195: media 2x (celular), alta 4x; baixa sem
+		for a in OS.get_cmdline_user_args():              # depuracao/medida: --msaa=0|2|4 (0 = como antes da T-195 na media)
+			if a.begins_with("--msaa="):
+				vp.msaa_3d = {"0": Viewport.MSAA_DISABLED, "2": Viewport.MSAA_2X, "4": Viewport.MSAA_4X}.get(a.substr(7), vp.msaa_3d)
 
 
 ## Light depth of field for the duel intro (null below Ultra): the trucks stay sharp, the background softens.
