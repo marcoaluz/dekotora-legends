@@ -4,7 +4,8 @@ extends Node3D
 ## Settings.fx_life (off by default on the phone):
 ##   wind on trees and bushes (LifeWind), falling leaves near the camera, bird flocks by day (LifeBirds),
 ##   factory/village smoke, drain steam and insects at the lamps (LifeEmitters), cloud shadows (CloudShadows, PC),
-##   cars and people on the city streets beside the viaduct (LifeStreets), train horn and rumble (LifeTrainSounds).
+##   cars and people on the city streets beside the viaduct (LifeStreets), train horn and rumble (LifeTrainSounds),
+##   ambient sound by biome (LifeAmbience).
 ## The race calls build() once, attach_camera() once and update() every frame.
 
 var wind_nodes: int = 0
@@ -13,6 +14,7 @@ var _emit: LifeEmitters
 var _clouds: CloudShadows
 var _streets: LifeStreets
 var _trains: LifeTrainSounds
+var _ambience: LifeAmbience
 var _leaves: CPUParticles3D
 var _tod: TimeOfDay
 var _scenery: StringName
@@ -60,6 +62,9 @@ func build(path: TrackPath, route_id: String, scenery: StringName, tod: TimeOfDa
 		_trains.name = "TrainSounds"
 		add_child(_trains)
 		_trains.setup(rail)
+	_ambience = LifeAmbience.new()
+	add_child(_ambience)
+	_ambience.setup(scenery, tod)
 	print("LIFE_T189 %s wind=%d flocks=%d smoke=%d steam=%d insects=%d clouds=%s street_cars=%d street_people=%d" % [route_id,
 		wind_nodes, flocks, _emit.sources["smoke"].size(), _emit.sources["steam"].size(), _emit.sources["insects"].size(),
 		_clouds != null, _streets._cars.size() if _streets != null else 0, _streets.people_count if _streets != null else 0])
@@ -109,7 +114,10 @@ func attach_camera(cam: Camera3D) -> void:
 	cam.add_child(_leaves)
 
 
-func update(dt: float, player_z: float, cam_pos: Vector3) -> void:
+## `tunnel` = 0 outside .. 1 inside (ambience fades); `speed` = player speed (m/s).
+func update(dt: float, player_z: float, cam_pos: Vector3, tunnel: float = 0.0, speed: float = 0.0) -> void:
+	if _ambience != null:
+		_ambience.update(dt, tunnel, speed)
 	if _birds != null:
 		_birds.update(dt, player_z)
 	if _emit != null:

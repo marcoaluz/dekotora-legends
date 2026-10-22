@@ -89,3 +89,19 @@ func test_city_streets() -> void:
 	for c in st._cars:
 		check(float(c["z"]) >= zone.x and float(c["z"]) <= zone.y, "and wrap around inside it")
 	st.free()
+
+
+func test_ambience_pick_and_missing_files() -> void:
+	var day: TimeOfDay = TimeOfDay.by_id(&"day")
+	var night: TimeOfDay = TimeOfDay.by_id(&"night")
+	check(LifeAmbience.pick(&"mountain", day).has("cicadas"), "cicadas in the mountains by day")
+	check(LifeAmbience.pick(&"coast", night).has("sea"), "sea on the coast")
+	check(LifeAmbience.pick(&"coast", night).has("night_insects"), "frogs and crickets at night")
+	check(LifeAmbience.pick(&"city", night).has("city_night"), "city hum on the viaduct")
+	check_eq(LifeAmbience.file_for("city_night"), "amb_city_night_loop" if RaceAudio.has_sound("amb_city_night_loop") else "highway_night_loop", "city falls back to the existing loop")
+	for id in LifeAmbience.SOUNDS:
+		check(String(LifeAmbience.SOUNDS[id][0]).ends_with("_loop"), "%s loops (AudioBus LOOP_HINTS)" % id)
+	var a := LifeAmbience.new()
+	a.setup(&"mountain", day)                      # files may be missing: must not fail
+	a.update(0.5, 1.0, 20.0)
+	a.free()

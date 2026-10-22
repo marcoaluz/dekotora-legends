@@ -74,6 +74,7 @@ var _impact: ImpactFx                   # T-141: faiscas, pedacos, chacoalhada e
 var _rail: Railway3D                    # T-154: ferrovia e trens
 var _speed_blur: SpeedBlur               # T-189: borrao de velocidade (Ultra, opcional; null = desligado)
 var _life: RaceLife                      # T-189: vida do cenario (so visual; null = Settings.fx_life desligado)
+var _rain_fx: RainFx                     # T-189: spray atras dos caminhoes, respingos e som da chuva (null = sem chuva)
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
 var _nohud: bool = false
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
@@ -225,6 +226,10 @@ func _ready() -> void:
 	_speed_blur = SpeedBlur.attach(_cam, q, Settings.fx_motion_blur)
 	if _life != null:
 		_life.attach_camera(_cam)
+	if Settings.fx_rain:
+		_rain_fx = RainFx.new()
+		add_child(_rain_fx)
+		_rain_fx.setup(_trucks, _cam, tod, q)
 	_speed_fx = SpeedFx.new()
 	add_child(_speed_fx)
 	var streaks := LightStreaks.new()
@@ -717,8 +722,13 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		_rail.update(dt, _player_z(), sim.trucks[player].speed, _cam.global_position)
 	if _speed_blur != null:
 		_speed_blur.update(sim.trucks[player].speed)
+	if _rain_fx != null:
+		var speeds: Array[float] = []
+		for t in sim.trucks:
+			speeds.append(t.speed)
+		_rain_fx.update(speeds)
 	if _life != null and _cam != null:
-		_life.update(dt, _player_z(), _cam.global_position)
+		_life.update(dt, _player_z(), _cam.global_position, _tunnel.amount, sim.trucks[player].speed)
 
 
 func _cam_target(z: float, x: float) -> Array[Vector3]:
@@ -938,7 +948,7 @@ func _intro_frame(dt: float) -> void:
 	_cinema.update_flash(dt)
 	_traffic3d.refresh()
 	if _life != null:                      # T-189: passaros e fumaca seguem vivos na abertura
-		_life.update(dt, _player_z(), _cam.global_position)
+		_life.update(dt, _player_z(), _cam.global_position, _tunnel.amount, sim.trucks[player].speed)
 	_demo.update(get_viewport(), sim.trucks[player], dt)
 	if _intro.skipped:                     # online depois de pular: espera na largada, na tomada do alinhamento
 		_update_visuals(1.0, dt)

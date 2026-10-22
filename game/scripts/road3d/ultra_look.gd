@@ -53,6 +53,10 @@ static func tune_tod(tod: TimeOfDay, q: int, rain: bool) -> TimeOfDay:
 		t.saturation *= 0.93
 		t.light_energy *= 0.72                          # overcast
 		t.cloud_color = t.cloud_color.darkened(0.25)
+		var w: float = 0.2 + 0.5 * t.day_amount             # overcast: grey sky by day
+		t.sky_top = t.sky_top.lerp(Color(0.36, 0.39, 0.44), w)
+		t.sky_horizon = t.sky_horizon.lerp(Color(0.58, 0.6, 0.64), w)
+		t.fog_color = t.fog_color.lerp(Color(0.55, 0.58, 0.62), w)
 	return t
 
 
