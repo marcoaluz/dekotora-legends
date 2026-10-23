@@ -63,6 +63,9 @@ func test_race_runs_server_side_and_finishes_with_results() -> void:
 	for p in r.order:
 		r.set_ready(p, true)
 	r.try_start(100, 5)
+	for p in r.order:                                # T-208: os dois montaram a corrida (o servidor espera)
+		r.mark_loaded(p)
+	r.advance(0.01)
 	r.advance(r.countdown + 0.01)
 	check_eq(r.state, Protocol.RoomState.RACING, "largou")
 	var steps: int = 0

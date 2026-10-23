@@ -32,6 +32,9 @@ var player_name: String = "Jogador"
 var pending_setup: Dictionary = {}          # corrida online a montar (preenchido em s_race_setup)
 var pending_truck: int = -1
 var pending_setup_msec: int = 0             # T-156: when the setup arrived (clock of the face-to-face opening)
+## T-208: the server starts the common clock (opening + countdown) only when every player has built the race; until
+## then the clock waits at 0. s_state(COUNTDOWN) = it started now (pending_setup_msec moves to that moment).
+var race_clock_started: bool = false
 var room_state: int = Protocol.RoomState.LOBBY   # last state sent by the server (s_state)
 
 # --- depuracao de rede (P62): simula latencia e perda de pacotes
@@ -152,6 +155,12 @@ func start_race() -> void:
 	rpc_id(1, "c_start_race")
 
 
+## T-208: the race scene is built and the opening prepared (the server starts the clock when everybody is).
+func race_loaded() -> void:
+	if online and not is_server:
+		rpc_id(1, "c_race_loaded")
+
+
 ## Comandos do jogador (30/s). `tick` = numero do comando no cliente (usado como "ack" pelo servidor).
 func send_commands(tick: int, cmd: Commands) -> void:
 	if debug_loss > 0.0 and randf() < debug_loss:
@@ -234,6 +243,12 @@ func c_start_race() -> void:
 		host.on_start_race(multiplayer.get_remote_sender_id())
 
 
+@rpc("any_peer", "reliable")
+func c_race_loaded() -> void:
+	if is_server:
+		host.on_race_loaded(multiplayer.get_remote_sender_id())
+
+
 @rpc("any_peer", "unreliable")
 func c_commands(tick: int, steer: float, throttle: float, brake: float, passing: bool, horn: bool) -> void:
 	if is_server:
@@ -287,12 +302,19 @@ func s_race_setup(setup: Dictionary, my_truck: int) -> void:
 	pending_setup = setup
 	pending_truck = my_truck
 	pending_setup_msec = Time.get_ticks_msec()
+	race_clock_started = false
 	room_state = Protocol.RoomState.COUNTDOWN
 	race_setup_received.emit(setup, my_truck)
 
 
 @rpc("authority", "reliable")
 func s_state(state: int) -> void:
+	if state == Protocol.RoomState.COUNTDOWN and not pending_setup.is_empty():   # T-208: the common clock starts now
+		pending_setup["countdown"] = float(pending_setup.get("countdown_total", pending_setup.get("countdown", 0.0)))
+		pending_setup_msec = Time.get_ticks_msec()
+		race_clock_started = true
+	elif state == Protocol.RoomState.RACING:
+		race_clock_started = true
 	room_state = state
 	race_state_changed.emit(state)
 

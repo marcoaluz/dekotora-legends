@@ -20,6 +20,7 @@ class Member:
 	var connected: bool = true
 	var last_cmd: Commands = Commands.new()
 	var ack_tick: int = 0                       # ultimo comando do cliente aplicado
+	var loaded: bool = false                    # T-208: ja montou a corrida e preparou a abertura (c_race_loaded)
 
 
 var code: String = ""
@@ -42,6 +43,10 @@ var countdown_total: float = Protocol.COUNTDOWN_SECONDS
 var race_rules: Dictionary = {}                 # regras usadas nesta corrida (comboio: transito mais leve)
 ## O servidor liga depois de mandar o setup: o quadro que montou a corrida (lento) nao entra na contagem (T-156).
 var hold_first_frame: bool = false
+## T-208: depois do setup a sala espera todos os jogadores montarem a corrida (ou Protocol.LOAD_WAIT_MAX) e so entao
+## comeca a contagem; o servidor avisa a todos com s_state(COUNTDOWN) no mesmo instante (ninguem perde a abertura).
+var loading: bool = false
+var load_wait: float = 0.0
 var _last_race_sig: String = ""                 # mesma rota e mesmas pessoas da corrida anterior = revanche (versao curta)
 var _acc: float = 0.0
 var _prev_damage: Dictionary = {}               # truck_idx -> assinatura do dano
@@ -156,6 +161,10 @@ func try_start(peer: int, seed_: int) -> String:
 	_last_race_sig = sig
 	countdown_total = DuelPlan.total_seconds(intro)
 	countdown = countdown_total
+	loading = true
+	load_wait = 0.0
+	for p in order:
+		(members[p] as Member).loaded = false
 	return ""
 
 
@@ -204,9 +213,30 @@ func apply_command(peer: int, tick: int, steer: float, throttle: float, brake: f
 	m.ack_tick = tick
 
 
+## T-208: o jogador `peer` montou a corrida e esta pronto para ver a abertura.
+func mark_loaded(peer: int) -> void:
+	if members.has(peer):
+		(members[peer] as Member).loaded = true
+
+
+## Todos os jogadores conectados ja montaram a corrida?
+func all_loaded() -> bool:
+	for p in order:
+		var m: Member = members[p]
+		if m.connected and not m.loaded:
+			return false
+	return true
+
+
 ## Avanca a sala em tempo real (chamado todo frame pelo servidor).
 func advance(delta: float) -> void:
 	if state == Protocol.RoomState.COUNTDOWN:
+		if loading:                     # T-208: espera todos montarem a corrida; o quadro que libera nao conta
+			load_wait += delta
+			if all_loaded() or load_wait >= Protocol.LOAD_WAIT_MAX:
+				loading = false
+				hold_first_frame = false        # este quadro (o do aviso a todos) ja e o "segurado"
+			return
 		if hold_first_frame:            # T-156: os clientes contam a partir do setup; o servidor, do quadro seguinte
 			hold_first_frame = false
 			return

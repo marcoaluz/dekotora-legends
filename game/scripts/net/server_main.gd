@@ -189,6 +189,13 @@ func on_start_race(peer: int) -> void:
 	_broadcast_lobby(room)
 
 
+## T-208: o cliente montou a corrida (e preparou a abertura).
+func on_race_loaded(peer: int) -> void:
+	var room: Room = _room_of(peer)
+	if room != null and room.state == Protocol.RoomState.COUNTDOWN:
+		room.mark_loaded(peer)
+
+
 func on_commands(peer: int, tick: int, steer: float, throttle: float, brake: float, passing: bool, horn: bool = false) -> void:
 	var room: Room = _room_of(peer)
 	if room != null and room.state == Protocol.RoomState.RACING:
@@ -220,7 +227,11 @@ func _process(delta: float) -> void:
 	for code in rooms:
 		var room: Room = rooms[code]
 		var before: int = room.state
+		var was_loading: bool = room.loading
 		room.advance(delta)
+		if was_loading and not room.loading and room.state == Protocol.RoomState.COUNTDOWN:   # T-208: todos prontos
+			log_msg("sala %s: todos montaram a corrida em %.1f s; abertura e contagem comecam agora" % [room.code, room.load_wait])
+			_broadcast_state(room)                 # s_state(COUNTDOWN) = o relogio comum comeca neste instante
 		if room.state == Protocol.RoomState.RACING or room.state == Protocol.RoomState.FINISHED:
 			_send_race_updates(room, delta)
 		if before != room.state:

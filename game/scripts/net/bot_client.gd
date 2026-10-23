@@ -31,6 +31,7 @@ var _err_big: int = 0                   # snapshots com erro acima de 1 m
 var _start_predicted_msec: int = 0      # T-156: hora da largada pelo relogio da abertura (setup + ping)
 var _horn: String = ""                  # T-173: --horn=ID
 var _exhaust: String = ""               # T-173: --exhaust=ID
+var _load_delay: float = 0.0            # T-208: --load-delay=MS (simula um celular lento montando a corrida)
 
 
 func _ready() -> void:
@@ -69,6 +70,8 @@ func _ready() -> void:
 			_horn = a.substr(7)
 		elif a.begins_with("--exhaust="):
 			_exhaust = a.substr(10)
+		elif a.begins_with("--load-delay="):
+			_load_delay = float(a.substr(13)) / 1000.0
 	# perfil proprio e isolado para este bot (nao mexe no perfil real do Marco)
 	gs.save_path = "user://botclient_%s.json" % code
 	gs.new_profile()
@@ -96,6 +99,8 @@ func _ready() -> void:
 	Net.events_received.connect(_on_events)
 	Net.race_state_changed.connect(func(s: int) -> void:
 		print("[botclient %s] estado da sala: %d" % [_name, s])
+		if s == Protocol.RoomState.COUNTDOWN and sync != null:   # T-208: todos montaram; o relogio comum comeca agora
+			_predict_start(Net.pending_setup)
 		if s == Protocol.RoomState.RACING and _start_predicted_msec > 0:
 			print("[botclient %s] LARGADA: o servidor largou %d ms depois da hora prevista pelo relogio da abertura" % [_name, Time.get_ticks_msec() - _start_predicted_msec])
 		racing = s == Protocol.RoomState.RACING)
@@ -155,16 +160,24 @@ func _on_setup(setup: Dictionary, my_truck: int) -> void:
 	sync.predict = not ("--nopredict" in OS.get_cmdline_user_args())
 	sync.setup(setup, my_truck)
 	driver = BotDriver.new(BotDriver.Difficulty.NORMAL, 7 + my_truck, StartGrid.lane_x(my_truck), false, true)
-	# T-156: relogio da abertura/largada como o cliente de verdade calcula (setup + ping) para conferir a coerencia
-	var total: float = float(setup.get("countdown_total", Protocol.COUNTDOWN_SECONDS))
-	var left0: float = total - DuelPlan.online_elapsed(total, float(setup["countdown"]), Net.pending_setup_msec, Time.get_ticks_msec(), Net.ping_ms)
-	_start_predicted_msec = Time.get_ticks_msec() + int(left0 * 1000.0)
-	print("[botclient %s] abertura %s, contagem total %.1f s, largada prevista em %d ms" % [_name, String(setup.get("intro", "?")), total, int(left0 * 1000.0)])
+	print("[botclient %s] abertura %s, contagem total %.1f s" % [_name, String(setup.get("intro", "?")), float(setup.get("countdown_total", 0.0))])
+	# T-208: um jogador de verdade demora para montar a corrida; o servidor espera todos (--load-delay=MS simula)
+	get_tree().create_timer(_load_delay).timeout.connect(func() -> void:
+		print("[botclient %s] corrida montada depois de %.1f s: avisando o servidor" % [_name, _load_delay])
+		Net.race_loaded())
 	print("[botclient %s] corrida montada: %d caminhoes, meu indice %d, predicao %s" % [_name, sync.sim.trucks.size(), my_truck, sync.predict])
 	for entry in setup["grid"]:                 # T-173: o som que cada caminhao vai tocar (descritor da rede)
 		var lo: Dictionary = entry["loadout"]
 		print("[botclient %s] SOM: caminhao %d bot=%s buzina=%s escape=%s motor=%s" % [_name, int(entry["idx"]), str(bool(entry["bot"])),
 			String(lo.get("horn", "?")), String(lo.get("exhaust", "?")), String(EngineSounds.from_descriptor(lo)["set"])])
+
+
+## T-156: relogio da abertura/largada como o cliente de verdade calcula (inicio do relogio + ping).
+func _predict_start(setup: Dictionary) -> void:
+	var total: float = float(setup.get("countdown_total", Protocol.COUNTDOWN_SECONDS))
+	var left0: float = total - DuelPlan.online_elapsed(total, float(setup["countdown"]), Net.pending_setup_msec, Time.get_ticks_msec(), Net.ping_ms)
+	_start_predicted_msec = Time.get_ticks_msec() + int(left0 * 1000.0)
+	print("[botclient %s] relogio comum comecou: abertura e contagem de %.1f s, largada prevista em %d ms" % [_name, total, int(left0 * 1000.0)])
 
 
 func _on_events(events: Array) -> void:

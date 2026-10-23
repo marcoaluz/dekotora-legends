@@ -2,6 +2,7 @@
 # Teste de ponta a ponta do multiplayer: 1 servidor + 2 clientes automaticos no mesmo PC.
 # Uso: bash tools/net_test.sh [latencia_ms] [perda]    (padrao: 0 e 0)
 # BODY=graneleira bash tools/net_test.sh  -> o cliente Beto corre com essa carroceria
+# T-208: LOAD_DELAY=4000 bash tools/net_test.sh -> o Beto demora 4 s para "montar a corrida"; a Ana espera e larga junto.
 # T-173: Beto corre com HORN (padrao horn_ship_deep) e EXH (padrao exh_stack); Ana precisa receber os dois no descritor.
 source "$(dirname "$0")/env.sh"
 LAT=${1:-0}; LOSS=${2:-0}
@@ -21,7 +22,7 @@ for i in $(seq 1 40); do
   sleep 0.5
 done
 echo "sala criada: $CODE"
-"$GODOT" --headless --path game -- --bot-client --port=$PORT --name=Beto --code=BETO3333 --join=$CODE --latency=$LAT --loss=$LOSS ${BODY:+--body=$BODY} --horn=$HORN --exhaust=$EXH > "$LOGDIR/beto.log" 2>&1 &
+"$GODOT" --headless --path game -- --bot-client --port=$PORT --name=Beto --code=BETO3333 --join=$CODE --latency=$LAT --loss=$LOSS ${BODY:+--body=$BODY} --horn=$HORN --exhaust=$EXH ${LOAD_DELAY:+--load-delay=$LOAD_DELAY} > "$LOGDIR/beto.log" 2>&1 &
 BETO=$!
 wait $ANA; RA=$?
 wait $BETO; RB=$?
@@ -30,7 +31,7 @@ echo "--- servidor"; grep -E "^\[servidor\]" "$LOGDIR/server.log" | head -20
 echo "--- Ana (saida $RA)"; grep -E "RESULTADO|PRED:|LARGADA|abertura|erro_pred|erro do servidor|desconectado" "$LOGDIR/ana.log" | tail -9
 echo "--- Beto (saida $RB)"; grep -E "RESULTADO|PRED:|LARGADA|abertura|erro_pred|erro do servidor|desconectado" "$LOGDIR/beto.log" | tail -9
 echo "--- carro acidentado (T-183: estado no snapshot, protocolo 8)"; grep -h "ACIDENTADOS:" "$LOGDIR/ana.log" "$LOGDIR/beto.log"
-echo "--- largada (T-156: abertura e relogio comum)"; grep -hE "abertura|LARGADA" "$LOGDIR/ana.log" "$LOGDIR/beto.log"
+echo "--- largada (T-156: abertura e relogio comum; T-208: o servidor espera todos montarem, LOAD_DELAY=ms atrasa o Beto)"; grep -hE "todos montaram" "$LOGDIR/server.log"; grep -hE "abertura|LARGADA|relogio comum|corrida montada depois" "$LOGDIR/ana.log" "$LOGDIR/beto.log"
 echo "--- som (T-173: buzina e escapamento no descritor)"; grep -h "SOM:" "$LOGDIR/ana.log"
 SOM_OK=0
 if grep -q "SOM:.*bot=false buzina=$HORN escape=$EXH" "$LOGDIR/ana.log"; then echo "SOM_REDE: OK (Ana ouve a buzina $HORN e o escape $EXH do Beto)"; else echo "SOM_REDE: FALHOU"; SOM_OK=1; fi
