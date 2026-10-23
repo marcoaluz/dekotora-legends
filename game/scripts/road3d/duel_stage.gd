@@ -1,249 +1,191 @@
 class_name DuelStage
 extends Node3D
-## Set of the face-to-face opening (T-156), far below the race world (nothing of the road is in view): the two
-## real race trucks are parked nose to nose here. Built only from cheap pieces that already exist:
-##   night / dusk -> highway rest area (parking area: wet asphalt, convenience store, vending machines, sodium
-##                   lamps, neon signs, an outdoor of the T-146 kit)
-##   day          -> toll plaza (2x toll_gate.glb, booths, ETC/一般 lane signs, jersey barriers, pines)
-## Boxes are merged by material (MeshBatch): the whole set costs ~10-14 draw calls; at most 2 omni lights.
-## Stage space: trucks along X (player on -X facing +X, rival on +X facing -X), noses GAP m apart around x = 0,
-## camera side = +Z. The sky, fog and sun are the route's (same time of day as the race).
+## Set of the duel opening (T-156, redone in T-204): a black studio far below the race world (nothing of the road is
+## in view) with purple ground fog (DuelFog), a glossy black floor, a key light, two violet rim lights, the light of
+## the strike, and the two guardians of our own art behind the trucks inside their flame auras: RAIJIN (thunder,
+## ring of drums) behind the player on the left and FUJIN (wind, wind bag) behind the rival on the right.
+## The camera gets the studio Environment (black background, glow) while the opening runs; DuelIntro gives the
+## race's own one back at the end. Cost: ~8 draw calls + the trucks; 4 lights.
 
 const ORIGIN := Vector3(0.0, -400.0, 0.0)
-const GAP: float = 4.0                  # m between the two noses
-const SODIUM := Color("#ffb060")
-const WARM := Color("#fff1d6")
+const GOD_TEX: Array[String] = ["res://assets/textures/duel/raijin.png", "res://assets/textures/duel/fujin.png"]
+const AURA_TEX := "res://assets/textures/duel/aura.png"
+const AURA_TINT: Array[Color] = [Color(1.0, 0.72, 0.28), Color(0.3, 0.9, 1.0)]   # thunder gold / wind cyan
+const GOD_X: float = 9.0                 # guardians stand behind and outside the trucks
+const GOD_Z: float = -17.0
+const GOD_H: float = 13.0                # m (the art is 1024x1280)
+const GOD_BASE_Y: float = 1.0            # bottom of the cloud when fully risen (hidden by the trucks)
 
-var rest_area: bool = true
-var _tod: TimeOfDay
-var _batch := MeshBatch.new(1000.0, 1200.0)
-var _mats: Dictionary = {}
+var quality: int = 1
+var fog: DuelFog
+var _gods: Array[MeshInstance3D] = []
+var _auras: Array[MeshInstance3D] = []
+var _strike: OmniLight3D
+var _env: Environment
 
 
-## Builds the set for the time of day (`tod.headlights` = night or dusk -> rest area).
-func build(tod: TimeOfDay) -> void:
+func build(q: int) -> void:
 	position = ORIGIN
-	_tod = tod
-	rest_area = tod.headlights
-	_ground(tod)
-	if rest_area:
-		_rest_area()
-	else:
-		_toll_plaza(tod)
-	_batch.commit(self)
-	_extras_people()
+	quality = q
+	_floor()
+	_lights()
+	fog = DuelFog.new()
+	add_child(fog)
+	fog.build(UltraLook.active(q))
+	for n in 2:
+		_guardian(n)
 
 
-## T-186: the two drivers standing by the cab door of their trucks (camera side), shirt in the truck's paint.
-func add_drivers(colors: Array[Color]) -> void:
-	var xs: Array = []
-	var looks: Array = []
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 156
-	for n in mini(colors.size(), 2):
+## Environment for the studio camera: black background, violet ambience, glow; Ultra adds volumetric fog and
+## reflections on the floor.
+func environment() -> Environment:
+	if _env != null:
+		return _env
+	# Black studio "sky" with a faint violet band at the horizon. It is the background AND the reflection of the
+	# chrome (the Compatibility renderer draws the sky even with a colour background, so the sky is the background).
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_top_color = Color("#010002")
+	sky_mat.sky_horizon_color = Color("#2c1450")
+	sky_mat.sky_curve = 0.06
+	sky_mat.ground_horizon_color = Color("#1c0c32")
+	sky_mat.ground_bottom_color = Color("#010002")
+	sky_mat.ground_curve = 0.04
+	sky_mat.sky_energy_multiplier = 1.0
+	sky_mat.sun_angle_max = 0.0
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+	sky.radiance_size = Sky.RADIANCE_SIZE_64
+	var env := Environment.new()
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color("#3c2a5c")
+	env.ambient_light_energy = 0.6
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	env.fog_enabled = true
+	env.fog_light_color = Color("#120820")
+	env.fog_density = 0.016
+	env.fog_sky_affect = 0.0
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.06
+	env.adjustment_saturation = 1.08
+	env.glow_enabled = quality >= 1
+	env.glow_intensity = 0.7
+	env.glow_strength = 0.9
+	env.glow_bloom = 0.04
+	env.glow_hdr_threshold = 1.0
+	env.set_glow_level(4, 0.4)
+	if UltraLook.active(quality):
+		env.volumetric_fog_enabled = true
+		env.volumetric_fog_density = 0.0
+		env.volumetric_fog_albedo = Color(0.6, 0.45, 1.0)
+		env.volumetric_fog_length = 70.0
+		env.volumetric_fog_detail_spread = 2.0
+		env.volumetric_fog_sky_affect = 0.0
+		env.ssr_enabled = true
+	_env = env
+	return env
+
+
+## Every frame of the opening: guardians rising behind the trucks, auras turning and pulsing, fog drifting, the
+## light of the strike.
+func update(t: float, reduced: bool) -> void:
+	var vis: float = DuelPlan.guard_in(t)
+	for n in 2:
 		var side: float = -1.0 if n == 0 else 1.0
-		var p := Vector3(side * (GAP * 0.5 + 2.4), 0.0, 2.3)
-		xs.append(PeopleKit.stand(p, Vector3(-side * 0.8, 0.0, 1.0), 1.0))
-		looks.append(PeopleKit.look(rng, colors[n]))
-	add_child(PeopleKit.group(xs, looks, _tod, "drivers"))
-
-
-## T-186: people of the place: shoppers at the store and the vending machines (rest area) or toll staff by the booths.
-func _extras_people() -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 186
-	var xs: Array = []
-	var looks: Array = []
-	if rest_area:
-		for i in 2:                                           # at the vending machines, looking at them
-			xs.append(PeopleKit.stand(Vector3(13.0 + float(i) * 2.2, 0.0, -12.3), Vector3(0.1, 0.0, -1.0), rng.randf_range(0.94, 1.04)))
-			looks.append(PeopleKit.look(rng))
-		for p in [Vector3(-6.0, 0.0, -12.4), Vector3(-4.8, 0.0, -11.8), Vector3(-11.0, 0.0, -7.0)]:   # store door, lamp
-			xs.append(PeopleKit.stand(p, Vector3(rng.randf_range(-1.0, 1.0), 0.0, 1.0), rng.randf_range(0.94, 1.04)))
-			looks.append(PeopleKit.look(rng))
-	else:
-		for i in 3:                                           # toll staff next to the booths, facing the trucks
-			xs.append(PeopleKit.stand(Vector3(-16.0 + float(i) * 8.0 + 1.1, 0.25, -15.4), Vector3(0.2, 0.0, 1.0), rng.randf_range(0.95, 1.03)))
-			looks.append(PeopleKit.look(rng, PeopleKit.STAFF))
-	add_child(PeopleKit.group(xs, looks, _tod, "people"))
-
-
-## Transform (stage -> world) for a truck of nose offset `front` (m from its rear to its nose) on side -1 (player,
-## facing +X) or +1 (rival, facing -X). TruckNode: origin = rear of the box, front = -Z.
-func truck_xform(side: float, front: float) -> Transform3D:
-	var yaw: float = -PI * 0.5 if side < 0.0 else PI * 0.5
-	var rear_x: float = side * (GAP * 0.5 + front)
-	return Transform3D(Basis(Vector3.UP, yaw), ORIGIN + Vector3(rear_x, 0.0, 0.0))
+		var rise: float = 1.0 - pow(1.0 - vis, 2.0)
+		var y: float = lerpf(GOD_BASE_Y - 3.0, GOD_BASE_Y, rise) + 0.12 * sin(t * 2.2 + float(n) * 1.7) * vis
+		_gods[n].visible = vis > 0.0
+		_gods[n].position = Vector3(side * GOD_X, y + GOD_H * 0.5, GOD_Z)
+		(_gods[n].material_override as StandardMaterial3D).albedo_color = Color(1.06, 1.06, 1.06, vis)
+		_auras[n].visible = vis > 0.0
+		_auras[n].position = Vector3(side * GOD_X, y + GOD_H * 0.6, GOD_Z - 0.4)
+		var pulse: float = 1.0 + 0.05 * sin(t * 6.0 + float(n))
+		_auras[n].basis = Basis(Vector3.BACK, t * 0.35 * side).scaled(Vector3.ONE * lerpf(0.6, 1.0, rise) * pulse)
+		var tint: Color = AURA_TINT[n]
+		(_auras[n].material_override as StandardMaterial3D).albedo_color = Color(tint.r * 1.6, tint.g * 1.6, tint.b * 1.6, 0.85 * vis)
+	fog.update(t)
+	var bs: Vector2 = DuelPlan.bolt_state(t, reduced)
+	_strike.visible = bs.y > 0.0
+	_strike.light_energy = (4.0 if reduced else 14.0) * bs.y * bs.x
 
 
 # ---------------------------------------------------------------- pieces
 
-func _mat(col: Color, emit: float = 0.0, rough: float = 0.6) -> StandardMaterial3D:
-	var k: String = "%s|%.2f|%.2f" % [col.to_html(), emit, rough]
-	if not _mats.has(k):
-		_mats[k] = MenuBackdrop.mat(col, emit, rough)
-	return _mats[k]
-
-
-func _box(size: Vector3, pos: Vector3, col: Color, emit: float = 0.0, rough: float = 0.6) -> void:
-	var bm := BoxMesh.new()
-	bm.size = size
-	bm.material = _mat(col, emit, rough)
-	_batch.add(bm, Transform3D(Basis(), pos), 0.0)
-
-
-func _glb(path: String, xf: Transform3D) -> void:
-	var s: PackedScene = load(path) as PackedScene
-	if s == null:
-		return
-	var n: Node3D = s.instantiate() as Node3D
-	n.transform = xf
-	add_child(n)
-	for m in n.find_children("*", "GeometryInstance3D", true, false):
-		(m as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-
-
-func _ground(tod: TimeOfDay) -> void:
-	var asphalt := MeshInstance3D.new()
+func _floor() -> void:
+	var mi := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
-	pm.size = Vector2(150, 150)
-	asphalt.mesh = pm
+	pm.size = Vector2(240.0, 240.0)
 	var m := StandardMaterial3D.new()
-	m.albedo_texture = load("res://assets/textures/asphalt_albedo.png") as Texture2D
-	m.albedo_color = Color(0.32, 0.32, 0.34) if rest_area else Color(0.62, 0.62, 0.62)
-	m.uv1_scale = Vector3(36, 36, 1)
-	m.roughness = 0.34 if rest_area else 0.85          # rest area at night: wet, the lights become streaks
-	m.metallic_specular = 0.7 if rest_area else 0.4
-	asphalt.material_override = m
-	asphalt.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(asphalt)
-	var field := MeshInstance3D.new()                   # far ground up to the fog (hides the edge of the set)
-	var fm := PlaneMesh.new()
-	fm.size = Vector2(1600, 1600)
-	field.mesh = fm
-	var g := StandardMaterial3D.new()
-	g.albedo_texture = load("res://assets/textures/grass.png") as Texture2D
-	g.uv1_scale = Vector3(220, 220, 1)
-	g.albedo_color = Color(0.5, 0.56, 0.45).lerp(Color(0.9, 0.95, 0.85), tod.day_amount)
-	field.material_override = g
-	field.position.y = -0.04
-	field.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(field)
-	var line := Color(0.86, 0.86, 0.8)
-	for zz in [-3.6, 3.6]:                             # lane edges of the aisle where the trucks stand
-		_box(Vector3(46.0, 0.012, 0.18), Vector3(0, 0.006, zz), line, 0.15, 0.5)
-	_box(Vector3(0.3, 0.013, 7.0), Vector3(0, 0.007, 0), Color(0.95, 0.85, 0.2), 0.3, 0.5)   # yellow line between the noses
+	m.albedo_color = Color("#0a0710")
+	m.roughness = 0.22
+	m.metallic_specular = 0.6
+	pm.material = m
+	mi.mesh = pm
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.name = "Floor"
+	add_child(mi)
 
 
-## Parking area at night: store with lit windows behind the trucks, vending machines, lamps, neon, outdoor.
-func _rest_area() -> void:
-	var dark := Color(0.09, 0.09, 0.1)
-	var fz: float = -14.0                                                             # store front (behind the trucks)
-	_box(Vector3(48.0, 6.4, 9.0), Vector3(0, 3.2, fz - 4.5), dark)                    # store
-	_box(Vector3(30.0, 2.6, 0.12), Vector3(-5.0, 1.6, fz + 0.06), Color(0.62, 0.55, 0.42), 0.14, 0.2)   # shop window
-	for x in range(-20, 12, 4):
-		_box(Vector3(0.16, 2.7, 0.16), Vector3(float(x), 1.6, fz + 0.1), Color(0.15, 0.15, 0.16))
-	_box(Vector3(48.2, 1.2, 0.4), Vector3(0, 5.4, fz + 0.1), Color(0.16, 0.16, 0.2))
-	_box(Vector3(48.0, 0.09, 0.09), Vector3(0, 4.75, fz + 0.32), UiTheme.CYAN, 5.0)   # cyan neon strip
-	var fronts: Array[Color] = [Color("#e8f2ff"), Color("#ff4060"), Color("#e8f2ff"), Color("#40a0ff"), Color("#ffe080"), Color("#e8f2ff")]
-	for i in fronts.size():                                                           # vending machines
-		var x: float = 12.5 + float(i) * 1.05
-		_box(Vector3(1.0, 1.9, 0.9), Vector3(x, 0.95, fz + 0.5), Color(0.75, 0.76, 0.8), 0.0, 0.4)
-		_box(Vector3(0.8, 1.3, 0.05), Vector3(x, 1.15, fz + 0.97), fronts[i], 2.2, 0.3)
-	for i in 7:                                                                       # stalls of the truck parking (camera side)
-		_box(Vector3(0.14, 0.012, 9.0), Vector3(-21.0 + float(i) * 7.0, 0.006, 10.0), Color(0.85, 0.85, 0.8), 0.15, 0.5)
-	for p in [Vector3(-12.0, 0, -8.0), Vector3(12.0, 0, -8.0), Vector3(-10.0, 0, 15.0), Vector3(14.0, 0, 15.0)]:
-		_lamp(p, SODIUM, 6.0)
-	var tower := Vector3(21.0, 0, -10.0)                                              # tall sign with 爆走
-	_box(Vector3(0.5, 12.0, 0.5), tower + Vector3(0, 6.0, 0), Color(0.25, 0.25, 0.28))
-	_box(Vector3(4.6, 2.2, 0.5), tower + Vector3(0, 12.0, 0), Color(0.08, 0.06, 0.1))
-	for e in [Vector3(0, 1.12, 0), Vector3(0, -1.12, 0)]:                            # thin pink frame
-		_box(Vector3(4.7, 0.1, 0.1), tower + Vector3(0, 12.0, 0.28) + e, UiTheme.PINK, 4.0)
-	for e2 in [Vector3(2.32, 0, 0), Vector3(-2.32, 0, 0)]:
-		_box(Vector3(0.1, 2.3, 0.1), tower + Vector3(0, 12.0, 0.28) + e2, UiTheme.PINK, 4.0)
-	MenuBackdrop.neon(self, "爆走", tower + Vector3(0, 12.0, 0.32), UiTheme.GOLD, 0.04, 48, 0.0)
-	MenuBackdrop.neon(self, "ドライブイン 街道", Vector3(-7.0, 7.2, fz + 0.4), UiTheme.PINK, 0.06, 48, 0.0)
-	MenuBackdrop.neon(self, "24H", Vector3(12.0, 7.2, fz + 0.4), UiTheme.CYAN, 0.052, 36, 0.0)
-	_billboard(Vector3(-30.0, 0.0, -10.0), 2)
-	for i in 11:                                                                      # barrier far behind the camera
-		_glb_jersey(Vector3(-17.5 + float(i) * 3.5, 0.0, 30.0))
-	MenuBackdrop.omni(self, Vector3(0.0, 7.5, 5.0), SODIUM, 1.5, 24.0)               # sodium light over the trucks
-	MenuBackdrop.omni(self, Vector3(-4.0, 3.0, fz + 3.0), WARM, 1.0, 14.0)           # shop light from behind
+func _lights() -> void:
+	var key := SpotLight3D.new()                                  # above and in front of the trucks
+	key.light_color = Color("#f2eaff")
+	key.light_energy = 5.0
+	key.spot_range = 45.0
+	key.spot_angle = 38.0
+	key.spot_angle_attenuation = 1.4
+	key.shadow_enabled = quality >= 2
+	key.transform = Transform3D(Basis.looking_at(Vector3(0.0, 1.0, -3.0) - Vector3(0.0, 12.0, 13.0), Vector3.UP), Vector3(0.0, 12.0, 13.0))
+	add_child(key)
+	for s in [-1.0, 1.0]:                                         # violet rim lights behind the trucks
+		var rim := OmniLight3D.new()
+		rim.light_color = Color("#a24cff")
+		rim.light_energy = 4.0
+		rim.omni_range = 20.0
+		rim.position = Vector3(s * 7.0, 5.0, -13.0)
+		add_child(rim)
+	_strike = OmniLight3D.new()                                   # the lightning hitting the floor between them
+	_strike.light_color = Color(0.82, 0.78, 1.0)
+	_strike.omni_range = 30.0
+	_strike.position = Vector3(0.0, 6.0, -2.0)
+	_strike.visible = false
+	add_child(_strike)
 
 
-## Toll plaza by day: two canopies of the track's toll gate behind the trucks, booths, lane signs, pines.
-func _toll_plaza(tod: TimeOfDay) -> void:
-	var path: String = "res://assets/scenery/toll_gate.glb"
-	for x in [-9.6, 9.6]:
-		_glb(path, Transform3D(Basis(), Vector3(x, 0.0, -17.0)))
-	var concrete := Color(0.78, 0.77, 0.74)
-	for i in 5:                                                                       # booths with lit windows
-		var x: float = -16.0 + float(i) * 8.0
-		_box(Vector3(1.6, 0.25, 9.0), Vector3(x, 0.12, -17.0), Color(0.95, 0.75, 0.1), 0.0, 0.7)   # island kerb
-		_box(Vector3(1.3, 2.4, 2.4), Vector3(x, 1.45, -17.0), concrete, 0.0, 0.7)
-		_box(Vector3(1.32, 0.9, 1.6), Vector3(x, 1.9, -17.0), Color(0.45, 0.6, 0.7), 0.25, 0.2)
-		_box(Vector3(0.14, 1.1, 0.14), Vector3(x + 0.9, 0.55, -12.8), Color(0.2, 0.2, 0.2))
-		_box(Vector3(0.1, 0.1, 3.0), Vector3(x + 0.9, 1.05, -11.3), Color(0.95, 0.95, 0.95), 0.2)   # gate arm
-	for i in 4:                                                                       # lane signs under the canopy: ETC / 一般
-		var x2: float = -12.0 + float(i) * 8.0
-		var etc: bool = i % 2 == 0
-		_box(Vector3(2.0, 0.8, 0.12), Vector3(x2, 4.75, -13.5), Color("#6a2fa0") if etc else Color("#17703c"), 0.0, 0.5)
-		_day_text("ETC" if etc else "一般", Vector3(x2, 4.75, -13.42), 0.011)
-	for px in [-6.6, 6.6]:                                                            # green gantry sign above the plaza
-		_box(Vector3(0.3, 9.2, 0.3), Vector3(px, 4.6, -12.6), Color(0.55, 0.57, 0.6), 0.0, 0.5)
-	_box(Vector3(13.6, 2.0, 0.16), Vector3(0.0, 8.3, -12.5), Color("#17703c"), 0.0, 0.5)
-	_box(Vector3(13.8, 2.2, 0.1), Vector3(0.0, 8.3, -12.6), Color(0.92, 0.92, 0.92), 0.0, 0.5)   # white border
-	_day_text("料金所  TOLL GATE", Vector3(0.0, 8.3, -12.4), 0.016)
-	for i in 11:
-		_glb_jersey(Vector3(-17.5 + float(i) * 3.5, 0.0, 30.0))
-	for p in [Vector3(-12.0, 0, 8.5), Vector3(12.0, 0, 8.5)]:
-		_lamp(p, Color(0.9, 0.95, 1.0), 1.2)
-	var kinds: Array[String] = ["tree_pine", "tree_cedar", "tree_round"]             # T-186: + Japanese cedar
-	for i in 12:                                                                      # tree line closing the view
-		var ang: float = float(i) / 12.0 * TAU
-		var r: float = 38.0 + float(i % 3) * 6.0
-		var tree := MeshInstance3D.new()                                            # T-192: folhagem em camadas
-		tree.mesh = BackdropKit.tree_mesh_of(kinds[i % 3], _tod)
-		tree.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		tree.transform = Transform3D(Basis(Vector3.UP, ang).scaled(Vector3.ONE * (1.8 + 0.3 * float(i % 3))),
-			Vector3(sin(ang) * r, 0.0, cos(ang) * r))
-		add_child(tree)
-	_billboard(Vector3(26.0, 0.0, -24.0), 1)
-
-
-## White painted text of a road sign (daylight: no glow, no outline).
-func _day_text(text: String, pos: Vector3, px: float) -> void:
-	var t: Label3D = MenuBackdrop.neon(self, text, pos, Color.WHITE, px * 2.0, 48, 0.0)
-	t.modulate = Color(0.95, 0.95, 0.95)
-	t.outline_size = 0
-
-
-func _lamp(p: Vector3, col: Color, emit: float) -> void:
-	var s: float = -signf(p.x)
-	_box(Vector3(0.22, 8.0, 0.22), p + Vector3(0, 4.0, 0), Color(0.3, 0.3, 0.32))
-	_box(Vector3(1.4, 0.14, 0.14), p + Vector3(0.6 * s, 7.9, 0), Color(0.3, 0.3, 0.32))
-	_box(Vector3(0.7, 0.12, 0.35), p + Vector3(1.2 * s, 7.8, 0), col, emit)
-
-
-func _glb_jersey(p: Vector3) -> void:
-	_batch.add(RoadsideKit.mesh("barrier_jersey", _tod), Transform3D(Basis(Vector3.UP, PI * 0.5), p), 0.0)
-
-
-## Outdoor of the T-146 kit with one of its (fictional, swappable) arts.
-func _billboard(p: Vector3, art: int) -> void:
-	_batch.add(RoadsideKit.mesh("billboard_tall", _tod), Transform3D(Basis(), p), 0.0)
-	var tex: Texture2D = RoadsideKit.art(art)
-	if tex == null:
-		return
-	var q := MeshInstance3D.new()
-	var qm := QuadMesh.new()
-	qm.size = RoadsideKit.BILL_ART
-	q.mesh = qm
+func _guardian(n: int) -> void:
+	var god := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(GOD_H * 1024.0 / 1280.0, GOD_H)
+	god.mesh = q
 	var m := StandardMaterial3D.new()
-	m.albedo_texture = tex
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.albedo_color = Color(0.85, 0.85, 0.85) if rest_area else Color.WHITE
-	q.material_override = m
-	q.position = p + Vector3(0.0, float(RoadsideKit.BILL_LEG["billboard_tall"]) + RoadsideKit.BILL_ART.y * 0.5, 0.02)
-	q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(q)
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	m.albedo_texture = load(GOD_TEX[n]) as Texture2D
+	m.disable_fog = true
+	god.material_override = m
+	god.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	god.visible = false
+	god.name = "Raijin" if n == 0 else "Fujin"
+	var aura := MeshInstance3D.new()
+	var aq := QuadMesh.new()
+	aq.size = Vector2(GOD_H * 1.12, GOD_H * 1.12)
+	aura.mesh = aq
+	var am := StandardMaterial3D.new()
+	am.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	am.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	am.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	am.cull_mode = BaseMaterial3D.CULL_DISABLED
+	am.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	am.albedo_texture = load(AURA_TEX) as Texture2D
+	am.disable_fog = true
+	aura.material_override = am
+	aura.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	aura.visible = false
+	aura.name = "Aura" + god.name
+	add_child(aura)
+	add_child(god)
+	_auras.append(aura)
+	_gods.append(god)

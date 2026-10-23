@@ -1,10 +1,11 @@
 extends TestCase
-## T-156: abertura "frente a frente" antes da largada, campanha 1 contra 1, grid lado a lado, comboio online.
+## T-156: abertura do duelo antes da largada, campanha 1 contra 1, grid lado a lado, comboio online.
+## T-204: abertura nova (estudio preto, guardioes, titulo, raio com clarao seguro, arrancada), 8 s ao todo.
 
 
-func test_timeline_full_is_8_to_10_s_and_short_is_3_s() -> void:
-	var full: float = DuelPlan.total_seconds(DuelPlan.FULL)
-	check(full >= 8.0 and full <= 10.0, "abertura cheia + contagem entre 8 e 10 s (%.1f)" % full)
+func test_timeline_full_is_8_s_and_short_is_3_s() -> void:
+	check_near(DuelPlan.total_seconds(DuelPlan.FULL), 8.0, 0.001, "T-204: abertura cheia + contagem = 8 s")
+	check_near(DuelPlan.intro_seconds(DuelPlan.FULL), 5.0, 0.001, "5 s de cena antes da contagem de 3 s")
 	check_near(DuelPlan.total_seconds(DuelPlan.SHORT), 3.0, 0.001, "versao curta = so a contagem (3 s)")
 	check_near(DuelPlan.intro_seconds(DuelPlan.NONE), 0.0, 0.001, "sem abertura")
 	var names: Array[String] = []
@@ -14,12 +15,137 @@ func test_timeline_full_is_8_to_10_s_and_short_is_3_s() -> void:
 		if names.is_empty() or names[-1] != ph:
 			names.append(ph)
 		t += 0.05
-	check_eq(",".join(names), "face,player,rival,vs,count", "ordem: frente a frente, jogador, rival, VS, contagem")
-	var details: Array[String] = []
-	for p in [0.1, 0.45, 0.8]:
-		details.append(String(DuelPlan.detail_at("player", p)[0]))
-	check_eq(",".join(details), "bumper,visor,mural", "detalhes do jogador: para-choque, viseira (andon), mural")
+	check_eq(",".join(names), "enter,guard,title,bolt,launch,count", "ordem: entrada, guardioes, titulo, raio, arrancada, contagem")
+	check(DuelPlan.BOLT_AT >= DuelPlan.phase_start("bolt") and DuelPlan.BOLT_AT < DuelPlan.phase_start("launch"), "o raio cai na fase do raio")
 	check(DuelPlan.ALIGN_S + RaceCinema.START_CUT_BEFORE <= Protocol.COUNTDOWN_SECONDS + 0.001, "alinhamento cabe antes do corte da largada")
+
+
+## T-204: fotossensibilidade. Um unico clarao branco de ~0,15 s (nunca mais de 1 por segundo); com "reduzir
+## claroes" nenhuma tela branca, so um brilho violeta suave e lento.
+func test_single_short_flash_and_reduced_mode() -> void:
+	var dt: float = 1.0 / 240.0
+	var rises: int = 0
+	var lit: float = 0.0
+	var was: bool = false
+	var max_soft: float = 0.0
+	var reduced_white: float = 0.0
+	var extra_soft: float = 0.0
+	var t: float = 0.0
+	while t < DuelPlan.total_seconds(DuelPlan.FULL):
+		var a: float = DuelPlan.flash_alpha(t, false)
+		if a > 0.0 and not was:
+			rises += 1
+		if a > 0.0:
+			lit += dt
+		was = a > 0.0
+		reduced_white = maxf(reduced_white, DuelPlan.flash_alpha(t, true))
+		max_soft = maxf(max_soft, DuelPlan.soft_alpha(t, true))
+		extra_soft = maxf(extra_soft, DuelPlan.soft_alpha(t, false))
+		t += dt
+	check_eq(rises, 1, "um clarao so")
+	check(lit <= 0.16 and lit >= 0.1, "clarao curto (%.3f s)" % lit)
+	check(DuelPlan.FLASH_PEAK < 1.0, "pico abaixo do branco total")
+	check_eq(reduced_white, 0.0, "reduzir claroes: nenhuma tela branca")
+	check(max_soft > 0.05 and max_soft <= 0.25, "reduzir claroes: brilho suave (%.2f)" % max_soft)
+	check_eq(extra_soft, 0.0, "sem o modo reduzido nao ha brilho violeta extra")
+	var bright: int = 0
+	var on: bool = false
+	t = 0.0
+	while t < DuelPlan.total_seconds(DuelPlan.FULL):                 # o raio aparece uma vez (sem re-piscar)
+		var b: bool = DuelPlan.bolt_state(t, false).y > 0.0
+		if b and not on:
+			bright += 1
+		on = b
+		t += dt
+	check_eq(bright, 1, "um raio so")
+	check(DuelPlan.bolt_state(DuelPlan.BOLT_AT + 0.05, true).y < DuelPlan.bolt_state(DuelPlan.BOLT_AT + 0.05, false).y, "raio mais fraco no modo reduzido")
+
+
+func test_overlay_curves() -> void:
+	check_near(DuelPlan.black_alpha(0.0), 1.0, 0.001, "comeca na tela preta")
+	check_near(DuelPlan.black_alpha(1.0), 0.0, 0.001, "a cena aparece")
+	check_near(DuelPlan.black_alpha(DuelPlan.intro_seconds(DuelPlan.FULL) - 0.001), 1.0, 0.02, "corte seco para a pista")
+	var title0: float = DuelPlan.phase_start("title")
+	check_eq(DuelPlan.title_state(title0 - 0.05).y, 0.0, "titulo antes do tambor: escondido")
+	check_near(DuelPlan.title_state(title0 + 0.3).x, 1.0, 0.001, "titulo assentado depois da batida")
+	check_near(DuelPlan.title_state(title0 + 0.3).y, 1.0, 0.001, "titulo visivel")
+	check(DuelPlan.title_state(title0 + 0.02).x > 1.5, "titulo entra grande (batida)")
+	check_near(DuelPlan.bands_in(title0 + 0.6), 1.0, 0.001, "faixas dos dois pilotos embaixo")
+	check_near(DuelPlan.bands_in(DuelPlan.phase_start("launch") + 0.3), 0.0, 0.001, "faixas saem na arrancada")
+	check_eq(DuelPlan.guard_in(DuelPlan.phase_start("guard") - 0.01), 0.0, "guardioes so depois da entrada")
+	check_near(DuelPlan.guard_in(title0), 1.0, 0.001, "guardioes inteiros no titulo")
+
+
+## Os caminhoes entram pelos lados em angulo, param lado a lado de frente para a camera e arrancam para ela.
+func test_truck_moves_enter_stop_side_by_side_and_launch() -> void:
+	for n in 2:
+		var side: float = -1.0 if n == 0 else 1.0
+		var a: Dictionary = DuelShots.truck_pose(n, 0.0)
+		var nose: Vector3 = a["nose"]
+		var dir: Vector3 = a["dir"]
+		check(nose.x * side > 25.0 and nose.z < -20.0, "%d: vem de longe, pelo lado da tela (%.1f, %.1f)" % [n, nose.x, nose.z])
+		check(dir.x * side < -0.4 and dir.z > 0.3, "%d: entra em angulo, para dentro e para a camera" % n)
+		var parked: Dictionary = DuelShots.truck_pose(n, DuelPlan.phase_start("guard"))
+		check(Vector3(parked["nose"]).distance_to(Vector3(side * DuelShots.SIDE_X, 0, 0)) < 0.001, "%d: parado no lugar" % n)
+		check(Vector3(parked["dir"]).distance_to(Vector3(0, 0, 1)) < 0.001, "%d: de frente para a camera" % n)
+		check_eq(float(parked["speed"]), 0.0, "%d: parado" % n)
+		var last: float = 999.0
+		var t: float = 0.0
+		var braking: bool = true
+		while t < DuelPlan.phase_len("enter") * DuelShots.STOP_AT:
+			var sp: float = float(DuelShots.truck_pose(n, t)["speed"])
+			braking = braking and sp <= last + 0.001
+			last = sp
+			t += 0.1
+		check(braking, "%d: so freia na entrada" % n)
+		check(float(a["speed"]) < 40.0, "%d: entrada sem velocidade absurda (%.0f m/s)" % [n, float(a["speed"])])
+		var go: Dictionary = DuelShots.truck_pose(n, DuelPlan.intro_seconds(DuelPlan.FULL) - 0.01)
+		check(Vector3(go["nose"]).z > 5.0 and float(go["speed"]) > 15.0, "%d: arranca para a camera" % n)
+	check(Vector3(DuelShots.truck_pose(0, 3.0)["nose"]).x < 0.0, "jogador na esquerda da tela, rival na direita")
+	var xf: Transform3D = DuelShots.truck_xform({"nose": Vector3(1, 0, 2), "dir": Vector3(0, 0, 1), "speed": 0.0}, 11.4)
+	check((xf.basis * Vector3(0, 0, -1)).distance_to(Vector3(0, 0, 1)) < 0.001, "frente do TruckNode (-Z) aponta para a camera")
+	check(xf.origin.distance_to(Vector3(1, 0, 2 - 11.4)) < 0.001, "traseira atras do nariz")
+
+
+func test_launch_lens_between_the_trucks() -> void:
+	var end_t: float = DuelPlan.intro_seconds(DuelPlan.FULL) - 0.01
+	var v: Array = DuelShots.studio_view(end_t, false)
+	var cam: Vector3 = v[0]
+	check(absf(cam.x) < 0.5 and cam.y < 1.5, "camera baixa no meio")
+	check(DuelShots.SIDE_X - 1.3 > absf(cam.x) + 0.8, "os caminhoes passam dos lados, sem atravessar a camera")
+	check(Vector3(DuelShots.truck_pose(0, end_t)["nose"]).z < cam.z - 1.0, "o nariz nao passa da lente")
+	var shake: Array = DuelShots.studio_view(DuelPlan.BOLT_AT + 0.05, false)
+	var calm: Array = DuelShots.studio_view(DuelPlan.BOLT_AT + 0.05, true)
+	check(Vector3(shake[0]).distance_to(Vector3(calm[0])) > 0.001, "tremor da camera no raio (so no modo normal)")
+	var before: Array = DuelShots.studio_view(DuelPlan.BOLT_AT - 0.001, true)
+	check(Vector3(calm[0]).distance_to(Vector3(before[0])) < 0.05, "modo reduzido: camera sem tranco")
+
+
+func test_bolt_is_seeded_and_grows_from_the_sky() -> void:
+	var p1: Array[PackedVector2Array] = DuelBolt.paths(Vector2(250, -10), Vector2(240, 200))
+	var p2: Array[PackedVector2Array] = DuelBolt.paths(Vector2(250, -10), Vector2(240, 200))
+	check_eq(p1.size(), p2.size(), "mesmo numero de galhos")
+	check(p1[0] == p2[0], "mesmo raio em todos os clientes")
+	check(p1[0][0] == Vector2(250, -10) and p1[0][p1[0].size() - 1] == Vector2(240, 200), "do ceu ao chao entre os caminhoes")
+	var half: PackedVector2Array = DuelBolt.grown(p1[0], 0.5)
+	check(half.size() < p1[0].size() and half[half.size() - 1].y < 150.0, "o raio desce do ceu")
+
+
+func test_reduce_flash_option_saved_and_assets() -> void:
+	var st: Node = Engine.get_main_loop().root.get_node("Settings")
+	var was: bool = st.fx_reduce_flash
+	var path: String = "user://test_t204_settings.cfg"
+	st.fx_reduce_flash = true
+	st.save_settings(path)
+	st.fx_reduce_flash = false
+	st.load_settings(path)
+	check(st.fx_reduce_flash, "opcao reduzir claroes gravada")
+	st.fx_reduce_flash = was
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	check(ResourceLoader.exists("res://assets/textures/duel/raijin.png") and ResourceLoader.exists("res://assets/textures/duel/fujin.png"), "arte dos guardioes")
+	check(ResourceLoader.exists("res://assets/textures/duel/title_taiketsu.png"), "titulo 対決")
+	check(RaceAudio.has_sound("duel_thunder") and RaceAudio.has_sound("vs_taiko_hit"), "trovao e taiko")
+	check_eq(Protocol.VERSION, 9, "protocolo 9 (contagem do servidor mudou para 8 s)")
 
 
 func test_offline_full_first_short_on_rematch_and_quick_race() -> void:

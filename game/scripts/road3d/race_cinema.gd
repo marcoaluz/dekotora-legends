@@ -45,6 +45,9 @@ func active() -> bool:
 func tunnel_flash(day_amount: float) -> void:
 	_flash_t = FLASH_S
 	_flash_peak = lerpf(0.4, 0.8, clampf(day_amount, 0.0, 1.0))
+	var st: Node = Engine.get_main_loop().root.get_node_or_null("Settings")
+	if st != null and bool(st.get("fx_reduce_flash")):        # T-204: "reduzir claroes" = so um toque de luz
+		_flash_peak *= 0.25
 	_flash_color = Color(1.0, 0.93, 0.8).lerp(Color(1.0, 0.98, 0.95), day_amount)
 
 

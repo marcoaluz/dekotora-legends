@@ -99,6 +99,7 @@ func _show(id: String) -> void:
 			_toggle(Tr.t("options.fx_rain"), _s.fx_rain, func(on: bool) -> void: _s.fx_rain = on)
 			_toggle(Tr.t("options.fx_impact"), _s.fx_impact, func(on: bool) -> void: _s.fx_impact = on)
 			_toggle(Tr.t("options.fx_life"), _s.fx_life, func(on: bool) -> void: _s.fx_life = on)
+			_toggle(Tr.t("options.fx_reduce_flash"), _s.fx_reduce_flash, func(on: bool) -> void: _s.fx_reduce_flash = on)   # T-204
 			if UltraLook.available():
 				_toggle(Tr.t("options.fx_motion_blur"), _s.fx_motion_blur, func(on: bool) -> void: _s.fx_motion_blur = on)
 			_hint(Tr.t("options.fx_hint"))

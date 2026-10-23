@@ -2,7 +2,7 @@ class_name Protocol
 extends RefCounted
 ## Constantes do protocolo de rede (docs/MULTIPLAYER.md).
 
-const VERSION: int = 8                   # 2 = T-139: eventos de pista no setup; 3 = T-144/T-141: buzina no comando, buzina/freada/empurrao e carro arremessado no snapshot; 4 = T-152: tranco da batida no snapshot; 5 = T-153: trechos de 2 faixas (`lane_sections`) no setup; 6 = T-156: abertura frente a frente (`intro`, `countdown_total` no setup; contagem do servidor mais longa), grid lado a lado e comboio; 7 = T-173: descritor com `horn` (buzina escolhida) e os outros tocam motor/turbo/escape do descritor; 8 = T-183: carro acidentado no snapshot (1 byte por carro)
+const VERSION: int = 9                   # 2 = T-139: eventos de pista no setup; 3 = T-144/T-141: buzina no comando, buzina/freada/empurrao e carro arremessado no snapshot; 4 = T-152: tranco da batida no snapshot; 5 = T-153: trechos de 2 faixas (`lane_sections`) no setup; 6 = T-156: abertura frente a frente (`intro`, `countdown_total` no setup; contagem do servidor mais longa), grid lado a lado e comboio; 7 = T-173: descritor com `horn` (buzina escolhida) e os outros tocam motor/turbo/escape do descritor; 8 = T-183: carro acidentado no snapshot (1 byte por carro); 9 = T-204: abertura nova do duelo (5 s + 3 s de contagem: `countdown_total` 8 s em vez de 9,4 s)
 const DEFAULT_PORT: int = 24600
 const MAX_PLAYERS: int = 4
 const COMMAND_RATE: float = 30.0          # comandos por segundo (cliente -> servidor)

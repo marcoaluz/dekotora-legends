@@ -441,6 +441,7 @@
  "options.quality_ultra": "Ultra",
  "options.quality_ultra_hint": "Ultra (só PC): luz rebatida, reflexos no asfalto molhado, névoa com raios de sol, sombras suaves e cor por hora do dia. Pede placa de vídeo.",
  "options.fx_life": "Vida do cenário (vento, pássaros, trânsito do outro lado, pessoas, som ambiente)",
+ "options.fx_reduce_flash": "Reduzir clarões (sensibilidade à luz): sem tela branca no raio e na saída do túnel",
  "options.fx_motion_blur": "Borrão de velocidade (Ultra)",
  "options.show_fps": "Mostrar FPS na corrida",
  "options.code_hint": "Código do jogador: use o mesmo código em outro aparelho para ter a mesma garagem.",

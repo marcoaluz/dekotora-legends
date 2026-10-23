@@ -76,6 +76,7 @@ var _speed_blur: SpeedBlur               # T-189: borrao de velocidade (Ultra, o
 var _life: RaceLife                      # T-189: vida do cenario (so visual; null = Settings.fx_life desligado)
 var _rain_fx: RainFx                     # T-189: spray atras dos caminhoes, respingos e som da chuva (null = sem chuva)
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
+var _sun: DirectionalLight3D            # T-204: a abertura apaga o sol/lua enquanto o estudio esta na tela
 var _nohud: bool = false
 var _hud_demo: bool = false             # T-202: --hud-demo
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
@@ -124,6 +125,7 @@ func _ready() -> void:
 	tod = _resolve_time_of_day()
 	var scenery: StringName = route.scenery if route != null else &"city"
 	var world: Dictionary = WorldEnv.create(self, false, tod, scenery == &"mountain")
+	_sun = world.get("sun") as DirectionalLight3D
 	var tunnels: Array[Vector2] = route.tunnels if route != null else ([] as Array[Vector2])
 	var bridges: Array[Vector2] = route.bridges if route != null else ([] as Array[Vector2])   # T-153
 	if sim.track.lane_sections.is_empty():
@@ -757,7 +759,7 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			_drawn.resize(sim.trucks.size())
 		_drawn[k] = Vector2(z, x)
 		var al: Vector2 = Vector2.ZERO                  # T-156: manobra de alinhamento no comeco da contagem
-		if _intro != null and _intro.kind != DuelPlan.NONE and _countdown > 0.0:
+		if _intro != null and _intro.kind == DuelPlan.SHORT and _countdown > 0.0:   # T-204: depois da cheia ja estao no grid
 			al = DuelShots.align_offset(t.x, DuelShots.align_progress(_countdown))
 		node.transform = _impact.jolt(k, path.vehicle_transform(z, x + al.x, t.length, t.body_yaw() + al.y, t.lean() * 0.11))
 		node.animate(t.speed, dt, t.lean())
@@ -1022,6 +1024,7 @@ func _setup_intro(args: PackedStringArray) -> void:
 	_intro.online = online
 	_intro.demo = _demo
 	_intro.audio = _audio
+	_intro.sun = _sun
 	if pair[1] >= 0:
 		var j: int = pair[1] if pair[1] < player else pair[1] - 1        # _rival_audio: os outros caminhoes em ordem
 		_intro.rival_engine = _rival_audio[j] if j < _rival_audio.size() else null
@@ -1090,6 +1093,12 @@ func _intro_count_shots(before: float) -> void:
 		_demo.queue_shot("duelo_5_alinhamento", 0.0)
 	if before > 1.0 and _countdown <= 1.0:
 		_demo.queue_shot("duelo_6_contagem", 0.0)
+	if _intro.kind == DuelPlan.FULL:                 # T-204: prints da contagem no relogio da abertura (5,5 / 6,5 / 7,5 s)
+		var total: float = DuelPlan.total_seconds(DuelPlan.FULL)
+		for st in DuelPlan.COUNT_SHOT_TIMES:
+			var left: float = total - st
+			if before > left and _countdown <= left:
+				_demo.queue_shot("abertura_%05.2fs" % st, 0.0)
 
 
 ## Depuracao (--fps-log): quantas superficies (≈ chamadas de desenho) cada parte da cena tem.

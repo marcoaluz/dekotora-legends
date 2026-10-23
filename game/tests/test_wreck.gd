@@ -216,7 +216,7 @@ func test_snapshot_round_trip_and_client_interpolation() -> void:
 	check_near(mirror.traffic.cars[2].yaw, 1.1, 0.002, "com o giro")
 	check(not mirror.traffic.cars[3].wrecked, "carro normal continua normal")
 	check_near(mirror.traffic.cars[4].crash_t, 25.4, 0.001, "tempo satura em 25,4 s (1 byte)")
-	check_eq(Protocol.VERSION, 8, "protocolo 8 (formato do snapshot mudou)")
+	check(Protocol.VERSION >= 8, "protocolo 8 ou mais novo (formato do snapshot mudou na T-183; 9 = T-204)")
 	# cliente: interpolacao entre dois snapshots (desenhado ~100 ms atras)
 	var cs := ClientSync.new()
 	cs.sim = mirror

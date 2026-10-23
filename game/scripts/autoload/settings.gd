@@ -23,6 +23,7 @@ var menu_bg: String = "a"               # fundo da tela inicial: "a" posto a noi
 var explorer_mode: bool = false         # T-181: camera livre (F1 / pausa) tambem fora da build de debug
 var fx_life: bool = true                # T-189: vida do cenario (vento, passaros, insetos, vapor, transito contrario, pessoas, som ambiente)
 var fx_motion_blur: bool = false        # T-189: borrao de velocidade (so Ultra; opcional)
+var fx_reduce_flash: bool = false       # T-204: reduzir claroes (raio da abertura, saida de tunel): sem tela branca
 var race_cam: String = "standard"       # T-198: camera da corrida (RaceCamRig.IDS); a ultima escolhida
 var race_cam_routes: Dictionary = {}    # T-198: rota -> camera usada nela da ultima vez
 var mirror_mode: int = 0                # T-198: retrovisor 0 automatico (RaceCamView.mirror_auto_on), 1 ligado, 2 desligado
@@ -55,6 +56,8 @@ func _ready() -> void:
 			fx_motion_blur = true
 		elif a == "--no-motion-blur":
 			fx_motion_blur = false
+		elif a == "--reduce-flash":                   # T-204 depuracao: claroes reduzidos (nao grava)
+			fx_reduce_flash = true
 	quality = UltraLook.clamp_quality(quality)    # Ultra so com Forward+ (celular: Compatibility -> Alta no maximo)
 
 
@@ -83,6 +86,7 @@ func load_settings(path: String = PATH) -> void:
 	explorer_mode = bool(cfg.get_value("advanced", "explorer_mode", explorer_mode))
 	fx_life = bool(cfg.get_value("graphics", "fx_life", fx_life))
 	fx_motion_blur = bool(cfg.get_value("graphics", "fx_motion_blur", fx_motion_blur))
+	fx_reduce_flash = bool(cfg.get_value("graphics", "fx_reduce_flash", fx_reduce_flash))
 	race_cam = String(cfg.get_value("camera", "race_cam", race_cam))
 	var per_route: Variant = cfg.get_value("camera", "race_cam_routes", {})
 	race_cam_routes = per_route if per_route is Dictionary else {}
@@ -111,6 +115,7 @@ func save_settings(path: String = PATH) -> void:
 	cfg.set_value("advanced", "explorer_mode", explorer_mode)
 	cfg.set_value("graphics", "fx_life", fx_life)
 	cfg.set_value("graphics", "fx_motion_blur", fx_motion_blur)
+	cfg.set_value("graphics", "fx_reduce_flash", fx_reduce_flash)
 	cfg.set_value("graphics", "version", GRAPHICS_VERSION)
 	cfg.set_value("camera", "race_cam", race_cam)
 	cfg.set_value("camera", "race_cam_routes", race_cam_routes)
