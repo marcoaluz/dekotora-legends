@@ -408,3 +408,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: game/scripts/ui/hud/*, ui/race_hud.gd, ui/event_hud.gd, road3d/race_scene_3d.gd, truck/truck_node.gd, input/touch_controls.gd, ui/components/debug_shot.gd, data/i18n/pt-BR.json, tests/test_hud_t202.gd, tests/test_hud_scene_t202.gd, tools/capture_t202.sh, tools_dev/crop_image.gd, docs/capturas_t202/, docs (STATUS, DECISOES, ROADMAP), skill godot-dekotora.
 - Validação: `--import` e `--quit-after 30` sem SCRIPT ERROR; suíte 437 testes, 0 falharam (eram 423); 7 prints (PC 1920x1080 e celular 2400x1080, dia/noite/dano/túnel) + folha `docs/capturas_t202/folha_t202.png` conferidos. Celular de verdade não testado. `game/scripts/sim/` intocado.
 - Decisão pendente: (1) "5 segmentos por peça" feito por ÁREA (frente/laterais/traseira/carga) — confirmar; (2) agulha passa do 140 até o pino de 150 no vácuo; (3) alcance do radar 360 m.
+
+## 2026-10-22 22:51 · T-203 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste (debug) gerado com o HUD da T-202, protocolo de rede 8; preset restaurado (git diff vazio); STATUS.md atualizado.
+- Arquivos: builds/kaido-bakuso-debug.apk (123 MB, 22:50, sobrescrito), docs/STATUS.md, .claude/coordenacao/LOG.md
+- Observação: export exit 0, sem erros. O APK anterior (T-201, 20:31) foi sobrescrito pelo próprio comando de export (mesmo nome). Não tocado QUADRO.md. Arquivos não-meus não commitados: game/tests/test_hud_scene_t202.gd.uid e test_hud_t202.gd.uid (untracked) e a modificação de QUADRO.md. Celular ainda não testado.
