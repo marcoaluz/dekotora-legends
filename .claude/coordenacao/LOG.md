@@ -444,3 +444,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 461/461; trace_toll --sweep 30 sementes × 3 rotas × 2/4 caminhões = 0 batidas/raspadas/0 dentro da ilha; net_test.sh 150 ms 2% PASSOU (antes da T-208); prints dia/noite 3 rotas (média Compatibility), PC Ultra noite, celular 1200x540 com toque; custo média +4 chamadas, −600 tri, +0,7 MB, FPS no ruído; Ultra igual.
 - Armadilhas: Compatibility ignora emission_texture (faixa colorida virava branca à noite); a câmera padrão (5,6 m) atravessava as placas: limite RaceCamRig.toll_h_max + cobertura a 7 m; race_scene_3d.gd estava com mudanças da T-208 no mesmo arquivo: commit só dos meus trechos via `git hash-object` + `update-index`.
 - Decisão pendente: Marco aprovar largura da passagem (3,8 m), ilha 120 m depois da largada, corrida rápida larga o jogador no meio (precisa escolher lado; último perde ~4 s), cores, sem limite de velocidade no ETC.
+
+## 2026-10-23 20:45 · T-209 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste (debug) gerado com T-207 (pedágio) e T-208 (abertura), protocolo de rede 11; preset restaurado (git diff vazio).
+- Arquivos: builds/kaido-bakuso-debug.apk (128 MB, fora do Git), docs/STATUS.md (linha do APK), .claude/coordenacao/LOG.md.
+- Observação: export sem erros (EXIT=0, "DONE", APK assinado com chave de debug). Celular não testado. Log do export em builds/t209_export.log.
