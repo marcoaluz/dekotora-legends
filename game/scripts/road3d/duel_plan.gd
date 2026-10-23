@@ -1,17 +1,20 @@
 class_name DuelPlan
 extends RefCounted
-## Timeline of the duel opening before the start (T-156, redone in T-204). Pure presentation timing: the race
-## simulation still starts at the end of the 3 s countdown, exactly as before. The server uses the same numbers to
-## stretch its countdown (online, every client plays the same clock and nobody starts late).
+## Timeline of the duel opening before the start (T-156, redone in T-204, slower in T-208). Pure presentation timing:
+## the race simulation still starts at the end of the 3 s countdown, exactly as before. The server uses the same
+## numbers to stretch its countdown (online, every client plays the same clock and nobody starts late).
+## The clock starts at the first SMOOTH frame of the opening (T-208): DuelIntro first prepares behind a black screen
+## with fog (shaders warmed up, see DuelIntro.PREP_*); online the server waits for every player to be ready.
 ##
-## FULL (1x1 duel, 8 s in all = 5 s of opening + 3 s of countdown), in a black studio with purple ground fog:
-##   enter  0.0-2.1  the two real race trucks drive in from each side at an angle and stop side by side, facing the
-##                   camera, headlights and neon on
-##   guard  2.1-2.8  the guardians rise behind them inside their auras (Raijin over the player, Fujin over the rival)
-##   title  2.8-3.7  対決 slams in with a taiko hit; the band of each driver slides in at the bottom
-##   bolt   3.7-4.2  a lightning bolt strikes between them: ONE white flash of 0.15 s (soft violet glow instead with
+## FULL (1x1 duel, 11.9 s in all = 8.9 s of opening + 3 s of countdown), in a black studio with purple ground fog:
+##   enter  0.0-2.6  the two real race trucks drive in from each side at an angle and stop side by side (at ~2.1 s),
+##                   facing the camera, headlights and neon on; a beat parked with the air brakes
+##   guard  2.6-3.9  the guardians rise behind them inside their auras (Raijin over the player, Fujin over the rival)
+##   title  3.9-5.1  対決 slams in with a taiko hit and stays alone on screen to be read
+##   bands  5.1-7.0  the band of each driver slides in at the bottom (portrait, name, truck, destaque): time to read
+##   bolt   7.0-7.9  a lightning bolt strikes between them: ONE white flash of 0.15 s (soft violet glow instead with
 ##                   "reduce flashes" on) and thunder
-##   launch 4.2-5.0  cut: the trucks charge at the low camera; then the countdown on the track (alignment shot)
+##   launch 7.9-8.9  cut: the trucks charge at the low camera; then the countdown on the track (alignment shot)
 ## SHORT (rematch / 3-4 trucks, 3 s): only the countdown with the alignment shot.
 
 const FULL: String = "full"
@@ -19,11 +22,11 @@ const SHORT: String = "short"
 const NONE: String = "none"
 
 ## Phases of the full intro (seconds). Countdown = Protocol.COUNTDOWN_SECONDS after them.
-const PHASES: Array = [["enter", 2.1], ["guard", 0.7], ["title", 0.9], ["bolt", 0.5], ["launch", 0.8]]
+const PHASES: Array = [["enter", 2.6], ["guard", 1.3], ["title", 1.2], ["bands", 1.9], ["bolt", 0.9], ["launch", 1.0]]
 ## Alignment shot at the start of the countdown (then RaceCinema's side cut, 1.6 s before the go).
 const ALIGN_S: float = 1.4
 ## Lightning strike (intro time, s) and the single flash: white, 0.15 s, peak below full white.
-const BOLT_AT: float = 3.78
+const BOLT_AT: float = 7.12
 const FLASH_S: float = 0.15
 const FLASH_PEAK: float = 0.85
 ## "Reduce flashes" on: no white screen; a soft violet glow rising and falling over SOFT_S.
@@ -34,8 +37,13 @@ const LEADER_S: float = 0.06
 const HOLD_S: float = 0.1
 const FADE_S: float = 0.32
 ## Captures (--shots=) at these intro times (the countdown ones are taken by the race scene).
-const SHOT_TIMES: Array[float] = [0.5, 1.5, 2.45, 3.0, 3.8, 4.05, 4.6]
-const COUNT_SHOT_TIMES: Array[float] = [5.5, 6.5, 7.5]
+const SHOT_TIMES: Array[float] = [0.6, 1.6, 2.4, 3.3, 4.5, 6.0, 7.14, 7.5, 8.5]
+const COUNT_SHOT_TIMES: Array[float] = [9.4, 10.4, 11.4]
+## Fade in from black at the start (the fog shows first, then the trucks come out of the dark).
+const FADE_IN_S: float = 0.6
+## Guardians: seconds to rise; title: seconds to slam; bands: seconds to slide in.
+const GUARD_RISE_S: float = 1.0
+const BANDS_SLIDE_S: float = 0.3
 
 
 ## Seconds of intro BEFORE the countdown.
@@ -113,7 +121,7 @@ static func bolt_state(t: float, reduced: bool) -> Vector2:
 
 ## Black over the whole screen: fade in from black at the start, dip to black right before the cut to the track.
 static func black_alpha(t: float) -> float:
-	var a: float = 1.0 - clampf(t / 0.35, 0.0, 1.0)
+	var a: float = 1.0 - clampf(t / FADE_IN_S, 0.0, 1.0)
 	var end_: float = intro_seconds(FULL)
 	return maxf(a, clampf((t - (end_ - 0.1)) / 0.1, 0.0, 1.0))
 
@@ -130,12 +138,12 @@ static func title_state(t: float) -> Vector2:
 	return Vector2(k, a)
 
 
-## The two driver bands at the bottom: 0 = out, 1 = in place (slide in after the taiko, out at the launch).
+## The two driver bands at the bottom: 0 = out, 1 = in place (slide in when the title has been read, out at the launch).
 static func bands_in(t: float) -> float:
-	var d: float = t - (phase_start("title") + 0.1)
+	var d: float = t - phase_start("bands")
 	if d < 0.0:
 		return 0.0
-	var e: float = 1.0 - pow(1.0 - clampf(d / 0.22, 0.0, 1.0), 3.0)
+	var e: float = 1.0 - pow(1.0 - clampf(d / BANDS_SLIDE_S, 0.0, 1.0), 3.0)
 	return e * (1.0 - clampf((t - phase_start("launch")) / 0.2, 0.0, 1.0))
 
 
@@ -144,7 +152,7 @@ static func guard_in(t: float) -> float:
 	var d: float = t - phase_start("guard")
 	if d < 0.0:
 		return 0.0
-	return clampf(d / 0.55, 0.0, 1.0) * (1.0 - clampf((t - phase_start("launch")) / 0.25, 0.0, 1.0))
+	return clampf(d / GUARD_RISE_S, 0.0, 1.0) * (1.0 - clampf((t - phase_start("launch")) / 0.25, 0.0, 1.0))
 
 
 # ---------------------------------------------------------------- who sees what

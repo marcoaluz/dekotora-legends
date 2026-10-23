@@ -9,9 +9,9 @@ extends RefCounted
 const SIDE_X: float = 4.0               # lateral position of each truck (m from the centre line)
 const START := Vector2(30.0, -26.0)     # where each nose comes from (x outward, z far): enters from the screen side
 const BEND := Vector2(4.0, -11.0)       # control point: comes in at an angle and straightens up facing the camera
-const STOP_AT: float = 0.88             # fraction of the enter phase when the trucks are stopped
+const STOP_AT: float = 0.8              # fraction of the enter phase when the trucks are stopped (T-208: a beat parked)
 const CRUISE: float = 0.35              # first part of the entrance at constant speed, then a steady braking
-const LAUNCH_ACCEL: float = 22.0        # m/s2 when they charge at the camera
+const LAUNCH_ACCEL: float = 16.0        # m/s2 when they charge at the camera (T-208: 1 s of launch, nose short of the lens)
 
 
 ## Height factor of the small Canter (its cab is ~2.1 m tall instead of ~3 m).
@@ -113,7 +113,7 @@ static func studio_view(t: float, reduced: bool) -> Array:
 		var p: float = clampf((t - launch0) / DuelPlan.phase_len("launch"), 0.0, 1.0)
 		return [Vector3(0.0, lerpf(1.05, 0.9, p), lerpf(9.6, 10.6, p)), Vector3(0.0, lerpf(2.3, 2.6, p), -8.0), lerpf(64.0, 70.0, p)]
 	var e: float = _ease(t / launch0)
-	var up: float = _ease((t - 1.3) / 1.2)                             # tilt up when the guardians appear
+	var up: float = _ease((t - DuelPlan.phase_start("guard") + 0.5) / 1.6)   # tilt up when the guardians appear
 	var pos := Vector3(0.0, lerpf(1.7, 2.3, e), lerpf(19.0, 15.6, e))
 	var look := Vector3(0.0, lerpf(2.5, 3.5, up), -4.0)
 	var d: float = t - DuelPlan.BOLT_AT

@@ -111,6 +111,24 @@ func update(t: float, reduced: bool) -> void:
 	_strike.light_energy = (4.0 if reduced else 14.0) * bs.y * bs.x
 
 
+## T-208: one frame with every piece of the scene visible and lit (behind the black screen of the preparation), so
+## their shaders compile before the clock starts instead of in the middle of the opening (hitches on the phone).
+func warm_up(on: bool) -> void:
+	for n in 2:
+		var side: float = -1.0 if n == 0 else 1.0
+		_gods[n].visible = on
+		_auras[n].visible = on
+		if on:
+			_gods[n].position = Vector3(side * GOD_X, GOD_BASE_Y + GOD_H * 0.5, GOD_Z)
+			_auras[n].position = Vector3(side * GOD_X, GOD_BASE_Y + GOD_H * 0.6, GOD_Z - 0.4)
+			(_gods[n].material_override as StandardMaterial3D).albedo_color = Color(1, 1, 1, 0.02)
+			(_auras[n].material_override as StandardMaterial3D).albedo_color = Color(1, 1, 1, 0.02)
+	_strike.visible = on
+	_strike.light_energy = 0.05 if on else 0.0
+	if fog != null:
+		fog.update(0.0)
+
+
 # ---------------------------------------------------------------- pieces
 
 func _floor() -> void:

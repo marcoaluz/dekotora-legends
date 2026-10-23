@@ -1,11 +1,12 @@
 extends TestCase
 ## T-156: abertura do duelo antes da largada, campanha 1 contra 1, grid lado a lado, comboio online.
-## T-204: abertura nova (estudio preto, guardioes, titulo, raio com clarao seguro, arrancada), 8 s ao todo.
+## T-204: abertura nova (estudio preto, guardioes, titulo, raio com clarao seguro, arrancada).
+## T-208: mais lenta (8,9 s de cena + 3 s de contagem), relogio a partir do 1o quadro liso, servidor espera todos.
 
 
-func test_timeline_full_is_8_s_and_short_is_3_s() -> void:
-	check_near(DuelPlan.total_seconds(DuelPlan.FULL), 8.0, 0.001, "T-204: abertura cheia + contagem = 8 s")
-	check_near(DuelPlan.intro_seconds(DuelPlan.FULL), 5.0, 0.001, "5 s de cena antes da contagem de 3 s")
+func test_timeline_full_is_8_9_s_plus_countdown_and_short_is_3_s() -> void:
+	check_near(DuelPlan.total_seconds(DuelPlan.FULL), 11.9, 0.001, "T-208: abertura cheia + contagem = 11,9 s")
+	check_near(DuelPlan.intro_seconds(DuelPlan.FULL), 8.9, 0.001, "8,9 s de cena antes da contagem de 3 s")
 	check_near(DuelPlan.total_seconds(DuelPlan.SHORT), 3.0, 0.001, "versao curta = so a contagem (3 s)")
 	check_near(DuelPlan.intro_seconds(DuelPlan.NONE), 0.0, 0.001, "sem abertura")
 	var names: Array[String] = []
@@ -15,8 +16,23 @@ func test_timeline_full_is_8_s_and_short_is_3_s() -> void:
 		if names.is_empty() or names[-1] != ph:
 			names.append(ph)
 		t += 0.05
-	check_eq(",".join(names), "enter,guard,title,bolt,launch,count", "ordem: entrada, guardioes, titulo, raio, arrancada, contagem")
+	check_eq(",".join(names), "enter,guard,title,bands,bolt,launch,count", "ordem: entrada, guardioes, titulo, faixas, raio, arrancada, contagem")
 	check(DuelPlan.BOLT_AT >= DuelPlan.phase_start("bolt") and DuelPlan.BOLT_AT < DuelPlan.phase_start("launch"), "o raio cai na fase do raio")
+	# T-208: cada etapa respira (tempo de leitura)
+	check(DuelPlan.phase_len("enter") >= 2.4, "entrada dos caminhoes sem pressa")
+	check(DuelPlan.phase_len("enter") * (1.0 - DuelShots.STOP_AT) >= 0.4, "uma pausa com os caminhoes parados antes dos guardioes")
+	check(DuelPlan.phase_len("guard") >= DuelPlan.GUARD_RISE_S + 0.2, "guardioes sobem e ficam um instante sozinhos")
+	check(DuelPlan.phase_len("title") >= 1.0, "titulo 対決 sozinho por pelo menos 1 s")
+	var read_bands: float = DuelPlan.phase_start("launch") - DuelPlan.phase_start("bands") - DuelPlan.BANDS_SLIDE_S
+	check(read_bands >= 2.2, "faixas dos pilotos paradas e legiveis por %.1f s" % read_bands)
+	var read_title: float = DuelPlan.phase_start("launch") - DuelPlan.phase_start("title")
+	check(read_title >= 3.5, "titulo na tela por %.1f s" % read_title)
+	check(DuelPlan.BOLT_AT - DuelPlan.phase_start("bolt") >= 0.1 and DuelPlan.phase_start("launch") - DuelPlan.BOLT_AT >= 0.6, "raio com respiro antes e depois (trovao)")
+	check(DuelPlan.phase_len("launch") >= 0.9, "arrancada inteira antes do corte")
+	for st in DuelPlan.SHOT_TIMES:
+		check(st < DuelPlan.intro_seconds(DuelPlan.FULL), "print %.2f s dentro da cena" % st)
+	for st in DuelPlan.COUNT_SHOT_TIMES:
+		check(st > DuelPlan.intro_seconds(DuelPlan.FULL) and st < DuelPlan.total_seconds(DuelPlan.FULL), "print %.2f s na contagem" % st)
 	check(DuelPlan.ALIGN_S + RaceCinema.START_CUT_BEFORE <= Protocol.COUNTDOWN_SECONDS + 0.001, "alinhamento cabe antes do corte da largada")
 
 
@@ -70,7 +86,8 @@ func test_overlay_curves() -> void:
 	check_near(DuelPlan.title_state(title0 + 0.3).x, 1.0, 0.001, "titulo assentado depois da batida")
 	check_near(DuelPlan.title_state(title0 + 0.3).y, 1.0, 0.001, "titulo visivel")
 	check(DuelPlan.title_state(title0 + 0.02).x > 1.5, "titulo entra grande (batida)")
-	check_near(DuelPlan.bands_in(title0 + 0.6), 1.0, 0.001, "faixas dos dois pilotos embaixo")
+	check_eq(DuelPlan.bands_in(title0 + 0.6), 0.0, "T-208: o titulo entra sozinho (faixas depois)")
+	check_near(DuelPlan.bands_in(DuelPlan.phase_start("bands") + 0.5), 1.0, 0.001, "faixas dos dois pilotos embaixo")
 	check_near(DuelPlan.bands_in(DuelPlan.phase_start("launch") + 0.3), 0.0, 0.001, "faixas saem na arrancada")
 	check_eq(DuelPlan.guard_in(DuelPlan.phase_start("guard") - 0.01), 0.0, "guardioes so depois da entrada")
 	check_near(DuelPlan.guard_in(title0), 1.0, 0.001, "guardioes inteiros no titulo")
@@ -145,7 +162,7 @@ func test_reduce_flash_option_saved_and_assets() -> void:
 	check(ResourceLoader.exists("res://assets/textures/duel/raijin.png") and ResourceLoader.exists("res://assets/textures/duel/fujin.png"), "arte dos guardioes")
 	check(ResourceLoader.exists("res://assets/textures/duel/title_taiketsu.png"), "titulo 対決")
 	check(RaceAudio.has_sound("duel_thunder") and RaceAudio.has_sound("vs_taiko_hit"), "trovao e taiko")
-	check(Protocol.VERSION >= 9, "protocolo 9 ou mais novo (contagem do servidor mudou para 8 s; 10 = T-207)")
+	check(Protocol.VERSION >= 11, "protocolo 11 (T-208: abertura de 11,9 s e o servidor espera todos montarem a corrida)")
 
 
 func test_offline_full_first_short_on_rematch_and_quick_race() -> void:
@@ -212,6 +229,17 @@ func test_room_two_players_waits_the_whole_intro_then_races() -> void:
 	var setup: Dictionary = r.race_setup()
 	check_eq(String(setup["intro"]), DuelPlan.FULL, "2 jogadores: abertura cheia no setup")
 	check_near(float(setup["countdown_total"]), DuelPlan.total_seconds(DuelPlan.FULL), 0.001, "contagem do servidor = abertura + 3 s")
+	# T-208: a sala espera os dois montarem a corrida (um celular lento nao perde a abertura)
+	check(r.loading, "depois do setup: esperando os jogadores montarem a corrida")
+	r.mark_loaded(100)
+	for i in 50:
+		r.advance(0.1)
+	check(r.loading and r.state == Protocol.RoomState.COUNTDOWN, "um montou, o outro ainda nao: o relogio nao anda")
+	check_near(r.countdown, DuelPlan.total_seconds(DuelPlan.FULL), 0.001, "a contagem continua cheia")
+	r.mark_loaded(101)
+	r.advance(0.1)
+	check(not r.loading, "os dois prontos: o relogio comum comeca")
+	check_near(r.countdown, DuelPlan.total_seconds(DuelPlan.FULL), 0.001, "o quadro do aviso nao conta")
 	r.advance(DuelPlan.total_seconds(DuelPlan.FULL) - 0.2)
 	check_eq(r.state, Protocol.RoomState.COUNTDOWN, "ainda na abertura")
 	r.advance(0.3)
@@ -221,6 +249,78 @@ func test_room_two_players_waits_the_whole_intro_then_races() -> void:
 	for i in r.sim.trucks.size():
 		check_near(c.sim.trucks[i].z, r.sim.trucks[i].z, 0.001, "cliente monta o mesmo grid (z) %d" % i)
 		check_near(c.sim.trucks[i].x, r.sim.trucks[i].x, 0.001, "cliente monta o mesmo grid (x) %d" % i)
+
+
+## T-208: quem nunca avisa (celular travado) nao segura a sala para sempre; desconectado nao conta.
+func test_room_load_wait_has_a_limit_and_ignores_disconnected() -> void:
+	var r: Room = _room(2)
+	r.try_start(100, 9)
+	r.mark_loaded(100)
+	var t: float = 0.0
+	while r.loading and t < Protocol.LOAD_WAIT_MAX + 1.0:
+		r.advance(0.5)
+		t += 0.5
+	check(not r.loading, "limite de espera (%.0f s)" % Protocol.LOAD_WAIT_MAX)
+	check(t >= Protocol.LOAD_WAIT_MAX - 0.01, "esperou o limite inteiro (%.1f s)" % t)
+	var r2: Room = _room(2)
+	r2.try_start(100, 10)
+	r2.mark_loaded(100)
+	(r2.members[101] as Room.Member).connected = false
+	r2.advance(0.1)
+	check(not r2.loading, "o outro caiu: comeca com quem ficou")
+
+
+## T-208: no cliente o relogio comum fica parado em 0 ate o servidor avisar (s_state COUNTDOWN) e entao conta daquele instante.
+func test_client_clock_waits_for_the_server_start() -> void:
+	var was_setup: Dictionary = Net.pending_setup
+	var was_msec: int = Net.pending_setup_msec
+	var was_started: bool = Net.race_clock_started
+	var was_state: int = Net.room_state
+	var was_truck: int = Net.pending_truck
+	Net.s_race_setup({"countdown": 11.9, "countdown_total": 11.9, "intro": DuelPlan.FULL}, 0)
+	check(not Net.race_clock_started, "setup chegou: relogio parado")
+	Net.pending_setup["countdown"] = 5.0                          # o setup antigo nao importa mais
+	Net.s_state(Protocol.RoomState.COUNTDOWN)
+	check(Net.race_clock_started, "servidor avisou: relogio andando")
+	check_near(float(Net.pending_setup["countdown"]), 11.9, 0.001, "conta a abertura inteira a partir do aviso")
+	check(absi(Net.pending_setup_msec - Time.get_ticks_msec()) < 50, "a partir de agora")
+	Net.pending_setup = was_setup
+	Net.pending_setup_msec = was_msec
+	Net.race_clock_started = was_started
+	Net.room_state = was_state
+	Net.pending_truck = was_truck
+
+
+## T-208: a preparacao (tela preta + neblina) segura o relogio em 0; offline comeca sozinho quando os quadros ficam
+## lisos, online so com o relogio do servidor; tocar nao pula a preparacao online.
+func test_preparation_holds_the_clock_until_smooth() -> void:
+	var intro := DuelIntro.new()
+	intro.band = DuelBand.new()
+	intro.kind = DuelPlan.FULL
+	intro.preparing = true
+	intro.clock_started = false
+	intro.online = true
+	var cam := Camera3D.new()
+	intro.stage = DuelStage.new()
+	intro.stage.build(1)
+	for i in 8:
+		intro.update_to(5.0, 0.016, cam)
+	check(intro.preparing and intro.t == 0.0, "online sem o relogio do servidor: continua preparando, t = 0")
+	check(intro.ready_local, "mas ja esta pronto aqui (avisa o servidor)")
+	check(intro.band.prep and intro.band.waiting != "", "tela preta com neblina e 'aguardando'")
+	intro.skip()
+	check(not intro.skipped, "online: tocar nao pula a preparacao")
+	intro.clock_started = true
+	intro.update_to(0.0, 0.016, cam)
+	check(not intro.preparing and not intro.band.prep, "relogio do servidor comecou: a cena comeca")
+	intro.update_to(0.5, 0.016, cam)
+	check_near(intro.t, 0.5, 0.001, "e segue o relogio")
+	var st: DuelStage = intro.stage
+	intro._leave_studio()
+	st.free()
+	intro.band.free()
+	cam.free()
+	intro.free()
 
 
 func test_room_convoy_three_players_short_and_lighter_traffic_then_rematch() -> void:

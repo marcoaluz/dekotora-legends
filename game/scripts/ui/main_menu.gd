@@ -13,6 +13,8 @@ var _panel: Control
 
 func _ready() -> void:
 	AudioBus.play_music("menu_citypop")
+	if not "--no-prefetch" in OS.get_cmdline_user_args():   # T-208: le a corrida em segundo plano (Continuar abre mais rapido)
+		get_tree().create_timer(1.0).timeout.connect(func() -> void: SceneFader.prefetch("res://scenes/race/race3d.tscn"))
 	get_node("/root/GameState").pending_contract = {}   # corrida abandonada nao leva o contrato adiante
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--demo-body="):                # nunca no perfil real

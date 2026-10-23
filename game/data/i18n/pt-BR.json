@@ -511,6 +511,7 @@
  "intro.destaque": "DESTAQUE",
  "intro.skip": "Toque para pular",
  "intro.waiting": "LARGADA EM %d",
+ "intro.wait_players": "Aguardando o outro piloto...",
  "intro.place_rest": "ÁREA DE DESCANSO · %s",
  "intro.place_toll": "PRAÇA DE PEDÁGIO · %s",
  "lobby.convoy": "Modo comboio (3–4 jogadores): trânsito mais leve",

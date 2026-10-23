@@ -82,12 +82,15 @@ var _hud_demo: bool = false             # T-202: --hud-demo
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
 var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrovisor (R); so apresentacao, local
+var _load_frames: int = 0               # T-208: quadros desde o fim do _ready (picos no log LOAD_T208)
+var _headless: bool = DisplayServer.get_name() == "headless"
 var _toll3d: TollPlaza3D                # T-207: praca de pedagio (cancelas e luz que segue o jogador)
 var _drawn: Array[Vector2] = []         # T-198: (z, x) interpolados de cada caminhao no ultimo quadro (cameras sem tranco)
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS     # recebe o botao de pausa mesmo pausado
+	LoadClock.mark("cena_carregada")            # T-208: cronometro do carregamento (LOAD_T208)
 	gs = get_node("/root/GameState")
 	RaceDemo.decorate_profile(gs, OS.get_cmdline_user_args())
 	route = gs.pending_route
@@ -142,6 +145,7 @@ func _ready() -> void:
 		road.bare = Vector2(zone.x, path.end_m() + 1.0)   # T-195: o TerrainPatch tambem cobre a continuacao
 	road.soft_spec = not UltraLook.active(q)        # T-195: sem pontos brilhantes no asfalto molhado
 	road.build(path, scenery, tod, tunnels)
+	LoadClock.mark("ceu_e_estrada")
 	if not bridges.is_empty():
 		var structures := SectionStructures3D.new()  # T-153: pilares, longarinas e cabeceiras da ponte
 		add_child(structures)
@@ -222,6 +226,7 @@ func _ready() -> void:
 		arrival.build(path, rid, scenery, tod, city.keep_out, side)
 	side.build(path, scenery, tod, tunnels)
 	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
+	LoadClock.mark("cenario")
 	if RaceLife.enabled():                         # T-189: vento, passaros, fumaca, insetos, sombras de nuvem
 		_life = RaceLife.new()
 		add_child(_life)
@@ -241,6 +246,7 @@ func _ready() -> void:
 		_connect_net()
 	else:
 		_spawn_field()
+	LoadClock.mark("caminhoes_e_transito")
 	_impact = ImpactFx.new()
 	add_child(_impact)
 	var lens: Array[float] = []
@@ -338,16 +344,24 @@ func _ready() -> void:
 	if _demo.mode.begins_with("result"):         # --demo=result|result_lose|result_timeout: so a tela (nao grava no perfil)
 		_result_shown = true
 		_open_result.call_deferred(ResultScreen.demo_result(_demo.mode), "res://scenes/menu/main_menu.tscn")
+	LoadClock.mark("camera_hud_toque")
 	_setup_audio()
+	LoadClock.mark("audio")
 	_update_visuals(0.0, 0.0)
 	_snap_camera()
 	_setup_intro(args)
+	LoadClock.mark("abertura_montada")
 	var hidden: Vector3 = path.world_point(_player_z() + 22.0, _player_x(), -1.2)   # embaixo do asfalto, na frente da camera
 	_impact.warmup(hidden)
 	_traffic3d.wreck_fx.warmup(hidden)            # T-183: pisca-alerta, fumaca e triangulo do carro acidentado
 	_brake_fx.warmup(hidden)
 	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
 	DebugShot.force_window(self)        # --window=2400x1080 (capturas T-202, maior que o monitor)
+	LoadClock.mark("ready_fim")
+	RenderingServer.frame_post_draw.connect(func() -> void:
+		LoadClock.mark("1o_quadro_desenhado")
+		if online and (_intro == null or _intro.kind != DuelPlan.FULL):
+			Net.race_loaded(), CONNECT_ONE_SHOT)    # T-208: sem a abertura cheia, pronto no 1o quadro desenhado
 
 
 ## Hora do dia: a da rota, ou --time=night|dusk|day (depuracao/capturas).
@@ -599,6 +613,15 @@ func _process(delta: float) -> void:
 			_fps_n = 0
 			_fps_max_calls = 0
 	var dt: float = minf(delta, 0.1)
+	if _load_frames < 400 and not _headless:         # T-208: picos dos primeiros quadros (shaders compilando)
+		_load_frames += 1
+		if delta > 0.05:
+			print("LOAD_T208 pico quadro %d: %.0f ms (abertura t=%.2f, %s)" % [_load_frames, delta * 1000.0,
+					_intro.t if _intro != null else -1.0, _intro.band.phase if _intro != null else ""])
+	if online and _intro != null:                    # T-208: o relogio comum so anda quando todos montaram a corrida
+		_intro.clock_started = Net.race_clock_started
+		if _intro.kind != DuelPlan.FULL:
+			_intro.band.waiting = "" if Net.race_clock_started or _net_racing else Tr.t("intro.wait_players")
 	if _intro != null and _intro.running():          # T-156: abertura frente a frente (a corrida espera na largada)
 		_intro.update_to(_net_elapsed() if online else _intro.t + dt, dt, _cam)
 		if _intro.running():
@@ -1042,6 +1065,10 @@ func _setup_intro(args: PackedStringArray) -> void:
 		var h: String = _horns[pair[1]] if pair[1] < _horns.size() else ""
 		_intro.rival_horn = h if h.begins_with("horn_musical") else "horn_musical_1"
 	_intro.finished.connect(_on_intro_finished)
+	_intro.prepared.connect(func() -> void:          # T-208: abertura preparada (shaders aquecidos)
+		LoadClock.mark("abertura_preparada")
+		if online:
+			Net.race_loaded())
 	_intro.setup(kind, tod, _trucks, pair, cards, DuelCards.place_of(route))
 	if _intro.running():
 		_cam.attributes = UltraLook.intro_attributes(int(Settings.quality))   # T-189: profundidade de campo (Ultra)
@@ -1074,6 +1101,8 @@ func _intro_frame(dt: float) -> void:
 
 ## Online: segundos desde que o servidor comecou a contagem (setup + ping; igual em todos os clientes).
 func _net_elapsed() -> float:
+	if not Net.race_clock_started:                  # T-208: o servidor ainda espera alguem montar a corrida
+		return 0.0
 	var total: float = float(Net.pending_setup.get("countdown_total", Protocol.COUNTDOWN_SECONDS))
 	return DuelPlan.online_elapsed(total, float(Net.pending_setup.get("countdown", total)), Net.pending_setup_msec,
 		Time.get_ticks_msec(), Net.ping_ms)

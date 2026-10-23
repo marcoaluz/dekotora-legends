@@ -27,4 +27,5 @@ func _ready() -> void:
 	for a in args:
 		if a.begins_with("--goto="):          # depuracao de builds exportadas: --goto=res://scenes/race/race3d.tscn
 			target = a.substr(7)
+			LoadClock.go()                    # T-208: mede o carregamento (LOAD_T208)
 	get_tree().change_scene_to_file.call_deferred(target)

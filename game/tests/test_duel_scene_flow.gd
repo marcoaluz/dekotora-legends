@@ -30,6 +30,12 @@ func test_campaign_is_one_on_one_with_full_intro_skip_and_short_rematch() -> voi
 	check_eq(intro.kind, DuelPlan.FULL, "1a vez contra o rival: abertura cheia")
 	check(intro.running() and not race._hud_layer.visible, "durante a abertura o HUD some")
 	var z0: float = sim.trucks[0].z
+	check(intro.preparing, "T-208: comeca preparando (tela preta + neblina), relogio em 0")
+	var guard: int = 0
+	while intro.preparing and guard < 400:                           # quadros lisos em sequencia (ou o limite)
+		race._process(0.016)
+		guard += 1
+	check(not intro.preparing and intro.t == 0.0, "T-208: preparada em %d quadros; o relogio comeca do 0" % intro.prep_frames)
 	for n in 10:
 		race._process(0.1)
 	check(intro.running() and intro.t > 0.9, "a abertura anda (%.1f s)" % intro.t)

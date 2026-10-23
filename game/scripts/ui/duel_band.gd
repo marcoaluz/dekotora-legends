@@ -23,7 +23,9 @@ var bolt_from: Vector2 = Vector2.ZERO
 var bolt_to: Vector2 = Vector2.ZERO
 var letterbox: float = 0.0          # 0..1 (slides in/out)
 var skip_hint: bool = true
-var waiting: String = ""            # online after a skip: "the start is in N s"
+var waiting: String = ""            # online after a skip: "the start is in N s"; T-208: waiting for the others
+var prep: bool = false              # T-208: preparation: black screen with the purple fog, nothing else
+var warm: bool = false              # T-208: warm-up frame: every layer drawn once, invisible under the black
 var _hf: Font
 var _bf: Font
 var _jf: Font
@@ -56,6 +58,17 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	var w: float = size.x
 	var h: float = size.y
+	if prep:                                                       # T-208: preparing the opening
+		if warm:                                                   # compile the 2D layers once (covered below)
+			_bolt_layer(w, h)
+			_title_layer(w, h)
+			_band(0, 1.0, w, h)
+			_band(1, 1.0, w, h)
+		draw_rect(Rect2(0, 0, w, h), Color(0, 0, 0, 1))
+		LoadingFog.draw_on(self, Vector2(w, h), LoadingFog.now(), 1.0)
+		if waiting != "":
+			_shadowed(_hf, Vector2(0, h * 0.5), waiting, 14, Color(1, 1, 1, 0.85), HORIZONTAL_ALIGNMENT_CENTER, w)
+		return
 	if phase != "":
 		_bolt_layer(w, h)
 		_title_layer(w, h)
@@ -79,6 +92,8 @@ func _draw() -> void:
 		var black: float = DuelPlan.black_alpha(t_intro)
 		if black > 0.0:
 			draw_rect(Rect2(0, 0, w, h), Color(0, 0, 0, black))
+			if t_intro < DuelPlan.FADE_IN_S:                       # T-208: the 2D fog of the wait melts into the 3D one
+				LoadingFog.draw_on(self, Vector2(w, h), LoadingFog.now(), black)
 	if waiting != "":
 		_shadowed(_hf, Vector2(0, h * 0.5), waiting, 18, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER, w)
 
