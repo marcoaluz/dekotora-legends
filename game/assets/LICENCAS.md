@@ -60,3 +60,6 @@ decisão do Marco): locomotiva (`train/`), vagões (`Vagoes/`), 2 carros do "Low
 (`Unico, apenas um carro/`), 8 prédios e "The City" (`Cidade/`) e os letreiros do `NeonText.blend`
 (`Letras Japones e neon/`). Todos reduzidos/re-texturizados pelos scripts `build_t193_*.py` e `build_traffic_cars.py`
 (carros com pintura lisa, emblemas apagados). O pacote "Animated Neon Sign Pack" (C4D) não foi usado.
+| Guardiões Raijin e Fujin da abertura do duelo (T-204; figuras do folclore japonês, domínio público; DESENHO nosso, feito por código a partir de coordenadas, sem traçar nem copiar obra existente), aura de chamas e névoa | `assets/textures/duel/raijin.png`, `fujin.png`, `aura.png`, `fog_puff.png` | Gerados por `game/tools_dev/make_duel_art.gd` (+ `duel_art_kit.gd`, `duel_art_raijin.gd`, `duel_art_fujin.gd`; determinístico) | Nosso |
+| Título 対決 da abertura (T-204) | `assets/textures/duel/title_taiketsu.png` | `game/tools_dev/make_duel_art.gd` com a fonte Noto Sans JP Black (Google Fonts) | Nosso (fonte: SIL Open Font License 1.1) |
+| Trovão do raio da abertura (T-204) | `assets/audio/sfx/ui/duel_thunder.wav` | Sintetizado por `tools/synth_duel_audio.py` (ruído filtrado, semente fixa) | Nosso |
