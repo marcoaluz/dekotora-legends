@@ -425,3 +425,8 @@ Formato em `docs/AGENTES.md`.
 - Feito: APK de teste gerado com a abertura da T-204 (protocolo de rede 9), com Min/Target SDK vazios numa cópia temporária do preset e preset restaurado do git.
 - Arquivos: builds/kaido-bakuso-debug.apk (127.418.537 bytes, fora do Git); docs/STATUS.md (linha do APK).
 - Observação: export_presets.cfg sem diff (restaurado com git checkout). QUADRO.md não foi commitado. Log de exportação em scratchpad. Testado só no PC (export sem erro); celular ainda não testado.
+
+## 2026-10-23 16:30 · T-206 · ajudante-rapido · CONCLUÍDA
+- Feito: trovão da abertura (`duel_thunder`) gerado no ElevenLabs; `.mp3` passa a valer no lugar do `.wav` sintetizado (`.wav` mantido como reserva). Import e testes do duelo passaram (16 testes, 0 falharam).
+- Arquivos: game/assets/audio/sfx/ui/duel_thunder.mp3 (+ .mp3.import), docs/AUDIO_ELEVENLABS.md (nota da T-204), .claude/coordenacao/LOG.md.
+- Observação: o script `gen_audio.py` mostrou "créditos gastos nesta execução: 0 (total 65052/131000)" mesmo gerando o arquivo novo; conferir o saldo no painel do ElevenLabs. Godot não está no PATH: usei `/d/DEV/Godot/Godot_v4.7.2-stable_win64_console.exe`. Ao fim dos testes saem avisos de "ObjectDB instances leaked" e "resources still in use" (não reprovaram; provavelmente já existiam). Não consegui apagar /d/tmp_import.txt e /d/tmp_test.txt (fora do projeto; bloqueado pela checagem de segurança). QUADRO.md não foi alterado (T-206 segue "em andamento" até o coordenador atualizar). Celular não testado; Marco precisa ouvir o trovão na abertura.

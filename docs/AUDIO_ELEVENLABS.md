@@ -189,10 +189,11 @@ Mapa no código: `ExhaustDef.sound_profile` (`game/data/engines/exh_*.tres`) e `
 > dos trilhos, 6 s, gerado com a opção de loop do ElevenLabs) foram gerados com `tools/gen_audio.py` em `sfx/ambient/`.
 > **Ainda não ligados ao jogo** (tarefa separada). Marco: ouvir e pedir regeração se algum ficar ruim (`--only nome --force`).
 
-> **T-204 (abertura nova do duelo):** `duel_thunder` (raio entre os caminhões) por enquanto é **sintetizado**
-> (`python tools/synth_duel_audio.py` grava `sfx/ui/duel_thunder.wav`, sem créditos). Para trocar pelo ElevenLabs:
-> `python tools/gen_audio.py --only duel_thunder` (o `.mp3` gerado tem prioridade sobre o `.wav`; atenção: o `--all`
-> também gera este, porque o script só procura o `.mp3`). O taiko do título é o `vs_taiko_hit` de antes.
+> **T-204 (abertura nova do duelo):** `duel_thunder` (raio entre os caminhões) era **sintetizado**
+> (`python tools/synth_duel_audio.py` grava `sfx/ui/duel_thunder.wav`, sem créditos). **T-206 (2026-10-23): agora é do
+> ElevenLabs**: `sfx/ui/duel_thunder.mp3` (gerado com `python tools/gen_audio.py --only duel_thunder`) tem prioridade
+> sobre o `.wav`. O `.wav` sintetizado foi mantido como reserva (não apagar). Para regerar: `--only duel_thunder --force`
+> (atenção: o `--all` também gera este, porque o script só procura o `.mp3`). O taiko do título é o `vs_taiko_hit` de antes.
 
 > **T-156 (abertura frente a frente):** `vs_taiko_hit` (tambor no banner VS) foi gerado com `tools/gen_audio.py`
 > (conta em ~61.100 de 131.000 créditos). Os outros sons da cena já existiam: motor acelerando parado = as camadas
