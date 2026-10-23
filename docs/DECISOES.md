@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-23 | **Abertura do duelo mais lenta e abrindo na hora (T-208, relato do Marco: "demorou para abrir e foi rápido demais").** Cena de **8,9 s + 3 s de contagem = 11,9 s** (antes 5 + 3): entrada 2,6 s (param em 2,1 s e respiram), guardiões 1,3 s, 対決 sozinho 1,2 s, **fase nova "faixas" 1,9 s** (faixas dos pilotos paradas ~2,5 s para ler), raio 0,9 s, arrancada 1,0 s. O relógio da cena começa no **1º quadro liso**: antes dele um preparo com tela preta + neblina roxa aquece os shaders (pista uma vez, estúdio com tudo aceso uma vez). O menu lê a corrida em segundo plano e a troca de tela mostra preto + neblina desde o clique. **Online: o servidor só começa a contar quando todos montaram a corrida** (`c_race_loaded`, no máximo 30 s) e avisa todos no mesmo instante (`s_state(COUNTDOWN)`); protocolo 11. | Relato do Marco no celular (T-208). Medidas em `docs/capturas_t208/medidas.txt`; detalhes na seção "T-208" no fim |
 | 2026-10-23 | **Abertura do duelo refeita (T-204, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** Estúdio preto com neblina roxa rasteira (volumétrica só no PC Ultra; no celular, planos de névoa baratos); os 2 caminhões DE VERDADE entram pelos lados em ângulo e param lado a lado de frente para a câmera, faróis e neon acesos; atrás deles sobem os guardiões **Raijin** (atrás do jogador, à esquerda) e **Fujin** (atrás do rival, à direita), arte NOSSA desenhada por código, cada um numa aura de chamas; **対決** entra com o taiko; as faixas dos dois pilotos aparecem juntas embaixo (sem a fala de provocação: não dá tempo de ler); um **raio** cai entre os dois com **UM clarão de 0,15 s** e trovão (opção nova **"Reduzir clarões"** troca por um brilho violeta suave e também suaviza o clarão da saída do túnel); corte: os dois arrancam para a câmera; na pista a contagem começa com eles já lado a lado no grid. **8 s no total (5 s de cena + 3 s de contagem)**, antes 9,4 s. Protocolo de rede 9. Saíram: área de descanso/praça de pedágio, detalhes de para-choque/viseira/mural, banner VS e o pisca-pisca de farol de provocação. | Pedido do Marco (T-204). Detalhes na seção "T-204" no fim |
 | 2026-10-21 | **Cenário novo em UM trecho-piloto por rota (T-188, etapa 1) — AGUARDA APROVAÇÃO DO MARCO pelos prints.** Litoral 0,6–1,6 km, cidade 1,3–2,05 km, montanha 1,1–2,05 km (`ScenicZone`, `--t188=off|segment|all`, padrão `segment`): terreno com relevo e textura (grama em 3 tons, terra, rocha, copa de floresta, areia na costa, margem do outro lado da baía), montanhas em 3 camadas (morros perto, cordilheira do meio por código, maciços do horizonte com textura, normais suaves e perspectiva aérea), floresta nas encostas, quarteirões com calçada/ruas/telhados variados/8 fachadas/letreiros de neon com kanji (recuo ≥ 40 m do eixo), casas nos morros do litoral, pedras novas, placas do pórtico com texto na textura. **Global** (não dá para cortar por km): céu novo (estrelas pequenas, lua, nuvens com volume), luar azulado + brilho da cidade no horizonte à noite, neblina com a cor do horizonte; neve dos maciços do litoral/cidade 0,8 → 0,5 (para aparecer floresta). Texturas feitas por código (numpy/Blender e Noto Sans JP, OFL); nada baixado | Pedido do Marco (T-188). Custo medido no PC (modo médio): chamadas −1 a +10, triângulos +5%, textura +1,4 MB, FPS no ruído. Detalhes na seção "T-188" no fim |
 | 2026-10-21 | **Biblioteca de cenário inteira no jogo (T-186) — escolhas visuais A CONFIRMAR PELO MARCO.** Inventário completo de docs/Modelos em `docs/BIBLIOTECA_CENARIO.md`. Lá só existe UMA espécie de árvore (Gleditsia, 6 variações), UM poste de luz (dentro da Ponte A) e UM personagem (o boneco do pacote ROAD SIGNS): as 6 Gleditsias, o poste da Ponte A (`lamp_bridge`) e o boneco (`person`) entraram; coqueiros (3 formas), cedro, pinheiro, árvore redonda e arbusto são **por código**. Árvores em **bosques por bioma** (nunca em fila), 2 LODs, MultiMesh; poste antigo na praça do pedágio e no litoral, poste da ponte no viaduto, na serra e nas pontes; pessoas no pedágio, no viaduto por cima e na abertura do duelo; **retrato** do motorista (busto com a camisa na cor do caminhão) na faixa do duelo, para o jogador e o rival. Só visual. Canter (`canter.obj`) continua fora (extraído de outro jogo) | Pedido do Marco (T-186). Detalhes na seção "T-186" no fim |
@@ -893,3 +894,32 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
 - 8 s contam a contagem 3-2-1. Itens da abertura antiga (área de descanso, pedágio, tomadas de detalhe, banner VS, falas, pisca de farol) **não voltam**.
 - Trovão: aprovado gerar no ElevenLabs (T-206).
 - Novo pedido: pedágio da pista mais real, com física e a rua se dividindo em duas (T-207).
+
+## 2026-10-23 · T-208 · Abertura demorando para abrir e rápida demais (relato do Marco no celular)
+
+**Causa da demora** (medida no PC imitando o celular; celular não medido): depois do clique a tela ficava parada no escuro enquanto o
+jogo (1) lia a cena da corrida e todos os scripts (2,3–2,6 s), (2) montava o mundo inteiro da rota (2,2–3,0 s; a estrada sozinha 0,8 s) e
+(3) compilava os shaders no 1º quadro (0,7–0,9 s com o cache; **8,6–10 s sem cache**, que é a 1ª corrida depois de instalar um APK novo).
+A abertura não é a culpada (o 1º quadro custa o mesmo sem ela); ela só ficou na frente. No celular tudo isso é várias vezes mais lento.
+Além disso os 3 primeiros quadros e a subida dos guardiões davam trancos de 120–150 ms (shaders do estúdio compilando no meio da cena).
+
+**O que mudou**
+- `SceneFader`: a cena nova é lida numa thread (`ResourceLoader.load_threaded_request`); para a corrida o fundo é preto com a neblina roxa
+  (`ui/loading_fog.gd`) desde o clique. O menu principal pede a leitura da corrida 1 s depois de abrir (`SceneFader.prefetch`;
+  `--no-prefetch` desliga): Continuar encontra a cena lida (2,3 s → 0,09 s).
+- `DuelIntro`: **preparo** antes do relógio: quadro 1 = pista sob o sol (shaders do mundo), quadro 2 = estúdio com guardiões, auras, luz do
+  raio, título, faixas e raio desenhados uma vez atrás do preto, depois espera 2 quadros abaixo de 70 ms (máximo 6 s). O relógio começa
+  do 0 só então (`ABERTURA: preparada em N quadros` no log). Tocar durante o preparo offline pula direto para a contagem.
+- Linha do tempo (`DuelPlan.PHASES`): entrada 2,6 / guardiões 1,3 / título 1,2 / **faixas 1,9 (nova)** / raio 0,9 / arrancada 1,0 = 8,9 s;
+  `BOLT_AT` 7,12 s; os caminhões param em 80% da entrada (`STOP_AT`), arrancada a 16 m/s² (o nariz não passa da lente em 1 s); fade do
+  preto 0,6 s; guardiões sobem em 1 s; segundo taiko mais baixo quando as faixas entram.
+- Online: `Room.loading` segura a contagem até todos mandarem `c_race_loaded` (ou `Protocol.LOAD_WAIT_MAX` = 30 s; desconectado não
+  conta); então o servidor manda `s_state(COUNTDOWN)` e o cliente passa a contar daquele instante (`Net.race_clock_started`). Quem já
+  preparou vê "Aguardando o outro piloto...". **Protocolo 11** (10 era da T-207).
+- Diagnóstico: `debug/load_clock.gd` imprime `LOAD_T208` (cada etapa do clique ao 1º quadro e picos > 50 ms dos primeiros quadros).
+
+**Medidas** (quente/frio): relógio da cena começa 3,3 s / 7,5 s depois do clique (antes a 1ª imagem vinha em 6,4 s / 14 s, mais trancos
+dentro da cena); nenhum quadro acima de 50 ms durante a cena. Arquivo: `docs/capturas_t208/medidas.txt`.
+
+**Fica para depois**: a estrada (`RoadMesh.build`, 0,8 s) usa SurfaceTool em GDScript na rota inteira; dá para cortar bem montando os
+arrays direto (estava sendo editada pela T-207, não mexi). No celular a 1ª corrida após instalar ainda vai demorar (shaders sem cache).

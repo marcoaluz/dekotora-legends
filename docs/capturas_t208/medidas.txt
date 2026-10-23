@@ -1,0 +1,31 @@
+T-208 - tempo do clique ate a abertura do duelo (PC do Marco imitando o celular: Compatibility, qualidade media,
+sem vida do cenario, janela 1280x576). Celular de verdade NAO medido (sem aparelho no adb). Comando:
+  GODOT=... bash tools/measure_t208.sh [frio|quente|ambos]      (MODE=goto = abrir a corrida direto, sem menu)
+"frio" = sem o cache de shaders do Godot (1a corrida depois de instalar o APK); "quente" = 2a corrida em diante.
+
+ANTES (codigo da T-204, corrida aberta direto, kanto_2_viaduct; o clique congelava a tela escura ate a cena aparecer)
+                               quente      frio
+  ler a cena (scripts)          2.6 s      2.4 s     tela congelada
+  montar o mundo (_ready)       2.9 s      3.0 s     tela congelada
+  1o quadro (shaders)           0.9 s      8.6 s     tela congelada (frio: 10 s em outra rodada)
+  TOTAL ate a 1a imagem         6.4 s     14.0 s
+  depois: picos de 120-150 ms nos 3 primeiros quadros e 141 ms quando os guardioes aparecem (2,1 s), dentro da cena
+
+DEPOIS (T-208, caminho de verdade: menu 3 s -> Continuar, kanto_1_coast)
+                               quente      frio      sem leitura antecipada (--no-prefetch, quente)
+  escurecer                     0.12 s     0.13 s    0.13 s
+  ler a cena                    0.09 s     0.17 s    2.31 s   (o menu ja leu em segundo plano)
+  montar o mundo (_ready)       2.2 s      2.4 s     2.3 s
+  1o quadro (shaders)           0.72 s     2.7 s     0.74 s
+  preparo (preto + neblina)     0.12 s     2.1 s     0.11 s   (shaders do estudio aquecidos atras do preto)
+  RELOGIO DA CENA COMECA EM     3.3 s      7.5 s     5.6 s
+  durante a cena: nenhum quadro acima de 50 ms (antes: 4 picos de 120-150 ms)
+  a tela mostra preto + neblina roxa desde o clique (antes: tela escura parada)
+
+Onde ainda vai o tempo (montar o mundo, quente): estrada RoadMesh.build 0,78 s (SurfaceTool em GDScript na rota
+inteira); terreno/cenario 0,29 s; ferrovia 0,21 s; arvores/postes 0,17 s; chegada 0,14 s; resto < 0,07 s cada.
+
+Online (tools/net_test.sh com LOAD_DELAY=4000: Beto demora 4 s para montar):
+  servidor: "todos montaram a corrida em 4.1 s; abertura e contagem comecam agora"
+  largada prevista x real: Ana -1 ms, Beto -7 ms (antes: o servidor contava a partir do setup e quem montava
+  devagar perdia a abertura inteira)
