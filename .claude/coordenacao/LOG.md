@@ -420,3 +420,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 443/443 (14 testes da abertura, 6 novos: linha do tempo 8 s, clarão único ≤0,16 s e nada branco no modo reduzido amostrado a 240 Hz, curvas do título/faixas, movimentos dos caminhões, lente da arrancada, raio com semente); `--quit-after 30` sem erro novo (o "1 resources still in use" já existia); `tools/net_test.sh` ok (largada prevista ±40 ms, igual antes); prints PC média/Ultra 1920x1080, celular 2400x1080, reduzido e dia conferidos; vídeo `builds/t204_abertura_duelo.avi`; custo média 330–377 FPS / 227–322 chamadas na cena.
 - Armadilhas: Compatibility desenha o céu mesmo com BG_COLOR (o céu do estúdio virou o fundo); câmera dentro do FogVolume = tela roxa; DOF do Ultra borrava os guardiões (attributes = null no estúdio); heredoc com aspas no Bash falha (patches por arquivo .py).
 - Decisão pendente: Marco aprovar o desenho dos guardiões (Raijin = jogador); 8 s contando a contagem (ou 8 s só de cena); saída das falas de provocação e do pisca-pisca de farol; trovão sintetizado x ElevenLabs. Commits com "Co-Authored-By: Claude Opus 5.5" (atribuição do sistema; o modelo que fez foi o Opus).
+
+## 2026-10-23 16:13 · T-205 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste gerado com a abertura da T-204 (protocolo de rede 9), com Min/Target SDK vazios numa cópia temporária do preset e preset restaurado do git.
+- Arquivos: builds/kaido-bakuso-debug.apk (127.418.537 bytes, fora do Git); docs/STATUS.md (linha do APK).
+- Observação: export_presets.cfg sem diff (restaurado com git checkout). QUADRO.md não foi commitado. Log de exportação em scratchpad. Testado só no PC (export sem erro); celular ainda não testado.
