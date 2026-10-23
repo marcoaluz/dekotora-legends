@@ -5,6 +5,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-207 | Pedágio mais real: textura/material melhores, luz, estrutura com volume, FÍSICA (bater na cabine/ilha), pista que se separa em duas ruas passando ao lado da cabine central | pedido do Marco | difícil | especialista | em andamento | 2026-10-23 | |
+| T-206 | Trovão da abertura via ElevenLabs (gen_audio.py --only duel_thunder), importar, testar, anotar em AUDIO_ELEVENLABS.md | delegado da T-204 (Marco aprovou gastar créditos) | fácil | ajudante-rapido | em andamento | 2026-10-23 | |
 | T-205 | APK de teste com a abertura da T-204 (protocolo 9) e linha do APK no STATUS | delegado da T-204 | fácil | ajudante-rapido | concluída (APK 127 MB, commit 2bb6903; precisa Marco: instalar e testar) | 2026-10-23 | 2026-10-23 |
 | T-204 | Reformular a abertura do duelo (T-156): estúdio preto com neblina roxa, caminhões reais entram em ângulo e param lado a lado, guardiões Raijin/Fujin originais com aura, título 対決 com taiko, raio + flash seguro + trovão, corte para o grid e contagem; ~8 s, pular, online no relógio do servidor; prints de cada etapa | pedido do Marco | difícil | especialista | concluída (commits fec0cb7, 6f14ebb, 18abe0e, 0dc9334; 443 testes ok, protocolo 9; precisa Marco: aprovar visual e 4 decisões) | 2026-10-23 | 2026-10-23 |
 | T-203 | APK de teste com o HUD da T-202 e linha do APK no STATUS (RELEASE_ANDROID.md) | delegado da T-202 | fácil | ajudante-rapido | concluída (APK 123 MB, protocolo 8; precisa Marco: instalar e testar) | 2026-10-22 | 2026-10-22 |

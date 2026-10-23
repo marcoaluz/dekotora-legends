@@ -887,3 +887,9 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
 - **A confirmar pelo Marco**: (1) o desenho dos guardiões e qual fica com quem (Raijin = jogador); (2) 8 s contando a contagem
   (se quiser 8 s só de cena, é mudar `DuelPlan.PHASES`; o servidor acompanha); (3) as falas de provocação saíram da cena;
   (4) o pisca-pisca de farol de provocação saiu (fotossensibilidade); (5) trovão sintetizado (trocar pelo ElevenLabs?).
+
+## 2026-10-23 — T-204: respostas do Marco sobre a abertura
+- Raijin/Fujin aprovados por ora (a arte será trocada mais tarde); Raijin com o jogador, Fujin com o rival.
+- 8 s contam a contagem 3-2-1. Itens da abertura antiga (área de descanso, pedágio, tomadas de detalhe, banner VS, falas, pisca de farol) **não voltam**.
+- Trovão: aprovado gerar no ElevenLabs (T-206).
+- Novo pedido: pedágio da pista mais real, com física e a rua se dividindo em duas (T-207).
