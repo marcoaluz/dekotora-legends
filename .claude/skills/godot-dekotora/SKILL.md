@@ -462,3 +462,17 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Glow: na noite o limiar é 1,1 (`night.tres`); nível 5 do glow 0,55 na média, Ultra 4=0,45/6=0,25 (antes halos enormes).
 - Prints sem painel: `--tour-clean` na câmera livre; `bash tools/capture_t199.sh PASTA [day night]` (`Q=3` Ultra,
   `ROUTES=`, `POSES=`), folhas `bash tools/sheet_t199.sh` (`GRID=rota/hora` = grade rápida). Testes `-- --only=scenery_t199`.
+
+## HUD da corrida (T-202)
+
+- Código em `game/scripts/ui/hud/`; `RaceHud` (`ui/race_hud.gd`) só monta, posiciona (`HudLayout`) e copia o estado
+  (`_feed`). Contas puras testáveis sem tela: `GaugeNeedle` (ângulo/agulha), `HudStatus` (5 segmentos, pisca-alerta),
+  `RadarModel` (radar), `HudLayout` (onde cada peça vai; recebe `TouchControls.button_layout(size, escala)`).
+- Peça nova no HUD: desenhe em unidades locais com fonte de tamanho FIXO e escale o nó inteiro (`scale`), como o
+  `SpeedGauge`; coloque o retângulo em `HudLayout` e um caso no `test_hud_t202.gd` (sem sobrepor nada, longe dos botões).
+- Texto claro sobre a pista some em cima da faixa branca: dê sombra/fundo escuro (ex.: rótulos dos segmentos).
+  `draw_string` com largura limitada CORTA o texto ("FRENT"): centralize à mão com `HudStyle.text_width`.
+- Capturas (janela): `GODOT=... bash tools/capture_t202.sh PASTA [casos]`; flags `--window=2400x1080` (janela maior que o
+  monitor), `--no-touch`/`--touch`, `--hud-scale=1.25`, `--safe-area=L,T,R,B`, `--hud-demo`. Recorte ampliado sem tela:
+  `-s res://tools_dev/crop_image.gd -- --in=ABS --out=ABS --rect=x,y,w,h --zoom=2`. Testes `-- --only=hud_`.
+- Dano das peças fica salvo no perfil entre corridas: segmento amarelo numa corrida normal pode ser dano real.

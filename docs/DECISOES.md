@@ -797,3 +797,50 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
 - **Não resolvido**: a poça de luz do poste da praça do pedágio (km 0) ainda estoura branca no asfalto molhado à
   noite (é luz do poste, não do caminhão); detalhes ficam pequenos na câmera da corrida porque os prédios estão a
   46 m+ da pista (regra da T-188).
+
+## 2026-10-22 · T-202 · HUD da corrida estilo Art Truck Battle (pedido do Marco)
+
+- **Só apresentação**: nada em `scripts/sim/` nem na rede. O HUD lê `TruckSim`/`RaceSim` (igual online e offline).
+  Código em `game/scripts/ui/hud/`: contas puras (`GaugeNeedle`, `HudStatus`, `RadarModel`, `HudLayout`) e
+  componentes que só desenham (`SpeedGauge`, `IndicatorStrip`, `DamageSegments`, `RouteClocks`, `RadarStrip`).
+  `RaceHud` (`ui/race_hud.gd`) monta tudo e posiciona também o ícone de câmera (T-198), o retrovisor e os avisos de
+  evento (`EventHud.alert_cx/alert_top/refused_at`).
+- **Lugar das peças (PC 16:9)**: POSIÇÃO + ícone de câmera em cima à esquerda; retrovisor no meio em cima (subiu: os
+  relógios foram para a direita); relógios + barra de progresso + destino/rival em cima à direita; radar na borda
+  esquerda; velocímetro embaixo à direita com setas/lâmpadas acima e os 5 segmentos abaixo (como no original).
+  **Celular**: as mesmas peças, maiores pelo DPI (`HudLayout.scale_for`: 3,4 pol / altura física, entre 1 e 1,25),
+  dentro da área segura (`DisplayServer.get_display_safe_area`, só em `mobile`), e o conjunto do velocímetro fica
+  entre os polegares, à esquerda do FREIO, sem cobrir nenhum botão (círculo de toque × 1,25) nem o caminhão; se não
+  couber, encolhe até 0,55. Coberto por `tests/test_hud_t202.gd`.
+- **Velocímetro**: escala 0–140 (= `EngineModel.MAX_SPEED`), 240° no sentido horário a partir de baixo à esquerda;
+  a agulha pode passar do 140 até o pino de 150 (o vácuo dá 38,9 + 2,0 m/s ≈ 147 km/h). Agulha com mola/amortecedor
+  (ω 13 rad/s, amortecimento 0,62: passa um pouco do alvo), sub-passos de 8 ms (mesmo movimento a 20 ou 240 FPS),
+  tremor pequeno que cresce com o RPM e um tranco para baixo na batida (`TruckSim.jolted`). Velocidade digital
+  pequena embaixo (fica vermelha no tranco, T-152), marcha no centro ("N" parado), turbo (T, ciano) e Passing (P)
+  como arcos no aro, "VÁCUO" acende no mostrador, cunha âmbar = velocidade segura da curva à frente (com o aviso),
+  traço vermelho = limite das obras. Luz de fundo: branca fria de dia → âmbar à noite e dentro do túnel
+  (`max(1 - day_amount, túnel)`); vidro/reflexo só quando `fancy` (PC sempre; celular só na qualidade Alta).
+- **Setas verdes** (como no original) no ritmo do `SignalBlink` (T-170). Lâmpadas: farol (noite/túnel), pisca-alerta,
+  buzina, freio (forte = vermelho vivo; pedal = vermelho fraco). Pontos das 5 faixas embaixo (faixa fechada à frente
+  = vermelho).
+- **Pisca-alerta (regra nova, só visual)**: acende no HUD e no caminhão (`TruckNode.set_signal(2)`) quando o
+  caminhão derrapa para fora da faixa, fica parado/abaixo de 4 m/s depois de 6 s de corrida, ou o prazo acabou.
+  Não liga na contagem nem depois da chegada. A seta normal tem prioridade.
+- **5 segmentos = por ÁREA** (interpretação de "5 segmentos de status por peça"): frente, lateral esquerda, lateral
+  direita, traseira, carga/baú. Valor = `DamageModel.zone_health` (o mesmo da garagem: média das peças da área ou o
+  sistema da área se não há peça) e `cargo_integrity` para a carga. Verde ≥ 66%, amarelo ≥ 33%, vermelho, escuro =
+  destruído (0). O segmento que piora pisca 1,2 s. Mouse em cima (PC) ou toque (celular, 3 s) abre o detalhe: estado
+  e %, peças inteiras X de Y, sistema por trás (motor/direção/carga) ou perda no prêmio. **Confirmar com o Marco** se
+  queria uma barra por peça instalada.
+- **Relógios**: 走行時間 / TEMPO DE PERCURSO (sobe) e 残り時間 / TEMPO RESTANTE (prazo; amarelo < 30 s, vermelho
+  piscando < 15 s); sem prazo, só o 1º. Barra de progresso com um marcador numerado por caminhão (número = posição de
+  largada): você em cima (rosa), os outros embaixo (rival dourado), para o rival colado em você não sumir.
+- **Radar vertical** (esquerda, translúcido): 360 m à frente (raiz quadrada: perto ocupa mais espaço) e 60 m atrás;
+  você rosa, rival dourado, outros caminhões azul-claro, carros do trânsito ciano até 220 m, acidentado vermelho
+  piscando; eventos até 900 m (acima de 360 m ficam presos na borda de cima): acidente vermelho, obras laranja,
+  estreitamento amarelo, trecho de 2 faixas cinza. Âmbar dentro do túnel.
+- **Contador de FPS** saiu do meio (ficava atrás do aviso de evento): agora à direita do painel POSIÇÃO.
+- **Capturas**: `--window=WxH` (janela sem borda maior que o monitor), `--no-touch`, `--hud-scale=`, `--safe-area=L,T,R,B`
+  (unidades do HUD) e `--hud-demo` (caminhão batido + seta esquerda presa + detalhe da FRENTE aberto; só offline).
+- **Não validado**: celular de verdade (DPI, área segura com entalhe real, toque no segmento com dois dedos) e custo
+  no celular (o HUD é todo `_draw()`; ~6 nós novos).

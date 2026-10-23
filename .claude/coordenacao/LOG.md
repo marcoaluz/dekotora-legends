@@ -402,3 +402,9 @@ Formato em `docs/AGENTES.md`.
 - Feito: APK de teste gerado (protocolo de rede 8, polimento do mapa T-199), commit 1adae35 com a linha do APK no STATUS.md.
 - Arquivos: builds/kaido-bakuso-debug.apk (123 MB, 123.055.738 bytes), docs/STATUS.md; game/export_presets.cfg restaurado (git diff vazio).
 - Observação: nada apagado em builds/; não foi feito push; QUADRO.md não mexido. Este log ficou sem commit.
+
+## 2026-10-22 22:50 · T-202 · especialista · CONCLUÍDA
+- Feito: retomada do HUD novo (estilo Art Truck Battle). Código parcial revisado e integrado (já compilava); corrigidos: rótulo "FRENT" cortado, rótulos dos segmentos sumindo sobre a faixa branca (fundo + sombra), contador de FPS atrás do aviso de evento (foi para o lado da POSIÇÃO), marcador do rival escondido atrás do jogador na barra (você em cima, outros embaixo), popup de detalhe transparente sobre o velocímetro, popup saindo pela direita, linha com tabs no `race_scene_3d.gd`, caso de túnel da captura fora do túnel (start 700). 14 testes novos.
+- Arquivos: game/scripts/ui/hud/*, ui/race_hud.gd, ui/event_hud.gd, road3d/race_scene_3d.gd, truck/truck_node.gd, input/touch_controls.gd, ui/components/debug_shot.gd, data/i18n/pt-BR.json, tests/test_hud_t202.gd, tests/test_hud_scene_t202.gd, tools/capture_t202.sh, tools_dev/crop_image.gd, docs/capturas_t202/, docs (STATUS, DECISOES, ROADMAP), skill godot-dekotora.
+- Validação: `--import` e `--quit-after 30` sem SCRIPT ERROR; suíte 437 testes, 0 falharam (eram 423); 7 prints (PC 1920x1080 e celular 2400x1080, dia/noite/dano/túnel) + folha `docs/capturas_t202/folha_t202.png` conferidos. Celular de verdade não testado. `game/scripts/sim/` intocado.
+- Decisão pendente: (1) "5 segmentos por peça" feito por ÁREA (frente/laterais/traseira/carga) — confirmar; (2) agulha passa do 140 até o pino de 150 no vácuo; (3) alcance do radar 360 m.

@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-22** (T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-22** (T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -31,9 +31,10 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Modelos novos (T-193) | corrida normal; desligar `-- --no-city-models` (prédios texturizados e skyline), `--no-unique-car`; trens `--train=freight`; prints `bash tools/capture_t193.sh PASTA [day night]` (em `docs/capturas_t193/`, folhas `folha_day/night/trens/modelos.png`); custo `MEASURE_Q=media bash tools/measure_t192.sh 3000 night` (antes: `MEASURE_EXTRA="--no-city-models --no-unique-car"`, em `docs/capturas_t193/custo_*.txt`); carro único `-s res://tools_dev/probe_unique_t193.gd`; regerar: ver `docs/BIBLIOTECA_CENARIO.md` seção 4; testes `-- --only=scenery_t193` |
 | PC Ultra + vida do cenário (T-189) | PC abre em Forward+/Ultra; Opções > Gráficos: Qualidade (Ultra só no PC), "Vida do cenário", "Borrão de velocidade", "Chuva"; forçar `-- --quality=3`, `--life=off\|on`, `--rain`/`--no-rain`, `--motion-blur`, `--time=dawn`; média como no celular: `godot --path game --rendering-method gl_compatibility ... -- --quality=1 --life=off`; prints `GODOT=... bash tools/capture_t189.sh PASTA [day night]` (em `docs/capturas_t189/`, folhas `folha_day/night.png`: esquerda média, direita Ultra); FPS `bash tools/measure_t189.sh [quadros] [day\|night] [1920x1080]`; testes `-- --only=ultra_look` e `-- --only=race_life`; no log `LIFE_T189 ...` |
 | Polimento do cenário (T-199) | corrida normal (detalhes sempre ligados); prints sem painel `bash tools/capture_t199.sh PASTA [day night]` (`Q=3` Ultra, `ROUTES=`, `POSES=`) e folhas `bash tools/sheet_t199.sh` (em `docs/capturas_t199/`: `folha_<rota>_<hora>.png`, `folha_ultra_noite.png`, `folha_resumo.png`, `retrato_duelo_depois.png`); custo `bash tools/measure_t195.sh 3000 night` (`custo_antes/depois.txt`); testes `-- --only=scenery_t199` |
+| HUD da corrida (T-202) | corrida normal (PC: `godot --path game res://scenes/race/race3d.tscn`); ver como celular no PC: `-- --touch --hud-scale=1.25 --safe-area=22,0,0,0`; caminhão batido + seta ligada + detalhe aberto `-- --hud-demo`; prints `GODOT=... bash tools/capture_t202.sh PASTA [pc_dia pc_noite cel_dia cel_noite dano_pc dano_cel tunel_pc]` (janela; `--window=2400x1080` cria a janela no tamanho do celular) e folha `docs/capturas_t202/folha_t202.png`; recorte ampliado `-s res://tools_dev/crop_image.gd -- --in= --out= --rect=x,y,w,h --zoom=2`; testes `-- --only=hud_` |
 | Câmeras da corrida e retrovisor (T-198) | na corrida: **C** (ou ícone de câmera no canto de cima à esquerda) troca perto → padrão → longe → cinema → órbita; **R** (ou tocar no espelho) liga/desliga o retrovisor; Opções > Gráficos: Câmera da corrida, Retrovisor (Automático/Ligado/Desligado), Faixas pretas; forçar `-- --race-cam=cinema --mirror=on` (`--cine-shot=side_low`, `--letterbox=off`); prints `bash tools/capture_t198.sh PASTA [day night]` + `bash tools/sheet_t198.sh`; custo `bash tools/measure_t198.sh [3000] [night]`; testes `-- --only=race_cameras` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
-| Testes automáticos (420) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Testes automáticos (437) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, H = buzina, C = câmera, R = retrovisor, Esc = pausa) |
@@ -100,6 +101,18 @@ viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminh�
 `docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
 (galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore. **T-199**: copas das Gleditsias
 engrossadas (`TreeCrown`) e retrato do duelo com rosto/óculos/hachimaki (`ui/duel_bust.gd`).
+
+## HUD da corrida (T-202)
+
+HUD refeito com a cara do Art Truck Battle (desenho nosso, sem copiar arte): velocímetro analógico 0–140 km/h com
+agulha com inércia e tremor, aro cromado, vidro e luz de fundo branca de dia / âmbar à noite e no túnel (marcha no
+centro, turbo e Passing no aro, cunha da curva e traço do limite de obra na escala); setas VERDES + lâmpadas (farol,
+pisca-alerta, buzina, freio) + pontos das faixas; 5 segmentos de status (frente, laterais, traseira, carga) com
+detalhe ao passar o mouse / tocar; relógios 走行時間 / 残り時間 com barra de progresso numerada (você em cima, os
+outros embaixo); radar vertical translúcido à esquerda (você, rival, caminhões, carros, acidentados, eventos à
+frente). No celular: maior pelo DPI (até 1,25×), dentro da área segura (entalhe) e longe dos botões de toque.
+Código em `game/scripts/ui/hud/` (contas puras testadas: `GaugeNeedle`, `HudStatus`, `RadarModel`, `HudLayout`).
+Pisca-alerta também acende no caminhão (só visual). Prints em `docs/capturas_t202/`. **Celular não testado de verdade.**
 
 ## Polimento do cenário (T-199)
 
@@ -238,6 +251,16 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-202 (2026-10-22): HUD novo da corrida.** Olhar `docs/capturas_t202/folha_t202.png` (linha 1 PC dia/noite,
+  linha 2 celular 2400×1080 dia/noite, linha 3 caminhão batido PC/celular com o detalhe da FRENTE aberto, linha 4
+  túnel: mostrador e radar âmbar). No PC: jogar uma corrida normal; passar o mouse nos 5 segmentos embaixo à direita.
+  **Gerar o APK de novo** e no celular: ver se nada fica embaixo dos dedos/entalhe, tocar num segmento (abre o
+  detalhe por 3 s). Dizer: (1) tamanho do velocímetro no celular; (2) se "5 segmentos por peça" era por ÁREA (feito:
+  frente, laterais, traseira, carga; o detalhe lista as peças) ou uma barra por peça instalada; (3) se a agulha pode
+  passar do 140 no vácuo (hoje vai até o pino de 150; o vácuo chega a ~147 km/h); (4) radar: alcance (360 m à frente)
+  e largura. O segmento FRENTE amarelo nas corridas normais é o dano real do caminhão salvo no perfil (consertar na
+  GARAGEM > REPARO).
 
 - **T-198 (2026-10-22): câmeras da corrida e retrovisor.** No PC: `godot --path game res://scenes/race/race3d.tscn --
   --route=kanto_1_coast`, apertar **C** várias vezes (padrão → longe → cinema → órbita → perto) e **R** (retrovisor).
