@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-22** (T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-23** (T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -25,7 +25,7 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 
 | O quê | Comando (na raiz do projeto) |
 | --- | --- |
-| Abertura frente a frente (T-156) | corrida da campanha normal (Continuar) mostra a cena; forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; capturas `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`; custo `bash tools/measure_t156.sh` (`MEASURE_EXTRA="--intro=none"` compara); duelo sem tela `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6]` |
+| Abertura do duelo (T-204; antes T-156) | corrida da campanha normal (Continuar) mostra a cena (8 s com a contagem); forçar `-- --route=kanto_2_viaduct --intro=full\|short\|none`; clarões reduzidos `--reduce-flash` (ou Opções > Gráficos > Reduzir clarões); prints de cada etapa `GODOT=... bash tools/capture_t204.sh PASTA [pc_ultra pc_media cel reduzido dia]` + folhas `bash tools/sheet_t204.sh PASTA` (em `docs/capturas_t204/`); vídeo `godot --path game --write-movie ABS/builds/x.avi --fixed-fps 30 --quit-after 275 res://scenes/race/race3d.tscn -- --intro=full --decorated --quality=3`; arte `godot --path game -s res://tools_dev/make_duel_art.gd` (janela) e trovão `python tools/synth_duel_audio.py`; custo `bash tools/measure_t156.sh`; testes `-- --only=duel` |
 | Biblioteca de cenário (T-186) | inventário `bash tools/inventory_models.sh`; corrida com as árvores/postes/pessoas novas é a normal; antigo: `-- --old-trees --old-lamps --no-people`; `--no-tree-lod`; prints com a câmera livre sem teclado `GODOT=... bash tools/capture_t186.sh PASTA [extras]` (`--freecam --freecam-tour=PASTA --tour=nome@km,lat,alt,giro,incl;...`); custo `bash tools/measure_t186.sh [quadros] [day|night]` (`MEASURE_EXTRA="--old-trees --old-lamps --no-people"`); folha dos modelos `godot --path game --resolution 640x480 -s res://tools_dev/model_sheet_t186.gd -- --out=PASTA_ABS`; contagem de árvores `-s res://tools_dev/probe_groves.gd`; testes `-- --only=scenery_t186`; detalhes em `docs/BIBLIOTECA_CENARIO.md` |
 | Cenário novo na rota inteira (T-188 + T-192) | padrão na corrida normal, nas 3 rotas do km 0 ao fim: `-- --route=kanto_3_mountain --start=300 --time=night`; só o antigo trecho-piloto `-- --t188=segment`; antigo `-- --t188=off`; prints da rota inteira `bash tools/capture_t192.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t192.sh` (em `docs/capturas_t192/`); custo `bash tools/measure_t192.sh [3000] [night]`; árvores `blender -b --factory-startup -P blender/scripts/build_foliage_t192.py -- --preview`; testes `-- --only=scenery_t192`; T-188: prints `GODOT=... bash tools/capture_t188.sh PASTA [day night] [-- extras]` + folhas `bash tools/sheet_t188.sh` (em `docs/capturas_t188/`); custo `bash tools/measure_t188.sh [quadros] [day ou night]` (`MEASURE_EXTRA="--t188=off"`); texturas `blender -b --factory-startup -P blender/scripts/build_t188_textures.py` e `godot --path game -s res://tools_dev/make_neon_atlas.gd` (janela); testes `-- --only=scenery_t188`; no log aparece `SCENIC_T188 ...` |
 | Modelos novos (T-193) | corrida normal; desligar `-- --no-city-models` (prédios texturizados e skyline), `--no-unique-car`; trens `--train=freight`; prints `bash tools/capture_t193.sh PASTA [day night]` (em `docs/capturas_t193/`, folhas `folha_day/night/trens/modelos.png`); custo `MEASURE_Q=media bash tools/measure_t192.sh 3000 night` (antes: `MEASURE_EXTRA="--no-city-models --no-unique-car"`, em `docs/capturas_t193/custo_*.txt`); carro único `-s res://tools_dev/probe_unique_t193.gd`; regerar: ver `docs/BIBLIOTECA_CENARIO.md` seção 4; testes `-- --only=scenery_t193` |
@@ -101,6 +101,19 @@ viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminh�
 `docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
 (galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore. **T-199**: copas das Gleditsias
 engrossadas (`TreeCrown`) e retrato do duelo com rosto/óculos/hachimaki (`ui/duel_bust.gd`).
+
+## Abertura do duelo nova (T-204)
+
+Pedido do Marco: ritmo do original. 8 s no total: estúdio preto com neblina roxa rente ao chão (volumétrica só no PC Ultra),
+os 2 caminhões de verdade entram pelos lados e param lado a lado de frente (faróis e neon acesos), Raijin (atrás do jogador)
+e Fujin (atrás do rival) sobem em auras de chamas (arte nossa, `tools_dev/make_duel_art.gd`), 対決 entra com o taiko e as
+faixas dos 2 pilotos embaixo, um raio cai entre eles com UM clarão de 0,15 s e trovão (`duel_thunder.wav` sintetizado),
+corte: arrancam para a câmera; contagem na pista com eles já no grid. Opção nova **Reduzir clarões** (sem tela branca; também
+suaviza o clarão da saída do túnel). Código: `road3d/duel_plan.gd` (tempos e curvas puras), `duel_shots.gd` (movimentos e
+câmera), `duel_stage.gd` (estúdio, luzes, guardiões), `duel_fog.gd` (névoa), `duel_intro.gd` (controle, som, prints),
+`ui/duel_band.gd` (título, faixas, raio, clarão), `ui/duel_bolt.gd`. **Protocolo 9: gerar o APK de novo.** Prints em
+`docs/capturas_t204/` (etapas 0,5–7,5 s; folhas PC média, PC Ultra, celular 2400x1080, dia, reduzido, arte); vídeo em
+`builds/t204_abertura_duelo.avi` (fora do git). **Celular não testado de verdade.**
 
 ## HUD da corrida (T-202)
 
@@ -251,6 +264,14 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-204 (2026-10-23): abertura nova do duelo.** Ver o vídeo `builds/t204_abertura_duelo.avi` (com som) e as folhas em
+  `docs/capturas_t204/` (`folha_pc_media.png`, `folha_pc_ultra.png`, `folha_cel.png`, `folha_reduzido.png`, `folha_arte.png`;
+  cada etapa em `etapas/`). Dizer: (1) se gosta do desenho de Raijin e Fujin (e Raijin = jogador, Fujin = rival); (2) se os
+  8 s são contando a contagem 3-2-1 (como ficou) ou 8 s só de cena; (3) as falas de provocação e o pisca-pisca de farol
+  saíram (não dá tempo de ler / fotossensibilidade): manter assim?; (4) ouvir o trovão sintetizado
+  (`game/assets/audio/sfx/ui/duel_thunder.wav`) e dizer se quer a versão do ElevenLabs; (5) testar Opções > Gráficos >
+  Reduzir clarões. **Gerar o APK de novo** (protocolo de rede 9).
 
 - **T-202 (2026-10-22): HUD novo da corrida.** Olhar `docs/capturas_t202/folha_t202.png` (linha 1 PC dia/noite,
   linha 2 celular 2400×1080 dia/noite, linha 3 caminhão batido PC/celular com o detalhe da FRENTE aberto, linha 4

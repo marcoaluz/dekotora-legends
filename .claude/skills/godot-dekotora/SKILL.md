@@ -216,20 +216,38 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Em script de áudio, pegue o `AudioBus` por `(Engine.get_main_loop() as SceneTree).root.get_node_or_null("AudioBus")`
   quando o nó pode estar fora da árvore (testes): `get_node("/root/...")` falha fora dela.
 
-## Abertura frente a frente (T-156)
+## Abertura do duelo (T-156, refeita na T-204)
 
 - Flags da corrida (depois de `--`):
-  - `--intro=full|short|none` força a versão: `full` = cena cheia (~9,4 s), `short` = só a contagem (3 s), `none` = nenhuma.
-  - `--no-intro` tira a abertura. `--start=` e `--demo=` também desligam a abertura, de propósito: as capturas e medições antigas continuam iguais.
-- Quem decide a versão é `race_scene_3d.gd` (`_setup_intro`). Os tempos, a versão e o relógio online ficam em `road3d/duel_plan.gd`; o controle, os sons e as luzes em `road3d/duel_intro.gd`; o cenário em `road3d/duel_stage.gd`.
-- Capturas (precisam de janela, sem `--headless`): `GODOT=... bash tools/capture_t156.sh PASTA [dia noite tarde curta comboio]`. Referência em `docs/capturas_t156/`.
-- Custo: `GODOT=... bash tools/measure_t156.sh` mede o modo médio nas 3 rotas. Para comparar: `MEASURE_EXTRA="--intro=none" bash tools/measure_t156.sh`.
-- Duelo sem tela: `godot --headless --path game -s res://tools_dev/measure_duel.gd [-- --seeds=6 --route=ROTA --player=2]`.
-- Regras de jogo: a campanha é **1 contra 1** (jogador × rival da rota). A corrida rápida é 4 caminhões com a versão curta. A revanche é curta.
-- Online: 2 jogadores = versão cheia; **3–4 jogadores = "comboio"**: versão curta e trânsito um nível mais leve (`DuelPlan.convoy_traffic`, `rules.convoy` no setup).
-- **Protocolo 6** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total`. Cada cliente toca a abertura pelo **relógio comum** do servidor: setup + ping/2 (`DuelPlan.online_elapsed`). Cliente e servidor precisam da mesma versão: gere o APK de novo.
-- Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo. O executor `tests/run_tests.gd` roda esses testes no 1º quadro, quando a árvore de cena já existe. Hoje: `tests/test_duel_scene_flow.gd`.
-- Regra para texto que cresce na tela (nome, fala, banner VS): desenhe em tamanho de fonte **fixo** e escale com `draw_set_transform` (ver `ui/duel_band.gd`). Cada tamanho de fonte novo cria um cache de textura; o VS chegou a criar +58 MB de memória de textura antes dessa correção.
+  - `--intro=full|short|none` força a versão: `full` = cena cheia (5 s + 3 s de contagem = 8 s), `short` = só a contagem (3 s), `none` = nenhuma.
+  - `--no-intro` tira a abertura. `--start=` e `--demo=` também desligam a abertura, de propósito.
+  - `--reduce-flash` liga "Reduzir clarões" sem gravar (`Settings.fx_reduce_flash`).
+- Linha do tempo e curvas PURAS em `road3d/duel_plan.gd` (`PHASES`, `flash_alpha`, `soft_alpha`, `bolt_state`, `title_state`,
+  `bands_in`, `guard_in`, `black_alpha`); movimentos dos caminhões e câmera em `duel_shots.gd` (`truck_pose`, `studio_view`),
+  tudo função do relógio da abertura (online todos veem o mesmo instante). Estúdio `duel_stage.gd`, névoa `duel_fog.gd`,
+  controle/sons/prints `duel_intro.gd`, desenho `ui/duel_band.gd` + `ui/duel_bolt.gd`.
+- Mudou a duração? `DuelPlan.total_seconds` alimenta o servidor (`room.gd`, `countdown_total`): suba `Protocol.VERSION` e gere o APK.
+- Arte: `godot --path game -s res://tools_dev/make_duel_art.gd [-- --only=raijin,fujin,title,aura,fog]` (precisa de janela).
+  Kit 2D em `tools_dev/duel_art_kit.gd`: formas = união de círculos (`Geometry2D.merge_polygons`, polígono sempre simples),
+  `part()` = contorno + base + meia-lua de sombra (a peça menos ela mesma deslocada) + meia-lua de luz. Depois de gerar:
+  `--import` e conferir no `.import` `compress/mode=2` + `mipmaps/generate=true` (o título fica `mode=0`).
+- **Armadilha (fundo de cor)**: no Compatibility o `Environment` com `BG_COLOR` e `sky` atribuído desenha o CÉU no fundo
+  (a cor é ignorada). No estúdio o céu é quase preto e é ele o fundo (`BG_SKY`), igual nos dois renderizadores.
+- **Armadilha (FogVolume)**: câmera DENTRO da caixa de névoa volumétrica = tela inteira roxa. Mantenha o topo da caixa abaixo
+  da lente e o fim antes da câmera da arrancada.
+- A câmera recebe o `Environment` do estúdio, `far` 160 m e `attributes = null` (a profundidade de campo do Ultra borrava os
+  guardiões); o sol da rota (`race_scene._sun`) apaga. Tudo volta em `_leave_studio` (fim ou pular). Teste: `test_duel_scene_flow.gd`.
+- Prints de cada etapa (janela, `--fixed-fps 60`): `GODOT=... bash tools/capture_t204.sh PASTA [pc_ultra pc_media cel reduzido dia]`
+  (grava `abertura_00.50s_1.png` ... `abertura_07.50s_1.png`, instantes em `DuelPlan.SHOT_TIMES`/`COUNT_SHOT_TIMES`) e folhas
+  `bash tools/sheet_t204.sh PASTA`. Vídeo com som: Movie Maker `--write-movie ABS.avi --fixed-fps 30 --quit-after 275`.
+- Custo: `GODOT=... bash tools/measure_t156.sh` (linhas `[abertura <fase>] FPS medio`). Duelo sem tela: `tools_dev/measure_duel.gd`.
+- Regras de jogo: a campanha é **1 contra 1**. A corrida rápida é 4 caminhões com a versão curta. A revanche é curta.
+- Online: 2 jogadores = versão cheia; **3–4 jogadores = "comboio"**: versão curta e trânsito um nível mais leve.
+- **Protocolo 9** (`VERSION` em `scripts/net/protocol.gd`): o setup leva `intro` e `countdown_total` (8 s na cheia). Cada cliente
+  toca a abertura pelo **relógio comum** do servidor (`DuelPlan.online_elapsed`); som que já passou (>0,3 s) não toca.
+- Testes que montam a corrida de verdade (`race3d.tscn`) usam `const IN_TREE := true` no topo do arquivo.
+- Texto que cresce na tela: fonte de tamanho **fixo** escalada com `draw_set_transform` (cada tamanho novo cria cache de
+  textura). Nome do piloto: o maior de `DuelBand.NAME_SIZES` que couber. O título 対決 é textura (escala sem custo).
 
 ## Listas com rolagem no celular (T-165)
 

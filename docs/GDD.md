@@ -103,11 +103,7 @@ Pagamento = frete × integridade da carga + bônus de posição + bônus de Fama
 | Garagem | 1 | MVP |
 | Corrida pública, Duelo de Rival, Frete Livre | — | Pós-MVP |
 
-**Abertura "frente a frente" (T-156):** antes do duelo da campanha (e online com 2 jogadores), ~6 s de cena numa
-área de descanso (noite/fim de tarde) ou praça de pedágio (dia): os dois caminhões estacionados de frente, luzes
-piscando, a câmera passeia pelos detalhes com a faixa de cada motorista (nome, caminhão, destaque, provocação), banner
-VS com tambor; depois os caminhões alinham lado a lado na pista e vem a contagem. Um toque pula. Revanche, corrida
-rápida e online com 3–4 jogadores: versão curta (só alinhamento e contagem, 3 s).
+**Abertura do duelo (T-156, refeita na T-204):** antes do duelo da campanha (e online com 2 jogadores), 8 s ao todo: num estúdio preto com neblina roxa rente ao chão, os dois caminhões entram pelos lados e param lado a lado de frente, faróis e neon acesos; atrás deles sobem os guardiões Raijin (jogador) e Fujin (rival), desenho nosso, cada um numa aura; 対決 entra com um taiko e o nome de cada piloto aparece embaixo; um raio cai entre os dois (um clarão curto; com "Reduzir clarões" só um brilho suave) com trovão; os dois arrancam para a câmera e a contagem 3-2-1 começa na pista com eles lado a lado no grid. Um toque pula. Revanche, corrida rápida e online com 3–4 jogadores: versão curta (só alinhamento e contagem, 3 s).
 
 Partida online: criar sala → código de 6 letras → amigos entram (celular ou PC) → cada um com o caminhão da
 própria garagem → servidor decide colisões e dano → pagamento e dano ficam no perfil.

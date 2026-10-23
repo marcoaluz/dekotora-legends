@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-23 | **Abertura do duelo refeita (T-204, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** Estúdio preto com neblina roxa rasteira (volumétrica só no PC Ultra; no celular, planos de névoa baratos); os 2 caminhões DE VERDADE entram pelos lados em ângulo e param lado a lado de frente para a câmera, faróis e neon acesos; atrás deles sobem os guardiões **Raijin** (atrás do jogador, à esquerda) e **Fujin** (atrás do rival, à direita), arte NOSSA desenhada por código, cada um numa aura de chamas; **対決** entra com o taiko; as faixas dos dois pilotos aparecem juntas embaixo (sem a fala de provocação: não dá tempo de ler); um **raio** cai entre os dois com **UM clarão de 0,15 s** e trovão (opção nova **"Reduzir clarões"** troca por um brilho violeta suave e também suaviza o clarão da saída do túnel); corte: os dois arrancam para a câmera; na pista a contagem começa com eles já lado a lado no grid. **8 s no total (5 s de cena + 3 s de contagem)**, antes 9,4 s. Protocolo de rede 9. Saíram: área de descanso/praça de pedágio, detalhes de para-choque/viseira/mural, banner VS e o pisca-pisca de farol de provocação. | Pedido do Marco (T-204). Detalhes na seção "T-204" no fim |
 | 2026-10-21 | **Cenário novo em UM trecho-piloto por rota (T-188, etapa 1) — AGUARDA APROVAÇÃO DO MARCO pelos prints.** Litoral 0,6–1,6 km, cidade 1,3–2,05 km, montanha 1,1–2,05 km (`ScenicZone`, `--t188=off|segment|all`, padrão `segment`): terreno com relevo e textura (grama em 3 tons, terra, rocha, copa de floresta, areia na costa, margem do outro lado da baía), montanhas em 3 camadas (morros perto, cordilheira do meio por código, maciços do horizonte com textura, normais suaves e perspectiva aérea), floresta nas encostas, quarteirões com calçada/ruas/telhados variados/8 fachadas/letreiros de neon com kanji (recuo ≥ 40 m do eixo), casas nos morros do litoral, pedras novas, placas do pórtico com texto na textura. **Global** (não dá para cortar por km): céu novo (estrelas pequenas, lua, nuvens com volume), luar azulado + brilho da cidade no horizonte à noite, neblina com a cor do horizonte; neve dos maciços do litoral/cidade 0,8 → 0,5 (para aparecer floresta). Texturas feitas por código (numpy/Blender e Noto Sans JP, OFL); nada baixado | Pedido do Marco (T-188). Custo medido no PC (modo médio): chamadas −1 a +10, triângulos +5%, textura +1,4 MB, FPS no ruído. Detalhes na seção "T-188" no fim |
 | 2026-10-21 | **Biblioteca de cenário inteira no jogo (T-186) — escolhas visuais A CONFIRMAR PELO MARCO.** Inventário completo de docs/Modelos em `docs/BIBLIOTECA_CENARIO.md`. Lá só existe UMA espécie de árvore (Gleditsia, 6 variações), UM poste de luz (dentro da Ponte A) e UM personagem (o boneco do pacote ROAD SIGNS): as 6 Gleditsias, o poste da Ponte A (`lamp_bridge`) e o boneco (`person`) entraram; coqueiros (3 formas), cedro, pinheiro, árvore redonda e arbusto são **por código**. Árvores em **bosques por bioma** (nunca em fila), 2 LODs, MultiMesh; poste antigo na praça do pedágio e no litoral, poste da ponte no viaduto, na serra e nas pontes; pessoas no pedágio, no viaduto por cima e na abertura do duelo; **retrato** do motorista (busto com a camisa na cor do caminhão) na faixa do duelo, para o jogador e o rival. Só visual. Canter (`canter.obj`) continua fora (extraído de outro jogo) | Pedido do Marco (T-186). Detalhes na seção "T-186" no fim |
 | 2026-10-21 | **Modelos novos e antigos de docs/Modelos aplicados (T-169, com T-163 e T-164).** Licença não é mais restrição (Marco). Entraram: **montanhas nevadas** no horizonte das 3 rotas no lugar dos cones (4 maciços do "Fundo Montanha Gelo", ~900 triângulos cada; neve cheia na montanha, só nos picos no litoral e na cidade; 16/10/6 maciços), **ondas do mar** (mapa de normais do pacote "Agua"), **árvore de folhas** (Gleditsia, 279 triângulos, 6,5 m: no lugar da árvore redonda na cidade, 25% na montanha, 20% no litoral do lado da terra), **poste** (coluna, caixa e suporte do poste novo no poste de energia da T-163), **pilar em T, guard-rail em W, postes com fios** (T-163), **viaduto rodoviário cruzando por cima** (cidade 2.050 m, montanha 2.580 m, seção da Ponte A) e **semáforos de faixa nos túneis** (seta verde / X vermelho ligados aos eventos, T-164). Tudo só visual; `--no-backdrop`, `--no-pontes-kit`, `--no-overpass`, `--no-poles`, `--no-lane-signals` desligam. Escolhas de lugar e quantidade feitas pelo Claude: **confirmar** | Pedido do Marco (T-169) e decisões da T-159. Detalhes na seção "T-169" no fim |
@@ -844,3 +845,45 @@ Marco aprovou: fumaça por 12 s, triângulo 9 m atrás (após 3 s), freada de 9 
   (unidades do HUD) e `--hud-demo` (caminhão batido + seta esquerda presa + detalhe da FRENTE aberto; só offline).
 - **Não validado**: celular de verdade (DPI, área segura com entalhe real, toque no segmento com dois dedos) e custo
   no celular (o HUD é todo `_draw()`; ~6 nós novos).
+
+
+## 2026-10-23 · T-204 · Abertura do duelo no ritmo do original (pedido do Marco)
+
+- **Pedido**: tela preta com nuvens roxas no chão; os dois caminhões reais entram de cada lado e param lado a lado de frente;
+  um guardião sobre cada um (Raijin e Fujin, desenho nosso); 対決 com taiko e o nome de cada piloto embaixo; um raio entre os
+  dois com clarão branco curto e seguro e trovão; corte para a contagem no grid. ~8 s, pular continua, online no relógio do servidor.
+- **Linha do tempo** (`DuelPlan.PHASES`, 8,0 s com a contagem): entrada 0–2,1 s (andam em velocidade constante e freiam até parar
+  em 1,85 s; ar do freio) · guardiões 2,1–2,8 s (sobem de trás dos caminhões, aura girando; trovão distante) · título 2,8–3,7 s
+  (対決 entra grande e assenta com o `vs_taiko_hit`; faixas entram) · raio 3,7–4,2 s (cai em 3,78 s) · arrancada 4,2–5,0 s (lente
+  baixa entre os dois, eles aceleram 22 m/s² para a câmera; escurece 0,1 s e corta) · contagem 5,0–8,0 s (tomada do alinhamento
+  e o corte lateral de sempre; depois da cena cheia os caminhões já estão no grid, sem a manobra de entrar na faixa).
+- **Fotossensibilidade**: um único clarão branco, 0,15 s, pico 85% (não 100%), queda quadrática; o raio aparece uma vez (sem
+  re-piscar); o farol não pisca mais na abertura (antes piscava a 4,5 Hz). Com **Opções > Gráficos > Reduzir clarões**
+  (`Settings.fx_reduce_flash`, `[graphics] fx_reduce_flash`; depuração `--reduce-flash`): nada de tela branca, brilho violeta de
+  22% que sobe e desce em 0,7 s, raio mais fraco, sem tremor de câmera e sem o chacoalhão do título; o clarão da saída do
+  túnel (`RaceCinema.tunnel_flash`) cai para 25%. Testado em `test_single_short_flash_and_reduced_mode` (amostragem a 240 Hz).
+- **Arte nossa** (`game/tools_dev/make_duel_art.gd` + `duel_art_kit.gd`, `duel_art_raijin.gd`, `duel_art_fujin.gd`; precisa de
+  janela): figuras montadas com círculos/elipses unidos (Geometry2D), contorno de tinta, meia-lua de sombra e de luz, pinceladas
+  afinando, padrões tradicionais desenhados por nós (mitsudomoe nos tambores, seigaiha na tanga do Fujin, nuvens em espiral).
+  Raijin: pele vermelha, cabelo branco em chamas, chifres, anel de 8 taikos, tanga de tigre, colar com magatama. Fujin: pele
+  verde, cabelo azul-escuro soprado, saco de vento creme com espirais índigo, tanga azul de ondas. Título: Noto Sans JP Black
+  (OFL) com degradê amarelo→laranja→vermelho, contorno tinta + dourado e brilho escuro. Nada copiado nem traçado de obra
+  existente (o biombo famoso de Sōtatsu não foi usado como base). Cores fora da paleta de pixel art (são ilustração, não sprite).
+- **Estúdio** (`DuelStage`, 400 m abaixo do mundo, como antes): chão preto brilhante, luz principal de cima e de frente,
+  2 luzes violeta atrás, luz do raio; o céu do estúdio é quase preto com uma faixa violeta no horizonte (o renderizador do
+  celular desenha o céu mesmo com fundo de cor; por isso o céu É o fundo). A câmera recebe o Environment do estúdio
+  (tonemap linear, glow) e `far` 160 m; o sol/lua da rota apaga; tudo volta no fim ou ao pular. Sem profundidade de campo.
+- **Neblina** (`DuelFog`): 42 nuvens num MultiMesh (1 chamada) rentes ao chão + brilho violeta no chão; no Ultra também um
+  `FogVolume` baixo (topo a 1,5 m, termina antes da lente da arrancada; com a câmera dentro dele a tela inteira ficava roxa).
+- **Som**: ar do freio (`air_brake_park`), trovão distante na subida dos guardiões, `vs_taiko_hit` no título, trovão no raio
+  (`duel_thunder.wav`, NOVO, sintetizado por `tools/synth_duel_audio.py`, sem créditos), motores roncando na entrada e no talo
+  na arrancada. Dá para trocar o trovão pelo ElevenLabs (linha nova na seção 5 de `docs/AUDIO_ELEVENLABS.md`).
+- **Online**: protocolo **9** (o `countdown_total` da cena cheia passou de 9,4 s para 8 s). Todos os movimentos são função do
+  relógio da abertura (`DuelShots.truck_pose`, `studio_view`), então quem entra atrasado vê o mesmo instante; sons já passados
+  não tocam (janela de 0,3 s). `net_test`: largada prevista com 40 ms de diferença (igual antes).
+- **Custo** (1280x720, sem vsync, viaduto): média/Compatibility 227–322 chamadas, 183 mil triângulos, 330–377 FPS na cena
+  (corrida 202 FPS); Ultra/Forward+ 214–309 chamadas, 206–220 FPS (corrida 97–116). Texturas novas: Raijin e Fujin
+  1024x1280 comprimidas com mipmaps, título 1024x560 sem perda, aura 512 e névoa 256.
+- **A confirmar pelo Marco**: (1) o desenho dos guardiões e qual fica com quem (Raijin = jogador); (2) 8 s contando a contagem
+  (se quiser 8 s só de cena, é mudar `DuelPlan.PHASES`; o servidor acompanha); (3) as falas de provocação saíram da cena;
+  (4) o pisca-pisca de farol de provocação saiu (fotossensibilidade); (5) trovão sintetizado (trocar pelo ElevenLabs?).

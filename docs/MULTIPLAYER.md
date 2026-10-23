@@ -40,8 +40,10 @@ Regra da sala `events: false` = pista livre.
 (`{start, end, lanes, taper, look}`, os da rota). O cliente usa a lista do servidor no lugar da rota dele; os trechos não
 vão em `events` e continuam com `events: false` (são a pista, não um evento).
 
+**Protocolo versão 9** (T-204): a abertura cheia ficou com 5 s de cena, então `countdown_total` = 8 s. Nada mudou no formato das mensagens; a versão subiu porque cliente e servidor precisam tocar a mesma linha do tempo (gerar o APK de novo).
+
 **Protocolo versão 6** (T-156): o `race_setup` leva `intro` (`full` = abertura frente a frente, `short` = só a contagem)
-e `countdown_total` (segundos da contagem do servidor = abertura + 3 s: 9,4 s ou 3 s). O servidor fica em COUNTDOWN
+e `countdown_total` (segundos da contagem do servidor = abertura + 3 s: 8 s ou 3 s desde a T-204; 9,4 s antes). O servidor fica em COUNTDOWN
 esse tempo todo e só então larga (RACING). Cada cliente toca a abertura pelo **relógio do servidor**: segundos desde o
 começo da contagem = (`countdown_total` − `countdown` do setup) + (agora − hora em que o setup chegou) + ping/2
 (`DuelPlan.online_elapsed`); por isso quem carregou a cena mais devagar entra na abertura já adiantada e todos largam
