@@ -145,7 +145,7 @@ func test_reduce_flash_option_saved_and_assets() -> void:
 	check(ResourceLoader.exists("res://assets/textures/duel/raijin.png") and ResourceLoader.exists("res://assets/textures/duel/fujin.png"), "arte dos guardioes")
 	check(ResourceLoader.exists("res://assets/textures/duel/title_taiketsu.png"), "titulo 対決")
 	check(RaceAudio.has_sound("duel_thunder") and RaceAudio.has_sound("vs_taiko_hit"), "trovao e taiko")
-	check_eq(Protocol.VERSION, 9, "protocolo 9 (contagem do servidor mudou para 8 s)")
+	check(Protocol.VERSION >= 9, "protocolo 9 ou mais novo (contagem do servidor mudou para 8 s; 10 = T-207)")
 
 
 func test_offline_full_first_short_on_rematch_and_quick_race() -> void:

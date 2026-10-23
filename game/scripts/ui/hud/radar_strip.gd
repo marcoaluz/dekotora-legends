@@ -3,13 +3,13 @@ extends Control
 ## T-202: translucent vertical radar on the left edge (like the original): the road seen from above around the
 ## player, ahead at the top. Lane lines scroll with the speed; coloured dots/bars: you (pink), the route rival (gold),
 ## other trucks (light blue), traffic cars close by (cyan), wrecked cars (red, blinking), and the events ahead:
-## accident (red), works (orange), narrowing (yellow), 2-lane section (grey). Turns amber inside tunnels.
+## accident (red), works (orange), narrowing (yellow), 2-lane section (grey), toll plaza islands (green, T-207). Turns amber inside tunnels.
 ## Size comes from HudLayout (any height). Data: RadarModel (pure).
 
 const BAND := Color(0.02, 0.04, 0.08, 0.42)
 const KIND_COL: Array[Color] = [
 	Color("#ff2e88"), Color("#f5cc5a"), Color("#9cc8ff"), Color("#21e6ff"), Color("#ff3b3b"),
-	Color("#ff3b3b"), Color("#ff9a1a"), Color("#f5cc5a"), Color("#8a93a8"),
+	Color("#ff3b3b"), Color("#ff9a1a"), Color("#f5cc5a"), Color("#8a93a8"), Color("#3ce07a"),
 ]
 const DASH_M: float = 12.0                  # lane dash period (m)
 

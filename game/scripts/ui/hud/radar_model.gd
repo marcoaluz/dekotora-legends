@@ -7,7 +7,7 @@ extends RefCounted
 ## x = track lateral (-1..1, like TruckSim.x) and z = metres relative to the player's rear (+ ahead).
 ## The strip maps z with `y_frac` (square root ahead: far events still fit; linear behind).
 
-enum Kind { ME, RIVAL, TRUCK, CAR, WRECK, ACCIDENT, WORKS, NARROW, SECTION }
+enum Kind { ME, RIVAL, TRUCK, CAR, WRECK, ACCIDENT, WORKS, NARROW, SECTION, TOLL }
 
 const AHEAD_M: float = 360.0               # top of the strip
 const BEHIND_M: float = 60.0               # bottom of the strip
@@ -42,6 +42,8 @@ static func blips(sim: RaceSim, player: int, rival: int = -1) -> Array[Dictionar
 	if sim.track != null and sim.track.events != null:
 		for ev in sim.track.events.list:
 			_event(out, ev, me.z)
+	if sim.track != null and sim.track.toll != null:       # T-207: toll plaza (centre island + outer islands)
+		_toll(out, sim.track.toll, me.z)
 	if sim.traffic != null:
 		for c in sim.traffic.cars:
 			var dz: float = c.z - me.z
@@ -74,6 +76,19 @@ static func _event(out: Array[Dictionary], ev: TrackEvents.Event, me_z: float) -
 	if ev.kind == TrackEvents.Kind.SECTION:
 		x1 = X_RANGE                                     # the right lane and its shoulder end
 	out.append(_blip(int(EVENT_KIND.get(ev.kind, Kind.WORKS)), x0, x1, z0, z1))
+
+
+## T-207: the booth island in the middle and the two outer islands (where the shoulders end) of the toll plaza.
+static func _toll(out: Array[Dictionary], p: TollPlaza, me_z: float) -> void:
+	var z0: float = p.nose_z() - me_z
+	var z1: float = p.tail_z() - me_z
+	if z1 < -BEHIND_M or z0 > EVENT_AHEAD_M:
+		return
+	var ih: float = p.island_half_x()
+	var of: float = TollPlaza.OUTER_FACE_M / Track.ROAD_HALF_WIDTH_M
+	out.append(_blip(Kind.TOLL, -ih, ih, z0, z1))
+	out.append(_blip(Kind.TOLL, -X_RANGE, -of, z0, z1))
+	out.append(_blip(Kind.TOLL, of, X_RANGE, z0, z1))
 
 
 static func _blip(kind: int, x0: float, x1: float, z0: float, z1: float) -> Dictionary:

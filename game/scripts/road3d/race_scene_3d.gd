@@ -104,6 +104,8 @@ func _ready() -> void:
 		var track: Track = route.build_track() if route != null else Track.make_test_track()
 		if "--no-sections" in OS.get_cmdline_user_args():  # T-153 depuracao: pista sem os trechos de 2 faixas (medir custo)
 			track.set_lane_sections([])
+		if "--no-toll" in OS.get_cmdline_user_args():     # T-207 depuracao: sem a praca de pedagio nova (comparar e medir)
+			track.set_toll(-1.0)
 		track.events = RaceDemo.track_events(OS.get_cmdline_user_args(), route, track)   # T-139 (--event=, --no-events)
 		var density: int = route.traffic if route != null else TrafficSim.Density.NORMAL
 		var fake: Dictionary = RaceDemo.fake_contract(OS.get_cmdline_user_args(), route)

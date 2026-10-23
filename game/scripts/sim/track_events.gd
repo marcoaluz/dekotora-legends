@@ -85,10 +85,13 @@ class Event:
 
 
 var list: Array[Event] = []
+## T-207: toll plaza of the route (part of the road, like the sections; attached by the Track.events setter). Never in
+## `list` (indices of the events stay the same) and never sent in `events`: the route alone defines it.
+var toll: TollPlaza = null
 
 
 func is_empty() -> bool:
-	return list.is_empty()
+	return list.is_empty() and toll == null
 
 
 ## Adds an event from a dictionary {kind, z, length, lanes:[Lanes indices]}. Invalid ones (3 lanes, not contiguous,
@@ -168,12 +171,17 @@ func blocked_at(x0: float, x1: float, zz: float) -> Event:
 	return null
 
 
-## Lane `lane` (centre) closed somewhere in [z0, z1]?
+## T-207: [x0, x1] touching the toll plaza (island or outer barriers) at zz?
+func toll_blocked_at(x0: float, x1: float, zz: float) -> bool:
+	return toll != null and toll.blocked_at(x0, x1, zz)
+
+
+## Lane `lane` (centre) closed somewhere in [z0, z1]? (events, sections and the toll plaza of T-207)
 func lane_blocked_between(lane: int, z0: float, z1: float) -> bool:
 	for ev in list:
 		if ev.block_z[lane] <= z1 and ev.clear_z[lane] >= z0:
 			return true
-	return false
+	return toll != null and toll.lane_blocked_between(lane, z0, z1)
 
 
 ## First z >= from_z (within `within` m) where the centre of `lane` is closed; INF if none.
@@ -182,6 +190,8 @@ func next_block(lane: int, from_z: float, within: float) -> float:
 	for ev in list:
 		if ev.clear_z[lane] >= from_z and ev.block_z[lane] <= from_z + within:
 			best = minf(best, maxf(ev.block_z[lane], from_z))
+	if toll != null:
+		best = minf(best, toll.next_block(lane, from_z, within))
 	return best
 
 

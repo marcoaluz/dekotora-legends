@@ -99,6 +99,10 @@ static func truck(evs: TrackEvents, t: TruckSim, dt: float) -> Dictionary:
 					out = c
 	if not touching_cones:
 		t.cone_m = CONE_EVERY_M                             # the first cone touched counts at once
+	if evs.toll != null:                                    # T-207: toll plaza (island + outer barriers)
+		var tc: Dictionary = TollContact.truck(evs.toll, t, dt)
+		if not tc.is_empty():
+			out = tc
 	return out
 
 
@@ -203,11 +207,15 @@ static func wall_x(evs: TrackEvents, x: float, z: float, length: float, half: fl
 			var over_l: float = ll - (x - half)
 			if is_finite(ll) and over_l > 0.0:
 				x += over_l if over_l < 0.15 else minf(over_l, WALL_PUSH * dt)
+	if evs.toll != null:                                  # T-207: toll plaza
+		x = TollContact.wall_x(evs.toll, x, z, length, half, dt)
 	return x
 
 
 ## Traffic car: never inside a closure (stops in front of the block, slides along the lane end).
 static func car(evs: TrackEvents, c: TrafficSim.Car, dt: float) -> void:
+	if evs.toll != null:                                  # T-207: toll plaza
+		TollContact.car(evs.toll, c, dt)
 	var half: float = c.width_x * 0.5
 	var nose: float = c.z + c.length
 	for ev in evs.list:

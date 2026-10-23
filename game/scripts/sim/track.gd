@@ -22,6 +22,16 @@ var events: TrackEvents = TrackEvents.new():
 	set(v):
 		events = v if v != null else TrackEvents.new()
 		events.set_sections(lane_sections)
+		events.toll = toll
+## T-207: toll plaza (the road splits in two passages around the booth island). null = none (test tracks). Like the
+## sections, every event list assigned to `events` gets it, so `--no-events` and `events: false` keep the island.
+var toll: TollPlaza = null
+
+
+## Places (z >= 0) or removes (z < 0) the toll plaza of this road.
+func set_toll(z: float) -> void:
+	toll = TollPlaza.new(z) if z >= 0.0 else null
+	events.toll = toll
 
 
 ## Troca os trechos de 2 faixas (rota ou setup da corrida online) e atualiza a lista de eventos.

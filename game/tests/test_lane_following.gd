@@ -26,6 +26,12 @@ func _dev_m(t: TruckSim, x: float) -> float:
 	return absf(x - Lanes.X[t.lane]) * Track.ROAD_HALF_WIDTH_M
 
 
+## T-207: the toll plaza near the start closes the middle lane (forced lane change / crash at the island): this test
+## measures the CURVES, so the plaza and the metres after it (the lane change back) are not measured.
+func _measured(track: Track, z: float) -> bool:
+	return track.toll == null or z > track.toll.zone_end() + 40.0
+
+
 ## Corre a rota inteira: acelerador no fundo sem tocar no controle (bot = null) ou dirigido pelo bot.
 ## Devolve {dev, yaw, time}.
 func _drive_route(route_id: String, desc: Dictionary, bot: BotDriver = null) -> Dictionary:
@@ -42,8 +48,9 @@ func _drive_route(route_id: String, desc: Dictionary, bot: BotDriver = null) -> 
 		sim.set_command(i, bot.command_for(sim, i, DT) if bot != null else Commands.make(0.0, 1.0, 0.0))
 		sim.step()
 		n += 1
-		dev = maxf(dev, _dev_m(t, t.x))
-		yaw = maxf(yaw, _yaw_vs_road_deg(path, t, t.z, t.x))
+		if _measured(track, t.z):
+			dev = maxf(dev, _dev_m(t, t.x))
+			yaw = maxf(yaw, _yaw_vs_road_deg(path, t, t.z, t.x))
 	return {"dev": dev, "yaw": yaw, "time": n * DT}
 
 
@@ -99,6 +106,8 @@ func test_client_prediction_follows_lane_like_server() -> void:
 			to_client = to_client.filter(func(d: Dictionary) -> bool: return int(d["due"]) > now)
 			sync.interpolate(now, DT)
 			var me: TruckSim = sync.my_truck()
+			if not _measured(sync.sim.track, me.z):
+				continue
 			dev = maxf(dev, _dev_m(me, sync.my_draw_x()))
 			yaw = maxf(yaw, _yaw_vs_road_deg(path, me, sync.my_draw_z(), sync.my_draw_x()))
 			gap = maxf(gap, absf(me.x - room.sim.trucks[sync.me].x) * Track.ROAD_HALF_WIDTH_M)

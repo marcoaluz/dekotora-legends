@@ -36,6 +36,9 @@ const WORKS_LOOK: float = 260.0                             # m a frente em que 
 const WORKS_BRAKE: float = 1.5                              # m/s^2 planejados (freio proporcional atrasa ~WORKS_BRAKE/1,25 m/s; T-183: 1,8 dava 1,44 > tolerancia de 5 km/h)
 const WRECK_LOOK_S: float = 1.2                             # T-183: s a mais de visao para um carro acidentado (parado)
 const WRECK_MARGIN_X: float = 0.02                          # T-183: folga lateral (x) para passar ao lado do acidentado
+const ZIPPER_M: float = 120.0                               # T-207: preso ao lado de alguem com a faixa fechando ate aqui: cai para tras dele
+const ZIPPER_DROP: float = 2.0                              # m/s abaixo de quem esta ao lado (abre a vaga atras dele)
+const LEAVE_MIN_SPEED: float = 2.0                          # T-207: saindo da faixa fechada perto do bloqueio: rola devagar (sem velocidade nao vira)
 
 var difficulty: int = Difficulty.NORMAL
 var rival: bool = false                # duela com o jogador mesmo na dificuldade facil
@@ -123,6 +126,7 @@ func _closure(sim: RaceSim, me: TruckSim, index: int, desired: float) -> float:
 	if evs.is_empty():
 		return desired
 	var nose: float = me.z + me.length
+	desired = _leaving(evs, me, nose, desired)
 	var bz: float = evs.next_block(target_lane, me.z, me.length + CLOSURE_LOOK)
 	if bz == INF:
 		return desired
@@ -136,8 +140,40 @@ func _closure(sim: RaceSim, me: TruckSim, index: int, desired: float) -> float:
 			_lane_timer = 0.8
 			_closing_lane = -1
 			closure_moves += 1
-			return desired
+			return _leaving(evs, me, nose, desired)
+		if bz - nose < ZIPPER_M:                 # T-207: alguem ao lado na mesma velocidade: cai para tras dele e entra
+			desired = minf(desired, maxf(_side_speed(sim, me, index, step_lane) - ZIPPER_DROP, 0.0))
 	return minf(desired, sqrt(2.0 * CLOSURE_BRAKE * maxf(bz - nose - 8.0, 0.0)))
+
+
+## T-207: o corpo ainda esta numa faixa que fecha logo a frente (trocando para a aberta): nao avanca para dentro do
+## bloqueio antes de sair dele, mas sem parar de todo (parado o caminhao nao vira).
+func _leaving(evs: TrackEvents, me: TruckSim, nose: float, desired: float) -> float:
+	var body: int = Lanes.nearest(me.x)
+	if body == target_lane:
+		return desired
+	var bzb: float = evs.next_block(body, me.z, me.length + CLOSURE_LOOK)
+	if bzb == INF:
+		return desired
+	return minf(desired, maxf(sqrt(2.0 * CLOSURE_BRAKE * maxf(bzb - nose - 1.0, 0.0)), LEAVE_MIN_SPEED))
+
+
+## Menor velocidade de quem esta ao lado (sobreposto em z) na faixa `lane`; a propria velocidade se ninguem.
+func _side_speed(sim: RaceSim, me: TruckSim, index: int, lane: int) -> float:
+	var lx: float = Lanes.X[lane]
+	var best: float = me.speed
+	var found: bool = false
+	for j in sim.trucks.size():
+		var o: TruckSim = sim.trucks[j]
+		if j != index and absf(o.x - lx) < 0.45 and o.z < me.z + me.length + 4.0 and o.z + o.length + 4.0 > me.z:
+			best = o.speed if not found else minf(best, o.speed)
+			found = true
+	if sim.traffic != null:
+		for c in sim.traffic.cars:
+			if absf(c.x - lx) < 0.4 and c.z < me.z + me.length + 4.0 and c.z + c.length + 4.0 > me.z:
+				best = c.speed if not found else minf(best, c.speed)
+				found = true
+	return best
 
 
 ## T-183: acidentado na frente e nenhuma faixa de rolagem livre: o acostamento vizinho, se estiver livre.

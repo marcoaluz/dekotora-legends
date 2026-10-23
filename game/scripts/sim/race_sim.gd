@@ -90,9 +90,10 @@ func step(dt: float = FIXED_DT) -> void:
 func _event_hit(i: int, c: Dictionary) -> void:
 	var t: TruckSim = trucks[i]
 	var kind: String = String(c["kind"])
-	var ev: TrackEvents.Event = track.events.list[int(c["event"])]
+	var ei: int = int(c["event"])                     # T-207: -1 = toll plaza (TollContact)
+	var ev_id: String = "toll" if ei < 0 else TrackEvents.KIND_IDS[track.events.list[ei].kind]
 	var out: Dictionary = {"type": "event_" + kind, "truck": i, "zone": String(c["zone"]), "force": float(c["dv"]),
-		"event": TrackEvents.KIND_IDS[ev.kind], "broken": [] as Array[String], "damage": 0.0}
+		"event": ev_id, "broken": [] as Array[String], "damage": 0.0}
 	if kind == "obstacle":
 		var dmg: float = DamageModel.impact_damage(float(c["dv"]), EventContact.OBSTACLE_MASS)
 		out["broken"] = DamageModel.apply_impact(t, String(c["zone"]), dmg)

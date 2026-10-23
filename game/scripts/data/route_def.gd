@@ -56,4 +56,5 @@ func build_track(seed_: int = 7) -> Track:
 		t.add_section(float(s["length"]), float(s["curve"]), float(s.get("hill", 0.0)))
 	t.set_lane_sections(lane_sections)
 	t.decorate_roadside(seed_)
+	t.set_toll(TollPlaza.DEFAULT_Z)                 # T-207: the road splits around the booth island at the toll gate
 	return t
