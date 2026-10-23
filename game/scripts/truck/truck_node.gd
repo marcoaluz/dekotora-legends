@@ -204,7 +204,7 @@ func _build_blinkers() -> void:
 		_blinkers.append(m)
 
 
-## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada), ~1,5 vez por segundo (T-170: SignalBlink,
+## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada, 2 = pisca-alerta dos dois lados, T-202), ~1,5 vez por segundo (T-170: SignalBlink,
 ## comeca aceso no toque). So mexe na visibilidade quando muda (nenhum no ou material novo).
 func set_signal(dir: int) -> void:
 	if _blink.update(dir, SignalBlink.now()) == SignalBlink.Edge.NONE and dir == _blink_shown:
@@ -212,7 +212,7 @@ func set_signal(dir: int) -> void:
 	_blink_shown = dir
 	for i in _blinkers.size():
 		var side: int = -1 if i % 2 == 0 else 1
-		_blinkers[i].visible = _blink.lit and side == dir
+		_blinkers[i].visible = _blink.lit and (side == dir or dir == 2)     # T-202: 2 = hazard (both sides)
 
 
 ## A seta esta acesa agora (testes)?

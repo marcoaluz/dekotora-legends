@@ -77,6 +77,7 @@ var _life: RaceLife                      # T-189: vida do cenario (so visual; nu
 var _rain_fx: RainFx                     # T-189: spray atras dos caminhoes, respingos e som da chuva (null = sem chuva)
 var _intro: DuelIntro                   # T-156: abertura "frente a frente" (so apresentacao)
 var _nohud: bool = false
+var _hud_demo: bool = false             # T-202: --hud-demo
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
 var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrovisor (R); so apresentacao, local
@@ -272,6 +273,7 @@ func _ready() -> void:
 	var event_hud := EventHud.new()                 # T-139: avisos de acidente / obras / estreitamento
 	event_hud.bind(sim, player)
 	layer.add_child(event_hud)
+	_hud.event_hud = event_hud                      # T-202: the HUD layout places the warnings
 	event_hud.alert_shown.connect(func(_kind: int) -> void:
 		_audio.event_alert()
 		Input.vibrate_handheld(60))
@@ -281,6 +283,9 @@ func _ready() -> void:
 	_demo = RaceDemo.new(args)
 	if not online:
 		_demo.setup(sim)
+		_hud_demo = HudDemo.wanted(args)                # T-202: damaged truck + signal on (screenshots)
+		if _hud_demo:
+			HudDemo.damage(sim.trucks[player])
 		for k in sim.trucks.size():
 			_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 	var v0: float = 30.0
@@ -298,7 +303,9 @@ func _ready() -> void:
 				sim.trucks[k].speed = v0
 				_prev[k] = Vector2(sim.trucks[k].z, sim.trucks[k].x)
 			_countdown = 0.0
-	var touch: bool = DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false)
+	var touch: bool = (DisplayServer.is_touchscreen_available() or "--touch" in args or gs.profile.get("force_touch", false)) \
+			and not "--no-touch" in args              # T-202: --no-touch = PC layout in screenshots
+	_hud.touch_layout = touch
 	if touch:
 		var tc := TouchControls.new()
 		tc.target = input
@@ -307,7 +314,9 @@ func _ready() -> void:
 	add_child(_camv)
 	_camv.anchor_node = _trucks[player]
 	_camv.setup(path, sim.track.events, tunnels, String(route.id) if route != null else "", layer, self,
-			62.0 if sim.deadline > 0.0 else 40.0, q, touch, world["env"])
+			HudLayout.M, q, touch, world["env"])     # T-202: mirror at the top centre (the clocks went to the right)
+	_hud.cam_button = _camv.button
+	_hud.mirror = _camv.mirror
 	_camv.layout(get_viewport().get_visible_rect().size.x / 2.0)
 	RearMirror.hide_from_mirror(_cam)              # chuva, folhas e borrao presos na camera nao aparecem no espelho
 	get_viewport().size_changed.connect(func() -> void: _camv.layout(get_viewport().get_visible_rect().size.x / 2.0))
@@ -329,6 +338,7 @@ func _ready() -> void:
 	_traffic3d.wreck_fx.warmup(hidden)            # T-183: pisca-alerta, fumaca e triangulo do carro acidentado
 	_brake_fx.warmup(hidden)
 	DebugShot.arm(self, 4.0)            # --shot=ARQUIVO.png (capturas, T-138)
+	DebugShot.force_window(self)        # --window=2400x1080 (capturas T-202, maior que o monitor)
 
 
 ## Hora do dia: a da rota, ou --time=night|dusk|day (depuracao/capturas).
@@ -751,7 +761,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 			al = DuelShots.align_offset(t.x, DuelShots.align_progress(_countdown))
 		node.transform = _impact.jolt(k, path.vehicle_transform(z, x + al.x, t.length, t.body_yaw() + al.y, t.lean() * 0.11))
 		node.animate(t.speed, dt, t.lean())
-		node.set_signal(t.signal_dir)
+		var hz: bool = t.signal_dir == 0 and HudStatus.hazard(t, sim.time, _countdown <= 0.0)
+		node.set_signal(2 if hz else t.signal_dir)       # T-202: 2 = hazard (both sides)
 		if _cam != null:
 			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights)
 	_traffic3d.refresh()
@@ -842,7 +853,6 @@ func _update_cam_view(dt: float, racing: bool, external_cut: bool) -> void:
 			is_rival = k in _rival_idx
 	var me: Vector2 = _drawn[player] if _drawn.size() > player else Vector2(pz, _player_x())
 	_camv.update(dt, racing, external_cut, path, me.x, me.y, gap, is_rival)
-	_hud.fps_y = _camv.mirror.position.y + RearMirror.RECT_SIZE.y + 10.0 if _camv.mirror.active() else 66.0
 
 
 ## Rival da camera cinema: o da rota, ou o caminhao mais perto (corrida rapida). Vector3(z, lateral m, comprimento).
@@ -876,6 +886,12 @@ func _update_hud() -> void:
 	_hud.countdown = _countdown
 	_hud.rival_idx = _rival_idx[0] if not _rival_idx.is_empty() else -1
 	_hud.cargo_notice = _cargo_notice
+	_hud.amber = maxf(1.0 - tod.day_amount, _tunnel.amount)     # T-202: gauge backlight (amber at night / tunnel)
+	_hud.tunnel = _tunnel.amount
+	_hud.headlights = tod.headlights or _tunnel.amount > 0.3
+	if _hud_demo:
+		HudDemo.hold_signal(sim.trucks[player])
+		_hud.segments.pin(0)
 	_curve_feedback(sim.trucks[player])
 	for k in sim.trucks.size():
 		var eng: float = float(sim.trucks[k].systems["engine"])

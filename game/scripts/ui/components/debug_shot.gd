@@ -26,3 +26,16 @@ static func _save(node: Node, path: String) -> void:
 	node.get_viewport().get_texture().get_image().save_png(path)
 	print("CAPTURA: ", path)
 	node.get_tree().quit()
+
+
+## T-202: `-- --window=2400x1080` makes the window that big even on a smaller (or switched off) monitor: borderless,
+## no maximum size. Screenshots at the real phone / PC resolution. Without the flag it does nothing.
+static func force_window(node: Node) -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--window="):
+			var p: PackedStringArray = a.substr(9).split("x")
+			if p.size() == 2:
+				var win: Window = node.get_tree().root
+				win.max_size = Vector2i(8000, 8000)
+				win.borderless = true
+				win.size = Vector2i(int(p[0]), int(p[1]))

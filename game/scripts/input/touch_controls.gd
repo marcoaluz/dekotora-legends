@@ -8,6 +8,7 @@ extends Control
 const BTN_COLOR := Color(0.03, 0.04, 0.09, 0.42)     # vidro escuro (nao esconde a estrada)
 const BTN_PRESSED := Color(1, 0.18, 0.53, 0.45)
 const RING := Color(1, 1, 1, 0.45)
+const HIT_MUL: float = 1.25                         # hit area = radius x this (fat fingers)
 
 var target: LocalInput
 var _buttons: Dictionary = {}      # nome -> {center: Vector2, radius: float}
@@ -29,10 +30,16 @@ func _ready() -> void:
 ## (celular comprido = mais largo): os botoes da direita ficam presos na borda direita (T-138).
 func layout() -> void:
 	size = get_viewport_rect().size / 2.0 if is_inside_tree() else Vector2(480, 270)
-	var s: float = Settings.touch_scale
-	var w: float = size.x
-	var h: float = size.y
-	_buttons = {
+	_buttons = button_layout(size, Settings.touch_scale)
+	queue_redraw()
+
+
+## Button geometry for a HUD of `hud_size` units and button scale `s` (T-202: the race HUD uses it to keep the
+## gauge and the radar away from the thumbs). The hit area of each button is `radius * HIT_MUL`.
+static func button_layout(hud_size: Vector2, s: float) -> Dictionary:
+	var w: float = hud_size.x
+	var h: float = hud_size.y
+	return {
 		"left": {"center": Vector2(52, h - 50), "radius": 38.0 * s},
 		"right": {"center": Vector2(146, h - 50), "radius": 38.0 * s},
 		"throttle": {"center": Vector2(w - 55, h - 55), "radius": 40.0 * s},
@@ -40,7 +47,6 @@ func layout() -> void:
 		"passing": {"center": Vector2(w - 48, h - 135), "radius": 24.0 * s},
 		"horn": {"center": Vector2(99, h - 50 - 70.0 * s), "radius": 22.0 * s},     # T-144: entre e acima das setas
 	}
-	queue_redraw()
 
 
 func _input(event: InputEvent) -> void:
@@ -68,7 +74,7 @@ func _hit(p: Vector2) -> String:
 	var best_d: float = 1e9
 	for name in _buttons:
 		var d: float = p.distance_to(_buttons[name]["center"])
-		if d <= float(_buttons[name]["radius"]) * 1.25 and d < best_d:
+		if d <= float(_buttons[name]["radius"]) * HIT_MUL and d < best_d:
 			best = name
 			best_d = d
 	return best

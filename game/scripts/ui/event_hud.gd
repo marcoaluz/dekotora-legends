@@ -21,6 +21,9 @@ var _bf: Font
 var _sb: StyleBoxFlat
 var _shown: int = -1                    # index of the event whose alert is showing
 var _shown_t: float = 0.0
+var alert_cx: float = -1.0              # T-202: centre x / top of the warning panel (RaceHud layout; < 0 = old place)
+var alert_top: float = 62.0
+var refused_at := Vector2(-1, -1)       # T-202: centre top of the lane arrows ("lane closed" goes above them)
 
 
 func bind(sim_: RaceSim, player_: int) -> void:
@@ -90,7 +93,11 @@ func _draw() -> void:
 	_draw_plates(t, w, blink)
 	if t.lane_refused_t > 0.0:
 		var x: float = w * 0.5 + float(t.lane_refused_dir) * 58.0
-		var r := Rect2(x - 34, size.y - 92, 68, 13)
+		var y: float = size.y - 92.0
+		if refused_at.x >= 0.0:
+			x = refused_at.x + float(t.lane_refused_dir) * 24.0
+			y = refused_at.y - 15.0
+		var r := Rect2(x - 34, y, 68, 13)
 		draw_style_box(_sb, r)
 		draw_rect(Rect2(r.position.x, r.position.y + 2, 2, r.size.y - 4), BAD_COL)
 		_text(Vector2(r.position.x, r.position.y + 10), Tr.t("hud.event.refused"), 9, BAD_COL if blink else Color.WHITE, r.size.x)
@@ -103,7 +110,8 @@ func _draw_alert(t: TruckSim, w: float, blink: bool) -> void:
 	var danger: bool = sim.track.events.lane_blocked_between(t.lane, t.z, nose + 220.0) and t.z < ev.end_z()
 	var lns: PackedStringArray = lines(_shown)
 	var h: float = 36.0 if danger else 26.0
-	var r := Rect2(w * 0.5 - PANEL_W * 0.5, 62, PANEL_W, h)
+	var cx: float = alert_cx if alert_cx >= 0.0 else w * 0.5
+	var r := Rect2(cx - PANEL_W * 0.5, alert_top, PANEL_W, h)
 	draw_style_box(_sb, r)
 	var edge: Color = (BAD_COL if blink else Color.WHITE) if danger else col
 	draw_rect(Rect2(r.position.x, r.position.y + 3, 3, r.size.y - 6), edge)
@@ -133,7 +141,8 @@ func _draw_plates(t: TruckSim, w: float, blink: bool) -> void:
 	var lim: float = sim.track.events.limit_at(t.z, t.z + t.length)
 	if is_inf(lim) or t.speed <= lim + TrackEvents.LIMIT_TOL_KMH / 3.6:
 		return
-	var r := Rect2(w * 0.5 - 90, 104, 180, 15)
+	var cx: float = alert_cx if alert_cx >= 0.0 else w * 0.5
+	var r := Rect2(cx - 90, alert_top + 42.0, 180, 15)
 	draw_style_box(_sb, r)
 	draw_rect(Rect2(r.position.x, r.position.y + 2, 3, r.size.y - 4), BAD_COL)
 	_heading(Vector2(r.position.x, r.position.y + 12), Tr.t("hud.event.plates", [roundi(t.speed * 3.6)]), 10,
