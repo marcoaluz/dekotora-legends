@@ -13,6 +13,7 @@ const TUNNEL_WALL_GAP_M: float = 1.8
 const TUNNEL_H_MAX: float = 5.6            # camera height limit inside tunnels (the arch is 6.6-8.2 m)
 const TUNNEL_RAMP: float = 0.35            # extra height allowed per metre away from a portal (smooth glide)
 const MIN_H: float = 0.6
+const TOLL_H_MAX: float = 5.6              # T-207: under the toll canopy / gantry (signs from 6,05 m), every mode
 const BODY_CLEAR_M: float = 2.4            # lateral distance kept from the player's box side
 const BODY_TOP_H: float = 5.0              # ... or the camera goes over the roof
 ## Orbit: one lap with ease in/out, then a pause behind the truck (automatic return), repeat.
@@ -99,6 +100,7 @@ func chase_local(z: float, x: float, k: float) -> Array[Vector3]:
 func chase_target(z: float, x: float, k: float) -> Array[Vector3]:
 	var c: Array[Vector3] = chase_local(z, x, k)
 	var p: Vector3 = c[0] if mode == Mode.STANDARD else clamp_point(c[0])
+	p.z = minf(p.z, toll_h_max(p.x))                         # T-207: never through the toll canopy (STANDARD too)
 	return [to_world(p), to_world(c[1])]
 
 
@@ -163,6 +165,7 @@ func clamp_point(p: Vector3, me: Vector3 = Vector3.ZERO) -> Vector3:
 	var lat: float = clampf(p.y, -(prof.x - gap), prof.y - gap)
 	var h: float = maxf(p.z, MIN_H)
 	h = minf(h, TUNNEL_H_MAX + t_gap * TUNNEL_RAMP)
+	h = minf(h, toll_h_max(p.x))
 	if me.z > 0.0 and p.x > me.x - 1.5 and p.x < me.x + me.z + 1.5 and absf(lat - me.y) < BODY_CLEAR_M:
 		var side: float = signf(lat - me.y) if lat != me.y else 1.0
 		var pushed: float = me.y + side * BODY_CLEAR_M
@@ -171,6 +174,16 @@ func clamp_point(p: Vector3, me: Vector3 = Vector3.ZERO) -> Vector3:
 		else:
 			h = maxf(h, BODY_TOP_H)
 	return Vector3(p.x, lat, h)
+
+
+## T-207: highest camera at z near the toll plaza (gantry .. canopy end), gliding like at the tunnel portals. INF far
+## from it (or without a plaza).
+func toll_h_max(z: float) -> float:
+	if path == null or path.track == null or path.track.toll == null:
+		return INF
+	var c: float = path.track.toll.z
+	var d: float = maxf(maxf((c + TollParts.GANTRY_DZ - 1.0) - z, z - (c + TollParts.CANOPY_DZ + 1.0)), 0.0)
+	return TOLL_H_MAX + d * TUNNEL_RAMP
 
 
 ## Metres from z to the nearest tunnel (0 inside; INF without tunnels).

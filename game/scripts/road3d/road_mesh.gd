@@ -309,6 +309,7 @@ func _build_chunk(s0: int, s1: int) -> void:
 	var coast: bool = kind == &"coast"
 	var q: int = int(Engine.get_main_loop().root.get_node("Settings").quality)
 	var bo: float = BARRIER_IN + BARRIER_W
+	var toll_lines: Vector2 = TollPaint.lines_span(path.track.toll) if TollPlaza3D.enabled(path.track) else Vector2(1, -1)
 	for i in range(s0, s1):
 		var band: bool = (i / BAND_SEGS) % 2 == 0
 		var j: int = i + 1
@@ -338,6 +339,8 @@ func _build_chunk(s0: int, s1: int) -> void:
 			var c: float = lane * LANE_W * 0.5
 			if _lane_ends(z, lane):
 				continue                                                    # T-139: a faixa acaba (EventProps pinta a linha nova)
+			if z >= toll_lines.x and z < toll_lines.y:
+				continue                                                    # T-207: linhas continuas e zebra do pedagio (TollPaint)
 			if sharp:
 				_strip(sts["yline"], i, j, c - 0.08, c + 0.08, 0.02, 0.02)  # amarela continua: nao mude de faixa
 			elif band:

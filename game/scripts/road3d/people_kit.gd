@@ -114,12 +114,18 @@ static func populate(parent: Node, path: TrackPath, route_id: String, tod: TimeO
 	var xs: Array = []                         # one group per place: the LOD distance is from the group's centre
 	var looks: Array = []
 	var hw: float = Track.ROAD_HALF_WIDTH_M
+	var plaza: bool = TollPlaza3D.enabled(path.track)                 # T-207: staff on the islands, beside the booths
 	for side in [-1.0, 1.0]:                                          # toll staff beside the canopy pillars
 		for k in 2:
 			var z: float = 150.0 + rng.randf_range(-2.5, 2.5) + float(k) * 1.6
 			var lat: float = side * rng.randf_range(9.8, 11.2)
-			var to_road: Vector3 = path.world_point(z, 0.0) - path.world_point(z, lat / hw)
-			xs.append(stand(path.world_point(z, lat / hw), to_road.rotated(Vector3.UP, rng.randf_range(-0.6, 0.6)), rng.randf_range(0.94, 1.04)))
+			var h: float = 0.0
+			if plaza:                                                     # same draws (the overpass people do not move)
+				z = path.track.toll.z + (2.75 if k == 0 else -2.75) * side + (lat - side * 10.5) * 0.3
+				lat = side * (1.15 if k == 0 else TollPlaza.OUTER_FACE_M + 0.75)
+				h = TollParts.ISLAND_TOP
+			var to_road: Vector3 = path.world_point(z, (side * 3.7 if plaza else 0.0) / hw) - path.world_point(z, lat / hw)
+			xs.append(stand(path.world_point(z, lat / hw, h), to_road.rotated(Vector3.UP, rng.randf_range(-0.6, 0.6)), rng.randf_range(0.94, 1.04)))
 			looks.append(look(rng, STAFF))
 	var zw: float = 118.0                                              # road worker by the stop line (left shoulder)
 	xs.append(stand(path.world_point(zw, -9.6 / hw), -path.forward_at(zw), 1.0))

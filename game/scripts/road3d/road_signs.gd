@@ -66,7 +66,8 @@ func build(path_: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Array[Ve
 	_curves(L, kind, tunnels)
 	_limits(L, kind, tunnels)
 	_distances(L, places, tunnels)
-	_toll()
+	if not TollPlaza3D.enabled(path.track):                 # T-207: a praca nova tem placas proprias (sem 止まれ/pare)
+		_toll()
 	faces.commit()
 	_commit_boxes(AtlasQuads.level_for(tod))
 	var blocks: int = _kit.commit(self) if _kit != null else 0

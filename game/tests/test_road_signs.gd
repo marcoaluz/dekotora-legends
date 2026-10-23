@@ -25,7 +25,7 @@ func test_signs_on_every_route_two_draws() -> void:
 		var c: Dictionary = signs.counts
 		check(int(c.get("limit", 0)) >= 2, rid + ": placas de limite de velocidade")
 		check(int(c.get("distance", 0)) >= 1, rid + ": painel de distancia")
-		check_eq(int(c.get("stop", 0)), 1, rid + ": pare no pedagio")
+		check_eq(int(c.get("stop", 0)), 0, rid + ": sem 止まれ/pare: a praca de pedagio da T-207 tem placas proprias e nao para ninguem")
 		check_eq(int(c.get("exit", 0)), 1, rid + ": placa de saida")
 		check_eq(int(c.get("tunnel_plaque", 0)) + int(c.get("tunnel_plaque_old", 0)), route.tunnels.size(),
 			rid + ": placa na boca de cada tunel (a do tunel antigo da T-153 e de pedra, no Tunnel3D)")

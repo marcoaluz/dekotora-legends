@@ -82,6 +82,7 @@ var _hud_demo: bool = false             # T-202: --hud-demo
 var _net_racing: bool = false           # online: o servidor ja largou (s_state RACING)
 var _freecam: Freecam                   # T-181: camera livre de exploracao (null = indisponivel; nunca online)
 var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrovisor (R); so apresentacao, local
+var _toll3d: TollPlaza3D                # T-207: praca de pedagio (cancelas e luz que segue o jogador)
 var _drawn: Array[Vector2] = []         # T-198: (z, x) interpolados de cada caminhao no ultimo quadro (cameras sem tranco)
 
 
@@ -158,6 +159,10 @@ func _ready() -> void:
 	var events3d := TrackEvents3D.new()           # T-139: acidente, obras, estreitamento (mesma lista da simulacao)
 	add_child(events3d)
 	events3d.build(path, tod)
+	if TollPlaza3D.enabled(sim.track):             # T-207: praca de pedagio (ilha central, 2 passagens, luzes)
+		_toll3d = TollPlaza3D.new()
+		add_child(_toll3d)
+		_toll3d.build(path, tod, q)
 	_tunnel = Tunnel3D.new()
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
@@ -641,6 +646,8 @@ func _process(delta: float) -> void:
 	_update_audio(dt)
 	_demo.update(get_viewport(), sim.trucks[player], dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
+	if _toll3d != null:
+		_toll3d.update(sim, _player_z(), sim.trucks[player].x, dt)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 	if _autoplay and not _fps_printed and Time.get_ticks_msec() > 6000:
@@ -676,6 +683,8 @@ func _process_online(dt: float) -> void:
 	_update_hud()
 	_update_audio(dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
+	if _toll3d != null:
+		_toll3d.update(sim, _player_z(), sim.trucks[player].x, dt)
 	for k in sim.trucks.size():
 		_trucks[k].sync_damage(sim.trucks[k].loadout)
 

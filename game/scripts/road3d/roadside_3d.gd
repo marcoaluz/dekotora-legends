@@ -44,6 +44,9 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 		if RoadMesh.in_tunnel(z, tunnels, 6.0):
 			continue                                  # dentro do tunel nao ha postes nem arvores
 		var k: String = String(o["kind"])
+		if TollPlaza3D.enabled(path.track):          # T-207: a praca nova substitui o pedagio antigo (toll_gate.glb)
+			if k == "toll_gate" or (k == "lamp_post" and absf(z - path.track.toll.z) < TollParts.CANOPY_DZ + 6.0):
+				continue
 		if RoadMesh.in_tunnel(z, bridges, 12.0) and k != "lamp_post":
 			continue                                  # T-153: ponte (embaixo e o mar)
 		if LaneSections.at(path.track.events, z, 4.0) != null:   # T-153: trecho de 2 faixas
