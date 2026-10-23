@@ -43,3 +43,6 @@ docs/Modelos/
 
 # Copias isoladas de agentes (git worktree)
 .claude/worktrees/
+
+# Quadros brutos das capturas da T-202 (so as finais e a folha vao para o Git)
+docs/capturas_t202/raw/
