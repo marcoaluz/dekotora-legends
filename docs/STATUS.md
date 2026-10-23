@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-23** (T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-23** (T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -34,7 +34,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | HUD da corrida (T-202) | corrida normal (PC: `godot --path game res://scenes/race/race3d.tscn`); ver como celular no PC: `-- --touch --hud-scale=1.25 --safe-area=22,0,0,0`; caminhão batido + seta ligada + detalhe aberto `-- --hud-demo`; prints `GODOT=... bash tools/capture_t202.sh PASTA [pc_dia pc_noite cel_dia cel_noite dano_pc dano_cel tunel_pc]` (janela; `--window=2400x1080` cria a janela no tamanho do celular) e folha `docs/capturas_t202/folha_t202.png`; recorte ampliado `-s res://tools_dev/crop_image.gd -- --in= --out= --rect=x,y,w,h --zoom=2`; testes `-- --only=hud_` |
 | Câmeras da corrida e retrovisor (T-198) | na corrida: **C** (ou ícone de câmera no canto de cima à esquerda) troca perto → padrão → longe → cinema → órbita; **R** (ou tocar no espelho) liga/desliga o retrovisor; Opções > Gráficos: Câmera da corrida, Retrovisor (Automático/Ligado/Desligado), Faixas pretas; forçar `-- --race-cam=cinema --mirror=on` (`--cine-shot=side_low`, `--letterbox=off`); prints `bash tools/capture_t198.sh PASTA [day night]` + `bash tools/sheet_t198.sh`; custo `bash tools/measure_t198.sh [3000] [night]`; testes `-- --only=race_cameras` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
-| Testes automáticos (437) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Pedágio (T-207) | corrida normal (km 0,15 de toda rota): passe pela esquerda ou direita; ficar na faixa do meio = bate na ilha; comparar `-- --no-toll` (pedágio antigo, sem física) e `--old-toll` (só o visual antigo); prints `GODOT=... bash tools/capture_t207.sh PASTA [day night] [-- extras]` (`Q=3` Ultra, `RES=1200x540` celular com toque, `ROUTES=`, `MODES="tour drive"`; em `docs/capturas_t207/`); custo `bash tools/measure_t207.sh [1500] [night]`; bots sem tela `godot --headless --path game -s res://tools_dev/trace_toll.gd -- --sweep=30 [--no-toll]` ou `-- --route=R --seed=N --n=4`; atlas `godot --path game -s res://tools_dev/make_toll_atlas.gd` (janela); testes `-- --only=toll` |
+| Testes automáticos (461) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, H = buzina, C = câmera, R = retrovisor, Esc = pausa) |
@@ -101,6 +102,17 @@ viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminh�
 `docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
 (galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore. **T-199**: copas das Gleditsias
 engrossadas (`TreeCrown`) e retrato do duelo com rosto/óculos/hachimaki (`ui/duel_bust.gd`).
+
+## Pedágio com física (T-207)
+
+No km 0,15 de toda rota a pista se divide em 2 passagens em volta da ilha central com a cabine (a faixa do meio inteira, de 132 a
+164 m), com funil de barreiras onde o acostamento acaba. Bater no nariz = batida de frente com dano (regra dos obstáculos da T-139);
+de lado = empurrado para fora. Bots, rival e trânsito escolhem uma passagem (0 batidas em 180 corridas simuladas). Visual por código
+do mesmo `TollPlaza` da física: cobertura com 料金所 TOLL GATE, LEDs, 3 cabines acesas à noite, placas ETC/一般 e ETC専用 com seta verde,
+amortecedor com pisca-alerta, pórtico ETC, cancelas que abrem, zebra e faixas roxa/verde, poças de luz e uma luz real sobre o jogador.
+Código: `sim/toll_plaza.gd`, `sim/toll_contact.gd`, `road3d/toll_plaza_3d.gd` (+ `toll_parts`, `toll_paint`, `toll_geo`, `toll_atlas`).
+**Protocolo 10 (hoje 11 pela T-208): gerar o APK de novo.** Prints em `docs/capturas_t207/` (antes, depois dia/noite nas 3 rotas,
+PC Ultra, celular 2400x1080, folhas). **Celular não testado/medido.**
 
 ## Abertura do duelo nova (T-204, mais lenta e abrindo na hora na T-208)
 

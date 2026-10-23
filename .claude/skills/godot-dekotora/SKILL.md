@@ -494,3 +494,21 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   monitor), `--no-touch`/`--touch`, `--hud-scale=1.25`, `--safe-area=L,T,R,B`, `--hud-demo`. Recorte ampliado sem tela:
   `-s res://tools_dev/crop_image.gd -- --in=ABS --out=ABS --rect=x,y,w,h --zoom=2`. Testes `-- --only=hud_`.
 - Dano das peças fica salvo no perfil entre corridas: segmento amarelo numa corrida normal pode ser dano real.
+
+## Pedágio com física (T-207)
+
+- Sim: `sim/toll_plaza.gd` (geometria pura: ilha `nose_z..tail_z` em |x| < 1,8 m, funil `outer_face_m(z)`, zebra `gore(z)`, tabelas
+  `block_z/clear_z` por faixa) e `sim/toll_contact.gd` (chamado no fim de `EventContact.truck/car/wall_x`). Fica em `TrackEvents.toll`,
+  FORA de `list` (índices dos eventos, `to_array` e HUD de avisos não mudam); `lane_blocked_between`, `next_block`, `is_empty` enxergam.
+  `Track.set_toll(z)` (z < 0 tira); `RouteDef.build_track` põe em 150 m. Contato com `"event": -1` → evento `event_obstacle/scrape`
+  com `"event": "toll"`. Pista de teste própria: `Track.new()` + `add_section` + `set_toll(150)` (`make_test_track` NÃO tem pedágio).
+- Teste que mede curvas nas rotas inteiras precisa ignorar a praça (troca de faixa forçada perto da largada): ver `_measured` em
+  `tests/test_lane_following.gd`.
+- Visual: `road3d/toll_plaza_3d.gd` monta com `TollGeo` (quads com normal própria, UV do atlas ou métrica; `fp` = quadro rígido no centro
+  da cabine, `rp` = na pista) em 5 materiais (atlas, concrete, paint, band, glow). Atlas `TollAtlas` gerado por
+  `tools_dev/make_toll_atlas.gd` (janela; depois `--import` e conferir `compress/mode=2`, `mipmaps/generate=true` no `.import`).
+- **Armadilha (Compatibility)**: `emission_texture` do StandardMaterial é ignorada: a emissão sai lisa e branqueia o que for colorido.
+  Emissão só em material de cor única; o resto vai para um shader `unshaded` com a textura (`GLOW_SHADER`).
+- Câmera: `RaceCamRig.toll_h_max(z)` limita a altura (5,6 m) perto da cobertura e do pórtico em TODOS os modos (inclusive a PADRÃO).
+- Flags: `--no-toll` (sem a praça, sim e visual), `--old-toll` (só o visual antigo). Prints `tools/capture_t207.sh`, custo
+  `tools/measure_t207.sh`, bots `tools_dev/trace_toll.gd --sweep`. Testes `-- --only=toll`.

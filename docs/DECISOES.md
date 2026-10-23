@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-23 | **Pedágio de verdade, com física (T-207, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** No km 0,15 de toda rota a pista se divide em **duas passagens** em volta de uma **ilha central** (a faixa do meio inteira, ±1,8 m, de 132 a 164 m) com a cabine; o acostamento acaba num **funil** de barreiras (60 m) e cada passagem tem 3,8 m (faixas 1 e 3 sempre cabem). **Bater no nariz da ilha = batida de frente como num veículo parado** (mesma regra/massa dos obstáculos da T-139: dano, carga, para a 6 m/s e sai para a passagem do lado, x = 0 vai para a esquerda); de lado = empurrado para fora (batida lateral ou raspada); encostar = raspada; acostamento = raspa e entra na passagem. Bots, rival e trânsito saem da faixa do meio antes (mesmas consultas de faixa fechada), o bot preso ao lado de alguém cai para trás dele para entrar ("zíper"), troca de faixa para a ilha é recusada perto dela. **Sem limite de velocidade nem parada** (é corrida: o ETC real pede 20 km/h). Passagem da esquerda **ETC/一般** (verde), da direita **ETC専用** (roxa); saiu o 止まれ/pare do acostamento. Duelo (largada nas faixas 1 e 3): custo 0 s; corrida rápida (jogador larga no meio, entre 2 bots): o último a passar perde ~4 s. Protocolo 10. | Pedido do Marco (T-207). Detalhes na seção "T-207" no fim |
 | 2026-10-23 | **Abertura do duelo mais lenta e abrindo na hora (T-208, relato do Marco: "demorou para abrir e foi rápido demais").** Cena de **8,9 s + 3 s de contagem = 11,9 s** (antes 5 + 3): entrada 2,6 s (param em 2,1 s e respiram), guardiões 1,3 s, 対決 sozinho 1,2 s, **fase nova "faixas" 1,9 s** (faixas dos pilotos paradas ~2,5 s para ler), raio 0,9 s, arrancada 1,0 s. O relógio da cena começa no **1º quadro liso**: antes dele um preparo com tela preta + neblina roxa aquece os shaders (pista uma vez, estúdio com tudo aceso uma vez). O menu lê a corrida em segundo plano e a troca de tela mostra preto + neblina desde o clique. **Online: o servidor só começa a contar quando todos montaram a corrida** (`c_race_loaded`, no máximo 30 s) e avisa todos no mesmo instante (`s_state(COUNTDOWN)`); protocolo 11. | Relato do Marco no celular (T-208). Medidas em `docs/capturas_t208/medidas.txt`; detalhes na seção "T-208" no fim |
 | 2026-10-23 | **Abertura do duelo refeita (T-204, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** Estúdio preto com neblina roxa rasteira (volumétrica só no PC Ultra; no celular, planos de névoa baratos); os 2 caminhões DE VERDADE entram pelos lados em ângulo e param lado a lado de frente para a câmera, faróis e neon acesos; atrás deles sobem os guardiões **Raijin** (atrás do jogador, à esquerda) e **Fujin** (atrás do rival, à direita), arte NOSSA desenhada por código, cada um numa aura de chamas; **対決** entra com o taiko; as faixas dos dois pilotos aparecem juntas embaixo (sem a fala de provocação: não dá tempo de ler); um **raio** cai entre os dois com **UM clarão de 0,15 s** e trovão (opção nova **"Reduzir clarões"** troca por um brilho violeta suave e também suaviza o clarão da saída do túnel); corte: os dois arrancam para a câmera; na pista a contagem começa com eles já lado a lado no grid. **8 s no total (5 s de cena + 3 s de contagem)**, antes 9,4 s. Protocolo de rede 9. Saíram: área de descanso/praça de pedágio, detalhes de para-choque/viseira/mural, banner VS e o pisca-pisca de farol de provocação. | Pedido do Marco (T-204). Detalhes na seção "T-204" no fim |
 | 2026-10-21 | **Cenário novo em UM trecho-piloto por rota (T-188, etapa 1) — AGUARDA APROVAÇÃO DO MARCO pelos prints.** Litoral 0,6–1,6 km, cidade 1,3–2,05 km, montanha 1,1–2,05 km (`ScenicZone`, `--t188=off|segment|all`, padrão `segment`): terreno com relevo e textura (grama em 3 tons, terra, rocha, copa de floresta, areia na costa, margem do outro lado da baía), montanhas em 3 camadas (morros perto, cordilheira do meio por código, maciços do horizonte com textura, normais suaves e perspectiva aérea), floresta nas encostas, quarteirões com calçada/ruas/telhados variados/8 fachadas/letreiros de neon com kanji (recuo ≥ 40 m do eixo), casas nos morros do litoral, pedras novas, placas do pórtico com texto na textura. **Global** (não dá para cortar por km): céu novo (estrelas pequenas, lua, nuvens com volume), luar azulado + brilho da cidade no horizonte à noite, neblina com a cor do horizonte; neve dos maciços do litoral/cidade 0,8 → 0,5 (para aparecer floresta). Texturas feitas por código (numpy/Blender e Noto Sans JP, OFL); nada baixado | Pedido do Marco (T-188). Custo medido no PC (modo médio): chamadas −1 a +10, triângulos +5%, textura +1,4 MB, FPS no ruído. Detalhes na seção "T-188" no fim |
@@ -923,3 +924,40 @@ dentro da cena); nenhum quadro acima de 50 ms durante a cena. Arquivo: `docs/cap
 
 **Fica para depois**: a estrada (`RoadMesh.build`, 0,8 s) usa SurfaceTool em GDScript na rota inteira; dá para cortar bem montando os
 arrays direto (estava sendo editada pela T-207, não mexi). No celular a 1ª corrida após instalar ainda vai demorar (shaders sem cache).
+
+## 2026-10-23 · T-207 · Pedágio mais real, com física e a rua se dividindo em duas
+
+**Simulação** (`sim/toll_plaza.gd` geometria pura, `sim/toll_contact.gd` física; igual no servidor e na predição do cliente):
+- Parte da PISTA, como os trechos de 2 faixas: `RouteDef.build_track` põe a praça em `TollPlaza.DEFAULT_Z` (150 m) em toda rota;
+  `Track.toll` → `TrackEvents.toll` (o setter de `Track.events` liga sempre, então `--no-events` e `events: false` mantêm a ilha).
+  Nada novo no setup da rede (a rota define tudo); **protocolo 10** porque a simulação mudou (cliente antigo preveria errado).
+- Fora de `TrackEvents.list`: os índices dos eventos, o HUD de avisos e o sorteio não mudam. `lane_blocked_between`, `next_block`,
+  `nearest_open_lane` e `is_empty` enxergam a praça → bots, rival, trânsito, recusa de troca de faixa e empurrão lateral já desviam.
+- Ao longo da pista (c = 150): funil das barreiras de c−78 a c−18 (13 m → 5,6 m, suave), zebra pintada de c−73 a c−18 (sem física),
+  ilha de c−18 a c+14 (dura), funil abre de c+14 a c+74. Contato: `event` = −1 e `"event": "toll"` no evento da `RaceSim`.
+- Bot (`bot_driver.gd`): `_leaving` (não avança no bloqueio enquanto o corpo ainda está na faixa fechada, mínimo 2 m/s para conseguir
+  virar) e "zíper" (`ZIPPER_M` 120 m, cai 2 m/s abaixo de quem está ao lado). Vale também para acidentes/obras (antes podia encostar no
+  bloqueio a 4 m/s quando ficava preso ao lado de outro caminhão até o fim). Medido: 30 sementes × 3 rotas × 2 e 4 caminhões = 0 batidas,
+  0 raspadas, ninguém dentro da ilha (`tools_dev/trace_toll.gd --sweep`); tempo até passar 14,7 s (duelo, igual sem a praça) e 20,0 s
+  (4 caminhões, era 15,9 s).
+- Radar: ilha e ilhas de fora em verde (`RadarModel.Kind.TOLL`).
+
+**Visual** (só apresentação, `road3d/toll_*.gd`): tudo por código a partir do MESMO `TollPlaza` (a ilha desenhada é a ilha da física).
+Cobertura 18,8 × 16 m a 7 m (fachada 料金所 TOLL GATE, verso "ご利用ありがとうございました", LEDs embaixo), 6 pilares nas ilhas, 3 cabines
+(a central com janela para as duas passagens; o motorista japonês senta à direita), amortecedor amarelo e preto com 2 pisca-alertas e
+placa azul "passe dos dois lados", pórtico das antenas ETC, placas ETC/一般 e ETC専用 com seta verde, barreiras de concreto do funil com
+refletores, cancelas que abrem quando alguém vem na passagem, pintura (zebra em V invertido, linhas contínuas, faixa verde 一般 e roxa ETC,
+marcas de redução). Noite: janelas acesas com o atendente, LEDs, fachada iluminada, poças de luz branca nas passagens e UMA luz real que
+acompanha o jogador embaixo da cobertura (só qualidade ≥ média). Atlas próprio `assets/textures/toll/toll_atlas.png` (arte nossa,
+`tools_dev/make_toll_atlas.gd`). A câmera da corrida (todos os modos) fica abaixo de 5,6 m perto da cobertura e do pórtico
+(`RaceCamRig.toll_h_max`). `--no-toll` = sem a praça (pedágio antigo, sem física); `--old-toll` = só o visual antigo.
+- Armadilha: no Compatibility a `emission_texture` do StandardMaterial é ignorada (a faixa roxa ficava branca à noite): pintura
+  branca e faixas coloridas em materiais separados.
+
+**Custo** (`tools/measure_t207.sh`, noite, 1920×1080, passando pela praça): média Compatibility +4 chamadas, −600 triângulos (o .glb
+antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem a praça (ruído alto); Ultra igual (55–57 FPS). Arquivo
+`docs/capturas_t207/custo_noite.txt`. **Celular não medido.**
+
+**A confirmar pelo Marco**: largura da passagem (3,8 m), ilha começando 120 m depois da largada, a corrida rápida largar o jogador no meio
+(ele precisa escolher um lado ou bate), cores das faixas pintadas, sem limite de velocidade.
+

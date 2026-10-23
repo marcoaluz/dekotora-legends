@@ -19,6 +19,7 @@ while [ $# -gt 0 ] && [ "$1" != "--" ]; do TIMES+=("$1"); shift; done
 Q="${Q:-1}"
 RES="${RES:-1280x720}"
 MODES="${MODES:-tour drive}"
+TOUCH=(--no-touch); [ "$RES" = 1200x540 ] && TOUCH=(--touch --hud-scale=1.25)   # celular: botoes de toque na tela
 if [ "$Q" = 3 ]; then RM=(); else RM=(--rendering-method gl_compatibility); fi
 # pose = nome@km,lateral_m,altura_m,giro_graus,inclinacao_graus (giro positivo = para a esquerda); pedagio em 0,150 km
 POSES="chegada@0.060,3.6,3.4,0,-2;frente@0.100,0,4.2,0,-5;nariz@0.122,-1.2,1.6,-8,0;lado@0.115,-17,6,-58,-12;cabine@0.140,-3.4,2.0,-30,-2;sob@0.141,3.6,2.4,0,6;alto@0.075,-16,30,-28,-34;saida@0.222,0,5,180,-6"
@@ -37,7 +38,7 @@ for T in "${TIMES[@]}"; do
       mkdir -p "$OUT/$T/${ROUTE}_drive"
       timeout 200 "$GODOT" --path game "${RM[@]}" --resolution "$RES" --quit-after 900 res://scenes/race/race3d.tscn -- \
           --route="$ROUTE" --quality="$Q" --no-motion-blur --no-rain --life=off --event-seed=7 --time="$T" --autoplay \
-          --start=40 --start-speed=12 --shots="$OUT/$T/${ROUTE}_drive" --snap-every=1.2 --no-touch "$@" 2>&1 \
+          --start=40 --start-speed=12 --shots="$OUT/$T/${ROUTE}_drive" --snap-every=1.2 "${TOUCH[@]}" "$@" 2>&1 \
           | grep -E "SCRIPT ERROR|Parse Error|^ERROR|TOLL_T207" ;;
     esac
   done
