@@ -1052,3 +1052,19 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   em dia). A garagem só lista as peças que cabem; trocar de cabine para uma onde não cabe deixa a de cima guardada, mas
   sem aparecer nem contar. **Protocolo 13** (estilo leva `led`/`neon`/`top`; ações `set_part_light`, `install_top`).
 - **Para-choque traseiro**: não foi mexido na T-214/T-215 (nem no lote 1 da T-211, que só criou a caixa do encaixe dele).
+
+## 2026-10-24 · T-216 · Canhões embaixo da caixa: à frente, com apoio visível
+
+- Pedido do Marco: canhões direto embaixo da caixa pareciam falsos. Agora, quando os **canhões ficam embaixo e a caixa
+  em cima** (`StackArrange`, `game/scripts/truck/stack_arrange.gd`), os canhões ficam **0,24 m (na escala da peça) à
+  frente da caixa** — a lente aparece na frente do deque, como os canhões de luz sob a aba de um deque de verdade — e a
+  caixa se apoia em dois lugares visíveis: **na frente, em cima dos canhões**; **atrás, em dois pés cromados com sapata**
+  que descem até o teto (medidos na grade do teto de cada cabine). Cada canhão desce de novo até o teto no lugar novo.
+- Onde a viseira fica logo embaixo da frente do teto (cabines **curta** e **JAC**: teto colado no vidro), os canhões
+  avançam só o que dá sem entrar no lugar da viseira e **a caixa recua** o resto (até o fim do teto). Se a soma ficar
+  abaixo de 0,10 m, a dupla "não cabe" e não aparece na garagem.
+- Conta de "cabe" (`StackFit`): no arranjo, os canhões podem passar até 0,32 m da frente da caixa do encaixe do deque,
+  mas nunca entrar no lugar da viseira nem nas zonas protegidas; os pés precisam chegar no teto (raio na malha real).
+  Tabela refeita: **1.500 de 1.728** duplas × caminhões cabem (chata, curta, JAC, Canter: 96/96; americana: 39/96 — lá
+  a caixa em cima dos canhões passou a caber e os canhões em cima de caixa continuam não cabendo).
+- Canhões **em cima** de caixa não mudaram (ficam no tampo, alinhados pelas costas).

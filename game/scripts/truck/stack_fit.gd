@@ -6,6 +6,7 @@ extends RefCounted
 ## numa tabela (`TABLE`, gerada por tools_dev/gen_stack_fit.gd) que o jogo consulta (DeckStack.fits), sem montar nada em
 ## tempo de jogo. O teste (tests/test_deck_stack.gd) refaz a conta e confere que a tabela esta em dia.
 
+const FRONT_ALLOW: float = 0.32    # m: no arranjo da T-216 os canhoes podem passar isto da frente da caixa do encaixe
 const TABLE := "res://assets/vehicles/dekotora/truck/stack_fit.json"
 
 static var _table: Dictionary = {}
@@ -42,10 +43,28 @@ static func problems(model: Node3D, data: Dictionary, c: AccessoryCatalog, lower
 		return ["nao montou"]
 	var upper: Node3D = c.instantiate(upper_id)
 	lower.add_child(upper)
-	SocketSeat.place_upper(upper, lower, c.entry(lower_id))
+	SocketSeat.place_upper(upper, lower, c.entry(lower_id), c.entry(upper_id))
 	var box: AABB = PartFit.aabb_in(lower, model)
-	if not PartFit.inside(box, TruckSockets.aabb_of(sk["box"])):
+	var limit: AABB = TruckSockets.aabb_of(sk["box"])
+	var arranged: bool = lower.find_child(StackArrange.PREFIX + "*", true, false) != null
+	if arranged:                                     # T-216: os canhoes passam um pouco da frente do deque
+		limit.position.z -= FRONT_ALLOW
+		limit.size.z += FRONT_ALLOW
+	if not PartFit.inside(box, limit):
 		probs.append("sai da caixa do encaixe")
+	var vs: Dictionary = TruckSockets.socket(data, "visor")
+	if vs.has("box") and PartFit.overlap(box, TruckSockets.aabb_of(vs["box"]), 0.002):
+		probs.append("entra no lugar da viseira")
+	if arranged and float(upper.get_meta("stack_offset", 0.0)) < StackArrange.AHEAD_MIN - 0.001:
+		probs.append("os canhoes nao ficam a frente da caixa (%.2f m)" % float(upper.get_meta("stack_offset", 0.0)))
+	if arranged:                                     # os pes de tras chegam no teto
+		var truck: TriangleMesh = PartFitSeat.truck_mesh(model, String(data.get("model", "")))
+		for f in lower.find_children(StackArrange.PREFIX + "foot_*", "MeshInstance3D", true, false):
+			var fb: AABB = PartFit.rel_xform(f as Node3D, model) * (f as MeshInstance3D).mesh.get_aabb()
+			var fc: Vector3 = fb.get_center()
+			var hit: Dictionary = truck.intersect_ray(Vector3(fc.x, fb.end.y + 0.3, fc.z), Vector3.DOWN)
+			if hit.is_empty() or absf((hit["position"] as Vector3).y - fb.position.y) > 0.03:
+				probs.append("pe de tras nao chega no teto (%s)" % f.name)
 	if box.end.y > float(sk["stack_max_y"]) + 0.03:
 		probs.append("passa da altura maxima %.2f (topo %.2f)" % [float(sk["stack_max_y"]), box.end.y])
 	for z in data.get("protected", {}):

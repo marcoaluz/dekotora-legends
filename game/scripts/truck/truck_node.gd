@@ -407,7 +407,7 @@ func _mount_top(catalog: AccessoryCatalog, d: PartDef, lower: Node3D, lower_entr
 		return null
 	top.name = "acc_%s_TOP" % d.accessory_id
 	lower.add_child(top)
-	SocketSeat.place_upper(top, lower, lower_entry)
+	SocketSeat.place_upper(top, lower, lower_entry, catalog.entry(d.accessory_id))
 	return top
 
 

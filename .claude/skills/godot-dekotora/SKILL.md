@@ -542,3 +542,5 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - 2º nível: perfil `installed.andon_top`, `GameState.stack_ok/install_top/stack_candidates`, estilo `top: true` (cópia em
   `part_styles()` e no descritor), `TruckNode._mount_top`. "Cabe" = tabela `truck/stack_fit.json` (StackFit); mudou peça do
   deque, encaixe ou caminhão: `godot --headless --path game -s res://tools_dev/gen_stack_fit.gd` (o teste acusa se esquecer).
+- T-216: canhões embaixo + caixa em cima = `StackArrange` (canhões 0,24 m à frente, caixa recua onde a viseira não deixa,
+  pés `SEAT_post_*` atrás). Sonda: `tools_dev/probe_stack_t216.gd -- --model=STEM --lower=ID --upper=ID`.

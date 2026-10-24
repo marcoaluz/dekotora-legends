@@ -245,9 +245,9 @@ static func _drop_pod(node: Node3D, pod: Node3D, anchor: Vector3, surf: Dictiona
 			var h: float = roof_h_pure(surf, anchor.x + p.x, anchor.z + p.z)
 			if h > MISS + 1.0:
 				gap = minf(gap, anchor.y + p.y - h)
-	if gap == INF or gap <= 0.0:
+	if gap == INF or absf(gap - EMBED) < 0.0005:
 		return
-	# desce `gap` (em y do socket), convertido para o espaco do pai do canhao
+	# desce `gap` (ou sobe, se entrou no teto) (em y do socket), convertido para o espaco do pai do canhao
 	var parent_xf: Transform3D = node.transform * PartFit.rel_xform(pod.get_parent() as Node3D, node)
 	pod.position += parent_xf.basis.inverse() * Vector3(0.0, -(gap - EMBED), 0.0)
 
@@ -420,12 +420,16 @@ static func stack_fits(data: Dictionary, lower: Dictionary, upper: Dictionary, l
 
 
 ## Poe `upper` (ja instanciada) em cima de `lower`: filha dela, apoiada na face de cima, alinhada pelas costas.
-## Embaixo canhoes: apoia no canhao mais alto depois de cada um descer ate o teto (a caixa e rigida).
-static func place_upper(upper: Node3D, lower: Node3D, lower_entry: Dictionary) -> void:
+## Embaixo canhoes e em cima caixa: arranjo da T-216 (StackArrange: canhoes a frente da caixa, pes cromados atras).
+## Embaixo canhoes (outros casos): apoia no canhao mais alto depois de cada um descer ate o teto (a caixa e rigida).
+static func place_upper(upper: Node3D, lower: Node3D, lower_entry: Dictionary, upper_entry: Dictionary = {}) -> void:
 	var info: Dictionary = stack_info(lower_entry)
 	var y: float = float(info.get("top_y", 0.0))
+	var arranged: float = StackArrange.arrange(upper, lower, lower_entry, upper_entry)
 	var pods: Array[Node3D] = _pods(lower)
-	if not pods.is_empty():
+	if not is_nan(arranged):
+		y = arranged
+	elif not pods.is_empty():
 		var hi: float = -INF
 		for pod in pods:
 			if upper.is_ancestor_of(pod):
@@ -434,7 +438,9 @@ static func place_upper(upper: Node3D, lower: Node3D, lower_entry: Dictionary) -
 			hi = maxf(hi, box.end.y)
 		if hi > -INF:
 			y = hi
-	upper.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, y - EMBED, 0.0))
+	upper.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, y - EMBED, float(upper.get_meta("stack_back", 0.0))))
+	if not is_nan(arranged):
+		StackArrange.add_posts(upper, lower, upper_entry)
 
 
 # ------------------------------------------------------------------------------------------------ malha
