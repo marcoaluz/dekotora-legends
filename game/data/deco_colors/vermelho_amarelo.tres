@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"vermelho_amarelo"
+display_key = "deco_color.vermelho_amarelo"
+tier = &"neon"
+price = 8000
+body = "deco_red"
+trim = "deco_black"
+led = "lamp_yellow"
+neon = "lamp_yellow"
+swatch_a = Color(0.7843, 0.1255, 0.1843, 1)
+swatch_b = Color(1.0000, 0.9529, 0.3608, 1)

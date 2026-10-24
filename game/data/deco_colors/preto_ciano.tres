@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"preto_ciano"
+display_key = "deco_color.preto_ciano"
+tier = &"comum"
+price = 2000
+body = "deco_black"
+trim = "deco_black"
+led = "lamp_green"
+neon = "lamp_cyan"
+swatch_a = Color(0.0824, 0.0902, 0.1098, 1)
+swatch_b = Color(0.1294, 0.9020, 1.0000, 1)

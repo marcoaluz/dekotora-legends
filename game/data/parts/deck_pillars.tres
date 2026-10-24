@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"deck_pillars"
+display_key = "part.deck_pillars"
+slot = &"andon"
+zones = PackedStringArray("roof")
+weight_kg = 100.0
+durability = 45.0
+fame = 30
+price = 38000
+accessory_id = "deck_pillars"
+rarity = &"rara"
+fame_min = 60

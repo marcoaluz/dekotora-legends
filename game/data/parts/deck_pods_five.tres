@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"deck_pods_five"
+display_key = "part.deck_pods_five"
+slot = &"andon"
+zones = PackedStringArray("roof")
+weight_kg = 80.0
+durability = 40.0
+fame = 26
+price = 32000
+accessory_id = "deck_pods_five"
+rarity = &"rara"
+fame_min = 60

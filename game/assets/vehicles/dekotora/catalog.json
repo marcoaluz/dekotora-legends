@@ -2105,6 +2105,1537 @@
       "license": "original (gerado por script; sem texturas externas)",
       "fit_warnings": [],
       "tier": "deluxe"
+    },
+    {
+      "id": "deck_cap_trio",
+      "name": "Capa de teto com 3 luzes",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_cap_trio.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.3,
+        "z": 0.94
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.93
+        ],
+        [
+          1.07,
+          0.3,
+          0.01
+        ]
+      ],
+      "triangles": 136,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_cap_trio_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "branco_azul",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "001"
+    },
+    {
+      "id": "deck_kanji_rail",
+      "name": "Deque com letreiro e grade",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_kanji_rail.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.146,
+        "y": 0.673,
+        "z": 0.935
+      },
+      "bounds_godot": [
+        [
+          -1.073,
+          0.0,
+          -0.925
+        ],
+        [
+          1.073,
+          0.673,
+          0.01
+        ]
+      ],
+      "triangles": 582,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "chrome",
+        "deco_body",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_kanji_rail_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.146,
+      "default_color": "cromo_ciano",
+      "has_sign": true,
+      "sign_cell": 0,
+      "captures": "002-003"
+    },
+    {
+      "id": "deck_led_box",
+      "name": "Deque LED com letreiro",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_led_box.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.83,
+        "z": 0.982
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.972
+        ],
+        [
+          1.07,
+          0.83,
+          0.01
+        ]
+      ],
+      "triangles": 1218,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_led_box_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 1,
+      "captures": "004-005"
+    },
+    {
+      "id": "deck_led_panel",
+      "name": "Deque LED com painel liso",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_led_panel.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.83,
+        "z": 0.985
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.975
+        ],
+        [
+          1.07,
+          0.83,
+          0.01
+        ]
+      ],
+      "triangles": 1312,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_led_panel_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "006"
+    },
+    {
+      "id": "deck_led_cyan",
+      "name": "Deque LED com tela ciano",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_led_cyan.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.854,
+        "z": 0.976
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.966
+        ],
+        [
+          1.07,
+          0.854,
+          0.01
+        ]
+      ],
+      "triangles": 1044,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_led_cyan_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "007"
+    },
+    {
+      "id": "deck_art_band",
+      "name": "Deque com faixa e pinturas",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_art_band.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.156,
+        "y": 0.88,
+        "z": 0.97
+      },
+      "bounds_godot": [
+        [
+          -1.078,
+          0.0,
+          -0.96
+        ],
+        [
+          1.078,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 206,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_art",
+        "acrylic_sign",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_art_band_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.156,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 2,
+      "captures": "008-009"
+    },
+    {
+      "id": "deck_led_columns",
+      "name": "Deque LED com colunas",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_led_columns.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.878,
+        "z": 0.99
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.98
+        ],
+        [
+          1.07,
+          0.878,
+          0.01
+        ]
+      ],
+      "triangles": 1314,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_led_columns_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 3,
+      "captures": "010-011"
+    },
+    {
+      "id": "deck_lace",
+      "name": "Deque com renda",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_lace.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.88,
+        "z": 0.982
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.972
+        ],
+        [
+          1.07,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 1590,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_lace_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 4,
+      "captures": "012-013"
+    },
+    {
+      "id": "deck_triple_sign",
+      "name": "Deque de 3 letreiros",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_triple_sign.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.88,
+        "z": 0.981
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.971
+        ],
+        [
+          1.07,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 1438,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_triple_sign_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 5,
+      "captures": "014-015"
+    },
+    {
+      "id": "deck_eyebrow",
+      "name": "Deque com sobrancelhas neon",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_eyebrow.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.929,
+        "z": 0.985
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.975
+        ],
+        [
+          1.07,
+          0.929,
+          0.01
+        ]
+      ],
+      "triangles": 2234,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_eyebrow_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 8,
+      "captures": "016-017"
+    },
+    {
+      "id": "deck_pillars",
+      "name": "Deque de colunas neon",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_pillars.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.88,
+        "z": 0.999
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.989
+        ],
+        [
+          1.07,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 922,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_pillars_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 9,
+      "captures": "018-021"
+    },
+    {
+      "id": "deck_cyan_frame",
+      "name": "Deque com moldura neon",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_cyan_frame.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.156,
+        "y": 0.88,
+        "z": 0.984
+      },
+      "bounds_godot": [
+        [
+          -1.078,
+          0.0,
+          -0.974
+        ],
+        [
+          1.078,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 1278,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_sign",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_cyan_frame_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.156,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 10,
+      "captures": "022-023"
+    },
+    {
+      "id": "deck_painted_wings",
+      "name": "Deque com asas pintadas",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_painted_wings.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.14,
+        "y": 0.88,
+        "z": 0.985
+      },
+      "bounds_godot": [
+        [
+          -1.07,
+          0.0,
+          -0.975
+        ],
+        [
+          1.07,
+          0.88,
+          0.01
+        ]
+      ],
+      "triangles": 1382,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_art",
+        "acrylic_sign",
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_painted_wings_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.14,
+      "default_color": "preto_ciano",
+      "has_sign": true,
+      "sign_cell": 11,
+      "captures": "024"
+    },
+    {
+      "id": "deck_pods_square",
+      "name": "Par de canhões de luz quadrados",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_pods_square.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.66,
+        "y": 0.428,
+        "z": 0.97
+      },
+      "bounds_godot": [
+        [
+          -0.83,
+          0.0,
+          -0.97
+        ],
+        [
+          0.83,
+          0.428,
+          -0.0
+        ]
+      ],
+      "triangles": 572,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_pods_square_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "025"
+    },
+    {
+      "id": "deck_pods_round",
+      "name": "Par de canhões de luz redondos",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_pods_round.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.68,
+        "y": 0.481,
+        "z": 0.97
+      },
+      "bounds_godot": [
+        [
+          -0.84,
+          0.0,
+          -0.97
+        ],
+        [
+          0.84,
+          0.481,
+          -0.0
+        ]
+      ],
+      "triangles": 660,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_pods_round_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "026"
+    },
+    {
+      "id": "deck_pods_long",
+      "name": "Par de canhões longos",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_pods_long.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 1.68,
+        "y": 0.481,
+        "z": 1.02
+      },
+      "bounds_godot": [
+        [
+          -0.84,
+          0.0,
+          -1.02
+        ],
+        [
+          0.84,
+          0.481,
+          -0.0
+        ]
+      ],
+      "triangles": 1012,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_pods_long_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "027"
+    },
+    {
+      "id": "deck_pods_five",
+      "name": "Bateria de 5 canhões",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/deck/deck_pods_five.glb",
+      "mount_point": "SOCKET_andon",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.03,
+        "y": 0.37,
+        "z": 0.97
+      },
+      "bounds_godot": [
+        [
+          -1.01,
+          0.0,
+          -0.97
+        ],
+        [
+          1.02,
+          0.37,
+          -0.0
+        ]
+      ],
+      "triangles": 948,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_deck_pods_five_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "andon",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "028"
+    },
+    {
+      "id": "visor_lamp_row",
+      "name": "Viseira com 8 lanternas",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_lamp_row.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 438,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_lamp_row_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "branco_azul",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "029"
+    },
+    {
+      "id": "visor_dash_short",
+      "name": "Viseira neon pontilhada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_dash_short.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 354,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_dash_short_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "030"
+    },
+    {
+      "id": "visor_dash_long",
+      "name": "Viseira neon tracejada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_dash_long.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 378,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_dash_long_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "031"
+    },
+    {
+      "id": "visor_twin_line",
+      "name": "Viseira de 2 linhas",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_twin_line.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 270,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_twin_line_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "032"
+    },
+    {
+      "id": "visor_morse",
+      "name": "Viseira traço-ponto",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_morse.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 306,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_morse_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "033"
+    },
+    {
+      "id": "visor_single_line",
+      "name": "Viseira de 1 linha",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_single_line.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 258,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_single_line_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "034"
+    },
+    {
+      "id": "visor_v_step",
+      "name": "Viseira em V com degraus",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_v_step.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.499
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.499
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 414,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_v_step_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "035"
+    },
+    {
+      "id": "visor_v_band",
+      "name": "Viseira em V larga",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_v_band.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.499
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.499
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 266,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_v_band_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "036"
+    },
+    {
+      "id": "visor_v_split",
+      "name": "Viseira em V partida",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_v_split.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.498
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.498
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 414,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_v_split_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "037"
+    },
+    {
+      "id": "visor_v_chevron",
+      "name": "Viseira de 3 chevrons",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_v_chevron.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.172,
+        "z": 0.506
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.506
+        ],
+        [
+          1.05,
+          0.172,
+          -0.0
+        ]
+      ],
+      "triangles": 314,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_v_chevron_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "038"
+    },
+    {
+      "id": "visor_split_bars",
+      "name": "Viseira de 2 barras",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_split_bars.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.466
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.466
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 270,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_split_bars_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "039"
+    },
+    {
+      "id": "visor_chrome_v",
+      "name": "Viseira cromada em V",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_chrome_v.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.501
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.501
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 286,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_chrome_v_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "040"
+    },
+    {
+      "id": "visor_chrome_louver",
+      "name": "Viseira cromada de lâminas",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_chrome_louver.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.425
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.425
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 1502,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_chrome_louver_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "041"
+    },
+    {
+      "id": "visor_neon_frame",
+      "name": "Moldura neon da cabine",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/visor/visor_neon_frame.glb",
+      "mount_point": "SOCKET_visor",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.1,
+        "y": 0.17,
+        "z": 0.486
+      },
+      "bounds_godot": [
+        [
+          -1.05,
+          0.0,
+          -0.486
+        ],
+        [
+          1.05,
+          0.17,
+          -0.0
+        ]
+      ],
+      "triangles": 510,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t211_visor_neon_frame_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "visor",
+      "fit": "uniform",
+      "nominal_w": 2.1,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "042"
     }
   ]
 }

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"branco_azul"
+display_key = "deco_color.branco_azul"
+tier = &"comum"
+price = 2000
+body = "deco_white"
+trim = "deco_navy"
+led = "lamp_blue"
+neon = "lamp_blue"
+swatch_a = Color(0.9137, 0.9333, 0.9608, 1)
+swatch_b = Color(0.1843, 0.4824, 1.0000, 1)

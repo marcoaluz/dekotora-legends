@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"deck_cap_trio"
+display_key = "part.deck_cap_trio"
+slot = &"andon"
+zones = PackedStringArray("roof")
+weight_kg = 35.0
+durability = 30.0
+fame = 8
+price = 9000
+accessory_id = "deck_cap_trio"
+rarity = &"comum"
+fame_min = 0

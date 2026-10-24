@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"prata_marinho"
+display_key = "deco_color.prata_marinho"
+tier = &"comum"
+price = 2000
+body = "deco_silver"
+trim = "deco_navy"
+led = "lamp_green"
+neon = "lamp_blue"
+swatch_a = Color(0.7255, 0.7608, 0.8157, 1)
+swatch_b = Color(0.1137, 0.1843, 0.4196, 1)
