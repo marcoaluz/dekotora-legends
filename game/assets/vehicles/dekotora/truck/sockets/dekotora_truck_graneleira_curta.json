@@ -400,44 +400,49 @@
   "andon": {
    "box": [
     [
-     -1.113,
-     2.639,
-     -11.178
+     -0.995,
+     2.484,
+     -10.75
     ],
     [
-     1.113,
-     3.679,
-     -9.678
+     0.995,
+     4.108,
+     -9.698
     ]
    ],
    "anchor": [
     0.0,
-    2.641,
+    2.623,
     -9.828
    ],
-   "width": 2.226,
-   "fit": "uniform"
+   "width": 1.91,
+   "fit": "seat",
+   "usable_half_w": 0.925,
+   "roof_end_z": -9.703,
+   "stack_max_y": 4.078
   },
   "visor": {
    "box": [
     [
-     -1.064,
-     2.434,
-     -11.644
+     -1.094,
+     2.424,
+     -11.813
     ],
     [
-     1.064,
-     2.629,
-     -10.984
+     1.094,
+     2.65,
+     -10.752
     ]
    ],
    "anchor": [
     0.0,
-    2.439,
-    -11.014
+    2.434,
+    -11.07
    ],
    "width": 2.128,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.5769,
+   "fill_max_z": -10.758
   },
   "mirror_stay_r": {
    "box": [
@@ -982,5 +987,6 @@
    ]
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_graneleira_curta.surf.json"
 }

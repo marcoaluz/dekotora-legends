@@ -15,7 +15,7 @@ static func models() -> Array[Dictionary]:
 	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
 	files.sort()
 	for f in files:
-		if not String(f).ends_with(".json"):
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
 			continue
 		var stem: String = String(f).get_basename()
 		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
@@ -68,7 +68,11 @@ func test_all_parts_installed_together_scale_limits() -> void:
 			continue
 		for id in PartFit.socket_parts(c, SLOTS):
 			var sc: float = TruckSockets.fit_scale(m["data"], c.entry(id))
-			check(sc >= 0.85 and sc <= 1.15, "%s em %s: escala %.2f" % [id, m["stem"], sc])
+			var lo: float = 0.85
+			var sk: Dictionary = TruckSockets.socket(m["data"], String(c.entry(id)["socket"]))
+			if sk.has("max_depth"):                   # T-214: teto curto (americana): menor pelo fundo, nunca < 0,7
+				lo = minf(lo, maxf(0.7, float(sk["max_depth"]) / TruckSockets.DECK_DEPTH) - 0.001)
+			check(sc >= lo and sc <= 1.15, "%s em %s: escala %.2f" % [id, m["stem"], sc])
 		# um deque e uma viseira juntos: as caixas sao separadas (regra 1), entao as pecas tambem
 		var deck: AABB = TruckSockets.aabb_of(TruckSockets.socket(m["data"], "andon")["box"])
 		var visor: AABB = TruckSockets.aabb_of(TruckSockets.socket(m["data"], "visor")["box"])
@@ -148,7 +152,7 @@ func test_style_and_broken_part_keeps_geometry() -> void:
 		var m: MeshInstance3D = mi as MeshInstance3D
 		for s in m.mesh.get_surface_count():
 			names.append(m.get_active_material(s).resource_name)
-	check("chrome" in names and "lamp_pink" in names and "deco_sign" in names, "cor cromo + rosa e letreiro: %s" % [names])
+	check("chrome" in names and "lamp_pink" + LightPatterns.LENS_SUFFIX in names and "deco_sign" in names, "cor cromo + rosa e letreiro: %s" % [names])
 	var sm: StandardMaterial3D = DecoStyle.sign_material(3, int(c.entry("deck_led_box")["sign_cell"]))
 	check(sm.uv1_offset != Vector3.ZERO, "letreiro trocado desloca a UV")
 	DecoStyle.set_broken(n, c)

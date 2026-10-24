@@ -548,44 +548,50 @@
   "andon": {
    "box": [
     [
-     -0.968,
-     3.56,
-     -10.899
+     -0.805,
+     1.046,
+     -10.785
     ],
     [
-     0.968,
-     4.6,
-     -9.82
+     0.805,
+     4.58,
+     -10.019
     ]
    ],
    "anchor": [
     0.0,
-    3.562,
-    -9.84
+    3.182,
+    -10.044
    ],
-   "width": 1.936,
-   "fit": "uniform"
+   "width": 0.56,
+   "fit": "seat",
+   "usable_half_w": 0.25,
+   "roof_end_z": -10.024,
+   "stack_max_y": 4.55,
+   "max_depth": 0.729
   },
   "visor": {
    "box": [
     [
-     -0.965,
-     2.73,
-     -11.544
+     -0.995,
+     2.72,
+     -11.891
     ],
     [
-     0.965,
-     3.21,
-     -10.884
+     0.995,
+     2.946,
+     -10.787
     ]
    ],
    "anchor": [
     0.0,
-    2.735,
-    -10.914
+    2.73,
+    -11.148
    ],
    "width": 1.93,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.4421,
+   "fill_max_z": -10.793
   },
   "mirror_stay_r": {
    "box": [
@@ -1291,5 +1297,6 @@
    "exempt": []
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_longo_americana.surf.json"
 }

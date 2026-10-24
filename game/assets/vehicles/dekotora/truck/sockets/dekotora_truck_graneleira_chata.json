@@ -444,44 +444,49 @@
   "andon": {
    "box": [
     [
-     -1.083,
-     3.185,
-     -10.464
+     -0.945,
+     3.009,
+     -9.838
     ],
     [
-     1.083,
-     4.225,
-     -8.49
+     0.945,
+     4.58,
+     -8.484
     ]
    ],
    "anchor": [
     0.0,
-    3.187,
+    3.175,
     -8.964
    ],
-   "width": 2.166,
-   "fit": "uniform"
+   "width": 1.81,
+   "fit": "seat",
+   "usable_half_w": 0.875,
+   "roof_end_z": -8.489,
+   "stack_max_y": 4.55
   },
   "visor": {
    "box": [
     [
-     -1.083,
-     2.68,
-     -11.54
+     -1.113,
+     2.67,
+     -11.681
     ],
     [
-     1.083,
-     3.16,
-     -10.88
+     1.113,
+     2.896,
+     -10.296
     ]
    ],
    "anchor": [
     0.0,
-    2.685,
-    -10.91
+    2.68,
+    -10.938
    ],
    "width": 2.166,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.5069,
+   "fill_max_z": -9.846
   },
   "mirror_stay_r": {
    "box": [
@@ -1026,5 +1031,6 @@
    ]
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_graneleira_chata.surf.json"
 }

@@ -392,44 +392,49 @@
   "andon": {
    "box": [
     [
-     -1.15,
-     2.984,
-     -8.495
+     -1.02,
+     2.83,
+     -8.09
     ],
     [
-     1.15,
-     4.024,
-     -6.795
+     1.02,
+     4.452,
+     -6.815
     ]
    ],
    "anchor": [
     0.0,
-    2.986,
+    2.972,
     -7.145
    ],
-   "width": 2.3,
-   "fit": "uniform"
+   "width": 1.96,
+   "fit": "seat",
+   "usable_half_w": 0.95,
+   "roof_end_z": -6.82,
+   "stack_max_y": 4.422
   },
   "visor": {
    "box": [
     [
-     -1.112,
-     2.757,
-     -8.954
+     -1.142,
+     2.747,
+     -9.125
     ],
     [
-     1.112,
-     2.974,
-     -8.294
+     1.142,
+     2.973,
+     -8.092
     ]
    ],
    "anchor": [
     0.0,
-    2.762,
-    -8.324
+    2.757,
+    -8.382
    ],
    "width": 2.224,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.6093,
+   "fill_max_z": -8.098
   },
   "mirror_stay_r": {
    "box": [
@@ -1067,5 +1072,6 @@
    "exempt": []
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_leve_jac.surf.json"
 }

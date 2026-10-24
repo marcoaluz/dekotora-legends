@@ -2,7 +2,8 @@
 
 4 bases (aba reta, aba em V, cromada de lâminas, moldura) + desenhos de neon na face da frente (mesma malha da aba,
 faixas emissivas diferentes). Origem = encaixe "visor" (borda de cima do para-brisa, encostado na testa da cabine);
-a aba cresce para a frente (+Y). Nominal: largura 2,10 m, fundo 0,46 m, altura 0,17 m (a menor testa, do Canter,
+a aba cresce para a frente (+Y). T-214: o jogo inclina as costas junto com o para-brisa e fecha a folga até a
+testa com um enchimento feito pela grade medida de cada cabine (`game/scripts/truck/socket_seat.gd`). Nominal: largura 2,10 m, fundo 0,46 m, altura 0,17 m (a menor testa, do Canter,
 deixa 0,17 m entre o vidro e o teto).
 """
 from __future__ import annotations
@@ -235,9 +236,21 @@ def visor_neon_frame(m):
     return o
 
 
-def _p(pid, name, build, caps, color="preto_ciano", base="reta"):
-    return {"id": pid, "name": name, "build": build, "captures": caps, "has_sign": False, "default_color": color,
-            "slot": "visor", "socket": "visor", "nominal_w": W, "base": base}
+def _detail(m, v=0.0, louver=False):
+    """T-214: acabamento comum a todas as viseiras: fileira de parafusos no tampo (perto das costas, onde a aba é
+    presa na testa) e friso cromado na borda de baixo da frente (as lâminas cromadas não precisam do friso)."""
+    top = K.Face((-W / 2, 0.035, H + 0.0005), (W, 0, 0), (0, 0.03, 0))
+    o = [K.bolts("bolts_top", top, [(0.05 + 0.9 * k / 9, 0.5) for k in range(10)], m["chrome"], r=0.009, h=0.005, off=0.0)]
+    if not louver:
+        o.append(front_strip("lip_low", -W / 2 + 0.02, W / 2 - 0.02, FZ0 - 0.014, FZ0 - 0.002, m["chrome"], v=v, off=0.003,
+                             depth=0.008))
+    return o
+
+
+def _p(pid, name, build, caps, color="preto_ciano", base="reta", v=0.0):
+    louver = base == "laminas"
+    return {"id": pid, "name": name, "build": lambda m, b=build: b(m) + _detail(m, v, louver), "captures": caps,
+            "has_sign": False, "default_color": color, "slot": "visor", "socket": "visor", "nominal_w": W, "base": base}
 
 
 PARTS = [
@@ -247,12 +260,12 @@ PARTS = [
     _p("visor_twin_line", "Viseira de 2 linhas", visor_twin_line, "032"),
     _p("visor_morse", "Viseira traço-ponto", visor_morse, "033"),
     _p("visor_single_line", "Viseira de 1 linha", visor_single_line, "034"),
-    _p("visor_v_step", "Viseira em V com degraus", visor_v_step, "035", base="v"),
-    _p("visor_v_band", "Viseira em V larga", visor_v_band, "036", base="v"),
-    _p("visor_v_split", "Viseira em V partida", visor_v_split, "037", base="v"),
-    _p("visor_v_chevron", "Viseira de 3 chevrons", visor_v_chevron, "038", base="v"),
+    _p("visor_v_step", "Viseira em V com degraus", visor_v_step, "035", base="v", v=0.10),
+    _p("visor_v_band", "Viseira em V larga", visor_v_band, "036", base="v", v=0.10),
+    _p("visor_v_split", "Viseira em V partida", visor_v_split, "037", base="v", v=0.10),
+    _p("visor_v_chevron", "Viseira de 3 chevrons", visor_v_chevron, "038", base="v", v=0.12),
     _p("visor_split_bars", "Viseira de 2 barras", visor_split_bars, "039"),
-    _p("visor_chrome_v", "Viseira cromada em V", visor_chrome_v, "040", color="cromo_ciano", base="v"),
+    _p("visor_chrome_v", "Viseira cromada em V", visor_chrome_v, "040", color="cromo_ciano", base="v", v=0.10),
     _p("visor_chrome_louver", "Viseira cromada de lâminas", visor_chrome_louver, "041", color="cromo_ciano", base="laminas"),
     _p("visor_neon_frame", "Moldura neon da cabine", visor_neon_frame, "042", base="moldura"),
 ]

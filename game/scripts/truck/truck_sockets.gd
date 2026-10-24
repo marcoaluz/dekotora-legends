@@ -44,7 +44,14 @@ static func fit_scale(data: Dictionary, entry: Dictionary) -> float:
 	if w <= 0.0 or nom <= 0.0:
 		return 1.0
 	var lim: Array = data.get("scale_limits", [0.85, 1.15])
-	return clampf(w / nom, float(lim[0]), float(lim[1]))
+	var sc: float = clampf(w / nom, float(lim[0]), float(lim[1]))
+	if s.has("max_depth"):                            # T-214: teto curto (americana): o deque encolhe pelo fundo
+		sc = minf(sc, float(s["max_depth"]) / DECK_DEPTH)
+	return sc
+
+
+## Fundo nominal de um deque (m; blender/scripts/lib/socket_rules.py DECK_DMAX) + 4 cm de lentes/frisos na frente.
+const DECK_DEPTH: float = 1.04
 
 
 ## Cria os nos SOCKET_<encaixe> (no anchor de cada encaixe com ponto) dentro do modelo. Idempotente.

@@ -73,20 +73,19 @@ def sockets(m: dict, extra_stacks: list) -> dict:
     c = m["cab"]
     s = {}
     w0, w1 = c["windshield"]
-    hw, rhw = c["half_w"], c["roof_half_w"]
-    # deque frontal (andon): em cima do teto, da testa até o fim da cabine
-    s["andon"] = {"box": _box(-rhw, c["roof_y"] + 0.01, c["slope_front_z"], rhw, c["roof_y"] + 1.05, c["roof_back_z"]),
-                  # ponto de trás do deque: 1,05 m atrás da borda da frente do teto plano (a frente do deque fica na
-                  # borda, como nas capturas), sem passar do fim da cabine
-                  "anchor": [0.0, round(c["roof_y"] + 0.012, 3), round(min(c["roof_back_z"] - 0.02, c["roof_front_z"] + 1.05), 3)],
-                  "width": round(2 * rhw, 3), "fit": "uniform"}
-    # viseira: aba sobre o para-brisa, da borda de cima do vidro até o teto; encosta na testa
-    vb = c["visor_back_z"]
-    vy0 = w1[1] - 0.03
-    vy1 = min(c["roof_y"], w1[1] + 0.45)
-    vhw = min(c["visor_half_w"], hw)
-    s["visor"] = {"box": _box(-vhw, vy0, vb - 0.6, vhw, vy1, vb + 0.06),
-                  "anchor": [0.0, round(vy0 + 0.005, 3), round(vb + 0.03, 3)], "width": round(2 * vhw, 3), "fit": "uniform"}
+    hw = c["half_w"]
+    if "surf" in m:                                   # T-214: apoio medido por raios na malha real
+        s.update(seat_sockets(m))
+    else:                                             # (sem grades: regra antiga da T-211)
+        rhw = c["roof_half_w"]
+        s["andon"] = {"box": _box(-rhw, c["roof_y"] + 0.01, c["slope_front_z"], rhw, c["roof_y"] + 1.05, c["roof_back_z"]),
+                      "anchor": [0.0, round(c["roof_y"] + 0.012, 3), round(min(c["roof_back_z"] - 0.02, c["roof_front_z"] + 1.05), 3)],
+                      "width": round(2 * rhw, 3), "fit": "uniform"}
+        vb = c["visor_back_z"]
+        vy0 = w1[1] - 0.03
+        vhw = min(c["visor_half_w"], hw)
+        s["visor"] = {"box": _box(-vhw, vy0, vb - 0.6, vhw, min(c["roof_y"], w1[1] + 0.45), vb + 0.06),
+                      "anchor": [0.0, round(vy0 + 0.005, 3), round(vb + 0.03, 3)], "width": round(2 * vhw, 3), "fit": "uniform"}
     # retrovisor (haste): quina da frente, para fora da cabine, na frente da porta
     d = c["door"]
     for side, sx in (("r", 1), ("l", -1)):
@@ -169,3 +168,141 @@ def check(sk: dict, zones: dict) -> list:
             if overlap(a, zv["box"]):
                 probs.append(f"encaixe {ka} entra na zona {zk}")
     return probs
+
+
+# ----------------------------------------------------------------------------- apoio real do deque e da viseira (T-214)
+# Iguais a game/scripts/truck/socket_seat.gd (o jogo assenta cada peça pela mesma grade).
+NOMINAL_W = 2.10                   # largura nominal do deque e da viseira (Blender: deck_t211.W, visor_t211.W)
+VISOR_H = 0.17                     # altura nominal da viseira
+VISOR_DMAX = 0.62                  # fundo máximo de uma viseira (aba + dentes), nominal
+DECK_DMAX = 1.00                   # fundo máximo de um deque, nominal
+FILL_MAX = 0.55                    # m: o enchimento atrás da viseira vai no máximo até aqui (senão a coluna fica de fora)
+CROWN = 0.05                       # m: queda do teto (abaulado) que ainda conta como "largura útil" do deque
+MISS = -99.0
+STACK_H = 1.45                     # m: altura máxima do deque de 2 níveis acima do ponto mais alto do teto (T-215)
+STACK_Y = 4.55                     # m: e nunca mais alto que isto do chão
+
+
+JUMP = 0.15                        # m: degrau entre vizinhos da grade = borda (não interpola através dela)
+
+
+def grid_roof(g: dict, x: float, z: float) -> float:
+    """Altura do teto em (x, z) (bilinear; numa borda vale o vizinho MAIS ALTO; fora da grade = MISS)."""
+    return _bilinear(g["h"], g["x0"], g["dx"], g["nx"], g["z0"], g["dz"], g["nz"], x, z, max)
+
+
+def grid_front(g: dict, x: float, y: float) -> float:
+    """z da superfície da frente em (x, y) (bilinear; numa borda vale o vizinho MAIS À FRENTE)."""
+    return _bilinear(g["z"], g["x0"], g["dx"], g["nx"], g["y0"], g["dy"], g["ny"], x, y, min)
+
+
+def _bilinear(vals, x0, dx, nx, r0, dr, nr, x, r, pick=max):
+    fx, fr = (x - x0) / dx, (r - r0) / dr
+    if fx < 0 or fr < 0 or fx > nx - 1 or fr > nr - 1:
+        return MISS
+    i, j = min(int(fx), nx - 2), min(int(fr), nr - 2)
+    tx, tr = fx - i, fr - j
+    v = [vals[(j + b) * nx + i + a] for b in (0, 1) for a in (0, 1)]
+    good = [q for q in v if q > MISS + 1]
+    if not good:
+        return MISS
+    if len(good) < 4 or max(good) - min(good) > JUMP:
+        return pick(good)
+    return (v[0] * (1 - tx) + v[1] * tx) * (1 - tr) + (v[2] * (1 - tx) + v[3] * tx) * tr
+
+
+def _scale(w: float) -> float:
+    return max(SCALE_MIN, min(SCALE_MAX, w / NOMINAL_W))
+
+
+def seat_sockets(m: dict) -> dict:
+    """Encaixes andon (deque) e visor (viseira) a partir das grades medidas por raios (T-214):
+    - viseira: borda de baixo 3 cm abaixo do topo do vidro, costas no plano do vidro (inclinação `lean`) encostadas no
+      ponto mais à frente da testa; o enchimento (feito no jogo) vai das costas até a testa, no máximo FILL_MAX e
+      nunca além da frente do deque (`fill_max_z`);
+    - deque: largura = parte do teto que cai menos que CROWN (o assento cobre o resto); frente 1,05 m à frente do fim
+      do teto plano, sem passar das costas da viseira."""
+    c, sf = m["cab"], m["surf"]
+    roof, front, k = sf["roof"], sf["front"], sf["lean"]
+    w1 = c["windshield"][1]
+    out = {}
+    # --- costas da viseira (o deque não pode passar delas)
+    vhw = min(c["visor_half_w"], c["half_w"])
+    sv = _scale(2 * vhw)
+    vy0 = round(w1[1] - 0.03, 3)
+    hs = VISOR_H * sv
+    xs = [front["x0"] + front["dx"] * i for i in range(front["nx"]) if abs(front["x0"] + front["dx"] * i) <= vhw * 0.95]
+    zmin = 1e9
+    for x in xs:
+        for jj in range(0, 11):
+            yy = hs * jj / 10
+            zf = grid_front(front, x, vy0 + yy)
+            if zf > MISS + 1:
+                zmin = min(zmin, zf - k * yy)
+    vz0 = round(zmin + 0.004, 3)
+    ztop = vz0 + k * VISOR_H * SCALE_MAX
+    # --- deque
+    rb = c["roof_front_z"]                     # fim do teto da cabine pela grade (os vértices podem cair no vão)
+    while grid_roof(roof, 0.0, rb + 0.025) > c["roof_shell_y"] - 0.30 and rb < c["roof_back_z"] + 0.3:
+        rb += 0.025
+    front_lim = max(ztop + 0.03, w1[2] + 0.02)  # nem nas costas da viseira, nem na frente da borda de cima do vidro
+    wd = 2 * c["roof_half_w"]
+    max_depth = None
+    for _ in range(3):                          # largura útil e posição dependem uma da outra: 3 voltas bastam
+        sd = _scale(wd)
+        dd = DECK_DMAX * sd
+        az = min(rb - 0.02, max(c["roof_front_z"] + 1.05, front_lim + dd))
+        if az - dd < front_lim:                 # teto curto (cabine americana): o deque fica menor (escala pelo fundo)
+            max_depth = round(az - front_lim, 3)
+            dd = max_depth
+        zs = [az - dd * t / 8 for t in range(9)]
+        usable = 0.0
+        x = 0.0
+        while x <= c["roof_half_w"] + 0.001:
+            ok = True
+            for z in zs:
+                top = max(grid_roof(roof, xx, z) for xx in (-0.3, 0.0, 0.3))
+                if min(grid_roof(roof, x, z), grid_roof(roof, -x, z)) < top - CROWN:
+                    ok = False
+                    break
+            if not ok:
+                break
+            usable = x
+            x += 0.025
+        wd = min(2 * c["roof_half_w"], 2 * (usable + 0.03))
+    sd = _scale(wd)
+    dd = DECK_DMAX * sd
+    if max_depth is not None and max_depth < dd:
+        dd = max_depth
+        sd = dd / DECK_DMAX
+    deck_front = az - dd
+    hx = max(wd / 2, NOMINAL_W * sd / 2) + 0.04
+    lo, hi = 1e9, -1e9
+    for t in range(9):
+        z = az - dd * t / 8
+        for q in range(-8, 9):
+            h = grid_roof(roof, hx * q / 8, z)
+            if h > MISS + 1:
+                lo, hi = min(lo, h), max(hi, h)
+    ay = grid_roof(roof, 0.0, az)
+    stack_max = round(min(hi + STACK_H, STACK_Y), 3)    # T-215: topo do deque empilhado (2 níveis) neste caminhão
+    out["andon"] = {"box": _box(-hx, lo - 0.03, deck_front - 0.012, hx, max(hi + 1.10, stack_max + 0.03), rb + 0.005),
+                    "anchor": [0.0, round(ay, 3), round(az, 3)], "width": round(wd, 3), "fit": "seat",
+                    "usable_half_w": round(usable, 3), "roof_end_z": round(rb, 3), "stack_max_y": stack_max}
+    if max_depth is not None:
+        out["andon"]["max_depth"] = max_depth
+    if dd < 0.6:
+        out["andon"]["problem"] = "deque nao cabe entre a viseira e o fim da cabine"
+    # --- viseira: o enchimento vai até a testa, sem passar da frente do deque
+    fill_max = round(deck_front - 0.02, 3)
+    fill_end = ztop
+    for x in xs:
+        zf = grid_front(front, x, vy0 + VISOR_H * SCALE_MAX)
+        if MISS + 1 < zf <= ztop + FILL_MAX:
+            fill_end = max(fill_end, zf)
+    fill_end = min(fill_end, fill_max)
+    out["visor"] = {"box": _box(-(vhw + 0.03), vy0 - 0.01, vz0 - VISOR_DMAX * SCALE_MAX - 0.03, vhw + 0.03,
+                                vy0 + VISOR_H * SCALE_MAX + 0.02, round(fill_end + 0.006, 3)),
+                    "anchor": [0.0, vy0, vz0], "width": round(2 * vhw, 3), "fit": "seat", "lean": k,
+                    "fill_max_z": fill_max}
+    return out

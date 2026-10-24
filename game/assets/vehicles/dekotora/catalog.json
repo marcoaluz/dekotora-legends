@@ -2116,7 +2116,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.14,
-        "y": 0.3,
+        "y": 0.303,
         "z": 0.94
       },
       "bounds_godot": [
@@ -2127,11 +2127,11 @@
         ],
         [
           1.07,
-          0.3,
+          0.303,
           0.01
         ]
       ],
-      "triangles": 136,
+      "triangles": 404,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2154,7 +2154,19 @@
       "default_color": "branco_azul",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "001"
+      "captures": "001",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": false,
+        "top_y": 0.3,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.63,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_kanji_rail",
@@ -2167,13 +2179,13 @@
       "dimensions_m": {
         "x": 2.146,
         "y": 0.673,
-        "z": 0.935
+        "z": 0.938
       },
       "bounds_godot": [
         [
           -1.073,
           0.0,
-          -0.925
+          -0.928
         ],
         [
           1.073,
@@ -2181,7 +2193,7 @@
           0.01
         ]
       ],
-      "triangles": 582,
+      "triangles": 938,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2204,7 +2216,19 @@
       "default_color": "cromo_ciano",
       "has_sign": true,
       "sign_cell": 0,
-      "captures": "002-003"
+      "captures": "002-003",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.671,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.82,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_led_box",
@@ -2231,7 +2255,7 @@
           0.01
         ]
       ],
-      "triangles": 1218,
+      "triangles": 2538,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2255,7 +2279,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 1,
-      "captures": "004-005"
+      "captures": "004-005",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.83,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_led_panel",
@@ -2268,13 +2304,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.83,
-        "z": 0.985
+        "z": 0.983
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.975
+          -0.973
         ],
         [
           1.07,
@@ -2282,7 +2318,7 @@
           0.01
         ]
       ],
-      "triangles": 1312,
+      "triangles": 2680,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2305,7 +2341,19 @@
       "default_color": "prata_marinho",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "006"
+      "captures": "006",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.83,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_led_cyan",
@@ -2318,13 +2366,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.854,
-        "z": 0.976
+        "z": 0.981
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.966
+          -0.971
         ],
         [
           1.07,
@@ -2332,11 +2380,12 @@
           0.01
         ]
       ],
-      "triangles": 1044,
+      "triangles": 2220,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2355,7 +2404,19 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "007"
+      "captures": "007",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.854,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_art_band",
@@ -2368,13 +2429,13 @@
       "dimensions_m": {
         "x": 2.156,
         "y": 0.88,
-        "z": 0.97
+        "z": 0.975
       },
       "bounds_godot": [
         [
           -1.078,
           0.0,
-          -0.96
+          -0.965
         ],
         [
           1.078,
@@ -2382,13 +2443,14 @@
           0.01
         ]
       ],
-      "triangles": 206,
+      "triangles": 658,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_art",
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_neon",
         "deco_trim"
@@ -2406,7 +2468,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 2,
-      "captures": "008-009"
+      "captures": "008-009",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_led_columns",
@@ -2419,13 +2493,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.878,
-        "z": 0.99
+        "z": 0.992
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.98
+          -0.982
         ],
         [
           1.07,
@@ -2433,12 +2507,13 @@
           0.01
         ]
       ],
-      "triangles": 1314,
+      "triangles": 2706,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2457,7 +2532,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 3,
-      "captures": "010-011"
+      "captures": "010-011",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.878,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_lace",
@@ -2470,13 +2557,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.88,
-        "z": 0.982
+        "z": 0.976
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.972
+          -0.966
         ],
         [
           1.07,
@@ -2484,7 +2571,7 @@
           0.01
         ]
       ],
-      "triangles": 1590,
+      "triangles": 2910,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2509,7 +2596,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 4,
-      "captures": "012-013"
+      "captures": "012-013",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_triple_sign",
@@ -2522,13 +2621,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.88,
-        "z": 0.981
+        "z": 0.98
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.971
+          -0.97
         ],
         [
           1.07,
@@ -2536,12 +2635,13 @@
           0.01
         ]
       ],
-      "triangles": 1438,
+      "triangles": 2942,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_trim"
@@ -2559,7 +2659,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 5,
-      "captures": "014-015"
+      "captures": "014-015",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_eyebrow",
@@ -2572,13 +2684,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.929,
-        "z": 0.985
+        "z": 0.98
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.975
+          -0.97
         ],
         [
           1.07,
@@ -2586,12 +2698,13 @@
           0.01
         ]
       ],
-      "triangles": 2234,
+      "triangles": 3766,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2610,7 +2723,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 8,
-      "captures": "016-017"
+      "captures": "016-017",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": false,
+        "top_y": 0.854,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.82,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_pillars",
@@ -2623,13 +2748,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.88,
-        "z": 0.999
+        "z": 1.0
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.989
+          -0.99
         ],
         [
           1.07,
@@ -2637,12 +2762,13 @@
           0.01
         ]
       ],
-      "triangles": 922,
+      "triangles": 2010,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2661,7 +2787,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 9,
-      "captures": "018-021"
+      "captures": "018-021",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.82,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_cyan_frame",
@@ -2674,13 +2812,13 @@
       "dimensions_m": {
         "x": 2.156,
         "y": 0.88,
-        "z": 0.984
+        "z": 0.98
       },
       "bounds_godot": [
         [
           -1.078,
           0.0,
-          -0.974
+          -0.97
         ],
         [
           1.078,
@@ -2688,12 +2826,13 @@
           0.01
         ]
       ],
-      "triangles": 1278,
+      "triangles": 2534,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
         "acrylic_sign",
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2712,7 +2851,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 10,
-      "captures": "022-023"
+      "captures": "022-023",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_painted_wings",
@@ -2725,13 +2876,13 @@
       "dimensions_m": {
         "x": 2.14,
         "y": 0.88,
-        "z": 0.985
+        "z": 0.978
       },
       "bounds_godot": [
         [
           -1.07,
           0.0,
-          -0.975
+          -0.968
         ],
         [
           1.07,
@@ -2739,7 +2890,7 @@
           0.01
         ]
       ],
-      "triangles": 1382,
+      "triangles": 2750,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -2764,7 +2915,19 @@
       "default_color": "preto_ciano",
       "has_sign": true,
       "sign_cell": 11,
-      "captures": "024"
+      "captures": "024",
+      "pods": 0,
+      "stack": {
+        "kind": "box",
+        "base": true,
+        "top_y": 0.88,
+        "top_rect": [
+          -1.02,
+          1.02,
+          -0.8,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_pods_square",
@@ -2775,27 +2938,28 @@
       "mount_point_left": null,
       "mirror_for_left": false,
       "dimensions_m": {
-        "x": 1.66,
-        "y": 0.428,
-        "z": 0.97
+        "x": 1.5,
+        "y": 0.319,
+        "z": 1.01
       },
       "bounds_godot": [
         [
-          -0.83,
-          0.0,
-          -0.97
+          -0.75,
+          -0.0,
+          -0.983
         ],
         [
-          0.83,
-          0.428,
-          -0.0
+          0.75,
+          0.319,
+          0.027
         ]
       ],
-      "triangles": 572,
+      "triangles": 792,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon",
         "deco_trim"
@@ -2813,7 +2977,19 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "025"
+      "captures": "025",
+      "pods": 2,
+      "stack": {
+        "kind": "pods",
+        "base": true,
+        "top_y": 0.32,
+        "top_rect": [
+          -0.66,
+          0.66,
+          -0.95,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_pods_round",
@@ -2824,27 +3000,28 @@
       "mount_point_left": null,
       "mirror_for_left": false,
       "dimensions_m": {
-        "x": 1.68,
-        "y": 0.481,
-        "z": 0.97
+        "x": 1.559,
+        "y": 0.407,
+        "z": 1.008
       },
       "bounds_godot": [
         [
-          -0.84,
-          0.0,
-          -0.97
+          -0.78,
+          -0.0,
+          -0.981
         ],
         [
-          0.84,
-          0.481,
-          -0.0
+          0.78,
+          0.407,
+          0.027
         ]
       ],
-      "triangles": 660,
+      "triangles": 1008,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon",
         "deco_trim"
@@ -2862,7 +3039,19 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "026"
+      "captures": "026",
+      "pods": 2,
+      "stack": {
+        "kind": "pods",
+        "base": true,
+        "top_y": 0.408,
+        "top_rect": [
+          -0.665,
+          0.665,
+          -0.95,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_pods_long",
@@ -2873,27 +3062,28 @@
       "mount_point_left": null,
       "mirror_for_left": false,
       "dimensions_m": {
-        "x": 1.68,
-        "y": 0.481,
-        "z": 1.02
+        "x": 1.498,
+        "y": 0.354,
+        "z": 1.008
       },
       "bounds_godot": [
         [
-          -0.84,
-          0.0,
-          -1.02
+          -0.749,
+          -0.0,
+          -0.981
         ],
         [
-          0.84,
-          0.481,
-          -0.0
+          0.749,
+          0.354,
+          0.027
         ]
       ],
-      "triangles": 1012,
+      "triangles": 1360,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon",
         "deco_trim"
@@ -2911,7 +3101,19 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "027"
+      "captures": "027",
+      "pods": 2,
+      "stack": {
+        "kind": "pods",
+        "base": true,
+        "top_y": 0.355,
+        "top_rect": [
+          -0.65,
+          0.65,
+          -0.95,
+          0.0
+        ]
+      }
     },
     {
       "id": "deck_pods_five",
@@ -2922,27 +3124,28 @@
       "mount_point_left": null,
       "mirror_for_left": false,
       "dimensions_m": {
-        "x": 2.03,
-        "y": 0.37,
-        "z": 0.97
+        "x": 1.986,
+        "y": 0.265,
+        "z": 1.008
       },
       "bounds_godot": [
         [
-          -1.01,
-          0.0,
-          -0.97
+          -0.948,
+          -0.0,
+          -0.981
         ],
         [
-          1.02,
-          0.37,
-          -0.0
+          1.038,
+          0.265,
+          0.027
         ]
       ],
-      "triangles": 948,
+      "triangles": 2056,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon",
@@ -2961,7 +3164,19 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "028"
+      "captures": "028",
+      "pods": 6,
+      "stack": {
+        "kind": "pods",
+        "base": true,
+        "top_y": 0.266,
+        "top_rect": [
+          -0.875,
+          0.875,
+          -0.95,
+          0.0
+        ]
+      }
     },
     {
       "id": "visor_lamp_row",
@@ -2973,7 +3188,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -2984,11 +3199,11 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 438,
+      "triangles": 610,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -3010,7 +3225,9 @@
       "default_color": "branco_azul",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "029"
+      "captures": "029",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_dash_short",
@@ -3022,7 +3239,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3033,15 +3250,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 354,
+      "triangles": 526,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3058,7 +3276,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "030"
+      "captures": "030",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_dash_long",
@@ -3070,7 +3290,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3081,15 +3301,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 378,
+      "triangles": 550,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3106,7 +3327,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "031"
+      "captures": "031",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_twin_line",
@@ -3118,7 +3341,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3129,15 +3352,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 270,
+      "triangles": 442,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3154,7 +3378,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "032"
+      "captures": "032",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_morse",
@@ -3166,7 +3392,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3177,15 +3403,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 306,
+      "triangles": 478,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3202,7 +3429,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "033"
+      "captures": "033",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_single_line",
@@ -3214,7 +3443,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3225,15 +3454,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 258,
+      "triangles": 430,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3250,7 +3480,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "034"
+      "captures": "034",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_v_step",
@@ -3262,7 +3494,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.499
       },
       "bounds_godot": [
@@ -3273,15 +3505,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 414,
+      "triangles": 594,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3298,7 +3531,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "035"
+      "captures": "035",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_v_band",
@@ -3310,7 +3545,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.499
       },
       "bounds_godot": [
@@ -3321,15 +3556,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 266,
+      "triangles": 446,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3346,7 +3582,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "036"
+      "captures": "036",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_v_split",
@@ -3358,7 +3596,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.498
       },
       "bounds_godot": [
@@ -3369,15 +3607,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 414,
+      "triangles": 594,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3394,7 +3633,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "037"
+      "captures": "037",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_v_chevron",
@@ -3406,7 +3647,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.172,
+        "y": 0.175,
         "z": 0.506
       },
       "bounds_godot": [
@@ -3417,15 +3658,16 @@
         ],
         [
           1.05,
-          0.172,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 314,
+      "triangles": 494,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3442,7 +3684,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "038"
+      "captures": "038",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_split_bars",
@@ -3454,7 +3698,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.466
       },
       "bounds_godot": [
@@ -3465,15 +3709,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 270,
+      "triangles": 442,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_neon"
       ],
@@ -3490,7 +3735,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "039"
+      "captures": "039",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_chrome_v",
@@ -3502,7 +3749,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.501
       },
       "bounds_godot": [
@@ -3513,11 +3760,11 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 286,
+      "triangles": 466,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -3538,7 +3785,9 @@
       "default_color": "cromo_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "040"
+      "captures": "040",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_chrome_louver",
@@ -3550,7 +3799,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.425
       },
       "bounds_godot": [
@@ -3561,11 +3810,11 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 1502,
+      "triangles": 1662,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -3586,7 +3835,9 @@
       "default_color": "cromo_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "041"
+      "captures": "041",
+      "pods": 0,
+      "stack": null
     },
     {
       "id": "visor_neon_frame",
@@ -3598,7 +3849,7 @@
       "mirror_for_left": false,
       "dimensions_m": {
         "x": 2.1,
-        "y": 0.17,
+        "y": 0.175,
         "z": 0.486
       },
       "bounds_godot": [
@@ -3609,15 +3860,16 @@
         ],
         [
           1.05,
-          0.17,
+          0.175,
           -0.0
         ]
       ],
-      "triangles": 510,
+      "triangles": 682,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
       "materials_used": [
+        "chrome",
         "deco_body",
         "deco_led",
         "deco_neon"
@@ -3635,7 +3887,9 @@
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
-      "captures": "042"
+      "captures": "042",
+      "pods": 0,
+      "stack": null
     }
   ]
 }

@@ -160,22 +160,72 @@ def _uv_cell(o, corners, cell):
 
 def led_grid(name, face: Face, s0, t0, s1, t1, cols, rows, mat, fill=0.62, off=0.008, depth=0.012, skip=None):
     """Matriz de LED: `cols` x `rows` quadradinhos em relevo dentro do retângulo (s0,t0)-(s1,t1) da face.
-    `skip(c, r)` -> True apaga aquele LED (padrões falhados como nas capturas)."""
+    `skip(c, r)` -> True apaga aquele LED (padrões falhados como nas capturas).
+    T-214: cada LED tem UV 0..1 na frente (o shader das luzes desenha a lente: centro forte, borda mais escura) e a
+    frente é um "domo" baixo (chanfro de 22%), que pega o reflexo como vidro."""
     bm = bmesh.new()
+    uvl = bm.loops.layers.uv.new("UVMap")
     du, dv = (s1 - s0) / cols, (t1 - t0) / rows
     hu, hv = du * fill / 2, dv * fill / 2
+    ins = 0.22
     for r in range(rows):
         for c in range(cols):
             if skip and skip(c, r):
                 continue
             sc, tc = s0 + du * (c + 0.5), t0 + dv * (r + 0.5)
-            p = [face.at(sc - hu, tc - hv, off), face.at(sc + hu, tc - hv, off), face.at(sc + hu, tc + hv, off), face.at(sc - hu, tc + hv, off)]
-            b = [q - face.n * depth for q in p]
-            vs = [bm.verts.new(q) for q in p + b]
-            for f in ((0, 1, 2, 3), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)):
-                bm.faces.new([vs[i] for i in f])
+            p = [face.at(sc - hu, tc - hv, off - 0.003), face.at(sc + hu, tc - hv, off - 0.003),
+                 face.at(sc + hu, tc + hv, off - 0.003), face.at(sc - hu, tc + hv, off - 0.003)]
+            q = [face.at(sc - hu * (1 - ins), tc - hv * (1 - ins), off), face.at(sc + hu * (1 - ins), tc - hv * (1 - ins), off),
+                 face.at(sc + hu * (1 - ins), tc + hv * (1 - ins), off), face.at(sc - hu * (1 - ins), tc + hv * (1 - ins), off)]
+            b = [v - face.n * depth for v in p]
+            uv_p = [(0, 0), (1, 0), (1, 1), (0, 1)]
+            uv_q = [(ins / 2, ins / 2), (1 - ins / 2, ins / 2), (1 - ins / 2, 1 - ins / 2), (ins / 2, 1 - ins / 2)]
+            vs = [bm.verts.new(v) for v in p + b + q]
+            uvs = uv_p + [(0.5, 0.5)] * 4 + uv_q
+            faces = [(8, 9, 10, 11), (0, 1, 9, 8), (1, 2, 10, 9), (2, 3, 11, 10), (3, 0, 8, 11),
+                     (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)]
+            for f in faces:
+                fa = bm.faces.new([vs[i] for i in f])
+                for lp, i in zip(fa.loops, f):
+                    lp[uvl].uv = uvs[i]
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     return M._link(name, bm, mat)
+
+
+def led_panel(name, face: Face, s0, t0, s1, t1, cols, rows, m, skip=None, fill=0.62, screws=True):
+    """Matriz de LED com CAIXA: placa de fundo (painel) em volta dos LEDs, um pouco saltada, e 4 parafusos cromados nos
+    cantos (T-214: "grade de LED" como a das capturas)."""
+    W, Hh = face.u.length, face.v.length
+    ps, pt = 0.014 / W, 0.014 / Hh
+    out = [quad_panel(name + "_housing", face, s0 - ps, t0 - pt, s1 + ps, t1 + pt, m["trim"], off=0.006, depth=0.010),
+           led_grid(name, face, s0, t0, s1, t1, cols, rows, m["led"], fill=fill, off=0.016, depth=0.012, skip=skip)]
+    if screws:
+        out.append(bolts(name + "_screws", face, [(s0 - ps * 0.5, t0 - pt * 0.5), (s1 + ps * 0.5, t0 - pt * 0.5),
+                                                   (s1 + ps * 0.5, t1 + pt * 0.5), (s0 - ps * 0.5, t1 + pt * 0.5)],
+                         m["chrome"], r=0.007, off=0.006))
+    return out
+
+
+def bolts(name, face: Face, pts, mat, r=0.010, h=0.007, off=0.004, seg=6):
+    """Cabeças de parafuso sextavadas na face (pontos em s, t)."""
+    bm = bmesh.new()
+    u, v = face.u.normalized(), face.v.normalized()
+    angs = [2 * math.pi * k / seg for k in range(seg)]
+    for (s_, t_) in pts:
+        c = face.at(s_, t_, off)
+        ring0 = [bm.verts.new(c + (u * math.cos(a) + v * math.sin(a)) * r) for a in angs]
+        ring1 = [bm.verts.new(c + (u * math.cos(a) + v * math.sin(a)) * r * 0.8 + face.n * h) for a in angs]
+        for k in range(seg):
+            bm.faces.new([ring0[k], ring0[(k + 1) % seg], ring1[(k + 1) % seg], ring1[k]])
+        bm.faces.new(ring1)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    return M._link(name, bm, mat)
+
+
+def grooves(name, face: Face, ts, mat, s0=0.04, s1=0.96, w=0.010, depth=0.006):
+    """Frisos horizontais (relevo baixo) na face, nas alturas `ts` (0..1)."""
+    Hh = face.v.length
+    return [bar_on(f"{name}_{k}", face, s0, t - w / Hh / 2, s1, t + w / Hh / 2, mat, off=0.002, depth=depth) for k, t in enumerate(ts)]
 
 
 def bar_on(name, face: Face, s0, t0, s1, t1, mat, off=0.008, depth=0.03):
@@ -198,6 +248,9 @@ def sign(name, face: Face, s0, t0, s1, t1, m, cell=0, frame_mat=None, bar=0.035)
     out = [quad_panel(name + "_face", face, s0, t0, s1, t1, m["sign"], off=0.004, uv_cell=cell)]
     if frame_mat is not None:
         out += frame_on(name + "_fr", face, s0, t0, s1, t1, bar / W, bar / Hh, frame_mat, off=0.004, depth=0.025)
+        bs, bt = bar / W / 2, bar / Hh / 2               # T-214: parafusos nos 4 cantos da moldura
+        out.append(bolts(name + "_bolts", face, [(s0 - bs, t0 - bt), (s1 + bs, t0 - bt), (s1 + bs, t1 + bt), (s0 - bs, t1 + bt)],
+                         m["chrome"], r=0.011, off=0.026))
     return out
 
 
@@ -206,14 +259,20 @@ def art_panel(name, face: Face, s0, t0, s1, t1, m, cell):
 
 
 def hex_pod(name, length, radius, loc, mat, seg=6):
-    """Tubo sextavado deitado ao longo de Y (canhão de luz), centro em `loc`."""
+    """Tubo sextavado deitado ao longo de Y (canhão de luz), centro em `loc`. T-214: face CHATA embaixo (apoia direto no
+    teto, sem base) e em cima (a peça de cima do deque empilhado apoia nela)."""
     o = M.cylinder(name, radius, length, loc, mat, axis="Y", seg=seg, bevel=0.01, bevel_seg=1)
     o.rotation_euler.y = math.radians(30 if seg == 6 else 45)
     return o
 
 
-def lens(name, radius, loc, mat, seg=6):
-    o = M.cylinder(name, radius, 0.03, loc, mat, axis="Y", seg=seg, bevel=0.0)
+def pod_flat(radius, seg=6) -> float:
+    """Distância do centro à face chata de baixo/de cima do tubo (`hex_pod`)."""
+    return radius * (math.cos(math.pi / 6) if seg == 6 else math.cos(math.pi / 4))
+
+
+def lens(name, radius, loc, mat, seg=6, depth=0.03):
+    o = M.cylinder(name, radius, depth, loc, mat, axis="Y", seg=seg, bevel=0.0)
     o.rotation_euler.y = math.radians(30 if seg == 6 else 45)
     return o
 

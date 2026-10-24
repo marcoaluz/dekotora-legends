@@ -5,7 +5,7 @@ extends RefCounted
 ##  1. as caixas de encaixes diferentes nao se cruzam (todas as pecas instaladas juntas);
 ##  2. nenhuma caixa de encaixe entra numa zona protegida (farol, lanterna, seta, placa, para-brisa, porta, roda);
 ##  3. a peca, ja com a escala, cabe inteira na caixa do encaixe (folga TOL);
-##  4. a peca nao entra na lataria (perfil do teto para o deque, perfil da testa para a viseira);
+##  4. a peca nao entra na lataria e encosta nela (T-214: raios na malha real, PartFitSeat; antes: perfis);
 ##  5. a peca nao toca zona protegida.
 
 const TOL: float = 0.02                  # m de folga para "cabe na caixa"
@@ -20,10 +20,26 @@ static func aabb_in(node: Node3D, root: Node3D) -> AABB:
 		var m: MeshInstance3D = mi as MeshInstance3D
 		if m.mesh == null or not m.visible:
 			continue
-		var box: AABB = rel_xform(m, root) * m.mesh.get_aabb()
+		var t: Transform3D = rel_xform(m, root)
+		var box: AABB = t * m.mesh.get_aabb()
+		if not t.basis.is_conformal() or absf(t.basis.x.y) + absf(t.basis.y.z) + absf(t.basis.z.x) > 1e-4:
+			box = _exact_aabb(m.mesh, t)                # T-214: inclinada/cisalhada: caixa pelos vertices (sem inchar)
 		out = box if first else out.merge(box)
 		first = false
 	return out
+
+
+static func _exact_aabb(mesh: Mesh, t: Transform3D) -> AABB:
+	var f: PackedVector3Array = mesh.get_faces()
+	if f.is_empty():
+		return t * mesh.get_aabb()
+	var lo: Vector3 = t * f[0]
+	var hi: Vector3 = lo
+	for v in f:
+		var w: Vector3 = t * v
+		lo = lo.min(w)
+		hi = hi.max(w)
+	return AABB(lo, hi - lo)
 
 
 static func rel_xform(n: Node3D, root: Node3D) -> Transform3D:
@@ -91,6 +107,8 @@ static func part_problems(data: Dictionary, entry: Dictionary, box: AABB) -> Arr
 		if not _exempt(slot, zv) and overlap(box, TruckSockets.aabb_of(zv["box"]), 0.002):
 			probs.append("cobre a zona protegida %s" % z)
 	var cab: Dictionary = data.get("measure", {}).get("cab", {})
+	if String(s.get("fit", "")) == "seat":           # T-214: assento real, conferido por raios (PartFitSeat)
+		return probs
 	if slot == "andon":                               # o deque fica acima do teto em todo o comprimento dele
 		for p in cab.get("roof_profile", []):
 			if float(p[0]) + 0.05 > box.position.z and float(p[0]) < box.end.z and float(p[1]) > box.position.y + 0.005:
@@ -123,6 +141,8 @@ static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalo
 	if n == null:
 		return ["nao montou (sem SOCKET_%s)" % String(catalog.entry(id).get("socket", "?"))]
 	var probs: Array[String] = part_problems(data, catalog.entry(id), aabb_in(n, model))
+	if String(TruckSockets.socket(data, String(catalog.entry(id).get("socket", ""))).get("fit", "")) == "seat":
+		probs.append_array(PartFitSeat.problems(model, String(data.get("model", "")), catalog.entry(id), n))
 	n.get_parent().remove_child(n)
 	n.free()
 	return probs

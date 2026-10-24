@@ -420,44 +420,49 @@
   "andon": {
    "box": [
     [
-     -1.083,
-     3.185,
-     -7.664
+     -0.945,
+     3.009,
+     -7.038
     ],
     [
-     1.083,
-     4.225,
-     -5.69
+     0.945,
+     4.58,
+     -5.684
     ]
    ],
    "anchor": [
     0.0,
-    3.187,
+    3.175,
     -6.164
    ],
-   "width": 2.166,
-   "fit": "uniform"
+   "width": 1.81,
+   "fit": "seat",
+   "usable_half_w": 0.875,
+   "roof_end_z": -5.689,
+   "stack_max_y": 4.55
   },
   "visor": {
    "box": [
     [
-     -1.083,
-     2.68,
-     -8.74
+     -1.113,
+     2.67,
+     -8.881
     ],
     [
-     1.083,
-     3.16,
-     -8.08
+     1.113,
+     2.896,
+     -7.496
     ]
    ],
    "anchor": [
     0.0,
-    2.685,
-    -8.11
+    2.68,
+    -8.138
    ],
    "width": 2.166,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.5069,
+   "fill_max_z": -7.046
   },
   "mirror_stay_r": {
    "box": [
@@ -1095,5 +1100,6 @@
    "exempt": []
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_leve_chata.surf.json"
 }

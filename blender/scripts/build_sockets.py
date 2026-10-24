@@ -58,21 +58,30 @@ def build_one(path: str) -> dict:
     data = TM.import_truck(path)
     m = TM.measure(data, body)
     m["open_body"] = body == "graneleira"
+    m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
     st = stacks(body, cab)
     sk = R.sockets(m, st)
     zones = R.protected_zones(m, cab, st)
     probs = R.check(sk, zones)
+    probs += [f"{k}: {v['problem']}" for k, v in sk.items() if "problem" in v]
     out = {
         "model": stem, "body": body, "cab": cab, "version": 1,
         "units": "metros; Godot: x direita, y cima, frente = -z, traseira do bau em z = 0",
         "scale_limits": [R.SCALE_MIN, R.SCALE_MAX],
-        "measure": {k: v for k, v in m.items() if k not in ("mounts",)},
+        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf")},
         "sockets": sk, "protected": zones, "design_problems": probs,
+        "surfaces": stem + ".surf.json",
     }
     os.makedirs(OUT_DIR, exist_ok=True)
     with open(os.path.join(OUT_DIR, stem + ".json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
+    # grades de apoio (T-214) num arquivo a parte, compacto (milhares de numeros)
+    with open(os.path.join(OUT_DIR, stem + ".surf.json"), "w", encoding="utf-8", newline="\n") as f:
+        json.dump(m["surf"], f, ensure_ascii=False, separators=(",", ":"))
     c = m["cab"]
+    an, vi = sk["andon"], sk["visor"]
+    print(f"[sockets] {stem:34s} deque y {an['anchor'][1]:.3f} z {an['anchor'][2]:.3f} larg util {an['width']:.2f}"
+          f" | viseira y {vi['anchor'][1]:.3f} z {vi['anchor'][2]:.3f} incl {vi.get('lean', 0):.3f}")
     print(f"[sockets] {stem:34s} cabine larg {2 * c['half_w']:.2f} teto y {c['roof_y']:.2f} z {c['roof_front_z']:.2f}..{c['roof_back_z']:.2f}"
           f" para-brisa topo {c['windshield'][1][1]:.2f} viseira z {c['visor_back_z']:.2f} | {len(sk)} encaixes, {len(zones)} zonas,"
           f" {len(probs)} problemas")

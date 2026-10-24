@@ -29,7 +29,7 @@ func _initialize() -> void:
 	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
 	files.sort()
 	for f in files:
-		if not String(f).ends_with(".json"):
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
 			continue
 		var stem: String = String(f).get_basename()
 		var data: Dictionary = TruckSockets.for_model(stem + ".glb")

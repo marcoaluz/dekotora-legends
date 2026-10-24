@@ -2,7 +2,7 @@
 
 Uso (na raiz do projeto):
   blender -b --factory-startup -P blender/scripts/build_t211_parts.py -- [--only id1,id2] [--no-preview]
-      [--compare PASTA_ABS] [--mounted PASTA_ABS] [--atlas]
+      [--compare PASTA_ABS] [--mounted PASTA_ABS] [--atlas] [--textures]
 
 Gera (dentro de game/assets/vehicles/dekotora/):
   accessories/deck/<id>.glb, accessories/visor/<id>.glb   modelos (sem textura embutida: o jogo põe o atlas)
@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from accessories import deck_t211, t211_kit as K, visor_t211  # noqa: E402
 from lib import mesh3d as M, scene  # noqa: E402
 import t211_atlas  # noqa: E402
+import t214_textures  # noqa: E402
 
 OUT = "game/assets/vehicles/dekotora"
 ATLAS = OUT + "/textures/deck_signs.png"
@@ -54,15 +55,50 @@ def export_glb(path, objs):
                               export_cameras=False, export_lights=False, export_image_format="NONE")
 
 
+def _join_pods(objs, pid):
+    """T-214: cada canhão (objetos POD<k>_*) vira UM objeto com vários materiais, nó POD<k> no jogo (que o apoia
+    sozinho no teto). Devolve (objetos que sobraram, objetos dos canhões)."""
+    groups, rest = {}, []
+    for o in objs:
+        if o.type == "MESH" and o.name.startswith("POD"):
+            groups.setdefault(o.name.split("_")[0], []).append(o)
+        else:
+            rest.append(o)
+    pods = []
+    for key in sorted(groups):
+        lst = groups[key]
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in lst:
+            o.select_set(True)
+        bpy.context.view_layer.objects.active = lst[0]
+        if len(lst) > 1:
+            bpy.ops.object.join()
+        ob = bpy.context.view_layer.objects.active
+        ob.name = f"{pid}_{key}"
+        ob.data.name = ob.name
+        pods.append(ob)
+    return rest, pods
+
+
+def _uv_all(objs):
+    """UV em metros (1 repetição a cada 0,5 m) nas malhas sem UV: a textura de detalhe da estrutura (escovado,
+    emendas, rebites, desgaste; `t214_textures.py`) fica do mesmo tamanho em todas as peças."""
+    for o in objs:
+        if o.type == "MESH" and not o.data.uv_layers:
+            M.uv_world(o, tile=0.5)
+
+
 def build_parts(todo, m):
     """Constrói e exporta cada peça. Devolve {id: (raiz, objetos, entrada do catálogo)}."""
     built = {}
     for p in todo:
         objs = p["build"](m)
         M.apply_transforms(objs)
+        _uv_all(objs)
         M.smooth(objs, 35.0)
         tris = M.count_tris(objs)
-        merged = M.join_by_material(objs, prefix=p["id"] + "_")
+        objs, pods = _join_pods(objs, p["id"])
+        merged = M.join_by_material(objs, prefix=p["id"] + "_") + pods
         root = bpy.data.objects.new(p["id"], None)
         bpy.context.scene.collection.objects.link(root)
         for o in merged:
@@ -87,6 +123,7 @@ def build_parts(todo, m):
             "fit_warnings": warn, "tier": "oficina", "style": "deco", "socket": p["socket"], "fit": "uniform",
             "nominal_w": round(max(size.x, p["nominal_w"]), 3), "default_color": p["default_color"], "has_sign": p["has_sign"],
             "sign_cell": _sign_cell(p), "captures": p["captures"],
+            "pods": len(pods), "stack": p.get("stack"),
         }
         built[p["id"]] = (root, merged, entry)
         log(f"{p['id']:22s} tris={tris:5d} mats={len(mats)} tam=({size.x:.2f} x {size.z:.2f} x {size.y:.2f}) {'; '.join(warn)}")
@@ -261,11 +298,14 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--no-preview", action="store_true")
     ap.add_argument("--atlas", action="store_true")
+    ap.add_argument("--textures", action="store_true", help="regera a textura de detalhe da estrutura (T-214)")
     ap.add_argument("--mounted", default="")
     ap.add_argument("--compare", default="")
     args = ap.parse_args(argv)
     if args.atlas or not os.path.exists(ATLAS):
         t211_atlas.make(os.path.abspath(ATLAS))
+    if args.textures or not os.path.exists(t214_textures.ALB):
+        t214_textures.make()
     scene.reset_scene()
     atlas = bpy.data.images.load(os.path.abspath(ATLAS))
     m = K.materials(atlas)

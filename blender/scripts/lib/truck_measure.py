@@ -157,3 +157,83 @@ def measure(data: dict, body: str) -> dict:
                       "top_y": round(float(bx[:, 1].max()), 3), "bottom_y": round(float(bx[:, 1].min()), 3),
                       "half_w": round(float(np.abs(bx[:, 0]).max()), 3)}
     return out
+
+
+# ----------------------------------------------------------------------------- superfícies reais (T-214)
+
+GRID = 0.05                       # m: passo das grades de apoio (teto e testa)
+GRID_Y = 0.02                     # m: passo vertical da grade da testa
+MISS = -99.0                      # raio que não bateu em nada
+
+
+def _bvh(include=None, exclude=("wheel_",)):
+    """BVH (Blender) das malhas do caminhão importado: todas menos as rodas, ou só as de `include`."""
+    import bmesh
+    from mathutils.bvhtree import BVHTree
+    bm = bmesh.new()
+    for o in sorted(bpy.data.objects, key=lambda o: o.name):
+        if o.type != "MESH" or o.name.startswith(exclude):
+            continue
+        if include is not None and o.name.split(".")[0] not in include:
+            continue
+        me = o.to_mesh()
+        me.transform(o.matrix_world)
+        bm.from_mesh(me)
+        o.to_mesh_clear()
+    tree = BVHTree.FromBMesh(bm)
+    bm.free()
+    return tree
+
+
+def surfaces(m: dict) -> dict:
+    """Grades de apoio medidas por RAIOS na malha real (T-214), em coordenadas do Godot:
+    - roof: altura do 1º ponto atingido de cima para baixo (teto da cabine + o que estiver nele), em x × z;
+    - front: z do 1º ponto atingido vindo da FRENTE (para-brisa, testa, viseira de fábrica), em x × y;
+    - lean: inclinação do para-brisa perto da borda de cima (dz/dy: quanto o vidro vai para trás por metro de subida).
+    Chame logo depois de `import_truck` (usa os objetos importados). Determinístico."""
+    from mathutils import Vector
+    c = m["cab"]
+    tree = _bvh()
+    glass = _bvh(include=("truck_glass_wind",))
+    hw = c["half_w"] + 0.05
+    nx = int(round(2 * hw / GRID)) + 1
+    x0 = -GRID * (nx - 1) / 2
+    xs = [round(x0 + GRID * i, 4) for i in range(nx)]
+    # teto: da testa (um pouco antes do começo da descida) até o fim da cabine
+    z0 = round(c["slope_front_z"] - 0.30, 3)
+    nz = int(round((c["roof_back_z"] + 0.02 - z0) / GRID)) + 1
+    top = c["roof_shell_y"] + 2.0
+    roof = []
+    for j in range(nz):
+        z = z0 + GRID * j
+        for x in xs:
+            hit = tree.ray_cast(Vector((x, -z, top)), Vector((0, 0, -1)))
+            roof.append(round(hit[0].z, 3) if hit[0] is not None else MISS)
+    # testa: da borda de cima do vidro até acima do teto
+    wy1 = c["windshield"][1][1]
+    y0 = round(wy1 - 0.10, 3)
+    ny = int(round((c["roof_shell_y"] + 0.06 - y0) / GRID_Y)) + 1
+    zf = c["front_z"] - 3.0
+    front = []
+    for j in range(ny):
+        y = y0 + GRID_Y * j
+        for x in xs:
+            hit = tree.ray_cast(Vector((x, -zf, y)), Vector((0, -1, 0)))
+            front.append(round(-hit[0].y, 3) if hit[0] is not None else MISS)
+    # inclinação do vidro nos últimos 60 cm (reta pelos pontos do centro e de ±0,3 m)
+    pts = []
+    for x in (-0.3, 0.0, 0.3):
+        y = wy1 - 0.60
+        while y <= wy1 - 0.03:
+            hit = glass.ray_cast(Vector((x, -zf, y)), Vector((0, -1, 0)))
+            if hit[0] is not None:
+                pts.append((y, -hit[0].y))
+            y += 0.02
+    a = np.array(pts) if pts else np.zeros((0, 2))
+    lean = float(np.polyfit(a[:, 0], a[:, 1], 1)[0]) if len(a) >= 4 else 0.0
+    return {
+        "roof": {"x0": xs[0], "dx": GRID, "nx": nx, "z0": z0, "dz": GRID, "nz": nz, "h": roof},
+        "front": {"x0": xs[0], "dx": GRID, "nx": nx, "y0": y0, "dy": GRID_Y, "ny": ny, "z": front},
+        "lean": round(lean, 4),
+        "glass_top": [round(float(a[:, 0].max()), 3), round(float(a[a[:, 0].argmax(), 1]), 3)] if len(a) else None,
+    }

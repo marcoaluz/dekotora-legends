@@ -356,44 +356,49 @@
   "andon": {
    "box": [
     [
-     -0.99,
-     2.326,
-     -6.564
+     -0.932,
+     2.162,
+     -6.176
     ],
     [
-     0.99,
-     3.366,
-     -5.264
+     0.932,
+     3.796,
+     -5.284
     ]
    ],
    "anchor": [
     0.0,
-    2.328,
+    2.286,
     -5.314
    ],
-   "width": 1.98,
-   "fit": "uniform"
+   "width": 1.71,
+   "fit": "seat",
+   "usable_half_w": 0.825,
+   "roof_end_z": -5.289,
+   "stack_max_y": 3.766
   },
   "visor": {
    "box": [
     [
-     -0.94,
-     2.141,
-     -7.081
+     -0.97,
+     2.131,
+     -7.25
     ],
     [
-     0.94,
-     2.316,
-     -6.421
+     0.97,
+     2.357,
+     -6.395
     ]
    ],
    "anchor": [
     0.0,
-    2.146,
-    -6.451
+    2.141,
+    -6.507
    ],
    "width": 1.88,
-   "fit": "uniform"
+   "fit": "seat",
+   "lean": 0.5417,
+   "fill_max_z": -6.184
   },
   "mirror_stay_r": {
    "box": [
@@ -1031,5 +1036,6 @@
    "exempt": []
   }
  },
- "design_problems": []
+ "design_problems": [],
+ "surfaces": "dekotora_truck_canter.surf.json"
 }
