@@ -34,6 +34,7 @@ func test_mount_points_exist_on_truck() -> void:
 	var c := _catalog()
 	var truck: Node3D = (load(TruckNode.MODEL_PATH) as PackedScene).instantiate() as Node3D
 	TruckNode.add_extra_mounts(truck, "base", CabCatalog.DEFAULT)          # pontos criados em tempo de execucao (T-126)
+	TruckSockets.add_nodes(truck, TruckNode.MODEL_PATH)                  # T-211: encaixes das pecas da oficina
 	for id in c.ids():
 		var e: Dictionary = c.entry(String(id))
 		check(truck.find_child(String(e["mount_point"]), true, false) != null, "%s: ponto %s existe" % [id, e["mount_point"]])
@@ -58,6 +59,7 @@ func test_attach_and_mirror() -> void:
 	var c := _catalog()
 	var truck: Node3D = (load(TruckNode.MODEL_PATH) as PackedScene).instantiate() as Node3D
 	TruckNode.add_extra_mounts(truck, "base", CabCatalog.DEFAULT)          # pontos criados em tempo de execucao (T-126)
+	TruckSockets.add_nodes(truck, TruckNode.MODEL_PATH)                  # T-211: encaixes das pecas da oficina
 	for id in c.ids():
 		var e: Dictionary = c.entry(String(id))
 		var r: Node3D = c.attach(truck, String(id), "R")

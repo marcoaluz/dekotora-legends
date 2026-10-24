@@ -261,6 +261,7 @@ func sell(id: String) -> void:
 		return
 	profile["money"] = money() + int(float(d.price) * 0.5)      # revenda a 50%
 	(profile["owned"] as Dictionary).erase(id)
+	(profile.get("part_style", {}) as Dictionary).erase(id)       # T-211: a cor paga vai junto com a peca
 	if installed_id(String(d.slot)) == id:
 		(profile["installed"] as Dictionary).erase(String(d.slot))
 	save_profile()
@@ -299,6 +300,76 @@ func set_horn(id: String) -> void:
 	save_profile()
 	_act("set_horn", id)
 	profile_changed.emit()
+
+
+# ---------------------------------------------------------------- cor L/R e letreiro (T-211)
+
+## Estilo de uma peca da oficina: {"color": id de DecoColorDef, "sign": celula do letreiro}; vazio = de fabrica.
+## Perfis antigos nao tem "part_style": vale vazio (nada a migrar).
+func part_style(id: String) -> Dictionary:
+	return (profile.get("part_style", {}) as Dictionary).get(id, {})
+
+
+## Estilos de todas as pecas (para TruckNode.apply_loadout).
+func part_styles() -> Dictionary:
+	return profile.get("part_style", {}) as Dictionary
+
+
+## Cor atual da peca (id de DecoColorDef): a escolhida ou a de fabrica do catalogo.
+func part_color(id: String) -> String:
+	var c: String = String(part_style(id).get("color", ""))
+	if c != "":
+		return c
+	return DecoStyle.default_color(AccessoryCatalog.get_instance().entry(_acc_id(id)))
+
+
+## Preco para trocar a cor da peca para `color` (0 = e a atual ou a de fabrica: voltar e de graca).
+func color_price(id: String, color: String) -> int:
+	var cd: DecoColorDef = DecoColorDef.find(color)
+	if cd == null or color == part_color(id):
+		return 0
+	if color == DecoStyle.default_color(AccessoryCatalog.get_instance().entry(_acc_id(id))):
+		return 0
+	return cd.price
+
+
+func set_part_color(id: String, color: String) -> bool:
+	if not owns(id) or DecoColorDef.find(color) == null or not DecoStyle.is_deco(AccessoryCatalog.get_instance().entry(_acc_id(id))):
+		return false
+	var cost: int = color_price(id, color)
+	if money() < cost:
+		return false
+	profile["money"] = money() - cost
+	_style_of(id)["color"] = color
+	save_profile()
+	_act("set_part_color", "%s:%s" % [id, color])
+	profile_changed.emit()
+	return true
+
+
+## Letreiro (nome pronto, DecoStyle.SIGN_NAMES): de graca.
+func set_part_sign(id: String, sign: int) -> bool:
+	var e: Dictionary = AccessoryCatalog.get_instance().entry(_acc_id(id))
+	if not owns(id) or not bool(e.get("has_sign", false)) or sign < 0 or sign >= DecoStyle.SIGN_NAMES.size():
+		return false
+	_style_of(id)["sign"] = sign
+	save_profile()
+	_act("set_part_sign", "%s:%d" % [id, sign])
+	profile_changed.emit()
+	return true
+
+
+func _style_of(id: String) -> Dictionary:
+	if not profile.has("part_style"):
+		profile["part_style"] = {}
+	if not (profile["part_style"] as Dictionary).has(id):
+		profile["part_style"][id] = {}
+	return profile["part_style"][id]
+
+
+func _acc_id(id: String) -> String:
+	var d: PartDef = part(id)
+	return d.accessory_id if d != null else id
 
 
 # ---------------------------------------------------------------- montagem -> simulacao
@@ -439,7 +510,11 @@ func truck_descriptor() -> Dictionary:
 	var parts: Array = []
 	for d in installed_part_defs():
 		var own: Dictionary = profile["owned"][String(d.id)]
-		parts.append({"id": String(d.id), "dur": float(own["dur"]), "broken": bool(own["broken"])})
+		var pe: Dictionary = {"id": String(d.id), "dur": float(own["dur"]), "broken": bool(own["broken"])}
+		var st: Dictionary = part_style(String(d.id))
+		if not st.is_empty():                                      # T-211: cor L/R e letreiro (protocolo 12)
+			pe["style"] = st.duplicate()
+		parts.append(pe)
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
@@ -633,6 +708,12 @@ func apply_action(action: String, arg: String) -> bool:
 		"set_horn":                                   # T-173
 			set_horn(arg)
 			return true
+		"set_part_color":                             # T-211: "id:cor"
+			var pc: PackedStringArray = arg.split(":")
+			return pc.size() == 2 and set_part_color(pc[0], pc[1])
+		"set_part_sign":                              # T-211: "id:celula"
+			var ps: PackedStringArray = arg.split(":")
+			return ps.size() == 2 and ps[1].is_valid_int() and set_part_sign(ps[0], int(ps[1]))
 	return false
 
 

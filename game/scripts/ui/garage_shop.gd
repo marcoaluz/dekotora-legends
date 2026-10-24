@@ -14,6 +14,8 @@ var on_preview: Callable        # func(part_id: String) -> void
 var on_preview_accept: Callable # func() -> void: Enter/A no cartao leva o foco ao botao da faixa PREVIA
 var on_preview_paint: Callable  # func(hex: String) -> void: cor travada por Fama (so ver)
 var previewing: String = ""     # peca ou cor (hex) em previa agora
+var is_day: Callable            # T-211: func() -> bool (garagem de dia?)
+var toggle_day: Callable        # T-211: func() -> void (De dia/De noite)
 var preview_cards: Dictionary = {}   # id da peca -> cartao (para marcar a previa sem redesenhar a lista)
 var _decals: GarageDecals
 
@@ -69,6 +71,7 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 	var dur: String = "—" if d.durability <= 0.0 else str(int(d.durability))
 	v.add_child(wl("%s %d kg · %s %s · %s +%d" % [Tr.t("garage.weight"), int(d.weight_kg), Tr.t("garage.durability"), dur, Tr.t("garage.destaque"), d.fame], 14, UiTheme.TEXT_DIM))
 	v.add_child(wl("%s: %s" % [Tr.t("garage.protects"), _zones_text(d)], 13, UiTheme.TEXT_DIM))
+	v.add_child(GarageDecoStyle.rarity_line(d))          # T-211: raridade (so etiqueta) ou "Classica"
 	if not installed:
 		v.add_child(wl(delta_text(preview.call({"install": String(d.id)}), base), 14, UiTheme.CYAN))
 	var row := HBoxContainer.new()
@@ -95,6 +98,7 @@ func part_card(d: PartDef, installed: bool, base: Dictionary) -> Control:
 		var bs: Button = small_button(Tr.t("garage.sell"), 120)
 		bs.pressed.connect(func() -> void: gs.sell(String(d.id)))
 		row.add_child(bs)
+	GarageDecoStyle.build(v, gs, d, flash)               # T-211: cor L/R com preco e letreiro
 	return cv[0]
 
 
@@ -113,6 +117,8 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 	box.add_child(UiKit.heading(Tr.t("slot." + slot).to_upper(), 22, UiTheme.PINK))
 	if on_preview.is_valid():
 		box.add_child(wl(Tr.t("garage.preview_tap_hint"), 13, GaragePreviewUi.PREVIEW_COLOR))
+	if slot in GarageDecoStyle.DAY_NIGHT_SLOTS and toggle_day.is_valid():
+		GarageDecoStyle.day_night_button(box, bool(is_day.call()) if is_day.is_valid() else false, toggle_day)
 	var inst: String = gs.installed_id(slot)
 	var base: Dictionary = preview.call({})
 	for d in gs.parts_for_slot(slot):

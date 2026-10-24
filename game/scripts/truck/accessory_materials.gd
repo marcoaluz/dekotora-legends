@@ -22,6 +22,17 @@ const DEFS: Dictionary = {
 	"lamp_cyan": {"c": "#21e6ff", "emit": 2.5},
 	"lamp_pink": {"c": "#ff2e88", "emit": 2.5},
 	"lamp_yellow": {"c": "#fff35c", "emit": 2.5},
+	# T-211: cores L/R das pecas da oficina (DecoColorDef): estrutura, painel e luzes
+	"deco_black": {"c": "#15171c", "metal": 0.35, "rough": 0.28, "coat": 0.6},
+	"deco_white": {"c": "#e9eef5", "metal": 0.25, "rough": 0.3, "coat": 0.8},
+	"deco_silver": {"c": "#b9c2d0", "metal": 0.85, "rough": 0.22, "coat": 0.0},
+	"deco_navy": {"c": "#1d2f6b", "metal": 0.3, "rough": 0.35, "coat": 0.6},
+	"deco_gunmetal": {"c": "#4a505c", "metal": 0.9, "rough": 0.25, "coat": 0.0},
+	"deco_red": {"c": "#c8202f", "metal": 0.35, "rough": 0.3, "coat": 0.8},
+	"lamp_green": {"c": "#3dff7a", "emit": 2.5},
+	"lamp_blue": {"c": "#2f7bff", "emit": 2.5},
+	"lamp_violet": {"c": "#a35cff", "emit": 2.5},
+	"lamp_off": {"c": "#202228", "metal": 0.0, "rough": 0.6},     # luz apagada (peca da oficina quebrada)
 }
 
 

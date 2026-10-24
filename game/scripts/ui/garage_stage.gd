@@ -197,7 +197,7 @@ static func wheel_bottom(t: TruckNode) -> float:
 func refresh_truck() -> void:
 	var gs: Node = get_node("/root/GameState")
 	var shown: Array[PartDef] = preview.loadout(gs) if preview != null else gs.installed_part_defs()
-	truck.apply_loadout(shown)
+	truck.apply_loadout(shown, gs.part_styles())
 	var col: Color = preview.paint(gs) if preview != null else Color(String(gs.profile.get("paint", "#e9eef5")))
 	truck.set_paint_color(col)
 	truck.apply_decals(gs.profile.get("decals", []) as Array)

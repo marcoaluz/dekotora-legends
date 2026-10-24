@@ -51,6 +51,10 @@ func _ready() -> void:
 		if _banner_main != null and is_instance_valid(_banner_main):
 			_banner_main.grab_focus()
 	shop.on_preview_paint = preview_paint
+	shop.is_day = func() -> bool: return stage.day                  # T-211: botao De dia/De noite no deque e na viseira
+	shop.toggle_day = func() -> void:
+		stage.set_daytime(not stage.day)
+		_refresh()
 	_ui_layer = CanvasLayer.new()
 	add_child(_ui_layer)
 	var root := Control.new()

@@ -6,7 +6,7 @@ extends RefCounted
 
 const IDS: Array[String] = ["steady", "sequential", "alternate", "breathing"]
 ## Materiais de luz que piscam; lamp_red (lanterna/freio) e lamp_white (farol) ficam fixos.
-const ANIMATED: Array[String] = ["lamp_amber", "lamp_yellow", "lamp_pink", "lamp_cyan"]
+const ANIMATED: Array[String] = ["lamp_amber", "lamp_yellow", "lamp_pink", "lamp_cyan", "lamp_green", "lamp_blue", "lamp_violet"]
 
 const SHADER := """
 shader_type spatial;

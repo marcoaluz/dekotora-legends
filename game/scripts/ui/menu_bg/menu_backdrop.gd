@@ -76,7 +76,7 @@ func spawn_truck() -> void:
 ## Reaplica pecas, pintura, adesivos e estado das pecas do perfil.
 func refresh_truck() -> void:
 	var gs: Node = get_node("/root/GameState")
-	truck.apply_loadout(gs.installed_part_defs())
+	truck.apply_loadout(gs.installed_part_defs(), gs.part_styles())
 	truck.set_paint_color(Color(String(gs.profile.get("paint", "#e9eef5"))))
 	truck.apply_decals(gs.profile.get("decals", []) as Array)
 	for d in gs.installed_part_defs():

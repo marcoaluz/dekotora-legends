@@ -414,11 +414,14 @@ func _spawn_field_online() -> void:
 		node.plates = _plates
 		add_child(node)
 		var defs: Array[PartDef] = []
+		var styles: Dictionary = {}
 		for p in entry["loadout"]["parts"]:
 			var d: PartDef = gs.part(String(p["id"]))
 			if d != null:
 				defs.append(d)
-		node.apply_loadout(defs)
+				if p.has("style"):                                         # T-211: cor L/R e letreiro do outro jogador
+					styles[String(p["id"])] = p["style"]
+		node.apply_loadout(defs, styles)
 		# T-173: buzina escolhida pelo outro jogador (descritor "horn"); servidor antigo/sem campo = a da peca
 		_horns.append(HornCatalog.resolve(String(entry["loadout"].get("horn", "")), _horn_of(defs)))
 		if not bool(entry["bot"]):
@@ -491,7 +494,7 @@ func _spawn_field() -> void:
 		add_child(node)
 		if i == 0:
 			gs.configure_truck(t)
-			node.apply_loadout(gs.installed_part_defs())
+			node.apply_loadout(gs.installed_part_defs(), gs.part_styles())
 			node.set_paint_color(Color(String(gs.profile.get("paint", "#e9eef5"))))
 			node.apply_decals(gs.profile.get("decals", []) as Array)
 		else:

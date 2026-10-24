@@ -77,6 +77,7 @@ func _ready() -> void:
 	model = scene.instantiate() as Node3D
 	add_child(model)
 	add_extra_mounts(model, body_kind, cab_kind)
+	TruckSockets.add_nodes(model, path)              # T-211: encaixes das pecas da oficina (deque, viseira...)
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
@@ -329,8 +330,9 @@ static func model_path(body: String, cab: String) -> String:
 	return path
 
 
-## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao.
-func apply_loadout(defs: Array[PartDef]) -> void:
+## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao. `styles` (T-211):
+## {id da peca: {"color": id de DecoColorDef, "sign": celula do letreiro}} das pecas da oficina; vazio = de fabrica.
+func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 	for id in _acc_nodes:
 		for n in _acc_nodes[id]:
 			if is_instance_valid(n):
@@ -354,10 +356,15 @@ func apply_loadout(defs: Array[PartDef]) -> void:
 		for n in made:
 			if n != null:
 				catalog.apply_variant(n, d.accessory_id, d.variant)
+				if DecoStyle.is_deco(entry):             # T-211: cor L/R e letreiro (antes do brilho e do cromo)
+					var st: Dictionary = styles.get(String(d.id), {})
+					DecoStyle.apply(n, entry, String(st.get("color", "")), int(st.get("sign", -1)))
 				glow.apply(n)                            # antes das luzinhas (que tiram o nome dos materiais lamp_*)
 				if chrome_mode != "":
 					ChromeMatcap.apply(n, chrome_mode)
 				_apply_light_materials(n)
+				if DecoStyle.is_deco(entry):
+					n.set_meta("deco", true)
 				list.append(n)
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
@@ -372,6 +379,9 @@ func set_part_state(part_id: String, state: String) -> void:
 	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
 	for n in _acc_nodes[part_id]:
 		var node: Node3D = n
+		if state == "broken" and node.has_meta("deco"):   # T-211: peca da oficina quebrada fica (torta e apagada)
+			DecoStyle.set_broken(node, catalog)
+			continue
 		node.visible = state != "broken"
 		if state == "dent":
 			catalog.swap_material(node, "chrome", "steel")

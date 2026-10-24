@@ -82,6 +82,8 @@ func attach(truck_model: Node3D, id: String, side: String = "R") -> Node3D:
 	mount.add_child(node)
 	if mirror and side == "L":
 		node.scale = Vector3(-1, 1, 1)
+	if mount.has_meta("sockets"):                     # T-211: encaixe por caminhao, escala pela largura (TruckSockets)
+		node.scale = Vector3.ONE * TruckSockets.fit_scale(mount.get_meta("sockets"), e)
 	return node
 
 
