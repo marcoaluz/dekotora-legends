@@ -34,6 +34,8 @@ builds/
 
 # Videos e quadros de referencia (analise de outros jogos) - nunca commitar
 referencias/
+# Capturas da oficina do Art Truck Battle extraidas do .docx do Marco (arte de terceiros, T-210): so locais
+docs/Referencias/oficina/
 
 # Modelos 3D de terceiros em avaliacao (1,1 GB, licenca desconhecida): nunca commitar
 docs/Novos modelos/
