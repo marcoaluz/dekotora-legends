@@ -463,3 +463,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: build_sockets 18/18 sem problema de projeto (rodar de novo = JSON iguais); test_part_fit 558/558 combinações; suíte 470/470; `--quit-after 30` sem erro novo; `tools/net_test.sh` PASSOU (protocolo 12); prints no jogo (garagem) conferidos — achou e corrigiu painel pintado invisível (quadrado solto com normal virada pelo recalc).
 - Armadilhas: recalc_face_normals em face solta; `.tres` não aceita `Color("#hex")`; foreach_set com float64; Compatibility ignora emission_texture (letreiro = unshaded); heredoc com aspas falha (patches .py).
 - Decisão pendente: aprovar o padrão do lote 1; cores/preços (seção 18); letreiro grátis?; Clássicas de teto (coroa de faróis etc.) ficam na frente do deque novo — (a) mover para o mesmo encaixe do deque (troca uma pela outra) ou (b) deixar; escolher 1 de cada lacuna (proposta_lacunas.png); isenções do para-choque (placa/seta) e lanternas de fábrica no lote da traseira.
+
+## 2026-10-24 02:22 · T-212 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste gerado com o protocolo 12 (T-211 lote 1, deque e viseira); Min/Target SDK vazios só na cópia durante a exportação, preset restaurado (git diff vazio).
+- Arquivos: builds/kaido-bakuso-debug.apk (fora do Git, 129.289.141 bytes), docs/STATUS.md
+- Observação: não testado no celular. Entrada do T-213 (docs/CREDITOS_MURAIS.md) estava sem commit e não foi incluída neste commit.
