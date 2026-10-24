@@ -119,6 +119,8 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		box.add_child(wl(Tr.t("garage.preview_tap_hint"), 13, GaragePreviewUi.PREVIEW_COLOR))
 	if slot in GarageDecoStyle.DAY_NIGHT_SLOTS and toggle_day.is_valid():
 		GarageDecoStyle.day_night_button(box, bool(is_day.call()) if is_day.is_valid() else false, toggle_day)
+	if slot == DeckStack.LOWER_SLOT:                     # T-215: deque de 2 niveis (no alto: a lista de deques e longa)
+		GarageDeckStack.build(box, gs, flash)
 	var inst: String = gs.installed_id(slot)
 	var base: Dictionary = preview.call({})
 	for d in gs.parts_for_slot(slot):
@@ -127,8 +129,6 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		var rm: Button = small_button(Tr.t("garage.remove"))
 		rm.pressed.connect(func() -> void: gs.uninstall(slot))
 		box.add_child(rm)
-	if slot == DeckStack.LOWER_SLOT:                     # T-215: deque de 2 niveis
-		GarageDeckStack.build(box, gs, flash)
 
 
 # ---------------------------------------------------------------- decoracao (cabecalho e pintura)

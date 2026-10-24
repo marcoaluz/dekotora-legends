@@ -525,3 +525,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   aceita `Color("#hex")`: use `Color(r, g, b, a)`.
 - Perfil `part_style` {id: {color, sign}}; ações `set_part_color` ("id:cor") e `set_part_sign` ("id:n"); descritor com
   `style` por peça (protocolo 12). Garagem: `ui/garage_deco_style.gd`. Vista `top` na garagem (`--view=top`).
+
+## Assento real, luzes e deque de 2 níveis (T-214/T-215)
+
+- Encaixe `fit: "seat"` (deque/viseira): `AccessoryCatalog.attach` chama `SocketSeat.seat` (grades do `<modelo>.surf.json`).
+  Nós `SEAT_*` (assento/enchimento) são criados no jogo com material `deco_trim`/`deco_body` (o `DecoStyle` pinta).
+- Teste de contato por raios: `PartFitSeat.problems` (TriangleMesh do caminhão sem rodas/peças). `PartFit.aabb_in` usa os
+  vértices quando a peça está inclinada/cisalhada (a AABB girada "incha" e reprovava à toa).
+- Sondas: `tools_dev/probe_seat_t214.gd -- --model=STEM --part=ID [--corner=x,z]`, `tools_dev/probe_pitch_t214.gd`.
+  Prints de perto sem a garagem (janela): `tools_dev/shot_fit_t214.gd -- --body= --cab= --parts=a,b,c --top=ID
+  --view=q34|side|front|back [--night] [--led=id:luz] --out=ABS.png` (monta no 2º quadro: no `_initialize` os nós ainda
+  não estão na árvore e o `TruckNode._ready` não rodou).
+- Luzes: `DecoLightDef` (`data/deco_lights/`), perfil `part_style.led/neon`, `GameState.set_part_light`. LED usa material
+  `lamp_x@lens` (`LightPatterns.LENS_SUFFIX`, uniform `lens`); use `LightPatterns.is_animated(nome)` em vez de `ANIMATED.has`.
+- Peças fora de linha: `RetiredParts` (migração com reembolso em `GameState._retire_old_parts`, idempotente).
+- 2º nível: perfil `installed.andon_top`, `GameState.stack_ok/install_top/stack_candidates`, estilo `top: true` (cópia em
+  `part_styles()` e no descritor), `TruckNode._mount_top`. "Cabe" = tabela `truck/stack_fit.json` (StackFit); mudou peça do
+  deque, encaixe ou caminhão: `godot --headless --path game -s res://tools_dev/gen_stack_fit.gd` (o teste acusa se esquecer).

@@ -2,7 +2,7 @@ class_name GarageDebug
 extends RefCounted
 ## Argumentos de depuracao da garagem (capturas): --demo (monta um caminhao cheio de pecas; --noparts = sem pecas;
 ## --cab=<estilo>; --body=<modelo>; --parts=a,b), --damage, --decals, --lights=<padrao>, --hideui, --day,
-## --view=<vista>, --spin (rodas em movimento), --zoom=<z>, --tab=model|parts|mech|repair, --slot=<slot>,
+## --top=<peca> (T-215: 2o nivel do deque), --view=<vista>, --spin (rodas em movimento), --zoom=<z>, --tab=model|parts|mech|repair, --slot=<slot>,
 ## --deco=parts|paint|lights|decals (secao da DECORACAO, T-177),
 ## --shot=ARQUIVO.png (depois de 6 s; --shot-pair = mais um quadro seguido), --preview=<peca> e
 ## --preview-paint=<#hex> (T-171: previa antes de comprar).
@@ -65,6 +65,11 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 				var pd: PartDef = gs.part(pid)
 				if pd != null and (gs.owns(pid) or gs.buy(pd)):
 					gs.install(pid)
+			stage.refresh_truck()
+		elif a.begins_with("--top=") and "--demo" in args:    # T-215: --top=deck_led_box compra e poe no 2o nivel do deque
+			var td: PartDef = gs.part(a.substr(6))
+			if td != null and (gs.owns(String(td.id)) or gs.buy(td)):
+				gs.install_top(String(td.id))
 			stage.refresh_truck()
 		elif a.begins_with("--zoom="):                      # aproxima a camera (capturas de detalhe)
 			var z: float = float(a.substr(7))

@@ -438,6 +438,20 @@ Valores **propostos** (catálogo `docs/REFERENCIA_PECAS.md`, seções 1 e 2). De
 sugerida" ficam só nos dados (`PartDef.rarity`, `PartDef.fame_min`) e **não travam** a compra (`fame_required` = 0).
 Cor L/R: tabela da seção 18 do catálogo (comum 2.000 ¥, metálica 6.000 ¥, neon 8.000 ¥; a de fábrica é de graça).
 
+**T-214/T-215 (propostas, a confirmar pelo Marco):**
+- **+8 cores de peça** (`game/data/deco_colors/`, total 18): comum 2.000 ¥ = rosa + branco, roxo + rosa, laranja + âmbar;
+  metálica 6.000 ¥ = verde + dourado, pérola + dourado, azul metálico + cromo, grafite + laranja; neon 8.000 ¥ = preto +
+  vermelho neon.
+- **Cor das luzes separada da cor da peça** (`game/data/deco_lights/`, 11 luzes: branco, amarelo, âmbar, laranja, vermelho,
+  rosa, violeta, azul, ciano, verde, lima): trocar a cor dos **LEDs** ou do **neon** de uma peça custa **3.000 ¥** cada; voltar
+  para a luz de fábrica da cor da peça é de graça. Peça sem LED (ou sem neon) não mostra a grade daquele papel.
+- **Deque de 2 níveis**: a peça de cima é uma peça normal do deque (mesmo preço, peso, durabilidade e destaque somados ao
+  caminhão); só conta quando cabe no caminhão atual. Sem custo extra para empilhar.
+- **Peças antigas de teto fora do jogo** (T-215): quem tinha recebe o **preço cheio** de volta (tabela abaixo continua
+  valendo só para o reembolso): `roof_lights_row` 12.000, `roof_lights_crown` 35.000, `roof_marker_small_lamps` 8.000,
+  `marker_crown_dx` 32.000, `antenna_decor_mount` 5.000, `roof_light_frame_halo` 22.000, `fumi_wing` 18.000,
+  `andon_kanji` 15.000, `andon_ichiban_dx` 48.000.
+
 | ID | Encaixe | Zona | Peso (kg) | Durab. | Destaque | Preço (¥) | Fama sugerida | Raridade |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `deck_cap_trio` | Deque frontal | Teto | 35 | 30 | 8 | 9.000 | 0 | Comum |

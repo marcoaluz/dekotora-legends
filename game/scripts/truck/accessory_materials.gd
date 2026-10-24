@@ -86,7 +86,7 @@ static func make_detailed(name: String) -> StandardMaterial3D:
 	m.albedo_texture = load(DETAIL_ALB) as Texture2D
 	m.normal_enabled = true
 	m.normal_texture = load(DETAIL_NRM) as Texture2D
-	m.normal_scale = 0.8
+	m.normal_scale = 0.5
 	m.roughness_texture = load(DETAIL_ORM) as Texture2D
 	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC

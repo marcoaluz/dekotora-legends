@@ -1015,3 +1015,40 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Dano sem buraco** (peças da oficina): quebrada fica no lugar, torta 7°, cromo vira aço e as luzes apagam.
 - **Conflito com as Clássicas** (PRECISA DECISÃO): a coroa de faróis `roof_lights_crown` e outras peças antigas de teto
   ficam na frente do deque novo (`docs/capturas_t211/exagerado_*`). O teste só garante o catálogo novo.
+
+## 2026-10-24 · T-214 / T-215 · Refino do deque e da viseira, peças antigas de teto, deque de 2 níveis
+
+- **Encaixe pela lataria real, não por caixa**: o Blender mede por raios o teto e a testa de cada `.glb` (grade de 5 cm,
+  `truck/sockets/<modelo>.surf.json`) e o jogo assenta cada peça (`game/scripts/truck/socket_seat.gd`): o deque inclina com
+  o topo do teto (até 20°; só a parte de cima do teto conta, a testa que cai na frente não), desce até encostar no ponto
+  mais alto embaixo dele e ganha um **assento** (saia fina na cor do painel) que fecha a folga do teto abaulado; a
+  viseira inclina as costas junto com o para-brisa e ganha um **enchimento** na cor da peça até a testa (ou até a frente do
+  deque). Os **canhões não têm mais base**: cada um desce sozinho até o teto (face chata embaixo).
+- **Teste por raios** (`PartFitSeat`): a peça encosta (folga ≤ 1,5 cm), não entra mais que 3 cm, e vista de lado não
+  sobra vão entre a peça e o teto (o assento cobre). Exceção declarada: na **cabine americana** (teto em cúpula, 0,4 m
+  plano) a quina da frente do deque fica sobre a descida da cúpula (mais de 30 cm de queda) e conta como **beiral**,
+  não como vão; lá o deque também fica menor (escala pelo fundo, ~0,70).
+- **Cor das luzes separada da cor da peça** (pedido do Marco): a cor L/R continua escolhendo estrutura + painel (e a luz
+  de fábrica); LEDs e neon têm grade própria de 11 cores, 3.000 ¥ por troca (proposta), voltar à de fábrica é grátis.
+  Perfil `part_style` ganha `led`/`neon` (campos novos; perfil antigo sem eles = luz de fábrica, nada a migrar).
+- **Peças antigas de teto saem do jogo** (pedido do Marco). Opção escolhida: **reembolso do preço cheio em ¥** e a peça
+  sai do perfil (o encaixe fica vazio). Motivo: é a mais segura — ninguém perde dinheiro (nem o que pagou), o save antigo
+  abre normalmente (a migração roda ao carregar e quando o servidor adota o perfil; é idempotente: rodar de novo não paga
+  de novo), e não sobra peça "fantasma" que ninguém mais vê na loja. A alternativa "slot vazio sem reembolso" faria o
+  jogador perder dinheiro; "manter a peça" contraria o pedido. Saíram: `roof_lights_row`, `roof_lights_crown`,
+  `roof_marker_small_lamps`, `marker_crown_dx`, `antenna_decor_mount`, `roof_light_frame_halo`, `fumi_wing`,
+  `andon_kanji`, `andon_ichiban_dx` (lista em `game/scripts/data/retired_parts.gd`; os `.tres` e modelos ficam no projeto
+  só para o preço do reembolso e para descritores antigos). Somem também os encaixes `roof_lights`, `roof_frame`,
+  `roof_ornament` e `roof_wing` da garagem. A garagem avisa uma vez quanto foi devolvido. Rivais trocaram as peças
+  antigas por deques novos (chefe: `deck_led_box`; Dragão de Aço: `deck_cap_trio`). Ficam: as viseiras antigas
+  (`visor_basic`, `visor_gold_lights`, `kw_visor`, não são de teto) e `andon_big_panel` (fica atrás, no painel do baú).
+  A coroa de faróis levava a buzina musical 1: ela continua escolhível na seção BUZINA (grátis).
+- **Deque de 2 níveis**: caixa em cima de canhões ou canhões em cima de caixa (nunca caixa+caixa ou canhão+canhão; a capa
+  baixa e o deque de sobrancelhas não aguentam peça em cima, mas podem ir em cima dos canhões). A peça de cima fica no
+  encaixe extra `andon_top` do perfil e é filha da de baixo (apoia no canhão mais alto ou no tampo da caixa). "Cabe" =
+  conta geométrica de verdade (`StackFit`: dentro da caixa do encaixe, até a altura máxima `stack_max_y` = teto + 1,45 m e
+  no máximo 4,55 m do chão, fora das zonas protegidas, apoiada), feita para todas as duplas × caminhões e guardada em
+  `game/assets/vehicles/dekotora/truck/stack_fit.json` (gerar com `tools_dev/gen_stack_fit.gd`; o teste confere que está
+  em dia). A garagem só lista as peças que cabem; trocar de cabine para uma onde não cabe deixa a de cima guardada, mas
+  sem aparecer nem contar. **Protocolo 13** (estilo leva `led`/`neon`/`top`; ações `set_part_light`, `install_top`).
+- **Para-choque traseiro**: não foi mexido na T-214/T-215 (nem no lote 1 da T-211, que só criou a caixa do encaixe dele).

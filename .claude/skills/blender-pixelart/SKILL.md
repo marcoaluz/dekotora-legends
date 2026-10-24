@@ -224,3 +224,13 @@ um problema visual não puder ser entendido pelos renders.
   carrega uma cópia.
 - Loop de comparação: `--mounted PASTA --compare PASTA` (mesmo ângulo da captura, `VIEW` no script). As folhas com as
   capturas são de terceiros: só em `docs/Referencias/oficina/comparacao/` (fora do Git).
+
+## Refino do deque/viseira (T-214)
+
+- Grades de apoio por raios (`lib/truck_measure.surfaces`, BVHTree): `build_sockets.py` grava `<modelo>.surf.json` ao lado
+  do JSON de encaixes. Determinístico (rodar 2× = arquivos idênticos).
+- Armadilha: `M.cylinder(..., axis="Y", seg=6)` com `rotation_euler.y = 0` deixa uma QUINA embaixo (o canhão "em V" boiava
+  2 cm no teto); 30° = face chata embaixo (conferido pelos raios do teste). Para seg=4, 45°.
+- Canhões: objetos `POD<k>_*` são juntados num objeto por canhão (`_join_pods`) para virar o nó `POD<k>` no jogo.
+- Textura de detalhe da estrutura: `t214_textures.py` (`--textures` regera); no `.import`: `compress/mode=2`,
+  `mipmaps/generate=true` e `normal_map=1` na normal.

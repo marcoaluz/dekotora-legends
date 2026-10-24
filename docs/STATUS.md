@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-24** (T-211: oficina lote 1, 17 deques + 14 viseiras novos, encaixes e zonas protegidas medidos em todos os caminhões, cor L/R com preço, protocolo 12; antes T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-24** (T-214/T-215: deque e viseira assentados na lataria real de cada cabine, canhões sem base, cor das luzes separada, peças antigas de teto fora com reembolso, deque de 2 níveis, protocolo 13; antes T-211: oficina lote 1, 17 deques + 14 viseiras novos, encaixes e zonas protegidas medidos em todos os caminhões, cor L/R com preço, protocolo 12; antes T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -285,6 +285,14 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-214/T-215 (2026-10-24): refino do deque e da viseira + deque de 2 níveis.** Olhar `docs/capturas_t214/`
+  (`folha_pilhas.png`: as 5 cabines com caixa em cima de canhões de noite, canhões em cima de caixa de dia e de lado;
+  `folha_luzes.png`: o mesmo deque com LEDs/neon de cores diferentes; `garagem_*.png`: a seção 2º NÍVEL e as grades
+  de cor das luzes). Na garagem (DECORAÇÃO > PEÇAS > Deque frontal): instalar um deque de canhões ou de caixa, rolar até
+  **2º NÍVEL (EM CIMA)**, comprar e PÔR EM CIMA; no cartão da peça, trocar "Cor dos LEDs" e "Cor do neon". Decidir:
+  preço da troca de luz (3.000 ¥?), as 8 cores novas, altura máxima da pilha (até 4,55 m do chão), e se as viseiras
+  antigas (`visor_basic`, `visor_gold_lights`, `kw_visor`) também saem. **Gerar o APK de novo** (protocolo 13).
 
 - **T-211 (2026-10-24): oficina, lote 1 (deque e viseira).** Olhar `docs/capturas_t211/`: `folha_lote1_deques.png` e
   `folha_lote1_viseiras.png` (cada peça de dia e de noite), `folha_exagerado.png` (caminhão mais enfeitado: frente, lado,
