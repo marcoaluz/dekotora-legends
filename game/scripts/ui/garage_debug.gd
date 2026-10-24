@@ -8,7 +8,7 @@ extends RefCounted
 ## --preview-paint=<#hex> (T-171: previa antes de comprar).
 ## O --demo grava em user://demo_profile.json, NUNCA no perfil real do jogador.
 
-const DEMO_PARTS: Array[String] = ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji",
+const DEMO_PARTS: Array[String] = ["fb_gold_wing", "visor_gold_lights", "deck_led_box", "skirt_light_bar",
 		"rb_chrome", "mural_lightning", "hub_chrome", "grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament",
 		"roof_torii_ornament", "fender_extension", "side_ornament_wave", "rear_lamp_cluster", "mudflap_designed"]
 

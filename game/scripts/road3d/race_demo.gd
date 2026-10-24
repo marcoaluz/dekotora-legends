@@ -134,7 +134,7 @@ static func decorate_profile(gs: Node, args: PackedStringArray) -> void:
 			elif a.begins_with("--cab="):
 				gs.profile["cab"] = CabCatalog.normalize(a.substr(6))
 		return
-	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning",
+	for id in ["fb_gold_wing", "visor_gold_lights", "deck_led_box", "skirt_light_bar", "rb_chrome", "mural_lightning",
 			"hub_gold", "grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "rear_lamp_cluster"]:
 		var d: PartDef = gs.part(id)
 		if d != null and gs.buy(d):

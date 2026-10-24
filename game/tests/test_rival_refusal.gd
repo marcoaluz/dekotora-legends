@@ -35,7 +35,7 @@ func test_rival_refuses_without_fame_or_destaque_then_accepts() -> void:
 	var need: int = int(r["min_destaque"])
 	gs.profile["owned"]["fb_basic"]["dur"] = 1.0
 	# destaque das pecas + 14 (dourado) + 24 (4 adesivos) ainda pode nao chegar a 140; completa com pecas caras
-	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning", "hub_gold"]:
+	for id in ["fb_gold_wing", "visor_gold_lights", "deck_led_box", "skirt_light_bar", "rb_chrome", "mural_lightning", "hub_gold"]:
 		var d: PartDef = gs.part(id)
 		if d != null:
 			gs.add_owned(d)

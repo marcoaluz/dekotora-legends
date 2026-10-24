@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"laranja_ambar"
+display_key = "deco_color.laranja_ambar"
+tier = &"comum"
+price = 2000
+body = "deco_orange"
+trim = "deco_black"
+led = "lamp_orange"
+neon = "lamp_amber"
+swatch_a = Color(0.9098, 0.4157, 0.1098, 1)
+swatch_b = Color(1.0000, 0.7020, 0.2784, 1)

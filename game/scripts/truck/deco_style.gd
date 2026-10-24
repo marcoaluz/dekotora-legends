@@ -18,10 +18,21 @@ const BROKEN_TILT_DEG: float = 7.0
 
 static var _sign_mats: Dictionary = {}       # "cell" -> StandardMaterial3D (acrylic_sign deslocado para a celula)
 static var _art_mat: StandardMaterial3D
+static var _lens_mats: Dictionary = {}       # "lamp_x@lens" -> StandardMaterial3D
 
 
 static func is_deco(entry: Dictionary) -> bool:
 	return String(entry.get("style", "")) == "deco"
+
+
+## Luz de fabrica de um papel ("led" | "neon") para a cor `color_id` (id de DecoLightDef; "" se a cor usa uma luz fora
+## da tabela).
+static func default_light(color_id: String, role: String) -> String:
+	var cd: DecoColorDef = DecoColorDef.find(color_id)
+	if cd == null:
+		return ""
+	var ld: DecoLightDef = DecoLightDef.by_lamp(cd.led if role == "led" else cd.neon)
+	return String(ld.id) if ld != null else ""
 
 
 ## Cor de fabrica da peca (id de DecoColorDef).
@@ -34,13 +45,19 @@ static func default_sign(entry: Dictionary) -> int:
 	return int(entry.get("sign_cell", -1))
 
 
-## Aplica cor e letreiro numa peca montada. `color_id` "" = de fabrica; `sign` -1 = de fabrica.
-static func apply(node: Node3D, entry: Dictionary, color_id: String = "", sign: int = -1) -> void:
+## Aplica cor, letreiro e luzes numa peca montada. `color_id` "" = de fabrica; `sign` -1 = de fabrica; `led`/`neon`
+## (T-214) = id de DecoLightDef ("" = a luz da cor escolhida). Estrutura e painel ganham a textura de detalhe; os LEDs
+## usam o material com lente (LightPatterns.LENS_SUFFIX).
+static func apply(node: Node3D, entry: Dictionary, color_id: String = "", sign: int = -1, led: String = "", neon: String = "") -> void:
 	var cdef: DecoColorDef = DecoColorDef.find(color_id if color_id != "" else default_color(entry))
 	if cdef == null:
 		cdef = DecoColorDef.find(default_color(entry))
 	var cell: int = sign if sign >= 0 and sign < SIGN_NAMES.size() else default_sign(entry)
 	var roles: Dictionary = cdef.roles() if cdef != null else {}
+	for pair in [["deco_led", led], ["deco_neon", neon]]:
+		var ld: DecoLightDef = DecoLightDef.find(String(pair[1])) if String(pair[1]) != "" else null
+		if ld != null:
+			roles[pair[0]] = ld.lamp
 	for mi in node.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
 		if m.mesh == null:
@@ -51,11 +68,25 @@ static func apply(node: Node3D, entry: Dictionary, color_id: String = "", sign: 
 				continue
 			var n: String = cur.resource_name
 			if roles.has(n):
-				m.set_surface_override_material(s, AccessoryMaterials.make(String(roles[n])))
+				m.set_surface_override_material(s, role_material(n, String(roles[n])))
 			elif n == "acrylic_sign" and cell >= 0:
 				m.set_surface_override_material(s, sign_material(cell, default_sign(entry)))
 			elif n == "acrylic_art":
 				m.set_surface_override_material(s, art_material())
+
+
+## Material de um papel: estrutura/painel com detalhe, LED com lente, neon liso.
+static func role_material(role: String, mat_name: String) -> Material:
+	if role == "deco_body" or role == "deco_trim":
+		return AccessoryMaterials.make_detailed(mat_name)
+	if role == "deco_led" and mat_name.begins_with("lamp_"):
+		var key: String = mat_name + LightPatterns.LENS_SUFFIX
+		if not _lens_mats.has(key):
+			var dup: StandardMaterial3D = AccessoryMaterials.make(mat_name).duplicate() as StandardMaterial3D
+			dup.resource_name = key
+			_lens_mats[key] = dup
+		return _lens_mats[key]
+	return AccessoryMaterials.make(mat_name)
 
 
 ## Material do acrilico do letreiro mostrando a celula `cell`; a malha foi feita na celula `base`.
@@ -97,8 +128,10 @@ static func _atlas_base(name: String, energy: float) -> StandardMaterial3D:
 ## Estado "quebrada" de uma peca da oficina: continua no lugar, torta, cromo vira aco e as luzes apagam.
 static func set_broken(node: Node3D, catalog: AccessoryCatalog) -> void:
 	node.visible = true
-	node.rotation.z = deg_to_rad(BROKEN_TILT_DEG) * (1.0 if node.get_instance_id() % 2 == 0 else -1.0)
-	node.rotation.x = deg_to_rad(3.0)
+	if not node.has_meta("broken_tilt"):              # T-214: soma a inclinacao ao assento (nao apaga escala/cisalhamento)
+		node.set_meta("broken_tilt", true)
+		var tilt: float = deg_to_rad(BROKEN_TILT_DEG) * (1.0 if node.get_instance_id() % 2 == 0 else -1.0)
+		node.transform.basis = node.transform.basis * Basis.from_euler(Vector3(deg_to_rad(3.0), 0.0, tilt))
 	var off: StandardMaterial3D = AccessoryMaterials.make("lamp_off")
 	for mi in node.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D

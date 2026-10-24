@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"perola_dourado"
+display_key = "deco_color.perola_dourado"
+tier = &"metalica"
+price = 6000
+body = "deco_pearl"
+trim = "paint_gold"
+led = "lamp_ice"
+neon = "lamp_amber"
+swatch_a = Color(0.9569, 0.9373, 0.8941, 1)
+swatch_b = Color(1.0000, 0.7020, 0.2784, 1)

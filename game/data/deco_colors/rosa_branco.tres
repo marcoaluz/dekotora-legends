@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"rosa_branco"
+display_key = "deco_color.rosa_branco"
+tier = &"comum"
+price = 2000
+body = "deco_pink"
+trim = "deco_white"
+led = "lamp_ice"
+neon = "lamp_pink"
+swatch_a = Color(0.9098, 0.3137, 0.5608, 1)
+swatch_b = Color(1.0000, 0.1804, 0.5333, 1)

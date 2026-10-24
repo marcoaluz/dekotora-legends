@@ -64,11 +64,12 @@ func test_buying_raises_destaque() -> void:
 	gs.profile["money"] = 900000
 	gs.profile["fame"] = 100
 	var before: int = gs.destaque()
-	for id in ["kw_exhaust_stacks", "fumi_wing", "kw_visor"]:
+	for id in ["kw_exhaust_stacks", "kw_visor"]:          # (T-215: o aerofolio de teto fumi_wing saiu do jogo)
 		check(gs.buy(gs.part(id)), "compra %s" % id)
 		check(gs.install(id), "instala %s" % id)
-	check_eq(gs.destaque() - before, 18 + 12 + 16, "destaque sobe com as pecas novas")
+	check_eq(gs.destaque() - before, 18 + 16, "destaque sobe com as pecas novas")
+	check(not gs.buy(gs.part("fumi_wing")), "peca que saiu do jogo nao se compra mais")
 	var t := TruckSim.new()
 	gs.configure_truck(t)
-	check(t.mass > 12000.0 + 90.0 + 35.0, "as pecas pesam na simulacao (%.0f kg)" % t.mass)
+	check(t.mass > 12000.0 + 90.0, "as pecas pesam na simulacao (%.0f kg)" % t.mass)
 	gs.new_profile()

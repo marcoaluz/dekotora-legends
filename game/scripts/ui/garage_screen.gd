@@ -113,6 +113,9 @@ func _ready() -> void:
 	_deco = String(dbg.get("deco", _deco))
 	gs.profile_changed.connect(_refresh)               # depois da depuracao: montar o caminhao demo nao conta como "roda nova"
 	_refresh()
+	var refund: int = gs.take_retired_notice()       # T-215: pecas antigas de teto sairam (aviso uma vez)
+	if refund > 0:
+		_flash(Tr.t("garage.retired_refund", [Tr.yen(refund)]))
 
 
 ## Painel lateral de vidro com rolagem; o da esquerda leva as abas no topo.

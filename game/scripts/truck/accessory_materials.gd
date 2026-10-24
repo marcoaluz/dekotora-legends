@@ -33,7 +33,25 @@ const DEFS: Dictionary = {
 	"lamp_blue": {"c": "#2f7bff", "emit": 2.5},
 	"lamp_violet": {"c": "#a35cff", "emit": 2.5},
 	"lamp_off": {"c": "#202228", "metal": 0.0, "rough": 0.6},     # luz apagada (peca da oficina quebrada)
+	# T-215: mais cores de estrutura e de luz (DecoColorDef / DecoLightDef)
+	"deco_pink": {"c": "#e8508f", "metal": 0.3, "rough": 0.3, "coat": 0.8},
+	"deco_green": {"c": "#1f5e3a", "metal": 0.35, "rough": 0.3, "coat": 0.7},
+	"deco_purple": {"c": "#4b2a7a", "metal": 0.35, "rough": 0.3, "coat": 0.7},
+	"deco_orange": {"c": "#e86a1c", "metal": 0.3, "rough": 0.3, "coat": 0.8},
+	"deco_pearl": {"c": "#f4efe4", "metal": 0.45, "rough": 0.22, "coat": 1.0},
+	"deco_blue": {"c": "#1f5fd6", "metal": 0.7, "rough": 0.2, "coat": 0.8},
+	"lamp_orange": {"c": "#ff7a1f", "emit": 2.5},
+	"lamp_ice": {"c": "#dff4ff", "emit": 2.5},                  # branco frio (o lamp_white e o farol, fixo)
+	"lamp_lime": {"c": "#b6ff2e", "emit": 2.5},
+	"lamp_ruby": {"c": "#ff2d4a", "emit": 2.5},                 # vermelho que pisca (o lamp_red e a lanterna, fixo)
 }
+
+## Textura de detalhe da estrutura das pecas da oficina (T-214, blender/scripts/t214_textures.py): metal escovado,
+## emendas, rebites e desgaste, em UV de metros (1 repeticao = 0,5 m). So nos papeis estrutura e painel.
+const DETAIL_ALB := "res://assets/vehicles/dekotora/textures/deco_detail_alb.png"
+const DETAIL_NRM := "res://assets/vehicles/dekotora/textures/deco_detail_nrm.png"
+const DETAIL_ORM := "res://assets/vehicles/dekotora/textures/deco_detail_orm.png"
+static var _detail_cache: Dictionary = {}
 
 
 static func make(name: String) -> StandardMaterial3D:
@@ -54,4 +72,23 @@ static func make(name: String) -> StandardMaterial3D:
 		m.emission = Color(String(d["c"]))
 		m.emission_energy_multiplier = float(d["emit"])
 	_cache[name] = m
+	return m
+
+
+## Mesmo material de `make(name)` com a textura de detalhe (cor x veio/emendas, normal, rugosidade). O nome fica igual
+## (o ChromeMatcap e o swap_material("chrome", "steel") continuam achando). Cromo nao leva (vira matcap).
+static func make_detailed(name: String) -> StandardMaterial3D:
+	if name == "chrome" or not ResourceLoader.exists(DETAIL_ALB):
+		return make(name)
+	if _detail_cache.has(name):
+		return _detail_cache[name]
+	var m: StandardMaterial3D = make(name).duplicate() as StandardMaterial3D
+	m.albedo_texture = load(DETAIL_ALB) as Texture2D
+	m.normal_enabled = true
+	m.normal_texture = load(DETAIL_NRM) as Texture2D
+	m.normal_scale = 0.8
+	m.roughness_texture = load(DETAIL_ORM) as Texture2D
+	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	_detail_cache[name] = m
 	return m

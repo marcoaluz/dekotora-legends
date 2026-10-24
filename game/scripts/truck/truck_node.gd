@@ -160,7 +160,7 @@ func _apply_light_materials(root: Node) -> void:
 			continue
 		for s in m.mesh.get_surface_count():
 			var cur: Material = m.get_active_material(s)
-			if cur == null or not cur.resource_name.begins_with("lamp_") or not LightPatterns.ANIMATED.has(cur.resource_name):
+			if cur == null or not cur.resource_name.begins_with("lamp_") or not LightPatterns.is_animated(cur.resource_name):
 				continue
 			var key: String = cur.resource_name
 			if not _lamp_mats.has(key):
@@ -342,9 +342,15 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 	if model == null:
 		return
 	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
+	var tops: Array[PartDef] = []
+	var lower: Node3D = null
+	var lower_entry: Dictionary = {}
 	for d in defs:
 		var entry: Dictionary = catalog.entry(d.accessory_id)
 		if entry.is_empty():
+			continue
+		if bool((styles.get(String(d.id), {}) as Dictionary).get("top", false)):
+			tops.append(d)                           # T-215: 2o nivel do deque, montado em cima da peca de baixo
 			continue
 		var list: Array = []
 		var made: Array[Node3D] = []
@@ -355,20 +361,54 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 				made.append(catalog.attach(model, d.accessory_id, side))
 		for n in made:
 			if n != null:
-				catalog.apply_variant(n, d.accessory_id, d.variant)
-				if DecoStyle.is_deco(entry):             # T-211: cor L/R e letreiro (antes do brilho e do cromo)
-					var st: Dictionary = styles.get(String(d.id), {})
-					DecoStyle.apply(n, entry, String(st.get("color", "")), int(st.get("sign", -1)))
-				glow.apply(n)                            # antes das luzinhas (que tiram o nome dos materiais lamp_*)
-				if chrome_mode != "":
-					ChromeMatcap.apply(n, chrome_mode)
-				_apply_light_materials(n)
-				if DecoStyle.is_deco(entry):
-					n.set_meta("deco", true)
+				_finish_part(n, d, entry, styles)
 				list.append(n)
+				if String(entry.get("socket", "")) == DeckStack.LOWER_SLOT:
+					lower = n
+					lower_entry = entry
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
+	for d in tops:
+		var top: Node3D = _mount_top(catalog, d, lower, lower_entry)
+		if top != null:
+			_finish_part(top, d, catalog.entry(d.accessory_id), styles)
+			_acc_nodes[String(d.id)] = [top]
+			_acc_state[String(d.id)] = "ok"
 	_queue_plates()
+
+
+## Variante, cor/letreiro/luzes da oficina, brilho, cromo e luzinhas de uma peca recem-montada.
+func _finish_part(n: Node3D, d: PartDef, entry: Dictionary, styles: Dictionary) -> void:
+	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
+	catalog.apply_variant(n, d.accessory_id, d.variant)
+	if DecoStyle.is_deco(entry):             # T-211: cor L/R e letreiro (antes do brilho e do cromo); T-214: luzes
+		var st: Dictionary = styles.get(String(d.id), {})
+		DecoStyle.apply(n, entry, String(st.get("color", "")), int(st.get("sign", -1)), String(st.get("led", "")),
+				String(st.get("neon", "")))
+	glow.apply(n)                            # antes das luzinhas (que tiram o nome dos materiais lamp_*)
+	if chrome_mode != "":
+		ChromeMatcap.apply(n, chrome_mode)
+	_apply_light_materials(n)
+	if DecoStyle.is_deco(entry):
+		n.set_meta("deco", true)
+
+
+## Peca do 2o nivel do deque (T-215): filha da peca de baixo, em cima dela. Confere de novo se cabe NESTE caminhao (o
+## descritor de outro jogador pode vir de outra cabine); nao cabendo, nao monta.
+func _mount_top(catalog: AccessoryCatalog, d: PartDef, lower: Node3D, lower_entry: Dictionary) -> Node3D:
+	if lower == null:
+		return null
+	var mount: Node = lower.get_parent()
+	var data: Dictionary = mount.get_meta("sockets", {}) if mount != null else {}
+	if not DeckStack.fits(data, String(lower_entry.get("id", "")), d.accessory_id):
+		return null
+	var top: Node3D = catalog.instantiate(d.accessory_id)
+	if top == null:
+		return null
+	top.name = "acc_%s_TOP" % d.accessory_id
+	lower.add_child(top)
+	SocketSeat.place_upper(top, lower, lower_entry)
+	return top
 
 
 ## Estado visual de uma peca: "ok", "dent" (opaca/amassada) ou "broken" (some do caminhao).

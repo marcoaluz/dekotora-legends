@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DecoLightDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_light_def.gd" id="1_dl"]
+
+[resource]
+script = ExtResource("1_dl")
+id = &"ambar"
+display_key = "deco_light.ambar"
+lamp = "lamp_amber"
+price = 3000
+order = 2
+swatch = Color(1.0000, 0.7020, 0.2784, 1)

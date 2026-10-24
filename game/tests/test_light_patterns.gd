@@ -41,7 +41,7 @@ func test_part_lamps_also_follow_the_pattern() -> void:
 	gs.new_profile()
 	var t := _truck()
 	var defs: Array[PartDef] = []
-	for id in ["roof_lights_crown", "andon_kanji", "skirt_light_bar"]:
+	for id in ["deck_led_box", "visor_lamp_row", "skirt_light_bar"]:
 		var d: PartDef = gs.part(id)
 		if d != null:
 			defs.append(d)

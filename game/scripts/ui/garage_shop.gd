@@ -127,6 +127,8 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		var rm: Button = small_button(Tr.t("garage.remove"))
 		rm.pressed.connect(func() -> void: gs.uninstall(slot))
 		box.add_child(rm)
+	if slot == DeckStack.LOWER_SLOT:                     # T-215: deque de 2 niveis
+		GarageDeckStack.build(box, gs, flash)
 
 
 # ---------------------------------------------------------------- decoracao (cabecalho e pintura)

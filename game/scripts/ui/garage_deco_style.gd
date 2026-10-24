@@ -64,6 +64,10 @@ static func build(v: VBoxContainer, gs: Node, d: PartDef, flash: Callable) -> vo
 			else:
 				AudioBus.play_ui("ui_error"))
 		grid.add_child(b)
+	var used: Array = entry.get("materials_used", [])
+	for role in DecoLightDef.ROLES:                   # T-214: cor das luzes separada da estrutura
+		if "deco_" + role in used:
+			_light_grid(v, gs, id, role, flash)
 	if not bool(entry.get("has_sign", false)):
 		return
 	var cell: int = int(gs.part_style(id).get("sign", DecoStyle.default_sign(entry)))
@@ -81,6 +85,42 @@ static func build(v: VBoxContainer, gs: Node, d: PartDef, flash: Callable) -> vo
 			if gs.set_part_sign(id, k):
 				AudioBus.play_ui("ui_select"))
 		sg.add_child(sb)
+
+
+## Grade de cores de luz (LED ou neon) com preco; a luz de fabrica da cor da peca e de graca.
+static func _light_grid(v: VBoxContainer, gs: Node, id: String, role: String, flash: Callable) -> void:
+	var cur: String = gs.part_light(id, role)
+	var cur_name: String = Tr.t("deco_light." + cur) if cur != "" else "-"
+	v.add_child(GarageShop.wl("%s: %s" % [Tr.t("garage.light_" + role), cur_name], 14, UiTheme.GOLD))
+	var grid := GridContainer.new()
+	grid.name = "Lights_%s_%s" % [role, id]
+	grid.columns = 6
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 4)
+	v.add_child(grid)
+	for ld in DecoLightDef.all():
+		var lid: String = String(ld.id)
+		var price: int = gs.light_price(id, role, lid)
+		var sel: bool = lid == cur
+		var b := Button.new()
+		b.name = "Light_" + lid
+		b.custom_minimum_size = Vector2(44, 34)
+		b.text = "✔" if sel else ("0" if price == 0 else "%dk" % int(price / 1000))
+		b.tooltip_text = "%s · %s" % [Tr.t("deco_light." + lid), Tr.yen(price)]
+		b.add_theme_font_size_override("font_size", 12)
+		var sb: StyleBoxFlat = UiTheme.box(Color(0.05, 0.05, 0.07), UiTheme.GOLD if sel else ld.swatch, 3 if sel else 2, 6, 4)
+		sb.shadow_color = ld.swatch
+		sb.shadow_size = 3
+		b.add_theme_stylebox_override("normal", sb)
+		b.add_theme_color_override("font_color", ld.swatch.lightened(0.3))
+		b.disabled = sel or gs.money() < price
+		b.pressed.connect(func() -> void:
+			if gs.set_part_light(id, role, lid):
+				AudioBus.play_ui("ui_buy" if price > 0 else "ui_select")
+				flash.call(Tr.t("garage.light_paid", [Tr.t("deco_light." + lid), Tr.yen(price)]))
+			else:
+				AudioBus.play_ui("ui_error"))
+		grid.add_child(b)
 
 
 static func _swatch(cd: DecoColorDef, border: Color, bw: int) -> StyleBoxFlat:

@@ -104,6 +104,8 @@ func migrate_profile() -> bool:
 	if BodyDef.find(body) == null:
 		profile["body"] = "base"
 		changed = true
+	if _retire_old_parts():                          # T-215: pecas antigas de teto sairam do jogo
+		changed = true
 	var st: Variant = profile.get("contracts", null)
 	if st is Dictionary and (st as Dictionary).get("list", null) is Array:
 		for c in (st as Dictionary)["list"]:
@@ -111,6 +113,40 @@ func migrate_profile() -> bool:
 				(c as Dictionary)["needs"] = String(Contracts.needs_of(c))
 				changed = true
 	return changed
+
+
+## T-215: tira do perfil as pecas que sairam do jogo (RetiredParts) e devolve o preco CHEIO de cada uma em ienes (a
+## peca sai da garagem e do encaixe; o encaixe fica vazio). Soma o total em "retired_notice" para a garagem avisar uma
+## vez. Idempotente: rodar de novo nao paga de novo (a peca ja saiu de "owned"). Devolve true se mudou algo.
+func _retire_old_parts() -> bool:
+	var owned: Dictionary = profile.get("owned", {}) as Dictionary
+	var refund: int = 0
+	var changed: bool = false
+	for id in owned.keys():
+		if RetiredParts.has(String(id)):
+			var d: PartDef = part(String(id))
+			refund += d.price if d != null else 0
+			owned.erase(id)
+			(profile.get("part_style", {}) as Dictionary).erase(id)
+			changed = true
+	var inst: Dictionary = profile.get("installed", {}) as Dictionary
+	for slot in inst.keys():
+		if RetiredParts.has(String(inst[slot])) or String(slot) in RetiredParts.SLOTS:
+			inst.erase(slot)
+			changed = true
+	if refund > 0:
+		profile["money"] = int(profile.get("money", 0)) + refund
+		profile["retired_notice"] = int(profile.get("retired_notice", 0)) + refund
+	return changed
+
+
+## Aviso da garagem (uma vez): quanto foi devolvido pelas pecas que sairam (0 = nada). Zera depois de ler.
+func take_retired_notice() -> int:
+	var v: int = int(profile.get("retired_notice", 0))
+	if profile.has("retired_notice"):
+		profile.erase("retired_notice")
+		save_profile()
+	return v
 
 
 ## Escrita atomica: grava num arquivo temporario e renomeia (nao corrompe se o app fechar no meio).
@@ -168,7 +204,7 @@ func part(id: String) -> PartDef:
 func all_parts() -> Array[PartDef]:
 	var out: Array[PartDef] = []
 	for f in DirAccess.get_files_at("res://data/parts/"):
-		if f.ends_with(".tres"):
+		if f.ends_with(".tres") and not RetiredParts.has(f.get_basename()):   # T-215: pecas antigas de teto sairam
 			var d: PartDef = part(f.get_basename())
 			if d != null:
 				out.append(d)
@@ -213,6 +249,8 @@ func add_owned(d: PartDef) -> void:
 
 
 func can_buy(d: PartDef) -> String:
+	if RetiredParts.has(String(d.id)):               # T-215: fora de linha
+		return Tr.t("reason.retired")
 	if owns(String(d.id)):
 		return Tr.t("reason.owned")
 	if fame() < d.fame_required:
@@ -239,9 +277,11 @@ func installed_id(slot: String) -> String:
 
 func install(id: String) -> bool:
 	var d: PartDef = part(id)
-	if d == null or not owns(id):
+	if d == null or not owns(id) or RetiredParts.has(id):
 		return false
 	(profile["installed"] as Dictionary)[String(d.slot)] = id
+	if top_id() == id:                               # a peca de cima desceu para o 1o nivel
+		(profile["installed"] as Dictionary).erase(DeckStack.SLOT)
 	save_profile()
 	_act("install", id)
 	profile_changed.emit()
@@ -250,6 +290,8 @@ func install(id: String) -> bool:
 
 func uninstall(slot: String) -> void:
 	(profile["installed"] as Dictionary).erase(slot)
+	if slot == DeckStack.LOWER_SLOT:                 # sem o deque de baixo, o de cima sai junto (continua comprado)
+		(profile["installed"] as Dictionary).erase(DeckStack.SLOT)
 	save_profile()
 	_act("uninstall", slot)
 	profile_changed.emit()
@@ -264,6 +306,8 @@ func sell(id: String) -> void:
 	(profile.get("part_style", {}) as Dictionary).erase(id)       # T-211: a cor paga vai junto com a peca
 	if installed_id(String(d.slot)) == id:
 		(profile["installed"] as Dictionary).erase(String(d.slot))
+	if top_id() == id or installed_id(DeckStack.LOWER_SLOT) == "":
+		(profile["installed"] as Dictionary).erase(DeckStack.SLOT)
 	save_profile()
 	_act("sell", id)
 	profile_changed.emit()
@@ -274,7 +318,7 @@ func apply_demo_profile() -> void:
 	new_profile()
 	profile["money"] = 900000
 	profile["fame"] = 500
-	for id in ["fb_gold_wing", "visor_gold_lights", "roof_lights_crown", "skirt_light_bar", "andon_kanji", "rb_chrome", "mural_lightning", "hub_chrome",
+	for id in ["fb_gold_wing", "visor_gold_lights", "deck_led_box", "skirt_light_bar", "rb_chrome", "mural_lightning", "hub_chrome",
 			"grille_frame_chrome", "aux_round_lamps_pair", "front_crest_ornament", "roof_torii_ornament", "fender_extension", "side_ornament_wave", "rear_lamp_cluster", "mudflap_designed"]:
 		var d: PartDef = part(id)
 		if d != null and buy(d):
@@ -311,8 +355,17 @@ func part_style(id: String) -> Dictionary:
 
 
 ## Estilos de todas as pecas (para TruckNode.apply_loadout).
+## T-215: a peca do 2o nivel ganha "top": true (copia; o perfil nao guarda isso).
 func part_styles() -> Dictionary:
-	return profile.get("part_style", {}) as Dictionary
+	var st: Dictionary = profile.get("part_style", {}) as Dictionary
+	if not stack_ok():
+		return st
+	var out: Dictionary = st.duplicate(true)
+	var t: String = top_id()
+	var one: Dictionary = (out.get(t, {}) as Dictionary).duplicate()
+	one["top"] = true
+	out[t] = one
+	return out
 
 
 ## Cor atual da peca (id de DecoColorDef): a escolhida ou a de fabrica do catalogo.
@@ -359,6 +412,38 @@ func set_part_sign(id: String, sign: int) -> bool:
 	return true
 
 
+## Luz atual de um papel ("led" | "neon") da peca (id de DecoLightDef): a escolhida ou a de fabrica da cor (T-214).
+func part_light(id: String, role: String) -> String:
+	var l: String = String(part_style(id).get(role, ""))
+	return l if l != "" else DecoStyle.default_light(part_color(id), role)
+
+
+## Preco para trocar a luz `role` da peca para `light` (0 = e a atual ou a de fabrica da cor da peca).
+func light_price(id: String, role: String, light: String) -> int:
+	var ld: DecoLightDef = DecoLightDef.find(light)
+	if ld == null or light == part_light(id, role) or light == DecoStyle.default_light(part_color(id), role):
+		return 0
+	return ld.price
+
+
+## Troca a cor dos LEDs ou do neon de uma peca da oficina (T-214), separada da cor da estrutura.
+func set_part_light(id: String, role: String, light: String) -> bool:
+	if not owns(id) or not role in DecoLightDef.ROLES or DecoLightDef.find(light) == null 			or not DecoStyle.is_deco(AccessoryCatalog.get_instance().entry(_acc_id(id))):
+		return false
+	var cost: int = light_price(id, role, light)
+	if money() < cost:
+		return false
+	profile["money"] = money() - cost
+	if light == DecoStyle.default_light(part_color(id), role):
+		_style_of(id).erase(role)                   # de volta a luz de fabrica da cor
+	else:
+		_style_of(id)[role] = light
+	save_profile()
+	_act("set_part_light", "%s:%s:%s" % [id, role, light])
+	profile_changed.emit()
+	return true
+
+
 func _style_of(id: String) -> Dictionary:
 	if not profile.has("part_style"):
 		profile["part_style"] = {}
@@ -377,10 +462,61 @@ func _acc_id(id: String) -> String:
 func installed_part_defs() -> Array[PartDef]:
 	var out: Array[PartDef] = []
 	for slot in profile["installed"]:
+		if String(slot) == DeckStack.SLOT or RetiredParts.has(String(profile["installed"][slot])):
+			continue
 		var d: PartDef = part(String(profile["installed"][slot]))
 		if d != null:
 			out.append(d)
+	if stack_ok():                                   # T-215: 2o nivel do deque, so se cabe neste caminhao
+		var t: PartDef = part(top_id())
+		if t != null:
+			out.append(t)
 	return out
+
+
+# ---------------------------------------------------------------- deque de 2 niveis (T-215)
+
+## Peca guardada no 2o nivel do deque ("" = nenhuma). Pode estar guardada sem caber (outra cabine): ver stack_ok().
+func top_id() -> String:
+	return String((profile["installed"] as Dictionary).get(DeckStack.SLOT, ""))
+
+
+## Dados de encaixe do caminhao do perfil (carroceria + cabine).
+func truck_sockets() -> Dictionary:
+	return DeckStack.truck_data(String(profile.get("body", "base")), CabCatalog.normalize(profile.get("cab", "")))
+
+
+## A peca `upper` (padrao: a guardada) cabe em cima do deque instalado, neste caminhao?
+func stack_ok(upper: String = "") -> bool:
+	var top: String = upper if upper != "" else top_id()
+	var low: String = installed_id(DeckStack.LOWER_SLOT)
+	if top == "" or low == "" or top == low or not owns(top) or not owns(low):
+		return false
+	return DeckStack.fits(truck_sockets(), _acc_id(low), _acc_id(top))
+
+
+## Pecas da loja que cabem em cima do deque instalado neste caminhao (a garagem so mostra estas).
+func stack_candidates() -> Array[PartDef]:
+	var out: Array[PartDef] = []
+	var low: String = installed_id(DeckStack.LOWER_SLOT)
+	if low == "":
+		return out
+	var data: Dictionary = truck_sockets()
+	for d in parts_for_slot(DeckStack.LOWER_SLOT):
+		if String(d.id) != low and DeckStack.fits(data, _acc_id(low), d.accessory_id):
+			out.append(d)
+	return out
+
+
+## Poe a peca (comprada) em cima do deque instalado. Recusa se nao cabe.
+func install_top(id: String) -> bool:
+	if not stack_ok(id):
+		return false
+	(profile["installed"] as Dictionary)[DeckStack.SLOT] = id
+	save_profile()
+	_act("install_top", id)
+	profile_changed.emit()
+	return true
 
 
 ## Lista de pecas para TruckSim.set_loadout, com o DANO atual (durabilidade e quebra) do perfil.
@@ -511,9 +647,11 @@ func truck_descriptor() -> Dictionary:
 	for d in installed_part_defs():
 		var own: Dictionary = profile["owned"][String(d.id)]
 		var pe: Dictionary = {"id": String(d.id), "dur": float(own["dur"]), "broken": bool(own["broken"])}
-		var st: Dictionary = part_style(String(d.id))
-		if not st.is_empty():                                      # T-211: cor L/R e letreiro (protocolo 12)
-			pe["style"] = st.duplicate()
+		var st: Dictionary = part_style(String(d.id)).duplicate()
+		if String(d.id) == top_id() and stack_ok():                # T-215: 2o nivel do deque (protocolo 13)
+			st["top"] = true
+		if not st.is_empty():                                      # T-211: cor L/R, letreiro e luzes (protocolo 12/13)
+			pe["style"] = st
 		parts.append(pe)
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
@@ -690,6 +828,8 @@ func apply_action(action: String, arg: String) -> bool:
 		"uninstall":
 			uninstall(arg)
 			return true
+		"install_top":                                # T-215: 2o nivel do deque
+			return install_top(arg)
 		"sell":
 			sell(arg)
 			return true
@@ -711,6 +851,9 @@ func apply_action(action: String, arg: String) -> bool:
 		"set_part_color":                             # T-211: "id:cor"
 			var pc: PackedStringArray = arg.split(":")
 			return pc.size() == 2 and set_part_color(pc[0], pc[1])
+		"set_part_light":                             # T-214: "id:led|neon:luz"
+			var pl: PackedStringArray = arg.split(":")
+			return pl.size() == 3 and set_part_light(pl[0], pl[1], pl[2])
 		"set_part_sign":                              # T-211: "id:celula"
 			var ps: PackedStringArray = arg.split(":")
 			return ps.size() == 2 and ps[1].is_valid_int() and set_part_sign(ps[0], int(ps[1]))

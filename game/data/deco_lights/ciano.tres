@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DecoLightDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_light_def.gd" id="1_dl"]
+
+[resource]
+script = ExtResource("1_dl")
+id = &"ciano"
+display_key = "deco_light.ciano"
+lamp = "lamp_cyan"
+price = 3000
+order = 8
+swatch = Color(0.1294, 0.9020, 1.0000, 1)

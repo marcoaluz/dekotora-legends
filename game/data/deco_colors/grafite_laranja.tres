@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecoColorDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/deco_color_def.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+id = &"grafite_laranja"
+display_key = "deco_color.grafite_laranja"
+tier = &"metalica"
+price = 6000
+body = "deco_gunmetal"
+trim = "deco_black"
+led = "lamp_orange"
+neon = "lamp_orange"
+swatch_a = Color(0.2902, 0.3137, 0.3608, 1)
+swatch_b = Color(1.0000, 0.4784, 0.1216, 1)

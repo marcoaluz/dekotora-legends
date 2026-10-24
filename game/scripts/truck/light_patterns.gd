@@ -6,7 +6,10 @@ extends RefCounted
 
 const IDS: Array[String] = ["steady", "sequential", "alternate", "breathing"]
 ## Materiais de luz que piscam; lamp_red (lanterna/freio) e lamp_white (farol) ficam fixos.
-const ANIMATED: Array[String] = ["lamp_amber", "lamp_yellow", "lamp_pink", "lamp_cyan", "lamp_green", "lamp_blue", "lamp_violet"]
+const ANIMATED: Array[String] = ["lamp_amber", "lamp_yellow", "lamp_pink", "lamp_cyan", "lamp_green", "lamp_blue", "lamp_violet",
+	"lamp_orange", "lamp_ice", "lamp_lime", "lamp_ruby"]
+## T-214: sufixo do material de LED com lente (DecoStyle): o shader desenha a lente pela UV 0..1 de cada LED.
+const LENS_SUFFIX := "@lens"
 
 const SHADER := """
 shader_type spatial;
@@ -16,6 +19,7 @@ uniform float energy = 1.5;
 uniform int pattern = 0;          // 0 fixas, 1 sequencial, 2 alternado, 3 respirando
 uniform float level = 1.0;        // brilho geral: 1 noite/tunel, ~0.4 previa de dia, ~0.12 apagadas
 uniform float speed = 1.0;
+uniform float lens = 0.0;         // T-214: LED com lente (UV 0..1 por LED): centro forte, borda mais escura
 varying vec3 lp;
 
 void vertex() {
@@ -38,6 +42,10 @@ void fragment() {
 		// respirando: tudo sobe e desce junto, devagar
 		k = 0.18 + 0.82 * (0.5 + 0.5 * sin(t * 2.2));
 	}
+	if (lens > 0.5) {
+		float d = length(UV - vec2(0.5));
+		k *= mix(1.3, 0.42, smoothstep(0.10, 0.52, d));
+	}
 	ALBEDO = base_color.rgb * energy * level * k;
 }
 """
@@ -57,7 +65,19 @@ static func make_material(src: Material) -> ShaderMaterial:
 	m.shader = _shader
 	m.set_shader_parameter("base_color", col)
 	m.set_shader_parameter("energy", 1.6)
+	if src != null and src.resource_name.ends_with(LENS_SUFFIX):
+		m.set_shader_parameter("lens", 1.0)
 	return m
+
+
+## Nome sem o sufixo da lente ("lamp_cyan@lens" -> "lamp_cyan").
+static func base_name(name: String) -> String:
+	return name.trim_suffix(LENS_SUFFIX)
+
+
+## Material de luz que pisca (com ou sem lente)?
+static func is_animated(name: String) -> bool:
+	return ANIMATED.has(base_name(name))
 
 
 static func label_key(id: String) -> String:
