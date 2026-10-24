@@ -13,6 +13,7 @@ const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), dista
 	"side": {"target": Vector3(0.6, 1.5, -6.0), "dist": 15.5, "az": 95.0, "el": 7.0},
 	"rear": {"target": Vector3(0, 1.8, -0.8), "dist": 10.0, "az": 158.0, "el": 11.0},
 	"wheel": {"target": Vector3(1.0, 0.8, -9.6), "dist": 7.0, "az": 100.0, "el": 5.0},
+	"top": {"target": Vector3(0, 2.6, -6.0), "dist": 17.0, "az": 20.0, "el": 58.0},     # T-211: conferencia de cima
 }
 const SLOT_FOCUS: Dictionary = {
 	"front_bumper": "front", "front_lip": "front", "grille": "front", "front_trim": "front", "front_ornament": "front",

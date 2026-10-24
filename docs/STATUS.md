@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-23** (T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-24** (T-211: oficina lote 1, 17 deques + 14 viseiras novos, encaixes e zonas protegidas medidos em todos os caminhões, cor L/R com preço, protocolo 12; antes T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -35,7 +35,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Câmeras da corrida e retrovisor (T-198) | na corrida: **C** (ou ícone de câmera no canto de cima à esquerda) troca perto → padrão → longe → cinema → órbita; **R** (ou tocar no espelho) liga/desliga o retrovisor; Opções > Gráficos: Câmera da corrida, Retrovisor (Automático/Ligado/Desligado), Faixas pretas; forçar `-- --race-cam=cinema --mirror=on` (`--cine-shot=side_low`, `--letterbox=off`); prints `bash tools/capture_t198.sh PASTA [day night]` + `bash tools/sheet_t198.sh`; custo `bash tools/measure_t198.sh [3000] [night]`; testes `-- --only=race_cameras` |
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
 | Pedágio (T-207) | corrida normal (km 0,15 de toda rota): passe pela esquerda ou direita; ficar na faixa do meio = bate na ilha; comparar `-- --no-toll` (pedágio antigo, sem física) e `--old-toll` (só o visual antigo); prints `GODOT=... bash tools/capture_t207.sh PASTA [day night] [-- extras]` (`Q=3` Ultra, `RES=1200x540` celular com toque, `ROUTES=`, `MODES="tour drive"`; em `docs/capturas_t207/`); custo `bash tools/measure_t207.sh [1500] [night]`; bots sem tela `godot --headless --path game -s res://tools_dev/trace_toll.gd -- --sweep=30 [--no-toll]` ou `-- --route=R --seed=N --n=4`; atlas `godot --path game -s res://tools_dev/make_toll_atlas.gd` (janela); testes `-- --only=toll` |
-| Testes automáticos (461) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Oficina lote 1 (T-211) | garagem: DECORAÇÃO > PEÇAS > Deque frontal / Viseira (botão VER DE NOITE, cores L/R com preço e letreiro no cartão da peça comprada); depuração `godot --path game res://scenes/garage/garage.tscn -- --demo --parts=deck_painted_wings,visor_v_chevron --view=front`; prints `GODOT=... bash tools/capture_t211.sh PASTA_ABS [DEQUE] [VISEIRA]` (em `docs/capturas_t211/`); relatório de encaixe `godot --headless --path game -s res://tools_dev/report_part_fit.gd` (→ `docs/REPORT_ENCAIXE.md`); regerar encaixes `blender -b --factory-startup -P blender/scripts/build_sockets.py`, peças `... build_t211_parts.py`, proposta `... t211_proposals.py -- --out PASTA`, dados `python tools/gen_t211_data.py`; testes `-- --only=part_fit` |
+| Testes automáticos (470) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, H = buzina, C = câmera, R = retrovisor, Esc = pausa) |
@@ -284,6 +285,14 @@ Ordem sugerida: T-131 (T-132, T-133 e T-138 já resolvidas).
    triângulos por caminhão); Canter: tirar a barra de lanternas do JAC ou as do baú premium (meia sessão).
 
 ## PENDENTE — precisa do Marco
+
+- **T-211 (2026-10-24): oficina, lote 1 (deque e viseira).** Olhar `docs/capturas_t211/`: `folha_lote1_deques.png` e
+  `folha_lote1_viseiras.png` (cada peça de dia e de noite), `folha_exagerado.png` (caminhão mais enfeitado: frente, lado,
+  trás, cima e teto, noite × dia), `folha_cabines.png` (as 5 cabines), `encaixes_zonas.png` (azul = lugar das peças,
+  vermelho = zonas protegidas), `proposta_lacunas.png` (rodas, escapamento, grade, buzina, interior, adesivos: escolher 1
+  de cada) e a tabela de cores/preços (`docs/REFERENCIA_PECAS.md`, seção 18). Na garagem: comprar um deque, trocar a cor
+  e o letreiro, VER DE NOITE. Decidir: aprovar o padrão de qualidade; cores e preços; letreiro grátis?; o que fazer com
+  as Clássicas de teto que ficam na frente do deque (coroa de faróis). **Gerar o APK de novo** (protocolo 12).
 
 - **T-204 (2026-10-23): abertura nova do duelo.** Ver o vídeo `builds/t204_abertura_duelo.avi` (com som) e as folhas em
   `docs/capturas_t204/` (`folha_pc_media.png`, `folha_pc_ultra.png`, `folha_cel.png`, `folha_reduzido.png`, `folha_arte.png`;

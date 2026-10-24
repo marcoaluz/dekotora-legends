@@ -45,7 +45,7 @@ def _art(cell: int, w: int, h: int) -> np.ndarray:
     u, v = xx / w, yy / h
     if cell == 12:                                  # ondas seigaiha azuis
         img = np.zeros((h, w, 3)) + np.array(hex_to_rgb("#0d2a6b"))
-        r = 18.0
+        r = 30.0
         for row in range(-1, int(h / (r * 0.5)) + 2):
             cy = row * r * 0.5
             off = r if row % 2 else 0.0

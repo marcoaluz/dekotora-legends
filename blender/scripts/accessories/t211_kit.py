@@ -95,7 +95,8 @@ def mesh_from(name, verts, faces, mat):
     vs = [bm.verts.new(v) for v in verts]
     for f in faces:
         bm.faces.new([vs[i] for i in f])
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    if len(faces) > 1:                    # um quadrado solto: a ordem dos vértices já aponta para fora (o recalc pode virar)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     return M._link(name, bm, mat)
 
 

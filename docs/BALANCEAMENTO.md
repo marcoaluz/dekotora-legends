@@ -431,3 +431,43 @@ Nenhum bot deixou de chegar; diferença de −1,2 a +2,5 s (o trânsito muda a c
   carência maior ou prazo do litoral/viaduto +3 s.
 - **Comboio online** (3–4 jogadores): trânsito um nível mais leve que a regra da sala (normal → leve).
 
+
+## Peças da oficina, lote 1: deque frontal e viseira (T-211)
+
+Valores **propostos** (catálogo `docs/REFERENCIA_PECAS.md`, seções 1 e 2). Decisão 4 do Marco: a raridade e a "Fama
+sugerida" ficam só nos dados (`PartDef.rarity`, `PartDef.fame_min`) e **não travam** a compra (`fame_required` = 0).
+Cor L/R: tabela da seção 18 do catálogo (comum 2.000 ¥, metálica 6.000 ¥, neon 8.000 ¥; a de fábrica é de graça).
+
+| ID | Encaixe | Zona | Peso (kg) | Durab. | Destaque | Preço (¥) | Fama sugerida | Raridade |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `deck_cap_trio` | Deque frontal | Teto | 35 | 30 | 8 | 9.000 | 0 | Comum |
+| `deck_kanji_rail` | Deque frontal | Teto | 70 | 40 | 16 | 18.000 | 20 | Incomum |
+| `deck_led_box` | Deque frontal | Teto | 85 | 40 | 22 | 26.000 | 20 | Incomum |
+| `deck_led_panel` | Deque frontal | Teto | 85 | 45 | 20 | 24.000 | 20 | Incomum |
+| `deck_led_cyan` | Deque frontal | Teto | 80 | 40 | 22 | 25.000 | 20 | Incomum |
+| `deck_art_band` | Deque frontal | Teto | 100 | 45 | 30 | 36.000 | 60 | Rara |
+| `deck_led_columns` | Deque frontal | Teto | 95 | 45 | 26 | 32.000 | 60 | Rara |
+| `deck_lace` | Deque frontal | Teto | 100 | 45 | 28 | 34.000 | 60 | Rara |
+| `deck_triple_sign` | Deque frontal | Teto | 110 | 45 | 32 | 40.000 | 60 | Rara |
+| `deck_eyebrow` | Deque frontal | Teto | 95 | 40 | 30 | 38.000 | 60 | Rara |
+| `deck_pillars` | Deque frontal | Teto | 100 | 45 | 30 | 38.000 | 60 | Rara |
+| `deck_cyan_frame` | Deque frontal | Teto | 105 | 45 | 32 | 42.000 | 60 | Rara |
+| `deck_painted_wings` | Deque frontal | Teto | 120 | 50 | 40 | 56.000 | 120 | Lendária |
+| `deck_pods_square` | Deque frontal | Teto | 45 | 35 | 14 | 16.000 | 20 | Incomum |
+| `deck_pods_round` | Deque frontal | Teto | 45 | 35 | 14 | 16.000 | 20 | Incomum |
+| `deck_pods_long` | Deque frontal | Teto | 55 | 35 | 18 | 22.000 | 20 | Incomum |
+| `deck_pods_five` | Deque frontal | Teto | 80 | 40 | 26 | 32.000 | 60 | Rara |
+| `visor_lamp_row` | Viseira | Frente | 45 | 45 | 10 | 12.000 | 0 | Comum |
+| `visor_dash_short` | Viseira | Frente | 40 | 40 | 8 | 9.000 | 0 | Comum |
+| `visor_dash_long` | Viseira | Frente | 40 | 40 | 9 | 10.000 | 0 | Comum |
+| `visor_twin_line` | Viseira | Frente | 40 | 40 | 10 | 11.000 | 0 | Comum |
+| `visor_morse` | Viseira | Frente | 40 | 40 | 10 | 11.000 | 0 | Comum |
+| `visor_single_line` | Viseira | Frente | 40 | 40 | 7 | 8.000 | 0 | Comum |
+| `visor_v_step` | Viseira | Frente | 55 | 45 | 16 | 18.000 | 20 | Incomum |
+| `visor_v_band` | Viseira | Frente | 55 | 45 | 15 | 17.000 | 20 | Incomum |
+| `visor_v_split` | Viseira | Frente | 55 | 45 | 16 | 18.000 | 20 | Incomum |
+| `visor_v_chevron` | Viseira | Frente | 60 | 45 | 20 | 24.000 | 20 | Incomum |
+| `visor_split_bars` | Viseira | Frente | 45 | 40 | 12 | 14.000 | 0 | Comum |
+| `visor_chrome_v` | Viseira | Frente | 80 | 70 | 14 | 22.000 | 20 | Incomum |
+| `visor_chrome_louver` | Viseira | Frente | 95 | 80 | 22 | 34.000 | 60 | Rara |
+| `visor_neon_frame` | Viseira | Frente | 50 | 35 | 22 | 28.000 | 20 | Incomum |

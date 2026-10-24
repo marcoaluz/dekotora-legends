@@ -243,3 +243,10 @@ Capturas antes/depois: `docs/capturas_t169/` (folhas `folha_*.png`). Catálogo d
 
 **T-179 (2026-10-21):** os maciços do `Fundo Montanha Gelo` estavam no jogo, mas do avesso e cortados pela câmera (não se
 viam como montanhas nevadas). Corrigido e regerado; ver `docs/DECISOES.md` (T-179) e `docs/capturas_t179/`.
+
+## Licença das pastas novas (Marco, 2026-10-24, T-211)
+
+"Homem machucado", "Homem", "Caminhão antigo", "Caminhão novo", "Caminhão vasculante" e "Carreta" em `docs/Modelos/`:
+**Royalty Free License (no AI)**. Não alimentar esses modelos em ferramentas de IA generativa; só ferramentas
+determinísticas (Blender, scripts). Registrado em `game/assets/LICENCAS.md`. A carreta e a caçamba (basculante) entram
+num lote posterior com o modelo que o Marco trouxer (decisão 3 da T-210). Nenhum deles foi usado na T-211.

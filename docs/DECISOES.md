@@ -961,3 +961,57 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 **A confirmar pelo Marco**: largura da passagem (3,8 m), ilha começando 120 m depois da largada, a corrida rápida largar o jogador no meio
 (ele precisa escolher um lado ou bate), cores das faixas pintadas, sem limite de velocidade.
 
+
+## 2026-10-24 · T-210, passo 1 · Respostas do Marco ao catálogo de peças (seção 17 de `docs/REFERENCIA_PECAS.md`)
+
+1. As 53 peças atuais **ficam** no save de quem comprou e saem da loja aos poucos como **"Clássicas"**; quem tem continua
+   equipando. (T-211: o cartão da loja mostra "Clássica" nas peças sem raridade.)
+2. Rodas, escapamento, grade, buzina, interior e adesivos: o Claude **propõe** um design novo no estilo do documento
+   (cromo, neon, LED, dia/noite) e mostra em folha **antes** de modelar (T-211: `docs/capturas_t211/proposta_lacunas.png`).
+3. "Caçamba" = carroceria de caminhão **basculante** (caixa aberta), design nosso. Carreta e caçamba ficam para um lote
+   posterior com o modelo que o Marco trouxer (cabine e caçamba novas); **não refinar a carreta atual**.
+4. Raridade: só o campo `raridade` e um campo opcional `fama mínima` nos dados, **sem travar nada** (regra fica para a fase
+   de regras).
+5. Troca de cor (L/R) **tem preço**: proposta de cores e preços na seção 18 do catálogo (para aprovar).
+6. Murais: dragão, tigre, ondas/Fuji, guerreiro-kabuki, mulher de quimono, fênix/aves + **máscaras japonesas** (hannya,
+   oni, kitsune, tengu, Noh) + carpas de reserva. Pode usar obra de domínio público **repintada**, com fonte e licença em
+   `docs/CREDITOS_MURAIS.md`. **Um mural por lado** (esquerdo e direito diferentes; kanji/texto nunca espelhado).
+7. Pode usar a fonte de pincel **Yuji** (OFL; registrada em `game/assets/LICENCAS.md`); usar as 9 frases sugeridas.
+8. Pintura da traseira = **arte separada** (não recorte do mural).
+9. Letreiro do deque = **lista de nomes prontos** (sem texto livre).
+10. Ordem proposta, parando a cada lote para aprovar a folha de contato. **Primeiro lote: só deque e viseira.**
+11. Carreta pode entrar agora mas vai mudar: não gastar tempo nela.
+12. **Sem conflito entre peças**: todas podem ser instaladas juntas e nenhuma oculta farol, lanterna dianteira/traseira,
+    placa, para-brisa, porta ou roda. Zonas protegidas em cada cabine e baú, no teste automático; peça que invade
+    reprova e é corrigida no Blender. Sem aviso/bloqueio na instalação.
+- Modelos de terceiros em `docs/Modelos` ("Homem machucado", "Homem", "Caminhão antigo", "Caminhão novo", "Caminhão
+  vasculante", "Carreta"): **Royalty Free License (no AI)** — não alimentar esses modelos em ferramentas de IA generativa;
+  só ferramentas determinísticas (Blender, scripts). Registrado em `game/assets/LICENCAS.md` e `docs/INVENTARIO_MODELOS.md`.
+
+## 2026-10-24 · T-211 · Lote 1 da oficina (deque e viseira) e base de encaixe
+
+- **Encaixe medido, não chutado**: `blender/scripts/build_sockets.py` mede os 18 `.glb` (cabine, teto, para-brisa, faróis,
+  lanternas, portas, rodas, baú) e grava `truck/sockets/<modelo>.json` com a caixa-limite de TODOS os encaixes do catálogo
+  novo e as zonas protegidas (para-brisa, faróis, lanternas da quina, setas do `TruckNode`, placas, portas, rodas, portas
+  de trás do baú). O próprio script para com ERRO se duas caixas se cruzarem ou uma caixa entrar numa zona. Os `.glb` dos
+  caminhões **não** foram regerados (os nós `SOCKET_*` são criados no jogo, como os `MOUNT_STACK_*`).
+- Isenções declaradas (decididas pelo Claude, conferir): a placa da frente fica **em cima** do para-choque e as setas da
+  frente ficam na quina dele → o para-choque novo é isento dessas 2 zonas e terá de levar a seta junto (lote da frente);
+  placa de trás isenta para o para-choque de trás; rodas isentas para as calotas. A caixa do para-choque de trás ficou
+  entre as lanternas de fábrica (para não cobri-las): o lote da traseira decide se as lanternas de fábrica viram nós
+  `STOCK_*` trocáveis.
+- **Deque**: a frente do deque fica na borda do teto plano (como nas capturas) e ele cresce para trás até 1,05 m, sem passar
+  da cabine; na americana (teto de 0,4 m) ele avança sobre a testa. Altura até 0,88 m (rodada 2 da comparação: os deques
+  das capturas são altos).
+- **Viseira**: a altura máxima é a "testa" do Canter (0,17 m entre o vidro e o teto). A aba em V das capturas desce no meio,
+  mas aqui o meio não pode descer (cobriria o para-brisa): as **pontas sobem** (rodada 3). A moldura neon (042) desce só até
+  a borda do vidro (não pelas colunas, que estão na zona do para-brisa).
+- **Escala** uniforme pela largura: deques 0,90–1,10, viseiras 0,90–1,06 nos 17 caminhões jogáveis (limite 0,85–1,15).
+- **Cor L/R** = 4 papéis de material por peça (estrutura, painel, LED, neon) + letreiro; troca custa o preço da cor (seção 18
+  do catálogo), a de fábrica é grátis; letreiro (12 nomes prontos) grátis. Perfil: `part_style` (campo novo, sem migração);
+  descritor da rede leva `style` por peça; ações `set_part_color`/`set_part_sign`; **protocolo 12**.
+- Letreiro aceso = material sem luz (unshaded) com o atlas; nada de emissão (no Compatibility a `emission_texture` é
+  ignorada e branquearia as cores).
+- **Dano sem buraco** (peças da oficina): quebrada fica no lugar, torta 7°, cromo vira aço e as luzes apagam.
+- **Conflito com as Clássicas** (PRECISA DECISÃO): a coroa de faróis `roof_lights_crown` e outras peças antigas de teto
+  ficam na frente do deque novo (`docs/capturas_t211/exagerado_*`). O teste só garante o catálogo novo.

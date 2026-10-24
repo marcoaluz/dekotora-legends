@@ -167,3 +167,17 @@ catálogo; orçamento 6.000 triângulos por peça.
 - **Limites conhecidos**: as peças de lado têm 4,2 m (como as saias antigas) e passam da frente do baú no Canter e no baú
   leve (`docs/capturas_t172/canter/`; as saias antigas fazem igual); o brilho no chão fica 11 cm acima do chão do
   caminhão (para aparecer em cima da plataforma da garagem).
+
+## Peças da oficina, lote 1: deque frontal e viseira (T-211, 2026-10-24)
+
+31 peças a partir das capturas do documento do Marco (catálogo `docs/REFERENCIA_PECAS.md`, seções 1–2): 17 deques
+(`accessories/deck/*.glb`) e 14 viseiras (`accessories/visor/*.glb`). Diferente das antigas:
+- montam no **encaixe medido de cada caminhão** (`SOCKET_andon`, `SOCKET_visor`; `truck/sockets/<modelo>.json`), com
+  escala uniforme pela largura da cabine (0,85–1,15) — servem em todas as cabines, baús e no Canter;
+- materiais por **papel** (`deco_body`, `deco_trim`, `deco_led`, `deco_neon`, `acrylic_sign`, `acrylic_art`, `chrome`):
+  o jogo (`DecoStyle`) troca cada papel pela cor L/R escolhida e põe o atlas de letreiros (`textures/deck_signs.png`);
+- quebrada **não some**: fica torta e apagada.
+- Gerar: `blender -b --factory-startup -P blender/scripts/build_t211_parts.py -- [--atlas] [--mounted PASTA] [--compare PASTA]`
+  (o `--compare` junta a captura e a nossa no mesmo ângulo; **fica fora do Git**, em `docs/Referencias/oficina/comparacao/`).
+  Encaixes: `blender/scripts/build_sockets.py -- [--preview PASTA]`. Dados: `python tools/gen_t211_data.py`.
+- Orçamento: 136–2.234 triângulos por peça, 2–6 materiais. Teste: `tests/test_part_fit.gd`; relatório `docs/REPORT_ENCAIXE.md`.

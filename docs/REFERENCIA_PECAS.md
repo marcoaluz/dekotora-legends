@@ -616,3 +616,45 @@ O trabalho mecânico (113 `.tres`, textos pt-BR, folhas de contato, conferência
     parar a cada lote para o Marco aprovar a folha de contato?
 11. **Carreta**: entra agora (está guardada) ou só quando ela virar jogável?
 12. **Conflitos**: tirar a peça que conflita **com aviso** (proposto) ou não deixar instalar até o jogador tirar?
+
+---
+
+## 18. Cores L/R e preços (T-211, PROPOSTA para o Marco aprovar; já está no jogo para testar)
+
+Decisão 5 do Marco: trocar a cor TEM preço. Cada peça da oficina vem com uma **cor de fábrica** (de graça; voltar para
+ela também é de graça). Trocar para outra cor da tabela custa o preço da cor, a cada troca. Uma "cor" pinta os 4 papéis
+da peça: estrutura, painel, matriz de LED e neon (como os pares preto + ciano / prata + azul-marinho das capturas).
+Dados: `game/data/deco_colors/*.tres` (gerados por `python tools/gen_t211_data.py`).
+
+| Cor | Faixa | Preço ¥ | Estrutura | Painel | LED | Neon |
+| --- | --- | --- | --- | --- | --- | --- |
+| Preto + ciano | comum | 2.000 | preto laca | preto | verde | ciano |
+| Preto + verde | comum | 2.000 | preto laca | preto | verde | verde |
+| Branco + azul | comum | 2.000 | branco | azul-marinho | azul | azul |
+| Prata + azul-marinho | comum | 2.000 | prata | azul-marinho | verde | azul |
+| Cromo + ciano | metálica | 6.000 | cromo | preto | verde | ciano |
+| Cromo + rosa | metálica | 6.000 | cromo | preto | rosa | rosa |
+| Dourado + âmbar | metálica | 6.000 | dourado | preto | âmbar | âmbar |
+| Grafite + violeta | metálica | 6.000 | grafite | preto | violeta | violeta |
+| Preto + rosa neon | neon | 8.000 | preto laca | preto | rosa | rosa |
+| Vermelho + amarelo neon | neon | 8.000 | vermelho | preto | amarelo | amarelo |
+
+Referência de preço: a peça mais barata do lote custa 8.000 ¥ e um frete de Kanto paga 20–45 mil ¥ (`BALANCEAMENTO.md`):
+a cor comum é ~1/4 da peça barata, a metálica ~1/2, a neon ~2/3. Letreiro do deque (lista de 12 nomes prontos:
+銀河丸, 一番星, 爆走丸, 龍神丸, 桜吹雪, 天翔丸, 浪花節, 男一匹, 夜桜, 鳳凰丸, 雷神丸, 唐獅子): **de graça** (proposta).
+
+## 19. Proposta para as lacunas (rodas, escapamento, grade, buzina, interior, adesivos) — T-211, NÃO modelado
+
+Decisão 2 do Marco: propor um design novo no estilo das capturas, mostrar em folha ANTES de modelar. Esboços de forma
+e cor (blocos simples, de noite para ver o neon): **`docs/capturas_t211/proposta_lacunas.png`** (uma imagem por
+categoria em `proposta_<categoria>.png`). Gerar: `blender -b --factory-startup -P blender/scripts/t211_proposals.py --
+--out PASTA_ABS`. Todas com cor L/R pela mesma tabela da seção 18 e luzes que acendem de noite.
+
+| Categoria | 1 | 2 | 3 | Encaixe / observação |
+| --- | --- | --- | --- | --- |
+| Rodas | Disco cromado de 10 furos com **anel de LED** na borda | Estrela de 8 raios cromados sobre aro dourado | Calota funda cromada com **lábio de neon** e "spinner" dourado | `hubcaps`: nas rodas de fora (gira com o pneu, T-133); isenta da zona da roda |
+| Escapamento | Chaminé dupla cromada com **ponta neon** e protetor dourado | Chaminé em J com protetor perfurado e **fendas de luz âmbar** | Saída lateral tripla com ponta acesa | `exhaust_stacks_r/l` (vão cabine–baú) ou embaixo; som segue `ExhaustDef.sound_profile` |
+| Grade | Barras verticais cromadas com **friso de LED** em cima | Colmeia dourada com **sol aceso** no meio | Lâminas douradas inclinadas com colunas de neon nos lados | `grille`: entre os faróis, sem cobrir faróis/setas/placa |
+| Buzina | Corneta tripla cromada (3 notas) | Par de cornetas longas douradas | Buzina de navio com aro âmbar | No teto ou atrás da cabine; o som é o `HornCatalog` (6 buzinas de hoje) |
+| Interior | Cortina franzida vermelha com varão dourado (aparece pelo para-brisa) | **Lustre** de cristal âmbar no teto da cabine | Estofado capitonê vermelho com botões dourados e friso neon | `interior`: dentro da cabine, visto de fora pelo vidro (custo baixo) |
+| Adesivos | Kanji de pincel (天下御免 etc., fonte Yuji) | Labaredas | Sol nascente | `decals` (sistema de hoje, `DecalPlacer`), com as frases da decisão 7 |

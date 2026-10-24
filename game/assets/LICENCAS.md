@@ -4,6 +4,8 @@
 | --- | --- | --- | --- |
 | Fonte Rajdhani (Bold, SemiBold) | `assets/fonts/Rajdhani-*.ttf` | Google Fonts (Indian Type Foundry) | SIL Open Font License 1.1 |
 | Fonte Noto Sans JP | `assets/fonts/NotoSansJP.ttf` | Google Fonts | SIL Open Font License 1.1 |
+| Fonte Yuji Syuku (pincel; só no Blender, gravada no atlas `assets/vehicles/dekotora/textures/deck_signs.png`; texto da licença em `blender/fonts/YujiSyuku-OFL.txt`) | `blender/fonts/YujiSyuku-Regular.ttf` | Google Fonts / Kinuta Font Factory (github.com/Kinutafontfactory/Yuji) | SIL Open Font License 1.1 (T-211) |
+| Modelos "Homem machucado", "Homem", "Caminhão antigo", "Caminhão novo", "Caminhão vasculante", "Carreta" (ainda não usados no jogo) | `docs/Modelos/<nome>/` (fora do Git) | baixados pelo Marco | Royalty Free License (no AI), informado pelo Marco em 2026-10-24: não usar em ferramentas de IA generativa; só Blender/scripts |
 | Textura Asphalt 02 (cor e rugosidade, 1k) | `assets/textures/cc0/asphalt_02_*_1k.jpg` | Poly Haven (polyhaven.com/a/asphalt_02), autor Rob Tuytel | CC0 1.0 |
 | Textura Concrete Wall 008 (cor, 1k) | `assets/textures/cc0/concrete_wall_008_diff_1k.jpg` (base de `concrete_streaks.png`) | Poly Haven (polyhaven.com/a/concrete_wall_008), Dario Barresi e Charlotte Baglioni | CC0 1.0 |
 | Textura Blue Metal Plate (cor, rugosidade, normal; reduzida a 512 px; só a rugosidade, os riscos e as lascas entram, a cor do baú é nossa) | `blender/cc0/blue_metal_plate/` (gravada em `assets/vehicles/dekotora/textures/tex_box_*.png`, baú premium T-136) | Poly Haven (polyhaven.com/a/blue_metal_plate), autor Rob Tuytel | CC0 1.0 |

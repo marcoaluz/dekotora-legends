@@ -512,3 +512,16 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Câmera: `RaceCamRig.toll_h_max(z)` limita a altura (5,6 m) perto da cobertura e do pórtico em TODOS os modos (inclusive a PADRÃO).
 - Flags: `--no-toll` (sem a praça, sim e visual), `--old-toll` (só o visual antigo). Prints `tools/capture_t207.sh`, custo
   `tools/measure_t207.sh`, bots `tools_dev/trace_toll.gd --sweep`. Testes `-- --only=toll`.
+
+## Peças da oficina: encaixes, cor L/R, dano sem buraco (T-211)
+
+- `TruckSockets` (`truck/truck_sockets.gd`) lê `assets/vehicles/dekotora/truck/sockets/<modelo>.json` e cria os nós
+  `SOCKET_<encaixe>` (TruckNode._ready). Peça do catálogo com `"socket"` monta ali com escala `TruckSockets.fit_scale`.
+- Regras/teste: `PartFit` (`truck/part_fit.gd`), `tests/test_part_fit.gd` (todas as cabines × baús × peças),
+  relatório `tools_dev/report_part_fit.gd` → `docs/REPORT_ENCAIXE.md`. Fora da árvore use `PartFit.aabb_in` (soma as
+  transformações dos pais) em vez de `global_transform`.
+- Cor/letreiro: `DecoStyle.apply(no, entrada, cor, celula)` ANTES de `AccessoryGlow`/`ChromeMatcap`/`LightPatterns`;
+  `TruckNode.apply_loadout(defs, gs.part_styles())`. Cores em `data/deco_colors/*.tres` (`DecoColorDef`); `.tres` não
+  aceita `Color("#hex")`: use `Color(r, g, b, a)`.
+- Perfil `part_style` {id: {color, sign}}; ações `set_part_color` ("id:cor") e `set_part_sign` ("id:n"); descritor com
+  `style` por peça (protocolo 12). Garagem: `ui/garage_deco_style.gd`. Vista `top` na garagem (`--view=top`).

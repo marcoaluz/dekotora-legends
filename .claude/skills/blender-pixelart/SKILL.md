@@ -210,3 +210,17 @@ um problema visual não puder ser entendido pelos renders.
   `offset` (engrossa o traço proporcional ao tamanho; 0,04 vira borrão; use 0,008–0,012).
 - Regerar só um modelo do cenário: `blender -b --factory-startup -P blender/scripts/build_scenery_3d.py -- --only sign_green`
   e depois `godot --headless --path game --import`.
+
+## Oficina: encaixes e peças por papel (T-211)
+
+- Encaixes: `build_sockets.py` (+ `lib/truck_measure.py`, `lib/socket_rules.py`) importa cada `.glb` do jogo e mede por
+  vértices (numpy), em coordenadas do GODOT. Determinístico: rodar de novo não muda os JSON (`git status` limpo = ok).
+- Peças: `build_t211_parts.py` + `accessories/t211_kit.py` (Face = plano com u/v/normal para pendurar LED, letreiro, neon).
+  Na FRENTE da peça o eixo u é **-X** (quem olha de frente vê o +X do caminhão à esquerda): senão o letreiro sai espelhado.
+- Armadilha: `bmesh.ops.recalc_face_normals` num **quadrado solto** (1 face) pode virar a face para dentro; no Godot ela
+  some (culling). O Blender mostra as duas faces, então só aparece no jogo. `mesh_from` só recalcula com 2+ faces.
+- Armadilha: `pixels.foreach_set` com array float64 dá "incorrect sequence item type": converter para float32.
+- Exportar sem imagem (`export_image_format="NONE"`) quando o jogo põe a textura compartilhada (atlas); senão cada `.glb`
+  carrega uma cópia.
+- Loop de comparação: `--mounted PASTA --compare PASTA` (mesmo ângulo da captura, `VIEW` no script). As folhas com as
+  capturas são de terceiros: só em `docs/Referencias/oficina/comparacao/` (fora do Git).

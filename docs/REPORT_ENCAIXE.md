@@ -31,7 +31,7 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 
 ## Falhas
 
-Nenhuma. (Na 1ª rodada o teste reprovou 63 combinações: deques 2–3 cm mais largos que a caixa e canhões fundos
+Nenhuma. (Na 1ª rodada o teste reprovou ~70 combinações: deques 2–3 cm mais largos que a caixa e canhões fundos
 demais na cabine americana; corrigido no Blender: largura nominal = largura real da peça; canhões medidos pela
 largura do teto. Imagem das caixas e zonas: `docs/capturas_t211/encaixes_zonas.png`.)
 
