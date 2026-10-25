@@ -492,3 +492,8 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: game/scripts/truck/stack_arrange.gd (novo), socket_seat.gd, stack_fit.gd, truck_node.gd, truck/stack_fit.json, tools_dev/probe_stack_t216.gd, docs/capturas_t216/folha_t216.png, DECISOES.
 - Validação: gen_stack_fit (chata/curta/JAC/Canter 96/96, americana 39/96); suíte 477/477; folha de contato conferida (5 cabines: noite 3/4, lado, dia).
 - Decisão pendente: Marco dizer se o arranjo ficou natural (avanço 0,24 m e pés atrás).
+
+## 2026-10-24 11:52 · T-217 · ajudante-rapido · ESCALADA
+- Feito: rodei `tools/ui_shots.sh 960x540 <pasta> .` e saiu com código 0 sem gerar nada (o "." virou nome de tela e não casou com o case). Refiz só as telas de garagem (garage_parts, garage_slot) e capturas extras direto no Godot (--deco=lights; --preview=deck_led_box). Nenhuma das 4 mostra as grades "Cor dos LEDs" / "Cor do neon": elas aparecem só no detalhe de peça com luz (garage_deco_style.gd, _light_grid), e a captura não chegou lá. Nenhum texto cortado visto nas telas que abriram.
+- Arquivos: docs/capturas_t214/ui/garagem_decoracao.png, garagem_peca.png, garagem_luzes.png, garagem_cor_led.png
+- Observação: script ui_shots.sh sem opção para as grades de cor; o "." extra passado no comando é ignorado em silêncio. Precisa de captura dedicada (clicar na peça com LED) ou opção nova no script. Não mexi em código.
