@@ -14,3 +14,4 @@ min_destaque = 40
 truck_key = "rival.rival_urban.truck"
 crest = "鉄"
 refuse_key = "rival.rival_urban.refuse"
+body = "dump"

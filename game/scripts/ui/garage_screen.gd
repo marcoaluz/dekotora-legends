@@ -9,7 +9,7 @@ const TABS: Array = [["model", "garage.tab_model", "truck"], ["parts", "garage.d
 		["mech", "garage.mechanics", "cog"], ["repair", "garage.repair", "hammer"]]
 const VIEWS: Array = [["front", "view.front"], ["side", "view.side"], ["rear", "view.rear"],
 		["roof", "view.roof"], ["wheel", "view.wheel"], ["default", "view.rotate"]]
-const BODIES: Array = ["canter", "leve", "base", "longo", "graneleira"]
+const BODIES: Array = ["canter", "leve", "base", "longo", "graneleira", "alubox", "tarp", "pinkbox", "tanker", "dump"]   # T-218: +5
 const CABS: Array = TruckNode.CABS
 const PANEL_W: float = 284.0
 
@@ -403,7 +403,7 @@ func _flash(text: String) -> void:
 func _build_model() -> void:
 	_left.add_child(UiKit.heading(Tr.t("garage.body").to_upper(), 18, UiTheme.PINK))
 	for k in BODIES:
-		_choice_card("body", String(k), "base", func() -> void: stage.set_body(String(k)))
+		_choice_card("body", String(k), "base", func() -> void: _pick_body(String(k)))
 	_left.add_child(UiKit.heading(Tr.t("garage.cab").to_upper(), 18, UiTheme.PINK))
 	var body: String = String(gs.profile.get("body", "base"))
 	if TruckNode.FIXED_CAB.has(body):              # o Canter so tem a cabine dele (a escolha do perfil fica guardada)
@@ -411,6 +411,18 @@ func _build_model() -> void:
 		return
 	for k in CABS:
 		_choice_card("cab", String(k), CabCatalog.DEFAULT, func() -> void: stage.set_cab(String(k)))
+
+
+## Escolhe o modelo; se ainda nao foi comprado, compra (preco e Fama do BodyDef, T-218) ou avisa o que falta.
+func _pick_body(kind: String) -> void:
+	if not gs.body_owned(kind):
+		var why: String = gs.can_buy_body(kind)
+		if why != "":
+			_flash(why)
+			return
+		gs.buy_body(kind)                           # tambem pinta na cor de fabrica do modelo
+		_flash(Tr.t("garage.body_bought"))
+	stage.set_body(kind)
 
 
 ## Cartao selecionavel (estilo da lista de veiculos da referencia): nome + descricao; o atual fica com borda rosa.
@@ -421,6 +433,10 @@ func _choice_card(field: String, kind: String, default_kind: String, apply: Call
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.text = "%s\n%s" % [Tr.t(field + "." + kind), Tr.t(field + ".desc." + kind)]
+	if field == "body" and not gs.body_owned(kind):          # T-218: modelo pago ainda nao comprado: preco e Fama
+		var bd: BodyDef = BodyDef.find(kind)
+		b.text += "\n" + Tr.t("garage.body_price", [Tr.yen(bd.price), bd.fame_required])
+		b.custom_minimum_size = Vector2(0, 70)
 	b.add_theme_font_size_override("font_size", 15)
 	b.add_theme_stylebox_override("normal", UiTheme.box(Color(1, 0.18, 0.53, 0.14) if cur else Color(1, 1, 1, 0.04), UiTheme.PINK if cur else Color(1, 1, 1, 0.1), 1, 8, 12))
 	b.add_theme_color_override("font_color", Color.WHITE if cur else UiTheme.TEXT)

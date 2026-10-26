@@ -76,7 +76,8 @@ const REAR_Z: float = 0.0                  # a origem do TruckNode e a traseira 
 ## A curta (JAC, T-125) tem a porta curta: o adesivo fica na chapa embaixo da janela; o Canter e a mesma em escala 0,88
 ## e a jac (T-129) em 0,95 x 0,88. A americana (Kenworth, T-129) tem a porta bem atras do capo.
 const CAB_SPOT: Dictionary = {"chata": [1.157, 2.4, 1.76, 0.15], "jac": [1.255, 1.07, 1.22, 0.14],
-		"curta": [1.2, 0.95, 1.08, 0.12], "canter": [1.06, 0.84, 0.95, 0.1], "americana": [0.97, 2.6, 1.5, 0.12]}
+		"curta": [1.2, 0.95, 1.08, 0.12], "canter": [1.06, 0.84, 0.95, 0.1], "americana": [0.97, 2.6, 1.5, 0.12],
+		"flat_wide": [1.25, 1.05, 1.45, 0.14], "flat_quad": [1.25, 1.05, 1.45, 0.14]}   # T-218: porta, abaixo da janela
 
 
 static func _quad(parent: Node3D, tex: Texture2D, color: Color, size: Vector2, pos: Vector3, yaw_deg: float) -> Node3D:

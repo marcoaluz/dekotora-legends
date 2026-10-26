@@ -59,6 +59,8 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 		elif a.begins_with("--cab=") and "--demo" in args:    # so com --demo (perfil de teste, nunca o real)
 			stage.set_cab(a.substr(6))
 		elif a.begins_with("--body=") and "--demo" in args:   # --body=canter (T-125)
+			if not gs.body_owned(a.substr(7)):               # T-218: modelo pago: compra no perfil de teste (cor de fabrica)
+				gs.buy_body(a.substr(7))
 			stage.set_body(a.substr(7))
 		elif a.begins_with("--parts=") and "--demo" in args:  # --parts=kw_bumper,fumi_wing (T-126): compra e instala
 			for pid in a.substr(8).split(","):

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/body_def.gd" id="1_bd"]
+
+[resource]
+script = ExtResource("1_bd")
+id = &"alubox"
+base_mass_kg = 7800.0
+capacity_t = 12.0
+default_cargo_kg = 4000.0
+length_m = 12.0
+agility = 1.0
+torque_mult = 1.0
+fixed_cab = "flat_wide"
+cargo_kind = &"box"
+price = 60000
+fame_required = 20
+default_paint = "#c9cdd2"
+mural = ""
+mural_emit = ""

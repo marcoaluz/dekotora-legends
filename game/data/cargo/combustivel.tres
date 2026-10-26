@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CargoDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/cargo_def.gd" id="1_cg"]
+
+[resource]
+script = ExtResource("1_cg")
+id = &"combustivel"
+display_key = "cargo.combustivel"
+icon = "fuel"
+weight_min_t = 8.0
+weight_max_t = 14.0
+pay_mult = 1.2
+fragility = 0.8
+trait_kind = &"heavy"
+needs = &"tank"

@@ -9,6 +9,9 @@ const FIELD_COLORS: Array[Color] = [Color("#e9eef5"), Color("#d1303f"), Color("#
 const RIVAL_CABS: Array[String] = ["chata", "jac", "curta", "chata"]
 ## Modelo de cada bot da corrida offline (indice = lugar no grid; o 0 e o jogador): baú leve, longo e a graneleira (T-145).
 const RIVAL_BODIES: Array[String] = ["base", "leve", "longo", "graneleira"]
+## Modelos que podem ser sorteados para os bots e para o rival sem caminhao fixo (RivalDef.body = ""), T-218:
+## os de sempre + os 5 caminhoes de homenagem. Forcar nas capturas: -- --rival-body=pinkbox
+const RIVAL_POOL: Array[String] = BodyDef.BOT_POOL
 
 var sim: RaceSim
 var path: TrackPath
@@ -501,7 +504,7 @@ func _spawn_field() -> void:
 		var t: TruckSim = sim.trucks[idx]
 		t.is_bot = i != 0
 		var node := TruckNode.new()
-		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else RIVAL_BODIES[i % RIVAL_BODIES.size()]
+		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else _bot_body(i, rival)
 		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		node.set_mural_glow(tod.mural_glow)                                   # T-155: mural aceso a noite
@@ -542,6 +545,17 @@ func _spawn_field() -> void:
 		node.set_light_pattern(String(gs.profile.get("light_pattern", "steady")) if i == 0 else LightPatterns.IDS[i % LightPatterns.IDS.size()])
 		_trucks.append(node)
 		_prev.append(Vector2(t.z, t.x))
+
+
+## Modelo de um bot offline (T-218): o rival da rota usa o dele (RivalDef.body); sem caminhao fixo, sorteia na hora
+## entre RIVAL_POOL (cada corrida um). `--rival-body=ID` forca (capturas e testes).
+func _bot_body(i: int, rival: RivalDef) -> String:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--rival-body="):
+			return a.substr(13)
+	if i == 1 and rival != null and rival.body != "":
+		return rival.body
+	return RIVAL_POOL[randi() % RIVAL_POOL.size()]
 
 
 ## Buzina que a lista de pecas traz (PartDef.horn) ou a basica (T-144).

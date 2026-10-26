@@ -101,7 +101,7 @@ func migrate_profile() -> bool:
 		profile["cab"] = cab
 		changed = true
 	var body: String = String(profile.get("body", "base"))
-	if BodyDef.find(body) == null:
+	if BodyDef.find(body) == null or not body_owned(body):     # T-218: modelo pago que o perfil nao comprou
 		profile["body"] = "base"
 		changed = true
 	if _retire_old_parts():                          # T-215: pecas antigas de teto sairam do jogo
@@ -267,6 +267,48 @@ func buy(d: PartDef) -> bool:
 	add_owned(d)
 	save_profile()
 	_act("buy_part", String(d.id))
+	profile_changed.emit()
+	return true
+
+
+# ---------------------------------------------------------------- modelos pagos (T-218)
+
+## O perfil pode usar o modelo? Os de preco 0 (os antigos) sempre; os de homenagem depois de comprados.
+func body_owned(id: String) -> bool:
+	var bd: BodyDef = BodyDef.find(id)
+	if bd == null:
+		return false
+	return bd.price <= 0 or bool((profile.get("owned_bodies", {}) as Dictionary).get(id, false))
+
+
+## Motivo para nao poder comprar o modelo ("" = pode).
+func can_buy_body(id: String) -> String:
+	var bd: BodyDef = BodyDef.find(id)
+	if bd == null:
+		return "?"
+	if body_owned(id):
+		return Tr.t("reason.owned")
+	if fame() < bd.fame_required:
+		return Tr.t("garage.body_need_fame", [bd.fame_required])
+	if money() < bd.price:
+		return Tr.t("garage.body_no_money")
+	return ""
+
+
+## Compra o modelo, pinta na cor de fabrica dele e ja deixa escolhido.
+func buy_body(id: String) -> bool:
+	if can_buy_body(id) != "":
+		return false
+	var bd: BodyDef = BodyDef.find(id)
+	profile["money"] = money() - bd.price
+	if not profile.has("owned_bodies"):
+		profile["owned_bodies"] = {}
+	profile["owned_bodies"][id] = true
+	if bd.default_paint != "":
+		profile["paint"] = bd.default_paint
+	profile["body"] = id
+	save_profile()
+	_act("buy_body", id)
 	profile_changed.emit()
 	return true
 
@@ -656,10 +698,16 @@ func truck_descriptor() -> Dictionary:
 	return {
 		"parts": parts, "engine": profile["engine"], "turbo": profile["turbo"], "exhaust": profile["exhaust"],
 		"jake": bool(profile["jake_brake"]), "paint": profile.get("paint", "#e9eef5"), "style_points": style_points(),
-		"body": String(profile.get("body", "base")), "cab": CabCatalog.normalize(profile.get("cab", "")),
+		"body": _usable_body(), "cab": CabCatalog.normalize(profile.get("cab", "")),
 		"horn": installed_horn(),                                  # T-173: os outros ouvem a buzina certa (protocolo 7)
 		"systems": {"engine": float(profile["systems"]["engine"]), "steering": float(profile["systems"]["steering"])},
 	}.merged(Contracts.sim_fields(pending_contract))
+
+
+## Modelo do perfil, se ele pode usar (T-218: modelo pago nao comprado vira o baú medio no descritor).
+func _usable_body() -> String:
+	var body: String = String(profile.get("body", "base"))
+	return body if body_owned(body) else "base"
 
 
 func configure_truck(t: TruckSim) -> void:
@@ -845,6 +893,8 @@ func apply_action(action: String, arg: String) -> bool:
 			return repair_all() > 0
 		"buy_new":
 			return buy_new_replacement(arg)
+		"buy_body":                                   # T-218: caminhao de homenagem
+			return buy_body(arg)
 		"set_horn":                                   # T-173
 			set_horn(arg)
 			return true
@@ -964,7 +1014,8 @@ func contract_block_reason(c: Dictionary) -> String:
 	if missing != &"":
 		return Tr.t("reason.needs_" + String(missing))          # PRECISA DE BAÚ / PRECISA DE GRANELEIRA
 	if float(c["weight_t"]) > capacity_t():
-		return Tr.t("reason.small_open" if Contracts.body_kind(String(profile.get("body", "base"))) == &"open" else "reason.small_box")
+		var kind: StringName = Contracts.body_kind(String(profile.get("body", "base")))
+		return Tr.t("reason.small_box" if kind == &"box" else "reason.small_" + String(kind))   # open / tank (T-218)
 	if not bool(rival_refusal(String(c.get("route", ""))).get("ok", true)):
 		return Tr.t("reason.rival_refuses")
 	return ""

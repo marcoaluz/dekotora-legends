@@ -25,7 +25,7 @@ static func build(parent: VBoxContainer, gs: Node, pv: Dictionary, on_customize:
 	head.add_child(tag)
 	box.add_child(head)
 	if TruckNode.FIXED_CAB.has(body):
-		cab = "curta"
+		cab = "curta" if body == "canter" else String(TruckNode.FIXED_CAB[body])     # T-218: cabine de homenagem
 	box.add_child(UiTheme.label("%s %s" % [Tr.t("garage.cab"), Tr.t("cab." + cab)], 15, UiTheme.CYAN))
 	box.add_child(UiKit.divider())
 	var rows := VBoxContainer.new()
@@ -41,7 +41,7 @@ static func build(parent: VBoxContainer, gs: Node, pv: Dictionary, on_customize:
 	if gain > 0.0:
 		torque += "  (+%d%%)" % roundi(gain * 100.0)
 	rows.add_child(UiKit.stat_line("zap", Tr.t("garage.torque"), torque))
-	var engine_name: String = Tr.t("engine.canter_note") if TruckNode.FIXED_CAB.has(body) else Tr.t("engine." + String(gs.profile["engine"]))
+	var engine_name: String = Tr.t("engine.canter_note") if body == "canter" else Tr.t("engine." + String(gs.profile["engine"]))
 	rows.add_child(UiKit.stat_line("cog", Tr.t("garage.engine"), engine_name))
 	rows.add_child(UiKit.stat_line("gauge", Tr.t("garage.redline"), "%s rpm" % _thousands(roundi(eng.redline_rpm) if eng else 0)))
 	rows.add_child(UiKit.stat_line("package", Tr.t("garage.capacity"), "%d t" % roundi(Contracts.capacity_t(body))))

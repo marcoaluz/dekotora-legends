@@ -15,3 +15,4 @@ min_destaque = 0
 truck_key = "rival.rival_coast.truck"
 crest = "桜"
 refuse_key = "rival.rival_coast.refuse"
+body = "pinkbox"

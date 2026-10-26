@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/body_def.gd" id="1_bd"]
+
+[resource]
+script = ExtResource("1_bd")
+id = &"tanker"
+base_mass_kg = 9000.0
+capacity_t = 14.0
+default_cargo_kg = 5000.0
+length_m = 12.0
+agility = 0.92
+torque_mult = 1.0
+fixed_cab = "flat_wide"
+cargo_kind = &"tank"
+price = 150000
+fame_required = 120
+default_paint = "#e8ecef"
+mural = ""
+mural_emit = ""

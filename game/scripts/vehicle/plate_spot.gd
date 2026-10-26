@@ -17,7 +17,7 @@ static func triangle_meshes(root: Node, y0: float = -INF, y1: float = INF) -> Ar
 	var band := AABB(Vector3(-0.6, maxf(y0, -100.0), -1000.0), Vector3(1.2, minf(y1, 100.0) - maxf(y0, -100.0), 2000.0))
 	for mi in list:
 		var m: MeshInstance3D = mi as MeshInstance3D
-		if m.mesh == null or not m.visible or dying(m, root):
+		if m.mesh == null or not m.visible or dying(m, root) or m.has_meta("lod"):   # T-218: LODs nao contam
 			continue
 		var xf: Transform3D = rel_transform(m, root)
 		if not (xf * m.mesh.get_aabb()).intersects(band):

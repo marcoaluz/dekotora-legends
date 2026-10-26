@@ -5,7 +5,8 @@ extends RefCounted
 ## bau e peca instalada. So a ALTURA da placa da frente depende da cabine (medida com tools_dev/measure_plates.gd).
 
 ## Altura (m) do centro da placa dianteira por cabine mostrada (TruckNode.shown_cab()).
-const FRONT_Y: Dictionary = {"chata": 0.775, "jac": 0.70, "curta": 0.62, "americana": 0.50, "canter": 0.60}
+const FRONT_Y: Dictionary = {"chata": 0.775, "jac": 0.70, "curta": 0.62, "americana": 0.50, "canter": 0.60,
+		"flat_wide": 0.66, "flat_quad": 0.66}
 const DEFAULT_FRONT_Y: float = 0.7
 
 

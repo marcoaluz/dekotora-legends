@@ -16,13 +16,17 @@ const MID: float = 0.62
 const BOTTOM: float = 1.0
 ## Forca dentro de tunel de dia (as luzinhas acendem la dentro como a noite).
 const TUNNEL: float = 0.75
+## Forca extra da emissao pronta de um mural com neons (T-218: baú rosa).
+const EMIT_GAIN: float = 2.2
 
 static var _cache: Dictionary = {}      # id da textura do mural -> ImageTexture de emissao
 
 
 ## Liga a emissao no material do mural (uma vez, ao criar o material). Energia 0: igual a antes.
-static func setup(mat: StandardMaterial3D, albedo: Texture2D) -> void:
-	var tex: Texture2D = emission_texture(albedo)
+## `emit` (T-218): emissao pronta do mural proprio de um modelo (arte escurecida + neons fortes); usada no lugar da
+## feita a partir da arte, com mais forca (EMIT_GAIN) para os neons acenderem de verdade.
+static func setup(mat: StandardMaterial3D, albedo: Texture2D, emit: Texture2D = null) -> void:
+	var tex: Texture2D = emit if emit != null else emission_texture(albedo)
 	if tex == null:
 		return
 	mat.emission_enabled = true                     # sempre ligada (trocar depois recompila o shader no meio da corrida)
@@ -30,6 +34,7 @@ static func setup(mat: StandardMaterial3D, albedo: Texture2D) -> void:
 	mat.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY   # cor x textura (o padrao SOMA a cor inteira)
 	mat.emission = LIGHT
 	mat.emission_energy_multiplier = 0.0
+	mat.set_meta("glow_gain", EMIT_GAIN if emit != null else 1.0)
 
 
 ## Ajusta a forca (0 = sem luz) e o tom (cor do rival, igual ao tingido do mural).
@@ -37,7 +42,7 @@ static func set_level(mat: StandardMaterial3D, energy: float, tint: Color = Colo
 	if mat == null or not mat.emission_enabled:
 		return
 	mat.emission = LIGHT * tint
-	mat.emission_energy_multiplier = maxf(energy, 0.0)
+	mat.emission_energy_multiplier = maxf(energy, 0.0) * float(mat.get_meta("glow_gain", 1.0))
 
 
 ## Brilho da faixa vertical na linha `v` (0 = topo da arte, 1 = base, que fica junto da saia).

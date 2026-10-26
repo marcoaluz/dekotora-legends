@@ -21,7 +21,7 @@ void fragment() {
 	EMISSION = m * strength;                       // + o ambiente pintado (cidade a noite / ceu de dia)
 }
 """
-const TARGETS: Dictionary = {"chrome": Color(1, 1, 1), "paint_gold": Color("#f6c453")}
+const TARGETS: Dictionary = {"chrome": Color(1, 1, 1), "paint_gold": Color("#f6c453"), "tank_shell": Color(0.96, 0.97, 1.0)}
 ## Forca do ambiente pintado por modo. "studio" = garagem (T-138): cinza neutro com softbox, sem o azul da noite.
 const STRENGTH: Dictionary = {"night": 2.2, "day": 0.45, "studio": 0.95}
 

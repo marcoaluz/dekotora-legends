@@ -13,6 +13,12 @@ const MODEL_PATHS: Dictionary = {
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
 	"graneleira": "res://assets/vehicles/dekotora/truck/dekotora_truck_graneleira_chata.glb",   # T-145: aberta com lona
+	# T-218: caminhoes de homenagem (feitos do zero, marca ficticia), cada um com a cabine dele
+	"alubox": "res://assets/vehicles/dekotora/truck/dekotora_truck_alubox.glb",
+	"tarp": "res://assets/vehicles/dekotora/truck/dekotora_truck_tarp.glb",
+	"pinkbox": "res://assets/vehicles/dekotora/truck/dekotora_truck_pinkbox.glb",
+	"tanker": "res://assets/vehicles/dekotora/truck/dekotora_truck_tanker.glb",
+	"dump": "res://assets/vehicles/dekotora/truck/dekotora_truck_dump.glb",
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Cabines que existem em .glb (T-129: so de modelos de arquivo; ids antigos caem em CabCatalog.normalize).
@@ -20,9 +26,16 @@ const CABS: Array[String] = CabCatalog.IDS
 ## Quanto a frente de cada cabine passa da frente padrao (CAB_Y1 = 11,5 m): JAC grande e bico longo americano.
 const CAB_FRONT_DELTA: Dictionary = {"jac": 0.17, "americana": 0.09}
 ## Modelos com cabine fixa (nao combinam com as outras cabines).
-const FIXED_CAB: Dictionary = {"canter": "canter"}
+const FIXED_CAB: Dictionary = {"canter": "canter", "alubox": "flat_wide", "tarp": "flat_quad", "pinkbox": "flat_wide",
+		"tanker": "flat_wide", "dump": "flat_quad"}
+## LODs (T-218): <modelo>_lod1.glb e _lod2.glb nesta pasta (so os caminhoes de homenagem tem). O LOD0 (o .glb de sempre,
+## com pecas, rodas que giram e pontos de montagem) aparece ate LOD_RANGES[0] m da camera; o LOD1 ate LOD_RANGES[1]; o
+## LOD2 dali em diante. As pecas compradas ficam sempre (sao filhas dos pontos de montagem do LOD0).
+const LOD_DIR := "res://assets/vehicles/dekotora/truck/lod/"
+const LOD_RANGES: Array[float] = [45.0, 120.0]
 ## Quanto cada modelo e mais comprido que o padrao (m); desloca o farol dianteiro.
-const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0}
+const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0,
+		"alubox": 0.0, "tarp": 0.0, "pinkbox": 0.0, "tanker": 0.0, "dump": 0.0}
 const WHEEL_RADIUS: float = 0.52
 const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## Mural das laterais do bau: troque este PNG (proporcao ~4:1) pela arte que quiser; um
@@ -78,6 +91,7 @@ func _ready() -> void:
 	add_child(model)
 	add_extra_mounts(model, body_kind, cab_kind)
 	TruckSockets.add_nodes(model, path)              # T-211: encaixes das pecas da oficina (deque, viseira...)
+	_attach_lods(path)                               # T-218: antes do cromo/mural/texturas (valem para os LODs tambem)
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
@@ -237,8 +251,8 @@ func set_paint_color(c: Color) -> void:
 	tint = c
 	if model == null:
 		return
-	if _mural_mat != null:
-		_mural_mat.albedo_color = c.lerp(Color.WHITE, 0.45)          # rivais: mural levemente tingido
+	if _mural_mat != null and _own_mural() == "":
+		_mural_mat.albedo_color = c.lerp(Color.WHITE, 0.45)          # rivais: mural levemente tingido (o proprio do modelo nao)
 		MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
@@ -251,7 +265,13 @@ func set_paint_color(c: Color) -> void:
 ## Troca a textura do material "mural" (laterais do bau) pelo PNG trocavel.
 func _apply_mural() -> void:
 	var tex: Texture2D = null
-	if FileAccess.file_exists(MURAL_USER):
+	var emit: Texture2D = null
+	if _own_mural() != "":                       # T-218: mural proprio do modelo (baú rosa) + emissao dos neons
+		tex = load(_own_mural()) as Texture2D
+		var bd: BodyDef = BodyDef.find(body_kind)
+		if bd != null and bd.mural_emit != "" and ResourceLoader.exists(bd.mural_emit):
+			emit = load(bd.mural_emit) as Texture2D
+	elif FileAccess.file_exists(MURAL_USER):
 		var img := Image.load_from_file(ProjectSettings.globalize_path(MURAL_USER))
 		if img != null and not img.is_empty():
 			img.generate_mipmaps()
@@ -270,9 +290,42 @@ func _apply_mural() -> void:
 					_mural_mat.albedo_texture = tex
 					TruckTextures.swap_textures(_mural_mat)      # bau premium: normais/oclusao da chapa (T-136)
 					_mural_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-					MuralGlow.setup(_mural_mat, tex)             # T-155: luz falsa das luzinhas (forca 0 ate set_mural_glow)
+					MuralGlow.setup(_mural_mat, tex, emit)       # T-155: luz falsa das luzinhas (forca 0 ate set_mural_glow)
 					MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
 				m.set_surface_override_material(s, _mural_mat)
+
+
+## PNG do mural proprio do modelo (BodyDef.mural) ou "" (usa o mural trocavel de sempre).
+func _own_mural() -> String:
+	var bd: BodyDef = BodyDef.find(body_kind)
+	return bd.mural if bd != null and bd.mural != "" and ResourceLoader.exists(bd.mural) else ""
+
+
+## LODs do modelo (T-218): esconde as malhas do .glb a partir de LOD_RANGES[0] m e poe as versoes leves no lugar.
+## Sem os arquivos _lod1/_lod2, nao faz nada (os caminhoes antigos continuam como antes).
+func _attach_lods(path: String) -> void:
+	var stem: String = path.get_file().get_basename()
+	var paths: Array[String] = [LOD_DIR + stem + "_lod1.glb", LOD_DIR + stem + "_lod2.glb"]
+	if not ResourceLoader.exists(paths[0]) or not ResourceLoader.exists(paths[1]):
+		return
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		(mi as MeshInstance3D).visibility_range_end = LOD_RANGES[0]
+	for k in 2:
+		var lod: Node3D = (load(paths[k]) as PackedScene).instantiate() as Node3D
+		lod.name = "LOD%d" % (k + 1)
+		for mi in lod.find_children("*", "MeshInstance3D", true, false):
+			var m: MeshInstance3D = mi as MeshInstance3D
+			m.visibility_range_begin = LOD_RANGES[k]
+			m.visibility_range_end = LOD_RANGES[1] if k == 0 else 0.0
+			m.set_meta("lod", k + 1)
+			if k == 1:
+				m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		model.add_child(lod)
+
+
+## Quantos LODs este caminhao tem carregados (0 = so o modelo; testes).
+func lod_count() -> int:
+	return 0 if model == null else model.find_children("LOD*", "Node3D", false, false).size()
 
 
 ## Pontos de montagem que os .glb ainda nao tem (T-126: escapamentos altos atras da cabine). Posicao no Blender

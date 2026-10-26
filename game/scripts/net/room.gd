@@ -38,6 +38,7 @@ var countdown: float = 0.0
 var end_timer: float = -1.0
 var results: Dictionary = {}                    # peer_id -> resultado final
 var bot_names: Dictionary = {}                  # truck_idx -> nome do bot
+var bot_loadouts: Dictionary = {}               # truck_idx -> descritor do bot (T-218: com o modelo sorteado)
 var intro: String = DuelPlan.SHORT              # T-156: abertura "frente a frente" (full) ou curta; o countdown inclui ela
 var countdown_total: float = Protocol.COUNTDOWN_SECONDS
 var race_rules: Dictionary = {}                 # regras usadas nesta corrida (comboio: transito mais leve)
@@ -181,6 +182,7 @@ func _build_race(seed_: int) -> void:
 	sim.freight = route.freight if route != null else 25000
 	sim.deadline = (route.deadline() + track.events.time_allowance()) if route != null else 0.0   # T-139: folga dos eventos
 	drivers.clear()
+	bot_loadouts.clear()
 	var bots: int = mini(int(rules["bots"]), Protocol.MAX_PLAYERS - order.size())
 	var n: int = order.size() + bots
 	var slot: int = 0
@@ -197,7 +199,10 @@ func _build_race(seed_: int) -> void:
 		var idx2: int = sim.add_truck(g2.x, g2.y)
 		var t: TruckSim = sim.trucks[idx2]
 		t.is_bot = true
-		TruckConfig.apply(t, TruckConfig.basic_descriptor())
+		var desc: Dictionary = TruckConfig.basic_descriptor()
+		desc["body"] = BodyDef.BOT_POOL[absi(seed_ + 7 * b) % BodyDef.BOT_POOL.size()]   # T-218: sorteio pela semente
+		bot_loadouts[idx2] = desc
+		TruckConfig.apply(t, desc)
 		drivers[idx2] = BotDriver.new(clampi(b, 0, 2), seed_ + 10 + b, g2.y)
 		bot_names[idx2] = names[b % names.size()]
 		slot += 1
@@ -343,7 +348,7 @@ func drain_damage_updates() -> Array[int]:
 func race_setup() -> Dictionary:
 	var grid: Array = []
 	for i in sim.trucks.size():
-		var entry: Dictionary = {"idx": i, "bot": sim.trucks[i].is_bot, "name": String(bot_names.get(i, "")), "peer": 0, "paint": "#e9eef5", "loadout": TruckConfig.basic_descriptor()}
+		var entry: Dictionary = {"idx": i, "bot": sim.trucks[i].is_bot, "name": String(bot_names.get(i, "")), "peer": 0, "paint": "#e9eef5", "loadout": bot_loadouts.get(i, TruckConfig.basic_descriptor())}
 		grid.append(entry)
 	for p in order:
 		var m: Member = members[p]

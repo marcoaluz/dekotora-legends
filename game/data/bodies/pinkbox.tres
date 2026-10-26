@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/body_def.gd" id="1_bd"]
+
+[resource]
+script = ExtResource("1_bd")
+id = &"pinkbox"
+base_mass_kg = 8200.0
+capacity_t = 12.0
+default_cargo_kg = 4000.0
+length_m = 12.0
+agility = 0.98
+torque_mult = 1.0
+fixed_cab = "flat_wide"
+cargo_kind = &"box"
+price = 200000
+fame_required = 120
+default_paint = "#f06aa8"
+mural = "res://assets/vehicles/dekotora/murals/mural_geisha.png"
+mural_emit = "res://assets/vehicles/dekotora/murals/mural_geisha_emit.png"

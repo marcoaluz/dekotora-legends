@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/body_def.gd" id="1_bd"]
+
+[resource]
+script = ExtResource("1_bd")
+id = &"tarp"
+base_mass_kg = 7400.0
+capacity_t = 13.0
+default_cargo_kg = 4000.0
+length_m = 12.0
+agility = 1.0
+torque_mult = 1.0
+fixed_cab = "flat_quad"
+cargo_kind = &"open"
+price = 90000
+fame_required = 60
+default_paint = "#1d2a4a"
+mural = ""
+mural_emit = ""
