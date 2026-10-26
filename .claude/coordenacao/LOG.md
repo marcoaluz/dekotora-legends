@@ -505,3 +505,15 @@ Formato em `docs/AGENTES.md`.
 - Pendente: capturas finais (antes/noite cidade+montanha e todas as "depois") e tools/measure_t217.sh antes/depois: o Claude Code parou os processos por memória baixa; não reiniciei sozinho.
 - Armadilha: MultiMesh com visible_instance_count = 0 desenha 1 cópia no Compatibility (esconder o nó). UniqueCar.spot_z tinha laço infinito quando não havia lugar livre (corrigido com limite de voltas).
 - Decisão pendente: Marco confirmar lugares (muros, farol, porto, cachoeira, obra), 2 faixas na contrária, flores na cerca viva, densidade do trânsito contrário.
+
+## 2026-10-26 · T-222 (ajudante-rapido, delegada da T-217) · concluída
+- Seção "Ambientação (T-217)" em .claude/skills/godot-dekotora/SKILL.md: 11 flags confirmadas no código (--no-opp-road também tira o tráfego), OppositeLayout/CutLayout/DanchiLayout + RouteAmbience.release(), armadilha do MultiMesh, scripts capture/measure_t217 e import_textures_3d, aviso de um processo Godot por vez. Commit 4bfa6b2.
+
+## 2026-10-26 · T-221 (ajudante-rapido, delegada da T-217) · concluída
+- Capturas antes/depois das 3 rotas, dia e noite (32 poses cada), folhas lado a lado em docs/capturas_t217/folha_*.png; custo PC 1280x720 (6 pontos): FPS 196,4→180,4, chamadas 522→572, triângulos 286k→340k. Commit 76f6c03. Memória livre ficou em ~4,5 GB rodando um processo por vez.
+- Revisão do coordenador nas folhas: muro de pedra, cachoeira, pista contrária e danchi aparecem bem; interior do túnel quase igual ao antes; danchi à noite ainda liso (pouca varanda/varal visível).
+
+## 2026-10-26 00:25 · T-223 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste (debug) gerado com a ambientação da T-217 (cenário novo), protocolo de rede 13; Min/Target SDK vazios só na cópia durante a exportação, preset restaurado (git diff vazio).
+- Arquivos: builds/kaido-bakuso-debug.apk (137.145.064 bytes, fora do Git), builds/t223_export.log, docs/STATUS.md (linha do APK), .claude/coordenacao/LOG.md.
+- Observação: export sem avisos (EXIT=0, DONE, assinado com chave de debug). Celular não testado. LOG.md não entrou no commit (já tinha alterações de outras tarefas).
