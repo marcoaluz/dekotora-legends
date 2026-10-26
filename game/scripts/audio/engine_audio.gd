@@ -125,7 +125,7 @@ func _setup_diesel(s: Dictionary) -> void:
 	_gain_db = float(s.get("gain_db", 0.0)) + DIESEL_DB
 	_pops = bool(s.get("pops", false))
 	_pop_rng.seed = hash(_voice) + get_instance_id()
-	_src = "rec" if EngineSounds.has_engine_file(DieselMix.layer(_voice, "on", DieselMix.IDLE_RPM, "rec")) else "syn"
+	_src = "rec" if recordings_complete(_voice) else "syn"
 	var vdef: EngineVoiceDef = null
 	if not positional:                                   # T-220: outros caminhoes ficam nos loops (custo)
 		var m: String = mode_override if mode_override in EngineSoundMode.MODES else EngineSoundMode.current()
@@ -167,6 +167,15 @@ func active_layers() -> Array[String]:
 		if float(_players[k].get("volume_db")) > -79.0:
 			out.append(String(k))
 	return out
+
+
+## T-220: gravacoes reais recortadas (tools/cut_loops.py) so entram com TODOS os pontos ON e OFF (sem buracos).
+static func recordings_complete(voice: String) -> bool:
+	for r in DieselMix.RPM_POINTS:
+		for k in ["on", "off"]:
+			if not EngineSounds.has_engine_file(DieselMix.layer(voice, k, r, "rec")):
+				return false
+	return true
 
 
 ## T-220: diesel procedural do caminhao do jogador (so cliente; o no nao toca sem janela).
