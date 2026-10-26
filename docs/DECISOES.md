@@ -1116,3 +1116,35 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   (173→204, 128→164 mil); montanha +27 chamadas e +23 mil. Medida completa (`tools/measure_t217.sh 3000 day`, 6 pontos,
   média de 2 amostras, 1280x720, PC): FPS 196 → 180, chamadas 522 → 572, triângulos 286 → 340 mil
   (`docs/capturas_t217/custo_antes.txt` e `custo_depois.txt`). Celular não medido.
+
+## 2026-10-26 · T-218 · Caminhões de homenagem ao Art Truck Battle (pedido do Marco, item 11) — PROPOSTA, Marco confere
+
+- **5 modelos novos, feitos do zero por código** (`blender/scripts/build_t218_trucks.py`, `truck3d/t218_cab.py`,
+  `truck3d/t218_bodies.py`); os prints do Marco serviram só de referência de silhueta, nada foi extraído do jogo original.
+  | id | Nome na garagem | Cabine (fixa) | Carroceria |
+  | --- | --- | --- | --- |
+  | `alubox` | Baú de alumínio | `flat_wide` "Plana larga": grade preta larga com faixa cromada, 4 faróis retangulares embutidos, para-choque cromado largo, cinza-claro | baú de alumínio liso 8,2 m, teto 3,45 m (mais alto que a cabine, como no print), porta lateral, traseira de 2 folhas com 4 barras de trava; sem mural, sem escapamentos altos |
+  | `tarp` | Lona verde | `flat_quad` "Plana de 4 faróis": grade cromada grande, 4 faróis redondos, azul-marinho | plataforma com guardas de alumínio, faixa branca com o nome da empresa **銀河運輸** (fictícia, "Ginga Unyu"), cabeceira cromada perfurada, lona verde-azulada esticada sobre 6 arcos com cordas cruzadas |
+  | `pinkbox` | Baú rosa da gueixa | `flat_wide`, rosa | baú rosa com o **mural grande nosso** (gueixa, grande onda, Fuji, sol nascente, sakura) e neons com mapa de emissão próprio; decoração V7 completa (andons, fileiras de luzes) |
+  | `tanker` | Tanque cromado | `flat_wide`, branca | tanque elíptico cromado (tampos abaulados, 5 cintas), passarela, corrimão, 3 bocas de visita, escada traseira, caixa de válvulas, porta-mangueiras |
+  | `dump` | Caçamba | `flat_quad`, vermelha | caçamba basculante de inox com nervuras, parede da frente alta + protetor de cabine cromado, tampa traseira com moldura e frisos polidos, braços da tampa, estrutura traseira polida, cilindro hidráulico; **protetores perfurados cromados** nos 2 escapamentos verticais |
+- **Marcas e textos fictícios**: marca da cabine **HAYATE** (emblema em relevo na grade), empresa **銀河運輸**; nenhum nome de
+  marca real em modelo, textura, catálogo, i18n ou arquivo (teste `test_homage_t218.gd` confere os nós). Kanji nunca espelhado
+  (texto 3D girado por lado). Mural sem texto.
+- **Mesmas regras do jogo**: chassi, rodas (rodado duplo, 2 eixos), pontos de montagem, encaixes medidos (deque, viseira,
+  retrovisor, para-choques...), dano das peças, pintura tingível da cabine (`paint_white_panel`), mural (o do baú rosa é do
+  modelo: `BodyDef.mural`, sem tingir pela cor do rival). Encaixe: **713/713** peças do lote 1 cabem (`docs/REPORT_ENCAIXE.md`);
+  deque de 2 níveis: **62 de 96 duplas** (como a americana: as duplas "caixa embaixo + canhões em cima" não cabem porque os
+  canhões avançariam para o lugar da viseira; a garagem só oferece as que cabem).
+- **Teto da cabine nova a 3,10 m** (a chata tem 3,175): com 3,32 m o deque de 2 níveis passava do limite de 4,55 m. A
+  cabine ficou um pouco mais baixa que a do jogo original; em troca o baú de alumínio fica mais alto que ela, como no print.
+- **3 LODs** (só nos modelos novos): LOD0 = o .glb de sempre até 45 m da câmera; LOD1 (~22%) até 120 m; LOD2 (~5%) dali em
+  diante (`TruckNode.LOD_RANGES`, arquivos em `truck/lod/`). Peças compradas ficam sempre visíveis.
+- **Compra na garagem (proposta)**: os modelos antigos continuam de graça; os novos têm preço e Fama (`BodyDef.price`,
+  `fame_required`) e, ao comprar, o caminhão é pintado na cor de fábrica (`default_paint`). Ação de rede `buy_body`.
+- **Carga**: baús = fechados; lona e caçamba = abertas (granel); **tanque = tipo novo `tank`** e carga nova **Combustível
+  (diesel)** que só ele leva (8–14 t, pagamento ×1,2, pesada). O tanque também leva carga comum.
+- **Rivais**: Trovão Rosa (litoral) = baú rosa, Lua Cromada (montanha) = tanque, Dragão de Aço (cidade) = caçamba; o chefe e
+  os bots da corrida rápida sorteiam a cada corrida entre todos os modelos (`BodyDef.BOT_POOL`); online, os bots recebem um
+  modelo sorteado pela semente da sala. **Protocolo 14.**
+- Números de preço/massa/agilidade em `docs/BALANCEAMENTO.md` (seção T-218) — **proposta para o Marco testar**.

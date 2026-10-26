@@ -136,3 +136,7 @@ leva `z`, `x`, **giro** (s16, milirradianos), **altura** (u8, 2 cm) — o carro 
 | Diferença de resultado entre cliente e servidor | Servidor sempre manda; cliente corrige suavemente |
 | Jogador sai no meio | Bot assume o caminhão até o fim |
 | Abuso de economia | Compras e reparos validados no servidor |
+
+**Protocolo 14 (T-218)**: o descritor pode trazer os modelos novos (`body`: alubox, tarp, pinkbox, tanker, dump; o
+servidor só aceita modelo comprado: `GameState._usable_body`), os bots do `race_setup` trazem um `loadout` com o modelo
+sorteado pela semente da sala e existe a ação de perfil `buy_body`.

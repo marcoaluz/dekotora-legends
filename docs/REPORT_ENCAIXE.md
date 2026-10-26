@@ -8,12 +8,14 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 
 | Caminhão | Deques OK | Viseiras OK | Escala deque | Escala viseira | Encaixes que se cruzam / entram em zona | Falhas |
 | --- | --- | --- | --- | --- | --- | --- |
+| alubox | 17/17 | 14/14 | 1.12–1.15 | 1.15–1.15 | nenhum | nenhuma |
 | base_americana | 17/17 | 14/14 | 0.70–0.70 | 0.92–0.92 | nenhum | nenhuma |
 | base_chata | 17/17 | 14/14 | 0.85–0.86 | 1.03–1.03 | nenhum | nenhuma |
 | base_curta | 17/17 | 14/14 | 0.89–0.91 | 1.01–1.01 | nenhum | nenhuma |
 | base_jac | 17/17 | 14/14 | 0.91–0.93 | 1.06–1.06 | nenhum | nenhuma |
 | canter | 17/17 | 14/14 | 0.85–0.85 | 0.90–0.90 | nenhum | nenhuma |
 | carreta (guardada) | 17/17 | 14/14 | 0.85–0.86 | 1.03–1.03 | nenhum | nenhuma |
+| dump | 17/17 | 14/14 | 1.12–1.15 | 1.15–1.15 | nenhum | nenhuma |
 | graneleira_americana | 17/17 | 14/14 | 0.70–0.70 | 0.92–0.92 | nenhum | nenhuma |
 | graneleira_chata | 17/17 | 14/14 | 0.85–0.86 | 1.03–1.03 | nenhum | nenhuma |
 | graneleira_curta | 17/17 | 14/14 | 0.89–0.91 | 1.01–1.01 | nenhum | nenhuma |
@@ -26,8 +28,11 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 | longo_chata | 17/17 | 14/14 | 0.85–0.86 | 1.03–1.03 | nenhum | nenhuma |
 | longo_curta | 17/17 | 14/14 | 0.89–0.91 | 1.01–1.01 | nenhum | nenhuma |
 | longo_jac | 17/17 | 14/14 | 0.91–0.93 | 1.06–1.06 | nenhum | nenhuma |
+| pinkbox | 17/17 | 14/14 | 1.12–1.15 | 1.15–1.15 | nenhum | nenhuma |
+| tanker | 17/17 | 14/14 | 1.12–1.15 | 1.15–1.15 | nenhum | nenhuma |
+| tarp | 17/17 | 14/14 | 1.12–1.15 | 1.15–1.15 | nenhum | nenhuma |
 
-**Total: 558 de 558 combinações cabem** (peça dentro da caixa, fora da lataria e de toda zona protegida).
+**Total: 713 de 713 combinações cabem** (peça dentro da caixa, fora da lataria e de toda zona protegida).
 
 ## Falhas
 

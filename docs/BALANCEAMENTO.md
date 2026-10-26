@@ -485,3 +485,20 @@ Cor L/R: tabela da seção 18 do catálogo (comum 2.000 ¥, metálica 6.000 ¥, 
 | `visor_chrome_v` | Viseira | Frente | 80 | 70 | 14 | 22.000 | 20 | Incomum |
 | `visor_chrome_louver` | Viseira | Frente | 95 | 80 | 22 | 34.000 | 60 | Rara |
 | `visor_neon_frame` | Viseira | Frente | 50 | 35 | 22 | 28.000 | 20 | Incomum |
+
+## Caminhões de homenagem (T-218) — PROPOSTA
+
+Dados em `game/data/bodies/<id>.tres`. Todos com 12 m na pista (chassi do baú médio) e motor normal (torque ×1,0).
+Referência: começa-se com 50.000 ¥ e um frete de Kanto paga 20–45 mil ¥ (2 a 6 corridas por caminhão).
+
+| Modelo | Preço | Fama | Massa vazia | Capacidade | Carga sem contrato | Agilidade | Leva | Cor de fábrica |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Baú de alumínio (`alubox`) | 60.000 ¥ | 20 | 7.800 kg | 12 t | 4.000 kg | 1,0 | carga fechada e comum | cinza-claro |
+| Lona verde (`tarp`) | 90.000 ¥ | 60 | 7.400 kg | 13 t | 4.000 kg | 1,0 | granel e carga aberta | azul-marinho |
+| Caçamba (`dump`) | 120.000 ¥ | 60 | 8.800 kg | 15 t | 5.000 kg | 0,95 | granel e carga aberta | vermelho |
+| Tanque cromado (`tanker`) | 150.000 ¥ | 120 | 9.000 kg | 14 t | 5.000 kg | 0,92 (líquido balança) | combustível e carga comum | branco |
+| Baú rosa da gueixa (`pinkbox`) | 200.000 ¥ | 120 | 8.200 kg | 12 t | 4.000 kg | 0,98 | carga fechada e comum | rosa |
+
+| Carga nova | Peso (t) | Pagamento | Fragilidade | Tipo | Carroceria |
+| --- | --- | --- | --- | --- | --- |
+| Combustível (diesel) | 8–14 | ×1,2 | 0,8 | pesada | **só o tanque** |
