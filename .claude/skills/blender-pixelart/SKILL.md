@@ -269,3 +269,20 @@ um problema visual não puder ser entendido pelos renders.
 - Nos `.sh` que passam caminhos ao Godot, use `pwd -W` (caminho Windows); senão o Godot não acha a pasta.
 - `_drop_module_ends` (no `build_t231_parts.py`) apaga as tampas escondidas nas pontas do módulo do meio (tubo, trilho):
   menos triângulos por metro.
+
+## Pinturas (T-232)
+
+- Script: `blender/scripts/build_t232_paint.py`. Rodar na raiz do projeto:
+  `blender -b --factory-startup -P blender/scripts/build_t232_paint.py -- [--only id1,id2] [--sheets PASTA_ABS] [--no-art]`
+  (`--sheets`: folhas de contato das artes, dia e noite; `--no-art`: só letras e folhas, sem regravar as artes).
+- Saídas: `game/assets/vehicles/dekotora/paint_t232/{mural,rear,roof}/*.png` (cor + `_emit` para a noite). Determinístico.
+- Biblioteca: `blender/scripts/lib/paint2d.py` (desenho em numpy, PNG sem metadados) e `lib/t232_*.py` (murais, traseira,
+  teto, texto, glifos, kit). Tabela única das 33 pinturas (id, nome, preço, função que desenha): `lib/t232_registry.py`.
+- Faces do baú: `lib/paint_measure.py` mede por raios na malha o retângulo de cada face (o jogo põe a arte 5 mm para fora).
+- Armadilha: o Blender desenha um glifo reserva, sem erro, quando a fonte não tem o caractere (sai "tofu").
+  Conferir os kanji com `lib/font_cmap.py` (tabela `cmap` da fonte) antes de aceitar o build.
+- Depois do build, importar as três pastas (caminho de disco, não `res://`):
+  `bash tools/import_textures_3d.sh game/assets/vehicles/dekotora/paint_t232/mural game/assets/vehicles/dekotora/paint_t232/rear game/assets/vehicles/dekotora/paint_t232/roof`
+  (VRAM + mipmaps).
+- `--batch` do Godot separa os argumentos por espaço: por isso os prints crus ficam em `blender/renders/t232/shots`
+  (caminho sem espaço). Não use pasta com espaço nesse caminho.

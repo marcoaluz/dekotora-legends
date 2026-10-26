@@ -637,3 +637,16 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Testes: `-- --only=t231` (roda `game/tests/test_parts_t231.gd`).
 - Protocolo de rede agora 16 (`game/scripts/net/protocol.gd`): pecas do lote 2 e bots com pecas sorteadas. Mudou a massa
   e o descritor: cliente antigo não entra.
+
+## Pinturas (T-232)
+
+- Encaixe: `game/scripts/truck/paint_fit.gd` (`PaintFit`, fit `"paint"`). A arte vai no `rect` do socket medido no baú,
+  com a janela de esticamento de 0,8 a 1,25 vezes a proporção da arte; a malha fica 5 mm para fora da lataria.
+- Sonda sem tela: `godot --headless --path game -s res://tools_dev/probe_t232.gd -- [--model=STEM] [--parts=id1,id2]`
+  (`tools_dev/probe_t232.gd`).
+- Capturas e folhas: `bash tools/capture_t232.sh [PASTA_ABS]` (padrão `docs/capturas_t232`; precisa de janela para os prints).
+- `shot_t231.gd` agora imprime `draw=` (chamadas de desenho) e `tri=` (triângulos) em cada print: use para ver o custo.
+- Testes: `-- --only=paint_t232` (roda `game/tests/test_paint_t232.gd`).
+- `catalog.json` (`game/assets/vehicles/dekotora/catalog.json`) é gravado pelo `tools/gen_t232_data.py` com `indent=2`.
+- Protocolo de rede 17 (`game/scripts/net/protocol.gd`): pinturas no descritor (`mural`, `rear_paint`, `roof_paint`) e
+  bots/rivais com pinturas sorteadas pela semente. Cliente antigo não entra.
