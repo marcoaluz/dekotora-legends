@@ -571,3 +571,8 @@ Formato em `docs/AGENTES.md`.
 
 ## 2026-10-26 · T-228 (ajudante-rapido, delegada da T-220) · concluída
 - APK de teste com a opção Som do motor (protocolo 15), 141 MB, commit 8992237. C: agora com 16,8 GB livres.
+
+## 2026-10-26 · T-229 (coordenador) · concluída
+- Sintoma: no APK, a aba DECORAÇÃO > PEÇAS da garagem não mostrava encaixes (teto, para-choque etc.).
+- Causa: GameState.all_parts() listava res://data/parts/ procurando "*.tres", mas no export os arquivos viram "*.tres.remap" (confirmado: 84 .tres.remap dentro do APK). No PC, com o projeto aberto, funcionava. Bug desde a fase 4; os outros 5 listadores já tiravam o ".remap".
+- Correção: trim_suffix(".remap") em all_parts(). Teste novo test_export_listing_t229.gd: peças/encaixes aparecem e nenhum script usa DirAccess.get_files_at sem tratar ".remap". 513/513 testes. Commit 49d2bd0. Delegado: T-230 (APK).
