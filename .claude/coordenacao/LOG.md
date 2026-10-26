@@ -524,3 +524,18 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 490/490; REPORT_ENCAIXE 713/713; build_sockets 0 problemas nos 5; deque de 2 níveis 62/96 duplas por modelo novo; capturas na garagem e como rival na pista (dia/noite) conferidas.
 - Armadilhas: (1) casca grande sem vértices no meio "não tinha teto" para `truck_measure` (lê vértices em fatias de 5 cm): cortar a casca a cada 10 cm (`bisect_plane`); (2) luz no teto da cabine faz o deque não encostar; (3) teto acima de ~3,15 m estoura o limite de 4,55 m do deque de 2 níveis; (4) Bash do Claude Code: heredoc com `\n` dentro de Python e comandos longos falham; scripts em arquivo.
 - Decisão pendente: preços/Fama/stats (BALANCEAMENTO T-218), rival fixo x sorteio, o que não ficou parecido (lista na resposta), nome HAYATE/銀河運輸.
+
+## 2026-10-26 · T-218 (especialista) · precisa Marco
+- 5 caminhões de homenagem (alubox, tarp, pinkbox, tanker, dump), marca fictícia HAYATE, empresa 銀河運輸, mural da gueixa próprio com emissão; 3 LODs; compra na garagem; rivais fixos do litoral/montanha/cidade; protocolo 14; 490/490 testes, encaixe 713/713.
+- Revisão do coordenador nas folhas: mural e luzes do pinkbox bons; frente das cabines genérica (pouco "cara" de cabine plana larga do original), teto baixo por limite do deque.
+- Delegado: T-224 (APK + FPS), T-225 (skills).
+
+## 2026-10-26 01:51 · T-225 · ajudante-rapido · CONCLUÍDA
+- Feito: seções T-218 acrescentadas nas skills blender-pixelart e godot-dekotora (comandos, scripts, armadilhas, flags --rival-body/--demo --body, filtro --only=homage).
+- Arquivos: .claude/skills/blender-pixelart/SKILL.md, .claude/skills/godot-dekotora/SKILL.md
+- Observação: commits 72ca820 e 28a3b88 (correção do caminho de saída dos .glb). Trailer usado: Claude Haiku 5.5 (o pedido dizia Opus 5.5, mas o modelo que executou é o Haiku).
+
+## 2026-10-26 01:56 · T-224 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste protocolo 14 (com T-218) gerado com Min/Target SDK vazios só na cópia (preset restaurado, git diff vazio); FPS do rival pinkbox × base medido; STATUS e DECISOES atualizados; commit 70443c6.
+- Arquivos: builds/kaido-bakuso-debug.apk (147.686.623 bytes, +10.541.559 vs T-223), builds/t224_export.log, builds/t224_fps_pinkbox.log, builds/t224_fps_base.log, docs/STATUS.md, docs/DECISOES.md, .claude/coordenacao/LOG.md (sem commit).
+- Observação: chamadas de desenho pinkbox 641 (mediana) × base 673; FPS muito ruidoso na janela (7 a 75); celular não testado. Trailer do commit usa Co-Authored-By Haiku 5.5 (a instrução pedia Opus 5.5; segui a atribuição do sistema).
