@@ -199,7 +199,7 @@ func _build_race(seed_: int) -> void:
 		var idx2: int = sim.add_truck(g2.x, g2.y)
 		var t: TruckSim = sim.trucks[idx2]
 		t.is_bot = true
-		var desc: Dictionary = TruckConfig.basic_descriptor()
+		var desc: Dictionary = TruckConfig.bot_descriptor(seed_ + 13 * b)     # T-231: pecas da oficina sorteadas
 		desc["body"] = BodyDef.BOT_POOL[absi(seed_ + 7 * b) % BodyDef.BOT_POOL.size()]   # T-218: sorteio pela semente
 		bot_loadouts[idx2] = desc
 		TruckConfig.apply(t, desc)

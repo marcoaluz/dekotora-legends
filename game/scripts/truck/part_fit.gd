@@ -71,11 +71,11 @@ static func design_problems(data: Dictionary) -> Array[String]:
 	var vol: Array = []
 	for k in data.get("sockets", {}):
 		var s: Dictionary = data["sockets"][k]
-		if s.has("box"):
-			vol.append([String(k), TruckSockets.aabb_of(s["box"])])
+		for b in (s.get("boxes", [s["box"]] if s.has("box") else []) as Array):   # T-231: contorno = varias caixas
+			vol.append([String(k), TruckSockets.aabb_of(b)])
 	for i in vol.size():
 		for j in range(i + 1, vol.size()):
-			if overlap(vol[i][1], vol[j][1]):
+			if vol[i][0] != vol[j][0] and overlap(vol[i][1], vol[j][1]):
 				probs.append("encaixes %s x %s se cruzam" % [vol[i][0], vol[j][0]])
 		for z in data.get("protected", {}):
 			var zv: Dictionary = data["protected"][z]
@@ -137,6 +137,18 @@ static func socket_parts(catalog: AccessoryCatalog, slots: Array = []) -> Array[
 
 ## Monta `id` no modelo e devolve os problemas (lista vazia = cabe).
 static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalog, id: String) -> Array[String]:
+	var e: Dictionary = catalog.entry(id)
+	if StripFit.handles(e):                          # T-231: pecas por modulo (foguete, contorno), os 2 lados
+		var out: Array[String] = []
+		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):
+			var sn: Node3D = catalog.attach(model, id, side)
+			if sn == null:
+				out.append("nao montou (sem SOCKET_%s)" % StripFit.socket_name(e, side))
+				continue
+			out.append_array(StripFit.problems(model, data, e, sn, side))
+			sn.get_parent().remove_child(sn)
+			sn.free()
+		return out
 	var n: Node3D = catalog.attach(model, id)
 	if n == null:
 		return ["nao montou (sem SOCKET_%s)" % String(catalog.entry(id).get("socket", "?"))]

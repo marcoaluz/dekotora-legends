@@ -8,6 +8,9 @@ const IDS: Array[String] = ["steady", "sequential", "alternate", "breathing"]
 ## Materiais de luz que piscam; lamp_red (lanterna/freio) e lamp_white (farol) ficam fixos.
 const ANIMATED: Array[String] = ["lamp_amber", "lamp_yellow", "lamp_pink", "lamp_cyan", "lamp_green", "lamp_blue", "lamp_violet",
 	"lamp_orange", "lamp_ice", "lamp_lime", "lamp_ruby"]
+## T-231: luzes que acendem a noite mas NAO piscam (lanterna das pecas da traseira); de dia ficam vermelho-escuro.
+const STEADY_LIT: Array[String] = ["lamp_tail"]
+const STEADY_FLOOR: float = 0.3
 ## T-214: sufixo do material de LED com lente (DecoStyle): o shader desenha a lente pela UV 0..1 de cada LED.
 const LENS_SUFFIX := "@lens"
 
@@ -20,6 +23,7 @@ uniform int pattern = 0;          // 0 fixas, 1 sequencial, 2 alternado, 3 respi
 uniform float level = 1.0;        // brilho geral: 1 noite/tunel, ~0.4 previa de dia, ~0.12 apagadas
 uniform float speed = 1.0;
 uniform float lens = 0.0;         // T-214: LED com lente (UV 0..1 por LED): centro forte, borda mais escura
+uniform float floor_level = 0.0;  // T-231: brilho minimo (lanterna: lente vermelha de dia)
 varying vec3 lp;
 
 void vertex() {
@@ -46,7 +50,7 @@ void fragment() {
 		float d = length(UV - vec2(0.5));
 		k *= mix(1.3, 0.42, smoothstep(0.10, 0.52, d));
 	}
-	ALBEDO = base_color.rgb * energy * level * k;
+	ALBEDO = base_color.rgb * energy * max(level, floor_level) * k;
 }
 """
 
@@ -67,7 +71,15 @@ static func make_material(src: Material) -> ShaderMaterial:
 	m.set_shader_parameter("energy", 1.6)
 	if src != null and src.resource_name.ends_with(LENS_SUFFIX):
 		m.set_shader_parameter("lens", 1.0)
+	if src != null and is_steady_lit(src.resource_name):
+		m.set_shader_parameter("lens", 1.0)
+		m.set_shader_parameter("floor_level", STEADY_FLOOR)
 	return m
+
+
+## Luz que acende a noite sem piscar (T-231)?
+static func is_steady_lit(name: String) -> bool:
+	return STEADY_LIT.has(base_name(name))
 
 
 ## Nome sem o sufixo da lente ("lamp_cyan@lens" -> "lamp_cyan").

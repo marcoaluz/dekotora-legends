@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"rocket_led"
+display_key = "part.rocket_led"
+slot = &"rocket"
+zones = PackedStringArray("roof")
+weight_kg = 70.0
+durability = 45.0
+fame = 16
+price = 20000
+accessory_id = "rocket_led"
+rarity = &"incomum"
+fame_min = 20

@@ -130,8 +130,12 @@ static func set_broken(node: Node3D, catalog: AccessoryCatalog) -> void:
 	node.visible = true
 	if not node.has_meta("broken_tilt"):              # T-214: soma a inclinacao ao assento (nao apaga escala/cisalhamento)
 		node.set_meta("broken_tilt", true)
-		var tilt: float = deg_to_rad(BROKEN_TILT_DEG) * (1.0 if node.get_instance_id() % 2 == 0 else -1.0)
-		node.transform.basis = node.transform.basis * Basis.from_euler(Vector3(deg_to_rad(3.0), 0.0, tilt))
+		# T-231: inclinacao por peca no catalogo (`broken_tilt` [x, z] em graus): o foguete so tomba de lado, o contorno
+		# do bau (no na origem do caminhao) nao inclina; as outras: 3 graus para tras e 7 de lado
+		var bt: Array = catalog.entry(String(node.get_meta("deco_id", ""))).get("broken_tilt", [3.0, BROKEN_TILT_DEG])
+		var sgn: float = 1.0 if node.get_instance_id() % 2 == 0 else -1.0
+		node.transform.basis = node.transform.basis * Basis.from_euler(Vector3(deg_to_rad(float(bt[0])), 0.0,
+				deg_to_rad(float(bt[1])) * sgn))
 	var off: StandardMaterial3D = AccessoryMaterials.make("lamp_off")
 	for mi in node.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
@@ -141,7 +145,7 @@ static func set_broken(node: Node3D, catalog: AccessoryCatalog) -> void:
 			var cur: Material = m.get_active_material(s)
 			var src: Material = m.mesh.surface_get_material(s)
 			var n: String = src.resource_name if src != null else ""
-			if n in ["deco_led", "deco_neon", "acrylic_sign", "acrylic_art"] or (cur != null and cur.resource_name.begins_with("lamp_")):
+			if n in ["deco_led", "deco_neon", "acrylic_sign", "acrylic_art"] or n.begins_with("lamp_") 					or (cur != null and cur.resource_name.begins_with("lamp_")):
 				# (o letreiro "apaga" tambem: placa escura, como uma peca sem energia)
 				m.set_surface_override_material(s, off)
 	catalog.swap_material(node, "chrome", "steel")

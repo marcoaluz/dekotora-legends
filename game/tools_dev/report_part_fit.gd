@@ -5,6 +5,70 @@ extends SceneTree
 
 const OUT := "res://../docs/REPORT_ENCAIXE.md"
 const SLOTS: Array = ["andon", "visor"]
+const LOT2: Array = ["rear_bumper", "rocket_r", "box_light_r", "box_light_l", "box_light_top"]   # T-231
+
+
+var _lot2_ok: int = 0
+var _lot2_n: int = 0
+
+
+## T-231: matriz caminhao x lote 2 (11 para-choques traseiros, 7 foguetes, 3 contornos do bau).
+func _lot2(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
+	var ids: Array[String] = PartFit.socket_parts(c, LOT2)
+	lines.append("## Matriz caminhão × lote 2 (T-231: 11 para-choques traseiros, 7 foguetes, 3 contornos do baú)")
+	lines.append("")
+	lines.append("| Caminhão | Para-choques OK | Escala | Foguetes OK | Faixa / comprimento do foguete | Contornos OK | Contorno (m: dir/esq/teto) | Falhas |")
+	lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
+	files.sort()
+	for f in files:
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
+			continue
+		var stem: String = String(f).get_basename()
+		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
+		var body: String = String(data.get("body", ""))
+		var model: Node3D = PartFit.load_model(TruckNode.MODEL_DIR + stem + ".glb", body, String(data.get("cab", "")))
+		var ok: Dictionary = {"rb": 0, "rk": 0, "bl": 0}
+		var n: Dictionary = {"rb": 0, "rk": 0, "bl": 0}
+		var here: int = 0
+		var sc: float = 0.0
+		for id in ids:
+			var e: Dictionary = c.entry(id)
+			var k: String = "rb" if String(e["socket"]) == "rear_bumper" else ("rk" if id.begins_with("rocket") else "bl")
+			if TruckSockets.socket(data, String(e["socket"])).is_empty():
+				continue                                    # so para bau fechado (graneleira, lona, tanque, cacamba)
+			n[k] += 1
+			if k == "rb":
+				sc = TruckSockets.fit_scale(data, e)
+			var probs: Array[String] = PartFit.check_part(model, data, c, id)
+			if probs.is_empty():
+				ok[k] += 1
+			else:
+				here += 1
+				fails.append("- `%s` em `%s`: %s" % [id, stem, "; ".join(probs)])
+		model.free()
+		var rk: Dictionary = TruckSockets.socket(data, "rocket_r")
+		var lens: PackedStringArray = []
+		for k2 in ["box_light_r", "box_light_l", "box_light_top"]:
+			var tot: float = 0.0
+			for g in TruckSockets.socket(data, k2).get("strips", []):
+				tot += StripFit._v(g["a"]).distance_to(StripFit._v(g["b"]))
+			lens.append("%.1f" % tot)
+		var name: String = stem.replace("dekotora_truck_", "") + (" (guardada)" if body == "carreta" else "")
+		var only_box: String = "só baú fechado"
+		lines.append("| %s | %d/%d | %.2f | %s | %s | %s | %s | %s |" % [name, ok["rb"], n["rb"], sc,
+				("%d/%d" % [ok["rk"], n["rk"]]) if n["rk"] > 0 else only_box,
+				("%.2f / %.2f m" % [float(rk["band"]), float(rk["length"])]) if not rk.is_empty() else "—",
+				("%d/%d" % [ok["bl"], n["bl"]]) if n["bl"] > 0 else only_box,
+				"/".join(lens) if n["bl"] > 0 else "—", "nenhuma" if here == 0 else str(here)])
+		_lot2_ok += int(ok["rb"]) + int(ok["rk"]) + int(ok["bl"])
+		_lot2_n += int(n["rb"]) + int(n["rk"]) + int(n["bl"])
+	lines.append("")
+	lines.append("Lote 2: **%d de %d** combinações cabem. Para-choque traseiro: largura do baú, atrás de tudo o que fica" % [_lot2_ok, _lot2_n])
+	lines.append("embaixo dele (substitui o para-choque e as lanternas de fábrica de baixo: leva lanternas próprias e a caixa da")
+	lines.append("placa), topo a 0,93 m (abaixo das setas). Foguete e contorno: faixas medidas por raios na lataria real")
+	lines.append("(`truck_measure.box_edges`); conferidos vértice a vértice (`StripFit.problems`).")
+	lines.append("")
 
 
 func _initialize() -> void:
@@ -69,6 +133,11 @@ func _initialize() -> void:
 	lines.append("")
 	lines.append("**Total: %d de %d combinações cabem** (peça dentro da caixa, fora da lataria e de toda zona protegida)." % [total_ok, total])
 	lines.append("")
+	_lot2(c, lines, fails)
+	total_ok += _lot2_ok
+	total += _lot2_n
+	lines.append("**Total geral (lotes 1 e 2): %d de %d combinações cabem.**" % [total_ok, total])
+	lines.append("")
 	lines.append("## Falhas")
 	lines.append("")
 	if fails.is_empty():
@@ -83,7 +152,8 @@ func _initialize() -> void:
 	lines.append_array(zones_txt)
 	lines.append("")
 	lines.append("Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo")
-	lines.append("leva a seta junto) para `front_bumper`; `rear_plate` para `rear_bumper`; rodas para `hubcaps`.")
+	lines.append("leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da")
+	lines.append("placa próprias) para `rear_bumper`; rodas para `hubcaps`.")
 	lines.append("")
 	var fa := FileAccess.open(ProjectSettings.globalize_path(OUT), FileAccess.WRITE)
 	fa.store_string("\n".join(lines) + "\n")

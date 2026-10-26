@@ -72,6 +72,8 @@ func attach(truck_model: Node3D, id: String, side: String = "R") -> Node3D:
 	if mirror and side == "L":
 		mount_name = String(e["mount_point_left"])
 	var mount: Node = truck_model.find_child(mount_name, true, false)
+	if mount == null and e.has("socket"):            # T-231: encaixe que este caminhao nao tem (ex.: foguete na graneleira)
+		return null
 	if mount == null:
 		push_warning("AccessoryCatalog: ponto de montagem ausente: %s (peca %s)" % [mount_name, id])
 		return null
@@ -82,7 +84,9 @@ func attach(truck_model: Node3D, id: String, side: String = "R") -> Node3D:
 	mount.add_child(node)
 	if mirror and side == "L":
 		node.scale = Vector3(-1, 1, 1)
-	if mount.has_meta("sockets"):                     # T-211: encaixe por caminhao, escala pela largura (TruckSockets)
+	if mount.has_meta("sockets") and StripFit.handles(e):   # T-231: foguete/contorno no tamanho do bau (modulos)
+		StripFit.apply(node, mount.get_meta("sockets"), e, side)
+	elif mount.has_meta("sockets"):                   # T-211: encaixe por caminhao, escala pela largura (TruckSockets)
 		node.scale = Vector3.ONE * TruckSockets.fit_scale(mount.get_meta("sockets"), e)
 		SocketSeat.seat(node, mount as Node3D, mount.get_meta("sockets"), e)   # T-214: assenta no teto/testa real
 	return node

@@ -4,7 +4,7 @@ extends RefCounted
 ## pecas antigas, troca de cor L/R com preco (DecoColorDef) e letreiro de nomes prontos; e o botao De dia/De noite
 ## no topo do encaixe (como nas capturas: ver as luzes acesas).
 
-const DAY_NIGHT_SLOTS: Array[String] = ["andon", "visor"]
+const DAY_NIGHT_SLOTS: Array[String] = ["andon", "visor", "rear_bumper", "rocket", "box_light_r", "box_light_l", "box_light_top"]
 const RARITY_COLOR: Dictionary = {"comum": Color("#c9d2e3"), "incomum": Color("#3dff7a"), "rara": Color("#21e6ff"),
 		"lendaria": Color("#f0b83a")}
 

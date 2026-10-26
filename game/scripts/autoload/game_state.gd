@@ -222,8 +222,9 @@ func parts_for_slot(slot: String) -> Array[PartDef]:
 
 
 const SLOT_ORDER: Array[String] = ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "visor",
-	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
-	"side_box", "side_ornament", "mural", "hubcaps", "rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament"]
+	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "rocket", "box_light_top", "body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
+	"side_box", "side_ornament", "mural", "box_light_r", "box_light_l", "hubcaps", "rear_bumper", "rear_lamps", "plate", "mudflaps",
+	"rear_ornament"]
 
 
 ## Slots na ordem logica do caminhao (frente -> teto -> laterais -> traseira).
@@ -508,7 +509,7 @@ func installed_part_defs() -> Array[PartDef]:
 		if String(slot) == DeckStack.SLOT or RetiredParts.has(String(profile["installed"][slot])):
 			continue
 		var d: PartDef = part(String(profile["installed"][slot]))
-		if d != null:
+		if d != null and part_fits_truck(d):         # T-231: foguete/contorno so em bau fechado (guardado nos outros)
 			out.append(d)
 	if stack_ok():                                   # T-215: 2o nivel do deque, so se cabe neste caminhao
 		var t: PartDef = part(top_id())
@@ -522,6 +523,15 @@ func installed_part_defs() -> Array[PartDef]:
 ## Peca guardada no 2o nivel do deque ("" = nenhuma). Pode estar guardada sem caber (outra cabine): ver stack_ok().
 func top_id() -> String:
 	return String((profile["installed"] as Dictionary).get(DeckStack.SLOT, ""))
+
+
+## A peca tem lugar neste caminhao? Pecas da oficina so montam se o encaixe existe (T-231: foguete e contorno so
+## em bau fechado; na graneleira/lona/tanque/cacamba ficam guardadas, sem aparecer nem contar). Classicas: sempre.
+func part_fits_truck(d: PartDef) -> bool:
+	var e: Dictionary = AccessoryCatalog.get_instance().entry(d.accessory_id)
+	if not e.has("socket"):
+		return true
+	return (truck_sockets().get("sockets", {}) as Dictionary).has(String(e["socket"]))
 
 
 ## Dados de encaixe do caminhao do perfil (carroceria + cabine).

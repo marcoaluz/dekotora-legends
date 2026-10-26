@@ -123,7 +123,10 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		GarageDeckStack.build(box, gs, flash)
 	var inst: String = gs.installed_id(slot)
 	var base: Dictionary = preview.call({})
-	for d in gs.parts_for_slot(slot):
+	var plist: Array[PartDef] = gs.parts_for_slot(slot)
+	if not plist.is_empty() and not gs.part_fits_truck(plist[0]):       # T-231: foguete/contorno so em bau fechado
+		box.add_child(wl(Tr.t("garage.box_only"), 14, UiTheme.BAD))
+	for d in plist:
 		box.add_child(part_card(d, d.id == StringName(inst), base))
 	if inst != "":
 		var rm: Button = small_button(Tr.t("garage.remove"))

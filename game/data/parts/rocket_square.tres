@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"rocket_square"
+display_key = "part.rocket_square"
+slot = &"rocket"
+zones = PackedStringArray("roof")
+weight_kg = 65.0
+durability = 50.0
+fame = 11
+price = 13000
+accessory_id = "rocket_square"
+rarity = &"comum"
+fame_min = 0

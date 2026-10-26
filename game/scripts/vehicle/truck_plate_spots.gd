@@ -36,7 +36,27 @@ static func spots(truck: Node3D, model: Node3D, cab: String) -> Array:
 		front = PlateSpot.plate_transform(tms, fy, size, true, front_z)
 	var rear_on: bool = rear_mount == null or rear_mount.get_child_count() == 0   # placa decorativa (rear_plate_custom) toma o lugar
 	var rear: Transform3D = PlateSpot.plate_transform(tms, ry, size, false, 0.06)
+	var rh: Dictionary = _rear_holder(truck, model)
+	if not rh.is_empty():                                   # T-231: para-choque traseiro da oficina com caixa da placa
+		var rb: AABB = rh["box"]
+		var rs: float = minf(minf(size.x, rb.size.x * 0.92), rb.size.y * 2.0 * 1.05)
+		var rc: Vector3 = rb.get_center()
+		rear = Transform3D(Basis.from_scale(Vector3(rs, rs * 0.5, 1.0)), Vector3(rc.x, rc.y, rb.end.z + PlateSpot.GAP))
+		rear_on = true
 	return [front, rear, rear_on]
+
+
+## Fundo branco da caixa da placa ("deco_plate") de uma peca montada no para-choque traseiro da oficina, se houver.
+static func _rear_holder(truck: Node3D, model: Node3D) -> Dictionary:
+	var rb: Node = model.find_child("SOCKET_rear_bumper", true, false)
+	if rb == null:
+		return {}
+	for mi in rb.find_children("*deco_plate*", "MeshInstance3D", true, false):
+		var m: MeshInstance3D = mi as MeshInstance3D
+		if m.mesh == null or not m.visible or PlateSpot.dying(m, model):
+			continue
+		return {"box": PlateSpot.rel_transform(m, truck) * m.mesh.get_aabb()}
+	return {}
 
 
 ## Retangulo branco ("paint_white") de uma peca montada no para-choque dianteiro, se houver.

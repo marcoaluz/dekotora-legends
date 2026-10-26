@@ -64,6 +64,30 @@ static func apply(t: TruckSim, desc: Dictionary) -> void:
 	t.refresh_damage_effects()
 
 
+## T-231: pecas da oficina que os bots sorteiam (para-choque traseiro com lanternas sempre; foguete em 1 de 3).
+const BOT_REAR: Array[String] = ["rb_square_row", "rb_round_twin", "rb_square_grid", "rb_neon_rows", "rb_target", "rb_bullet"]
+const BOT_ROCKET: Array[String] = ["rocket_round", "rocket_neon_dash", "rocket_led"]
+
+
+## Pecas de um bot pela semente (mesma semente = mesmas pecas no servidor e em todos os clientes).
+static func bot_part_ids(seed_: int) -> Array[String]:
+	var k: int = absi(seed_)
+	var out: Array[String] = ["fb_basic", BOT_REAR[k % BOT_REAR.size()]]
+	if k % 3 == 0:
+		out.append(BOT_ROCKET[(k / 3) % BOT_ROCKET.size()])
+	return out
+
+
+## Descritor de bot com as pecas sorteadas pela semente (T-231).
+static func bot_descriptor(seed_: int) -> Dictionary:
+	var d: Dictionary = basic_descriptor()
+	var parts: Array = []
+	for id in bot_part_ids(seed_):
+		parts.append({"id": id})
+	d["parts"] = parts
+	return d
+
+
 ## Caminhao basico de bot (para-choques simples).
 static func basic_descriptor() -> Dictionary:
 	return {"parts": [{"id": "fb_basic"}, {"id": "rb_basic"}], "engine": "eng_i6_std", "turbo": "turbo_none", "exhaust": "exh_std", "jake": false,

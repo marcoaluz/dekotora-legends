@@ -161,8 +161,9 @@ func mural_glow() -> float:
 ## Padrao de pisca: "steady" (fixas), "sequential" (onda correndo), "alternate" (grupos alternando) ou "breathing".
 func set_light_pattern(pattern: String) -> void:
 	_pattern = pattern if pattern in LightPatterns.IDS else "steady"
-	for m in _lamp_mats.values():
-		(m as ShaderMaterial).set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
+	for k in _lamp_mats:
+		if not LightPatterns.is_steady_lit(String(k)):   # T-231: lanterna (lamp_tail) acende mas nao pisca
+			(_lamp_mats[k] as ShaderMaterial).set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
 
 
 ## Troca os materiais das luzinhas (lamp_amber/yellow/pink/cyan) de `root` pelo material animado do padrao.
@@ -174,13 +175,13 @@ func _apply_light_materials(root: Node) -> void:
 			continue
 		for s in m.mesh.get_surface_count():
 			var cur: Material = m.get_active_material(s)
-			if cur == null or not cur.resource_name.begins_with("lamp_") or not LightPatterns.is_animated(cur.resource_name):
+			if cur == null or not cur.resource_name.begins_with("lamp_") or not (LightPatterns.is_animated(cur.resource_name) 					or LightPatterns.is_steady_lit(cur.resource_name)):
 				continue
 			var key: String = cur.resource_name
 			if not _lamp_mats.has(key):
 				var sm: ShaderMaterial = LightPatterns.make_material(cur)
 				sm.set_shader_parameter("level", _lights_level)
-				sm.set_shader_parameter("pattern", LightPatterns.IDS.find(_pattern))
+				sm.set_shader_parameter("pattern", 0 if LightPatterns.is_steady_lit(key) else LightPatterns.IDS.find(_pattern))
 				_lamp_mats[key] = sm
 			m.set_surface_override_material(s, _lamp_mats[key])
 
@@ -460,6 +461,7 @@ func _finish_part(n: Node3D, d: PartDef, entry: Dictionary, styles: Dictionary) 
 	_apply_light_materials(n)
 	if DecoStyle.is_deco(entry):
 		n.set_meta("deco", true)
+		n.set_meta("deco_id", d.accessory_id)       # T-231: a peca quebrada le a inclinacao dela no catalogo
 
 
 ## Peca do 2o nivel do deque (T-215): filha da peca de baixo, em cima dela. Confere de novo se cabe NESTE caminhao (o

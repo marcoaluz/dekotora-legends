@@ -533,7 +533,7 @@ func _spawn_field() -> void:
 				paint = rival.paint
 				diff = rival.difficulty
 			else:
-				for pid in ["fb_basic", "rb_basic"]:
+				for pid in TruckConfig.bot_part_ids(i * 7 + base_diff):    # T-231: para-choque traseiro/foguete da oficina
 					defs.append(gs.part(pid))
 			var parts: Array[Dictionary] = []
 			for d in defs:

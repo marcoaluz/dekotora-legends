@@ -44,6 +44,9 @@ const DEFS: Dictionary = {
 	"lamp_ice": {"c": "#dff4ff", "emit": 2.5},                  # branco frio (o lamp_white e o farol, fixo)
 	"lamp_lime": {"c": "#b6ff2e", "emit": 2.5},
 	"lamp_ruby": {"c": "#ff2d4a", "emit": 2.5},                 # vermelho que pisca (o lamp_red e a lanterna, fixo)
+	# T-231: lanterna das pecas da traseira (acende a noite, nao pisca) e fundo da caixa da placa
+	"lamp_tail": {"c": "#ff2a2a", "emit": 2.5},
+	"deco_plate": {"c": "#e9eef5", "metal": 0.0, "rough": 0.5},
 }
 
 ## Textura de detalhe da estrutura das pecas da oficina (T-214, blender/scripts/t214_textures.py): metal escovado,

@@ -14,6 +14,8 @@ const FOCUS: Dictionary = {   # alvo no mundo Godot (x, y, -z do Blender), dista
 	"rear": {"target": Vector3(0, 1.8, -0.8), "dist": 10.0, "az": 158.0, "el": 11.0},
 	"wheel": {"target": Vector3(1.0, 0.8, -9.6), "dist": 7.0, "az": 100.0, "el": 5.0},
 	"top": {"target": Vector3(0, 2.6, -6.0), "dist": 17.0, "az": 20.0, "el": 58.0},     # T-211: conferencia de cima
+	"box_roof": {"target": Vector3(0, 3.0, -3.5), "dist": 13.0, "az": 150.0, "el": 32.0}, # T-231: teto do bau por tras
+	"side_l": {"target": Vector3(-0.6, 1.8, -5.0), "dist": 15.5, "az": -95.0, "el": 7.0},  # T-231: lado esquerdo
 }
 const SLOT_FOCUS: Dictionary = {
 	"front_bumper": "front", "front_lip": "front", "grille": "front", "front_trim": "front", "front_ornament": "front",
@@ -22,6 +24,7 @@ const SLOT_FOCUS: Dictionary = {
 	"body_ornament": "roof", "andon": "roof", "side_skirts": "side", "fenders": "side", "steps": "side", "side_trim": "side",
 	"side_box": "side", "side_ornament": "side", "mural": "side", "hubcaps": "wheel", "rear_bumper": "rear",
 	"rear_lamps": "rear", "plate": "rear", "mudflaps": "rear", "rear_ornament": "rear",
+	"rocket": "box_roof", "box_light_top": "box_roof", "box_light_r": "side", "box_light_l": "side_l",
 }
 ## Velocidade de mentira das rodas em "Ver em movimento" (m/s; ~1 volta a cada 3 s).
 const WHEEL_VIEW_SPEED: float = 1.0

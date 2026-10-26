@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"rb_bullet"
+display_key = "part.rb_bullet"
+slot = &"rear_bumper"
+zones = PackedStringArray("rear")
+weight_kg = 270.0
+durability = 170.0
+fame = 30
+price = 44000
+accessory_id = "rb_bullet"
+rarity = &"rara"
+fame_min = 60

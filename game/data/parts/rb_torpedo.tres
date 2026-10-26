@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"rb_torpedo"
+display_key = "part.rb_torpedo"
+slot = &"rear_bumper"
+zones = PackedStringArray("rear")
+weight_kg = 300.0
+durability = 170.0
+fame = 36
+price = 52000
+accessory_id = "rb_torpedo"
+rarity = &"lendaria"
+fame_min = 120
