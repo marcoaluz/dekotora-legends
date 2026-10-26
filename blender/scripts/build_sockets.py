@@ -65,17 +65,19 @@ def build_one(path: str) -> dict:
     m["open_body"] = body in OPEN_BODIES
     m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
     m["edges"] = TM.box_edges(data, m)                          # T-231: traseira, foguete e contorno do baú
+    m["front"] = TM.front_side(data, m)                         # T-233: frente, retrovisor e saias
     st = stacks(body, cab)
     zones = R.protected_zones(m, cab, st)
     m["paint"] = PM.paint_faces(data, m, m["edges"], zones["rear_doors"]["box"]) if "rear_doors" in zones else {}   # T-232
     sk = R.sockets(m, st)
+    R.clear_mirror(sk, zones)                                   # T-233: haste por fora da viseira/lanterna da quina
     probs = R.check(sk, zones)
     probs += [f"{k}: {v['problem']}" for k, v in sk.items() if "problem" in v]
     out = {
         "model": stem, "body": body, "cab": cab, "version": 1,
         "units": "metros; Godot: x direita, y cima, frente = -z, traseira do bau em z = 0",
         "scale_limits": [R.SCALE_MIN, R.SCALE_MAX],
-        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges", "paint")},
+        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges", "paint", "front")},
         "sockets": sk, "protected": zones, "design_problems": probs,
         "surfaces": stem + ".surf.json",
     }
@@ -102,6 +104,10 @@ def build_one(path: str) -> dict:
             tot = sum(sum((g["b"][i] - g["a"][i]) ** 2 for i in range(3)) ** 0.5 for g in sk[k]["strips"])
             txt += f" | {k} {len(sk[k]['strips'])} trechos {tot:.1f} m"
     print(f"[sockets] {stem:34s} {txt}")
+    fb, mr, sr = sk.get("front_bumper", {}), sk.get("mirror_stay_r", {}), sk.get("side_skirts_r", {})
+    print(f"[sockets] {stem:34s} T-233 para-choque altura {fb.get('height', 0):.2f} costas z {fb.get('anchor', [0, 0, 0])[2]:.2f}"
+          f" | retrovisor lado x {mr.get('anchor', [0])[0]:.2f} vidro {mr.get('window_h', 0):.2f} m espelho de fabrica {'sim' if mr.get('hide') else 'nao'}"
+          f" | saia dir {[r for r in sr.get('runs', [])]} | escada {sk.get('ladder_r', {}).get('anchor')}")
     for k in ("mural_r", "mural_l", "rear_paint", "roof_paint"):
         r = sk.get(k, {}).get("rect")
         if r:

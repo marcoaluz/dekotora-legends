@@ -439,3 +439,110 @@ def box_edges(data: dict, m: dict) -> dict:
                                  "z1": round(float(zs[j1 - 1]) + EDGE_STEP / 2 - 0.005, 3),
                                  "top": round(top + roof_plane, 3)}
     return out
+
+
+# ----------------------------------------------------------------------------- frente, retrovisor, escada e saias (T-233)
+
+FB_FLOOR = 0.16                   # m: altura mínima do para-choque da frente (vão livre)
+FB_DEPTH = 0.62                   # m: quanto o para-choque novo pode avançar além do nariz de fábrica
+FB_SIDE = 0.15                    # m: quanto ele pode passar da largura da cabine de cada lado
+MIRROR_REACH = 0.50               # m: quanto a haste do retrovisor pode sair da lateral da cabine (decisão T-233)
+MIRROR_AHEAD = 0.60               # m: quanto ela pode avançar além da frente da cabine
+SKIRT_DEPTH = 0.10                # m: espessura máxima reservada à saia
+SKIRT_OUT = 0.03                  # m: quanto a saia pode passar da lateral do baú
+SKIRT_H = 0.46                    # m: altura máxima da saia (embaixo do baú)
+SKIRT_MIN = 0.60                  # m: trecho livre mais curto que isto não leva saia
+
+
+def front_side(data: dict, m: dict) -> dict:
+    """Medidas da frente e das laterais (T-233), em coordenadas do Godot, por raios na malha real (BVH) e vértices:
+    - nose: z do ponto mais à frente da lataria embaixo da linha dos faróis (o para-choque novo encosta ali, na frente
+      do de fábrica, que ele cobre) e o topo permitido (3 cm abaixo do farol/lanterna mais baixo);
+    - mirror_r/l: espelho de fábrica (caixa dos vértices fora da lateral da cabine, na altura do para-brisa: o jogo
+      esconde esses triângulos quando a haste nova está montada), a lateral da cabine na coluna do para-brisa e o
+      ponto de montagem da haste;
+    - skirt_r/l: faixa da saia embaixo do baú (da lateral do baú para dentro) e os trechos livres entre as rodas
+      (tanque, bateria e degraus de fábrica ficam fora: a saia para antes deles)."""
+    from mathutils import Vector
+    objs = data["objs"]
+    c = m["cab"]
+    tree = _bvh()
+    out = {}
+    hw = c["half_w"]
+    lamps = [b[0][1] for k in ("headlights", "front_lamps") for b in m[k].values()]
+    top = round(min(lamps or [0.88]) - 0.03, 3)
+    # --- nariz: raios de frente numa grade x × y
+    zf = c["front_z"] - 3.0
+    nose = 99.0
+    x = -(hw + FB_SIDE)
+    while x <= hw + FB_SIDE + 1e-6:
+        y = FB_FLOOR
+        while y <= top + 1e-6:
+            hit = tree.ray_cast(Vector((x, -zf, y)), Vector((0, -1, 0)))
+            if hit[0] is not None:
+                nose = min(nose, -hit[0].y)
+            y += 0.02
+        x += 0.02
+    out["nose"] = {"z": round(nose, 3), "top_y": top, "floor_y": FB_FLOOR, "half_w": round(hw + FB_SIDE, 3)}
+    # --- retrovisor
+    w0, w1 = c["windshield"]
+    d0 = c["door"]["z"][0]
+    allv = _cat(objs, [k for k in objs if not k.startswith("wheel_")])
+    y_lo, y_hi = w0[1] - 0.25, w1[1] + 0.20
+    zmin = round(min(c["front_z"], w0[2]) - MIRROR_AHEAD, 3)
+    for side, sx in (("r", 1), ("l", -1)):
+        sel = allv[(allv[:, 0] * sx > hw + 0.025) & (allv[:, 1] >= w0[1] - 0.45) & (allv[:, 1] <= c["roof_shell_y"] + 0.1)
+                   & (allv[:, 2] >= c["front_z"] - 0.3) & (allv[:, 2] <= d0 + 0.8)]
+        stock = None
+        if len(sel):
+            stock = [[round(float(v) - 0.01, 3) for v in sel.min(0)], [round(float(v) + 0.01, 3) for v in sel.max(0)]]
+        # lateral da cabine junto à coluna (sem o espelho de fábrica)
+        near = allv[(allv[:, 0] * sx > 0.5) & (allv[:, 1] >= y_lo) & (allv[:, 1] <= y_hi) & (allv[:, 2] >= zmin) & (allv[:, 2] <= d0)]
+        if stock is not None and len(near):
+            inside = np.all((near >= np.array(stock[0])) & (near <= np.array(stock[1])), axis=1)
+            near = near[~inside]
+        x_side = float((near[:, 0] * sx).max()) if len(near) else hw
+        out["mirror_" + side] = {"stock": stock, "x_side": round(x_side, 3), "y": [round(y_lo, 3), round(y_hi, 3)],
+                                 "z": [zmin, round(d0 - 0.02, 3)],
+                                 "anchor": [round(sx * x_side, 3), round(w0[1], 3), round(w0[2], 3)],
+                                 "window_h": round(w1[1] - w0[1], 3)}
+    # --- saias: faixa embaixo do baú, trechos livres entre a roda da frente e a primeira de trás (raios de fora)
+    bx = m.get("box")
+    if bx:
+        y_hi = round(bx["bottom_y"] - 0.02, 3)
+        y_lo = round(max(0.26, y_hi - SKIRT_H), 3)
+        fw = [b for n, b in m["wheels"].items() if n.startswith("wheel_f")]
+        rw = [b for n, b in m["wheels"].items() if n.startswith("wheel_r")]
+        za = max(b[1][2] for b in fw) + 0.08
+        zb = min(b[0][2] for b in rw) - 0.08
+        for side, sx in (("r", 1), ("l", -1)):
+            # linha de fora do chassi em cada célula (raio de fora): o que é fino e corre o vão inteiro (trilho de
+            # fábrica, longarina) fica atrás da saia; o que sai mais que a mediana (tanque, bateria, degrau) a saia
+            # contorna (o trecho para antes dele)
+            cells = []
+            z = za
+            while z < zb - 1e-6:
+                mx = -9.0
+                for yy in np.arange(y_lo, y_hi + 1e-6, 0.04):
+                    for dz in (0.005, 0.025, 0.045):
+                        hit = tree.ray_cast(Vector((sx * 3.0, -(z + dz), float(yy))), Vector((-sx, 0, 0)), 3.0)
+                        if hit[0] is not None:
+                            mx = max(mx, hit[0].x * sx)
+                cells.append((round(z, 3), mx))
+                z += 0.05
+            line = float(np.median([c[1] for c in cells])) if cells else 0.0
+            x_out = round(bx["half_w"] + SKIRT_OUT, 3)
+            x_in = round(max(line + 0.008, x_out - SKIRT_DEPTH), 3)
+            x_out = max(x_out, round(x_in + 0.04, 3))
+            runs, start = [], None
+            for zc, mx in cells + [(round(z, 3), 99.0)]:
+                b = mx > x_in - 0.002
+                if not b and start is None:
+                    start = zc
+                elif b and start is not None:
+                    if zc - start >= SKIRT_MIN:
+                        runs.append([round(start + 0.01, 3), round(zc - 0.01, 3)])
+                    start = None
+            out["skirt_" + side] = {"x_in": x_in, "x_out": x_out, "y": [y_lo, y_hi], "runs": runs,
+                                    "span": [round(za, 3), round(zb, 3)], "line": round(line, 3)}
+    return out

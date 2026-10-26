@@ -124,6 +124,15 @@ func _mount(j: Dictionary) -> void:
 		"roof": [Vector3(0.01, 16.0, mid + 0.01), Vector3(0.0, 3.0, mid)],
 		"roof_corner": [Vector3(-2.6, 4.6, 1.8), Vector3(-1.0, 3.2, -0.6)],
 		"roof_front": [Vector3(-2.8, 4.8, front + 1.2), Vector3(-0.8, 3.2, front + 3.6)],
+		# T-233: frente (para-choque, retrovisor), escada e saia
+		"front34": [Vector3(-4.6, 1.5, front - 5.2), Vector3(0.0, 1.1, front + 0.9)],
+		"front_low": [Vector3(0.0, 1.3, front - 6.5), Vector3(0.0, 1.05, front)],
+		"cab34": [Vector3(-6.0, 3.4, front - 4.6), Vector3(0.0, 2.0, front + 1.6)],
+		"ladder34": [Vector3(-5.2, 3.6, front - 2.4), Vector3(-1.2, 2.0, front + 3.6)],
+		"skirt": [Vector3(-9.5, 1.3, mid + 1.0), Vector3(0.0, 0.8, mid + 1.0)],
+		"skirt34": [Vector3(-6.5, 1.6, front + 0.5), Vector3(-1.0, 0.7, mid + 1.5)],
+		"skirt_close": [Vector3(3.6, 0.9, mid - 0.5), Vector3(1.2, 0.5, mid + 0.6)],
+		"skirt_top": [Vector3(3.2, 3.0, mid + 0.6), Vector3(1.2, 0.5, mid + 0.6)],
 	}
 	var v: Array = views.get(String(j["view"]), views["back34"])
 	_world.add_child(cam)

@@ -18,6 +18,10 @@ SCALE_MIN, SCALE_MAX = 0.85, 1.15  # escala automática "uniform"
 ROCKET_H = 0.38                    # m: altura máxima do foguete acima do teto do baú (T-231)
 RB_DEPTH = 0.55                    # m: fundo máximo do para-choque traseiro com as lanternas (T-231)
 STRIP_W, STRIP_T = 0.025, 0.03     # m: largura e espessura reservadas ao contorno de LED (T-231)
+LADDER_OUT = 0.16                  # m: quanto a escada sai da lateral do baú (por fora do contorno), T-233
+TM_FB_DEPTH = 0.62                 # = truck_measure.FB_DEPTH (para-choque da frente, T-233)
+TM_MIRROR_REACH = 0.50             # = truck_measure.MIRROR_REACH (haste do retrovisor, T-233)
+SKIRT_MIN = 0.60                   # = truck_measure.SKIRT_MIN
 # Encaixes que só existem em baú fechado (a graneleira é aberta).
 # T-232: o mural também (a graneleira/lona/tanque/caçamba não têm lateral de baú fechado)
 BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint",
@@ -95,18 +99,36 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         vhw = min(c["visor_half_w"], hw)
         s["visor"] = {"box": _box(-vhw, vy0, vb - 0.6, vhw, min(c["roof_y"], w1[1] + 0.45), vb + 0.06),
                       "anchor": [0.0, round(vy0 + 0.005, 3), round(vb + 0.03, 3)], "width": round(2 * vhw, 3), "fit": "uniform"}
-    # retrovisor (haste): quina da frente, para fora da cabine, na frente da porta
+    # retrovisor (haste): T-233 medido nos .glb (truck_measure.front_side): da lateral da cabine junto à coluna do
+    # para-brisa até MIRROR_REACH para fora, da borda de baixo do vidro - 0,25 até a de cima + 0,20, da frente da
+    # cabine - MIRROR_AHEAD até a porta; o espelho de fábrica (caixa `hide`) some quando a haste nova está montada
     d = c["door"]
+    fs = m.get("front")
     for side, sx in (("r", 1), ("l", -1)):
-        b = _box(sx * (hw + 0.02), w0[1] - 0.25, c["front_z"] - 0.9, sx * (hw + 0.75), w1[1] + 0.25, d["z"][0] - 0.02)
-        s["mirror_stay_" + side] = {"box": b, "anchor": [sx * round(hw + 0.02, 3), round(w0[1], 3), round(c["front_z"], 3)],
-                                    "width": round(2 * hw, 3), "fit": "uniform"}
-    # para-choque da frente: embaixo dos faróis e lanternas
+        if fs:
+            mr = fs["mirror_" + side]
+            xs = mr["x_side"]
+            b = _box(sx * (xs + 0.004), mr["y"][0], mr["z"][0], sx * (xs + TM_MIRROR_REACH), mr["y"][1], mr["z"][1])
+            s["mirror_stay_" + side] = {"box": b, "anchor": mr["anchor"], "width": round(2 * hw, 3), "fit": "stay",
+                                        "window_h": mr["window_h"], "hide": mr["stock"]}
+        else:
+            b = _box(sx * (hw + 0.02), w0[1] - 0.25, c["front_z"] - 0.9, sx * (hw + 0.75), w1[1] + 0.25, d["z"][0] - 0.02)
+            s["mirror_stay_" + side] = {"box": b, "anchor": [sx * round(hw + 0.02, 3), round(w0[1], 3), round(c["front_z"], 3)],
+                                        "width": round(2 * hw, 3), "fit": "uniform"}
+    # para-choque da frente: T-233 encosta na FRENTE do nariz de fábrica (que ele cobre), embaixo dos faróis e lanternas;
+    # ponto = topo, centro, costas (a peça cresce para a frente e para baixo e encolhe a altura do meio onde o farol é baixo)
     lamp_y = min([b[0][1] for k in ("headlights", "front_lamps") for b in m[k].values()] or [0.85])
     fz = c["front_z"]
     fb = m["mounts"].get("MOUNT_FRONT_BUMPER", [0, 0.5, fz])
-    s["front_bumper"] = {"box": _box(-(hw + 0.15), 0.16, fb[2] - 0.65, hw + 0.15, lamp_y - 0.03, fb[2] + 0.12),
-                         "anchor": [0.0, round(fb[1], 3), round(fb[2], 3)], "width": round(2 * hw, 3), "fit": "uniform"}
+    if fs:
+        ns = fs["nose"]
+        back = round(ns["z"] - 0.004, 3)
+        s["front_bumper"] = {"box": _box(-ns["half_w"], ns["floor_y"], back - TM_FB_DEPTH, ns["half_w"], ns["top_y"], back),
+                             "anchor": [0.0, ns["top_y"], back], "width": round(2 * hw, 3), "fit": "bumper",
+                             "height": round(ns["top_y"] - ns["floor_y"], 3)}
+    else:
+        s["front_bumper"] = {"box": _box(-(hw + 0.15), 0.16, fb[2] - 0.65, hw + 0.15, lamp_y - 0.03, fb[2] + 0.12),
+                             "anchor": [0.0, round(fb[1], 3), round(fb[2], 3)], "width": round(2 * hw, 3), "fit": "uniform"}
     # grade: entre os faróis, do para-choque até embaixo do para-brisa
     inner = min([abs(b[1][0]) if b[1][0] < 0 else abs(b[0][0]) for b in m["headlights"].values()] + [0.8])
     s["grille"] = {"box": _box(-(inner - 0.04), lamp_y, fz - 0.11, inner - 0.04, w0[1] - 0.05, fz + 0.12),
@@ -123,13 +145,14 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         bh, top, bot, bf, rz = bx["half_w"], bx["top_y"], bx["bottom_y"], bx["front_z"], bx["rear_z"]
         ed = m.get("edges", {})
         # escada: na lateral do baú, logo atrás da quina da frente (e atrás dos escapamentos); T-231: por fora do
-        # contorno de LED da lateral
+        # contorno de LED da lateral; T-233: encostada nele (4 mm de folga), do fundo ao topo do baú
         lz0 = max(bf + 0.08, stack_zmax + 0.03)
         for side, sx in (("r", 1), ("l", -1)):
             segs = ed.get("strips", {}).get("box_light_" + side, [])
-            lx = max([bh + 0.04] + [abs(g["a"][0]) + STRIP_T + 0.01 for g in segs])
-            s["ladder_" + side] = {"box": _box(sx * lx, bot, lz0, sx * (lx + 0.28), top, lz0 + 0.34),
-                                   "anchor": [sx * round(lx, 3), round(bot, 3), round(lz0 + 0.17, 3)], "fit": "stretch_y"}
+            lx = max([bh + 0.01] + [abs(g["a"][0]) + STRIP_T + 0.004 for g in segs])
+            s["ladder_" + side] = {"box": _box(sx * lx, bot, lz0, sx * (lx + LADDER_OUT), top, lz0 + 0.34),
+                                   "anchor": [sx * round(lx, 3), round(bot, 3), round(lz0 + 0.17, 3)], "fit": "ladder",
+                                   "height": round(top - bot, 3)}
         if not m.get("open_body"):
             # T-231: foguete = uma faixa em cada borda do teto (entre o andon de fábrica do teto e a borda), medida por
             # raios; a peça estica no comprimento (fit "stretch") e encolhe na largura da faixa
@@ -148,14 +171,20 @@ def sockets(m: dict, extra_stacks: list) -> dict:
                 if not segs:
                     continue
                 s[k] = {"anchor": [0.0, 0.0, 0.0], "strips": segs, "boxes": [strip_box(g) for g in segs], "fit": "strips"}
-        # saia lateral: embaixo do baú, entre a roda da frente e a 1ª de trás
-        fw = [b for n, b in m["wheels"].items() if n.startswith("wheel_f")]
-        rw = [b for n, b in m["wheels"].items() if n.startswith("wheel_r")]
-        z0 = max(max(b[1][2] for b in fw) + 0.08, stack_zmax + 0.03)
-        z1 = min(b[0][2] for b in rw) - 0.08
+        # saia lateral (T-233): embaixo do baú, na faixa da lateral do baú para dentro, só nos trechos livres entre a
+        # roda da frente e a 1ª de trás (tanque, bateria e degraus de fábrica ficam de fora: medido por raios); uma caixa
+        # por trecho. Ponto = lado de fora, topo, z = 0 (cada trecho tem z próprio; o jogo monta um pedaço por trecho,
+        # fit "runs": a peça cresce para a frente, para baixo e para dentro)
         for side, sx in (("r", 1), ("l", -1)):
-            s["side_skirts_" + side] = {"box": _box(sx * (bh - 0.40), 0.22, z0, sx * (bh + 0.02), bot - 0.02, z1),
-                                        "anchor": [sx * round(bh, 3), 0.22, round(z0, 3)], "length": round(z1 - z0, 3), "fit": "stretch9"}
+            sk = (fs or {}).get("skirt_" + side)
+            runs = [[max(r[0], round(stack_zmax + 0.03, 3)), r[1]] for r in (sk or {}).get("runs", [])]
+            runs = [r for r in runs if r[1] - r[0] >= SKIRT_MIN]       # (atrás dos escapamentos e da cabine)
+            if not runs:
+                continue
+            boxes = [_box(sx * sk["x_in"], sk["y"][0], r[0], sx * sk["x_out"], sk["y"][1], r[1]) for r in runs]
+            s["side_skirts_" + side] = {"anchor": [sx * sk["x_out"], sk["y"][1], 0.0], "boxes": boxes,
+                                        "runs": runs, "depth": round(sk["x_out"] - sk["x_in"], 3),
+                                        "height": round(sk["y"][1] - sk["y"][0], 3), "fit": "runs"}
         # para-choque de trás (T-231): largura do baú, atrás de tudo o que fica embaixo dele (substitui o para-choque e
         # as lanternas de fábrica, levando lanternas próprias), topo abaixo das setas de trás; a placa vai na caixa da
         # placa da peça. Antes (T-211) a caixa ficava entre as lanternas de fábrica (1,5 m; 8 cm no Canter).
@@ -358,3 +387,28 @@ def seat_sockets(m: dict) -> dict:
                     "anchor": [0.0, vy0, vz0], "width": round(2 * vhw, 3), "fit": "seat", "lean": k,
                     "fill_max_z": fill_max}
     return out
+
+
+def clear_mirror(sk: dict, zones: dict) -> None:
+    """T-233: a caixa da haste do retrovisor começa logo por fora do que já ocupa a quina (viseira, lanterna da quina,
+    farol): empurra a borda de dentro para fora até não cruzar nenhuma caixa nem zona sem isenção."""
+    for side, sx in (("r", 1), ("l", -1)):
+        k = "mirror_stay_" + side
+        if k not in sk or "box" not in sk[k]:
+            continue
+        for _ in range(4):
+            b = sk[k]["box"]
+            others = [v for kk, v in sk.items() if kk != k for v in boxes_of(v)]
+            others += [z["box"] for z in zones.values() if k[:-2] not in z["exempt"] and k not in z["exempt"]]
+            push = 0.0
+            for o in others:
+                if overlap(b, o):
+                    edge = o[1][0] if sx > 0 else -o[0][0]
+                    push = max(push, edge + 0.002)
+            if push <= 0.0:
+                break
+            if sx > 0:
+                b[0][0] = round(max(b[0][0], push), 3)
+            else:
+                b[1][0] = round(min(b[1][0], -push), 3)
+            sk[k]["anchor"][0] = round(sx * max(abs(sk[k]["anchor"][0]), push), 3)
