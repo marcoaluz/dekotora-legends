@@ -581,3 +581,21 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   for dono, e monta com a cor de fábrica. Nunca grava no perfil real.
 - Testes da T-218: `godot --headless --path game -s res://tests/run_tests.gd -- --only=homage` roda só
   `game/tests/test_homage_t218.gd` (o filtro `--only=` casa com o trecho do nome do arquivo).
+
+## Peso do caminhão (T-219)
+
+- Dados: `TruckFeel` (`game/scripts/data/truck_feel.gd`), valores em `game/data/feel/truck_feel.tres`.
+  `TruckFeel.current()` devolve o que está em uso; `TruckFeel.use(f)` troca; `TruckFeel.legacy()` devolve os números de antes (comparação).
+- Campos `sim_*` mudam a simulação: exigem subir o protocolo de rede (hoje 15, `game/scripts/net/protocol.gd`) e APK novo.
+  Os demais campos são só visual, som ou haptic.
+- Visual: `RaceFeel` (`game/scripts/road3d/race_feel.gd`); `TruckMotion` (`game/scripts/truck/truck_motion.gd`) calcula
+  rolagem, cabeceio e emendas; `TruckNode.set_body_motion` aplica no modelo; `TruckWheels.apply` compensa as rodas para ficarem no chão.
+- Haptics: `game/scripts/input/haptics.gd` (duração escalada pelo feel).
+- Flags da corrida: `--feel-log=ARQ.csv` (telemetria por quadro); `--reduce-shake` (tremor reduzido, depuração, não grava).
+- `measure_duel` (`game/tools_dev/measure_duel.gd`): `--feel=legacy`, `--feel-set=campo=valor,campo=valor`, `--no-hysteresis`,
+  `--modes=1x1` (modos: `antigo`, `1x1_old`, `1x1`).
+- Captura: `bash tools/capture_t219.sh PASTA_ABS [casos]` (casos: `crash lanes crash_lado brake_lado`).
+  Gráfico: `godot --path game -s res://tools_dev/plot_feel_t219.gd -- --out=ABS.png`.
+- Armadilha: `-s` com janela precisa de `root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED`, senão o desenho sai esticado.
+- Armadilha: Movie Maker grava em D: (o C: fica sem espaço; cada caso gera ~450 MB de PNG).
+- Pendência: `tools/capture_t219.sh` passa `--feel=res://...` via `EXTRA`, mas a corrida ainda não lê esse flag (só `measure_duel` lê `--feel=legacy`).

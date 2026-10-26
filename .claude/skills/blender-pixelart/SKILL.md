@@ -247,3 +247,14 @@ um problema visual não puder ser entendido pelos renders.
   `bisect_plane` para achar o teto de verdade.
 - Armadilha: luz no teto da cabine impede o deque de encostar. Mantenha a luz fora da área do deque.
 - Armadilha: teto acima de ~3,15 m estoura o limite de 4,55 m do deque de 2 níveis. Confira a altura antes de gerar.
+
+## Vídeo antes/depois do peso (T-219)
+
+- Script: `tools/video_t219.py` (raiz do projeto, não é de `blender/scripts/`). Uso:
+  `blender -b --factory-startup -P tools/video_t219.py -- ANTES DEPOIS SAIDA [casos...] [--tiras]`.
+  Gera MP4 lado a lado com o som do "depois" e as tiras de quadros. As sequências vêm de `tools/capture_t219.sh`.
+- Não há ffmpeg instalado no PC: o Blender faz o MP4 pelo FFmpeg que vem com ele.
+- Armadilhas do Blender 5:
+  - `image_settings.media_type = "VIDEO"` antes de `file_format = "FFMPEG"`.
+  - Use `se.strips` (não `sequences`) no editor de sequência.
+  - `view_settings.view_transform = "Standard"`; com AgX as cores dos quadros do jogo desbotam.
