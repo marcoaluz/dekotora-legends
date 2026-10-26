@@ -15,6 +15,7 @@ func _initialize() -> void:
 	var seeds: int = 6
 	var only: String = ""
 	var pdiff: int = BotDriver.Difficulty.HARD
+	var modes: PackedStringArray = PackedStringArray(MODES)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--seeds="):
 			seeds = int(a.substr(8))
@@ -22,12 +23,23 @@ func _initialize() -> void:
 			only = a.substr(8)
 		elif a.begins_with("--player="):
 			pdiff = int(a.substr(9))
+		elif a == "--feel=legacy":                  # T-219: numeros da simulacao de antes (comparacao)
+			TruckFeel.use(TruckFeel.legacy())
+		elif a.begins_with("--feel-set="):           # T-219: --feel-set=campo=valor,campo=valor (sobre o feel em uso)
+			var f: TruckFeel = TruckFeel.current().duplicate() as TruckFeel
+			for kv in a.substr(11).split(","):
+				f.set(kv.get_slice("=", 0), float(kv.get_slice("=", 1)))
+			TruckFeel.use(f)
+		elif a == "--no-hysteresis":                # T-219: bot sem a histerese do "preso atras" (comparacao)
+			BotDriver.blocked_hysteresis = 1.0
+		elif a.begins_with("--modes="):
+			modes = a.substr(8).split(",")
 	for r in ROUTES:
 		if only != "" and r != only:
 			continue
 		var route: RouteDef = load("res://data/routes/%s.tres" % r) as RouteDef
 		var rv: RivalDef = load("res://data/rivals/%s.tres" % route.rival_id) as RivalDef
-		for mode in MODES:
+		for mode in modes:
 			var acc: Dictionary = {"p": 0.0, "r": 0.0, "win": 0, "late": 0, "touch": 0}
 			for s in seeds:
 				_run(route, rv, mode, 2000 + s * 131, pdiff, acc)

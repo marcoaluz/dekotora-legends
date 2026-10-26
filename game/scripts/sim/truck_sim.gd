@@ -10,13 +10,13 @@ const BRAKE_FORCE: float = 60000.0      # N
 const OFFROAD_MAX_SPEED: float = 14.0   # m/s no acostamento
 const OFFROAD_DECEL: float = 8.0        # m/s^2 acima desse limite
 const STEER_SPEED: float = 1.6          # x/s de autoridade maxima de direcao (limite de aderencia nas curvas)
-const STEER_RESPONSE: float = 3.2          # inercia lateral: quanto menor, mais pesado o caminhao para sair da faixa
 const LANE_SIGNAL_WINDOW: float = 1.5   # s: 2o toque no mesmo lado dentro desta janela executa a troca
 const LANE_CHANGE_TIME: float = 1.0     # s: duracao nominal da troca de faixa (pesado, jeito do original)
-const LANE_GAIN: float = 1.9            # 1/s: quanto o x corre atras da faixa alvo
-const LANE_MAX_VEL: float = 0.95        # x/s: velocidade lateral maxima
+## T-219: inercia lateral (STEER_RESPONSE), ganho da faixa (LANE_GAIN), velocidade lateral maxima (LANE_MAX_VEL) e o
+## peso da carga/pecas na inercia vem de TruckFeel (data/feel/truck_feel.tres, campos sim_*).
 const MAX_BODY_YAW: float = 0.0524     # rad (3 graus): giro maximo do corpo, SO na troca de faixa (T-132)
 const MASS_REF: float = 12000.0
+const LANE_LIGHT_MAX: float = 1.05       # T-219: teto do lane_mass_factor para caminhoes leves
 const BASE_MASS: float = 8000.0
 const DEFAULT_CARGO: float = 4000.0
 const WIDTH_X: float = 0.35             # largura do caminhao em unidades de x
@@ -40,6 +40,7 @@ var rpm: float = 700.0
 var gear: int = 1
 var boost: float = 0.0
 var mass: float = BASE_MASS + DEFAULT_CARGO
+var cargo_kg: float = DEFAULT_CARGO       # T-219: carga desta corrida (a inercia pesa a carga e as pecas a parte)
 ## Modelo do caminhao (BodyDef, via TruckConfig): massa vazia, comprimento na pista e agilidade na troca de faixa.
 var base_mass: float = BASE_MASS
 var length: float = Collision.LEN         # metros de z a z+length (colisao, vacuo)
@@ -102,8 +103,24 @@ var jolt_side: int = 0                  # onde bateu: -1 esquerda, 0 frente, +1 
 var jolts: int = 0                      # batidas que custaram velocidade (testes/estatistica)
 
 
-func set_mass(parts_kg: float = 0.0, cargo_kg: float = DEFAULT_CARGO) -> void:
+func set_mass(parts_kg: float = 0.0, cargo_kg_: float = DEFAULT_CARGO) -> void:
+	cargo_kg = cargo_kg_
 	mass = base_mass + cargo_kg + parts_kg
+
+
+## T-219: massa da INERCIA (aceleracao e troca de faixa): carga e pecas pesam a mais pelo TruckFeel. Colisao, aderencia
+## na curva e dano continuam com a massa real (`mass`). Peca que cai deixa `mass` mais leve e a inercia acompanha.
+func inertia_mass() -> float:
+	var f: TruckFeel = TruckFeel.current()
+	var parts: float = maxf(mass - base_mass - cargo_kg, 0.0)
+	var extra_cargo: float = maxf(cargo_kg - DEFAULT_CARGO, 0.0)    # so a carga ACIMA da padrao (4 t) pesa a mais
+	return base_mass + cargo_kg + extra_cargo * (f.sim_cargo_inertia - 1.0) + parts * f.sim_parts_inertia
+
+
+## T-219: quanto a massa deixa a troca de faixa mais lenta (1 = caminhao de referencia de 12 t). Mais leve que a
+## referencia ganha no maximo LANE_LIGHT_MAX (o Canter ja tem a agilidade dele).
+func lane_mass_factor() -> float:
+	return clampf(pow(MASS_REF / inertia_mass(), TruckFeel.current().sim_lane_mass_exp), 0.4, LANE_LIGHT_MAX)
 
 
 func set_loadout(parts: Array[Dictionary]) -> void:
@@ -193,7 +210,7 @@ func lane_closed_ahead(l: int, track: Track) -> bool:
 
 ## Inclinacao visual da cabine (-1..+1) durante a troca de faixa.
 func lean() -> float:
-	return clampf(lateral_vel / (LANE_MAX_VEL * agility), -1.0, 1.0)
+	return clampf(lateral_vel / (TruckFeel.current().sim_lane_max_vel * agility), -1.0, 1.0)
 
 
 ## Giro do corpo (rad, > 0 = para a esquerda) em relacao a faixa: SO da troca de faixa (velocidade lateral do
@@ -238,7 +255,7 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	if speed > 0.0:
 		force -= resist
 	force -= cmd.brake * BRAKE_FORCE * (1.0 if speed > 0.0 else 0.0)
-	var accel: float = force / mass - GRAVITY * track.hill_at(z) * 0.5 - CurveGrip.scrub_decel(curve_ratio)
+	var accel: float = force / inertia_mass() - GRAVITY * track.hill_at(z) * 0.5 - CurveGrip.scrub_decel(curve_ratio)
 	speed = maxf(speed + accel * dt, 0.0)
 	# barra de Passing: enche em alta velocidade, esvazia enquanto usada
 	passing_active = cmd.passing and passing_charge > 0.02
@@ -253,11 +270,13 @@ func step(dt: float, cmd: Commands, track: Track) -> void:
 	# 3) lateral: seta + troca de faixa; o x segue a faixa alvo sozinho, tambem na curva (T-132).
 	#    Raspando o pneu, aceita uma deslizada de ate 0,5 m para fora; escapando, perde a autoridade.
 	_lane_input(cmd.steer, dt, track)
+	var feel: TruckFeel = TruckFeel.current()
 	var authority: float = minf(speed / 6.0, 1.0) * grip() * (0.0 if escaping else 1.0)
-	var vmax: float = LANE_MAX_VEL * agility
+	var vmax: float = feel.sim_lane_max_vel * agility
 	var target_x: float = Lanes.X[lane] + CurveGrip.slide_x(curve, curve_ratio)
-	var desired: float = clampf((target_x - x) * LANE_GAIN * agility, -vmax, vmax) * authority
-	lateral_vel += (desired - lateral_vel) * minf(STEER_RESPONSE * agility * dt, 1.0)
+	var heavy: float = lane_mass_factor()                  # T-219: bau cheio / pecas pesadas trocam mais devagar
+	var desired: float = clampf((target_x - x) * feel.sim_lane_gain * agility * heavy, -vmax, vmax) * authority
+	lateral_vel += (desired - lateral_vel) * minf(feel.sim_steer_response * agility * heavy * dt, 1.0)
 	var push: float = CurveGrip.escape_push(curve, curve_ratio)
 	x += (lateral_vel + push + steer_pull * steer_pull_dir) * dt
 	x = clampf(x, -1.6, 1.6)   # limite fisico (fora do acostamento)

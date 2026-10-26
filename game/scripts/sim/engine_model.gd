@@ -11,10 +11,9 @@ const GEAR_RATIOS: Array[float] = [6.4, 4.1, 2.75, 1.9, 1.35, 1.0]
 const FINAL_DRIVE: float = 3.3
 const WHEEL_RADIUS: float = 0.52
 const DRIVE_EFFICIENCY: float = 1.15   # perdas + escala de jogo
-const TRACTION_LIMIT: float = 32000.0  # N: limite de aderencia na arrancada (patina acima disso)
 const UPSHIFT_FRAC: float = 0.9        # sobe de marcha acima desta fracao da rotacao de corte
 const DOWNSHIFT_RPM: float = 1000.0
-const SHIFT_TIME: float = 0.35         # corte de torque ao trocar de marcha (s)
+## T-219: limite de aderencia na arrancada (N) e corte de torque na troca de marcha (s) vem de TruckFeel (data/feel).
 const ENGINE_BRAKE_FORCE: float = 4500.0   # N, freio-motor padrao em rotacao alta
 const JAKE_BONUS: float = 0.35         # +35% (jake_brake)
 const JAKE_MIN_RPM: float = 1500.0
@@ -92,10 +91,10 @@ func step(dt: float, throttle: float, speed: float, speed_bonus: float = 0.0) ->
 	if shifting <= 0.0:
 		if rpm > redline_rpm * UPSHIFT_FRAC and gear < GEARS:
 			gear += 1
-			shifting = SHIFT_TIME
+			shifting = TruckFeel.current().sim_shift_time_s
 		elif rpm < DOWNSHIFT_RPM and gear > 1 and speed > 2.0:
 			gear -= 1
-			shifting = SHIFT_TIME * 0.6
+			shifting = TruckFeel.current().sim_shift_time_s * 0.6
 	# turbo: enche com acelerador e rotacao acima do minimo; esvazia rapido ao soltar
 	var boost_target: float = 0.0
 	if throttle > 0.5 and rpm > turbo_min_rpm and turbo_gain > 0.0:
@@ -113,7 +112,7 @@ func step(dt: float, throttle: float, speed: float, speed_bonus: float = 0.0) ->
 	if throttle > 0.0 and shifting <= 0.0:
 		var tq: float = max_torque * torque_fraction(rpm) * (1.0 + exhaust_bonus) * (1.0 + turbo_gain * boost) * power_factor * body_torque
 		var f_drive: float = tq * _ratio_total() * DRIVE_EFFICIENCY / WHEEL_RADIUS * throttle * limiter * rpm_limit
-		return minf(f_drive, TRACTION_LIMIT)
+		return minf(f_drive, TruckFeel.current().sim_traction_limit_n)
 	if throttle <= 0.0 and rpm > JAKE_MIN_RPM and speed > 1.0:
 		var f: float = ENGINE_BRAKE_FORCE * clampf(rpm / redline_rpm, 0.0, 1.0) * (1.0 + (JAKE_BONUS if has_jake else 0.0))
 		return -f

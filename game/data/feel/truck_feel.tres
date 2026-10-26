@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="TruckFeel" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/truck_feel.gd" id="1_tf"]
+
+[resource]
+script = ExtResource("1_tf")
+sim_traction_limit_n = 29000.0
+sim_shift_time_s = 0.45
+sim_cargo_inertia = 1.25
+sim_parts_inertia = 1.5
+sim_steer_response = 2.6
+sim_lane_gain = 1.7
+sim_lane_max_vel = 0.95
+sim_lane_mass_exp = 0.4
+roll_deg_per_mps2 = 0.35
+roll_max_deg = 4.0
+roll_freq_hz = 1.05
+roll_damping = 0.38
+roll_curve_share = 3.0
+pitch_deg_per_mps2 = 0.5
+pitch_max_deg = 2.5
+pitch_freq_hz = 1.2
+pitch_damping = 0.45
+heave_m_per_mps2 = 0.035
+heave_max_m = 0.12
+heave_freq_hz = 1.6
+heave_damping = 0.3
+joint_kick_mps = 0.22
+joint_spacing_m = 32.0
+cam_follow_rate = 8.0
+fov_deg_per_mps = 0.45
+fov_max_extra_deg = 20.0
+speed_shake_from_kmh = 95.0
+speed_shake_m = 0.045
+impact_shake_m = 0.32
+hitstop_ms = 75.0
+hitstop_min_force = 9.0
+reduced_shake_scale = 0.25
+haptic_strength = 1.0
+haptic_amplitude = 0.8
+crash_tire_smoke_s = 0.9
+offroad_dust_from_mps = 6.0
+wind_gain_db = 2.0
+body_rumble_db = -12.0
+creak_db = -9.0
+impact_thud_db = -2.0
+joint_thump_db = -14.0

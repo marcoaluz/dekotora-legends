@@ -38,6 +38,7 @@ const WRECK_LOOK_S: float = 1.2                             # T-183: s a mais de
 const WRECK_MARGIN_X: float = 0.02                          # T-183: folga lateral (x) para passar ao lado do acidentado
 const ZIPPER_M: float = 120.0                               # T-207: preso ao lado de alguem com a faixa fechando ate aqui: cai para tras dele
 const ZIPPER_DROP: float = 2.0                              # m/s abaixo de quem esta ao lado (abre a vaga atras dele)
+static var blocked_hysteresis: float = 1.25                    # T-219: preso atras de um lento, o relogio de ultrapassar segue ate 25% mais longe
 const LEAVE_MIN_SPEED: float = 2.0                          # T-207: saindo da faixa fechada perto do bloqueio: rola devagar (sem velocidade nao vira)
 
 var difficulty: int = Difficulty.NORMAL
@@ -262,6 +263,13 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 	# obstaculo na faixa atual / desejada
 	var horizon: float = REACTION_M[difficulty] + speed * 1.3
 	var obstacle: Dictionary = _obstacle_ahead(sim, me, index, Lanes.X[target_lane], horizon)
+	# T-219: histerese. Ja preso atras de alguem, o relogio de "preso" continua com o lento ate 25% mais longe (so para
+	# decidir ultrapassar; a velocidade segue a regra de sempre). Sem isto o bot podia seguir exatamente na borda do
+	# horizonte (o obstaculo pisca, _blocked_time zera e ele nunca ultrapassa: aconteceu com a aceleracao mais lenta).
+	var trailing: bool = false
+	if obstacle.is_empty() and _blocked_time > 0.0 and blocked_hysteresis > 1.0:
+		obstacle = _obstacle_ahead(sim, me, index, Lanes.X[target_lane], horizon * blocked_hysteresis)
+		trailing = not obstacle.is_empty()
 	var passing: bool = false
 	_lane_timer -= dt
 	if obstacle.is_empty():
@@ -281,7 +289,7 @@ func command_for(sim: RaceSim, index: int, dt: float) -> Commands:
 			target_lane = options[_rng.randi_range(0, options.size() - 1)] if options.size() > 1 else options[0]
 			_lane_timer = 1.0
 			passing = int(obstacle["truck"]) >= 0
-		else:
+		elif not trailing:
 			desired = minf(desired, float(obstacle["speed"]) * 0.95)
 			if float(obstacle["gap"]) < 6.0:
 				desired = minf(desired, float(obstacle["speed"]) * 0.7)
