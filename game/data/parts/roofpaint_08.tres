@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"roofpaint_08"
+display_key = "part.roofpaint_08"
+slot = &"roof_paint"
+zones = PackedStringArray("roof")
+fame = 15
+price = 19000
+accessory_id = "roofpaint_08"
+rarity = &"incomum"
+fame_min = 20

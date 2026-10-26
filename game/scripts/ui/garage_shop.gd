@@ -124,8 +124,10 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 	var inst: String = gs.installed_id(slot)
 	var base: Dictionary = preview.call({})
 	var plist: Array[PartDef] = gs.parts_for_slot(slot)
-	if not plist.is_empty() and not gs.part_fits_truck(plist[0]):       # T-231: foguete/contorno so em bau fechado
+	if plist.any(func(pd: PartDef) -> bool: return not gs.part_fits_truck(pd)):   # T-231/T-232: so em bau fechado
 		box.add_child(wl(Tr.t("garage.box_only"), 14, UiTheme.BAD))
+	if slot == "mural":                                  # T-232: cada mural tem um desenho em cada lado
+		box.add_child(wl(Tr.t("garage.paint_both_sides"), 14, UiTheme.TEXT_DIM))
 	for d in plist:
 		box.add_child(part_card(d, d.id == StringName(inst), base))
 	if inst != "":

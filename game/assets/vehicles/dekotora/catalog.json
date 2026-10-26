@@ -5142,6 +5142,1452 @@
         0.0
       ],
       "fade_end": 90.0
+    },
+    {
+      "id": "mural_ryu_kumo",
+      "name": "Dragão nas nuvens",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_kumo_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_kumo_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_kumo_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_kumo_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_ryu_nami",
+      "name": "Dragão e ondas",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_nami_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_nami_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_nami_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_ryu_nami_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_tora_take",
+      "name": "Tigre no bambuzal",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_tora_yuki",
+      "name": "Tigre na neve",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_nami_fuji",
+      "name": "Grande onda e Fuji",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_nami_fuji_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_nami_fuji_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_nami_fuji_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_nami_fuji_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_kabuki",
+      "name": "Kabuki",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_musha",
+      "name": "Guerreiro samurai",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_bijin_ogi",
+      "name": "Dama do leque",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_bijin_tsuki",
+      "name": "Dama sob a lua",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_hoo",
+      "name": "Fênix e grous",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_hoo_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_hoo_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_hoo_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_hoo_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_men",
+      "name": "Máscaras do Japão",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_men_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_men_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_men_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_men_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "mural_koi",
+      "name": "Carpas",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 4,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_koi_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_koi_r_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/mural/mural_koi_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_koi_l_emit.png",
+            "aspect": 4.0,
+            "px": [
+              1536,
+              384
+            ]
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "rearpaint_ryu",
+      "name": "Traseira: dragão",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_ryu.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_ryu_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_tora",
+      "name": "Traseira: tigre",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_tora.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_tora_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_hannya",
+      "name": "Traseira: hannya",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_hannya.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_hannya_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_oni",
+      "name": "Traseira: oni",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_oni.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_oni_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_kitsune",
+      "name": "Traseira: raposa",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_kitsune.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_kitsune_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_tengu",
+      "name": "Traseira: tengu",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_tengu.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_tengu_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_noh",
+      "name": "Traseira: máscara de Noh",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_noh.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_noh_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_kabuki",
+      "name": "Traseira: kabuki",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_kabuki.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_kabuki_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_bijin",
+      "name": "Traseira: gueixa",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_bijin.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_bijin_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_shishi",
+      "name": "Traseira: leão do kabuki",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_shishi.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_shishi_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_hoo",
+      "name": "Traseira: fênix",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_hoo.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_hoo_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rearpaint_koi",
+      "name": "Traseira: carpas",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_koi.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_koi_emit.png",
+            "aspect": 1.25,
+            "px": [
+              640,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_01",
+      "name": "Teto: 一番星 (estrela nº 1)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_01_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_01_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_01_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_01_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_02",
+      "name": "Teto: 男花道 (caminho de honra)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_02_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_02_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_02_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_02_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_03",
+      "name": "Teto: 爆走 (corrida louca)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_03_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_03_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_03_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_03_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_04",
+      "name": "Teto: 御意見無用 (dispenso opinião)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_04_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_04_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_04_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_04_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_05",
+      "name": "Teto: 唯我独尊 (único no mundo)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_05_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_05_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_05_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_05_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_06",
+      "name": "Teto: 義理人情 (dever e coração)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_06_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_06_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_06_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_06_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_07",
+      "name": "Teto: 浪漫街道 (estrada romântica)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_07_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_07_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_07_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_07_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_08",
+      "name": "Teto: 天下御免 (licença do mundo)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_08_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_08_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_08_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_08_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "roofpaint_09",
+      "name": "Teto: 夜明けまで (até o amanhecer)",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_09_long.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_09_long_emit.png",
+            "aspect": 0.25,
+            "px": [
+              256,
+              1024
+            ]
+          },
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_09_short.png",
+            "emit": "res://assets/vehicles/dekotora/paint_t232/roof/roofpaint_09_short_emit.png",
+            "aspect": 0.5,
+            "px": [
+              256,
+              512
+            ]
+          }
+        ]
+      }
     }
   ]
 }

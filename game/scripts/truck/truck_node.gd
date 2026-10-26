@@ -152,6 +152,10 @@ func set_mural_glow(energy: float) -> void:
 	_mural_glow = maxf(energy, 0.0)
 	if _mural_mat != null:
 		MuralGlow.set_level(_mural_mat, _mural_glow, _mural_mat.albedo_color)
+	for id in _acc_nodes:                            # T-232: pinturas compradas (mural, traseira, teto) acendem junto
+		for n in _acc_nodes[id]:
+			if is_instance_valid(n) and (n as Node3D).has_meta("paint_mat"):
+				MuralGlow.set_level((n as Node3D).get_meta("paint_mat") as StandardMaterial3D, _mural_glow)
 
 
 func mural_glow() -> float:
@@ -450,6 +454,9 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 ## Variante, cor/letreiro/luzes da oficina, brilho, cromo e luzinhas de uma peca recem-montada.
 func _finish_part(n: Node3D, d: PartDef, entry: Dictionary, styles: Dictionary) -> void:
 	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
+	if n.has_meta("paint_mat"):                  # T-232: pintura = so a arte (sem cor L/R, cromo nem luzinhas)
+		MuralGlow.set_level(n.get_meta("paint_mat") as StandardMaterial3D, _mural_glow)
+		return
 	catalog.apply_variant(n, d.accessory_id, d.variant)
 	if DecoStyle.is_deco(entry):             # T-211: cor L/R e letreiro (antes do brilho e do cromo); T-214: luzes
 		var st: Dictionary = styles.get(String(d.id), {})
@@ -490,6 +497,8 @@ func set_part_state(part_id: String, state: String) -> void:
 	var catalog: AccessoryCatalog = AccessoryCatalog.get_instance()
 	for n in _acc_nodes[part_id]:
 		var node: Node3D = n
+		if node.has_meta("paint"):                    # T-232: pintura nao amassa nem cai (risca: perfil, "scratch")
+			continue
 		if state == "broken" and node.has_meta("deco"):   # T-211: peca da oficina quebrada fica (torta e apagada)
 			DecoStyle.set_broken(node, catalog)
 			continue

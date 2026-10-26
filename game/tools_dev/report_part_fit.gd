@@ -1,5 +1,5 @@
 extends SceneTree
-## Relatorio de encaixe (T-211; lote 2 na T-231): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
+## Relatorio de encaixe (T-211; lote 2 na T-231; pinturas na T-232): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
 ## usada, os problemas de projeto dos encaixes e as zonas protegidas de cada caminhao.
 ## Uso (raiz do projeto): godot --headless --path game -s res://tools_dev/report_part_fit.gd
 
@@ -71,6 +71,64 @@ func _lot2(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("")
 
 
+var _lot3_ok: int = 0
+var _lot3_n: int = 0
+
+
+## T-232: matriz caminhao x pinturas (12 murais nos 2 lados, 12 traseiras, 9 tetos), com o tamanho de cada face medida.
+func _lot3(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
+	var ids: Array[String] = []
+	for e in c.data.get("accessories", []):
+		if PaintFit.handles(e):
+			ids.append(String(e["id"]))
+	lines.append("## Matriz caminhão × pinturas (T-232: 12 murais com os 2 lados, 12 traseiras, 9 tetos)")
+	lines.append("")
+	lines.append("| Caminhão | Murais OK | Lateral (m) | Traseiras OK | Traseira (m) | Tetos OK | Teto (m) | Falhas |")
+	lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
+	files.sort()
+	for f in files:
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
+			continue
+		var stem: String = String(f).get_basename()
+		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
+		var body: String = String(data.get("body", ""))
+		var name: String = stem.replace("dekotora_truck_", "") + (" (guardada)" if body == "carreta" else "")
+		if not TruckSockets.socket(data, "mural_r").has("rect"):
+			lines.append("| %s | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |" % name)
+			continue
+		var model: Node3D = PartFit.load_model(TruckNode.MODEL_DIR + stem + ".glb", body, String(data.get("cab", "")))
+		var ok: Dictionary = {"mural_r": 0, "rear_paint": 0, "roof_paint": 0}
+		var n: Dictionary = {"mural_r": 0, "rear_paint": 0, "roof_paint": 0}
+		var here: int = 0
+		for id in ids:
+			var k: String = String(c.entry(id)["socket"])
+			n[k] += 1
+			var probs: Array[String] = PartFit.check_part(model, data, c, id)
+			if probs.is_empty():
+				ok[k] += 1
+			else:
+				here += 1
+				fails.append("- `%s` em `%s`: %s" % [id, stem, "; ".join(probs)])
+		model.free()
+		var sz: Dictionary = {}
+		for k in ["mural_r", "rear_paint", "roof_paint"]:
+			var r: Dictionary = TruckSockets.socket(data, k)["rect"]
+			sz[k] = "%.2f × %.2f" % [float(r["w"]), float(r["h"])]
+		lines.append("| %s | %d/%d | %s | %d/%d | %s | %d/%d | %s | %s |" % [name, ok["mural_r"], n["mural_r"], sz["mural_r"],
+				ok["rear_paint"], n["rear_paint"], sz["rear_paint"], ok["roof_paint"], n["roof_paint"], sz["roof_paint"],
+				"nenhuma" if here == 0 else str(here)])
+		for k in ok:
+			_lot3_ok += int(ok[k])
+			_lot3_n += int(n[k])
+	lines.append("")
+	lines.append("Pinturas: **%d de %d** combinações cabem (os murais contam os 2 lados numa combinação). Cada face é um retângulo" % [_lot3_ok, _lot3_n])
+	lines.append("medido por raios no plano real da lataria (`blender/scripts/lib/paint_measure.py`), por dentro do contorno de LED;")
+	lines.append("a arte nunca sai espelhada (u × v = normal) e fica fora das zonas protegidas (a traseira é tinta na porta: isenta só")
+	lines.append("de `rear_doors`). Conferido por `PaintFit.problems`.")
+	lines.append("")
+
+
 func _initialize() -> void:
 	var c := AccessoryCatalog.new()
 	c.reload()
@@ -136,7 +194,10 @@ func _initialize() -> void:
 	_lot2(c, lines, fails)
 	total_ok += _lot2_ok
 	total += _lot2_n
-	lines.append("**Total geral (lotes 1 e 2): %d de %d combinações cabem.**" % [total_ok, total])
+	_lot3(c, lines, fails)
+	total_ok += _lot3_ok
+	total += _lot3_n
+	lines.append("**Total geral (lotes 1 e 2 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
 	lines.append("")
 	lines.append("## Falhas")
 	lines.append("")
@@ -153,7 +214,7 @@ func _initialize() -> void:
 	lines.append("")
 	lines.append("Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo")
 	lines.append("leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da")
-	lines.append("placa próprias) para `rear_bumper`; rodas para `hubcaps`.")
+	lines.append("placa próprias) para `rear_bumper`; rodas para `hubcaps`; `rear_doors` para `rear_paint` (T-232: tinta na porta).")
 	lines.append("")
 	var fa := FileAccess.open(ProjectSettings.globalize_path(OUT), FileAccess.WRITE)
 	fa.store_string("\n".join(lines) + "\n")

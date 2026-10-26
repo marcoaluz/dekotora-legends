@@ -67,6 +67,10 @@ static func apply(t: TruckSim, desc: Dictionary) -> void:
 ## T-231: pecas da oficina que os bots sorteiam (para-choque traseiro com lanternas sempre; foguete em 1 de 3).
 const BOT_REAR: Array[String] = ["rb_square_row", "rb_round_twin", "rb_square_grid", "rb_neon_rows", "rb_target", "rb_bullet"]
 const BOT_ROCKET: Array[String] = ["rocket_round", "rocket_neon_dash", "rocket_led"]
+## T-232: pinturas que os bots sorteiam (mural em 1 de 2, traseira em 1 de 2, teto em 1 de 4). Peso 0: so visual.
+const BOT_MURAL: Array[String] = ["mural_nami_fuji", "mural_koi", "mural_tora_take", "mural_hoo", "mural_kabuki", "mural_men"]
+const BOT_REAR_PAINT: Array[String] = ["rearpaint_koi", "rearpaint_noh", "rearpaint_kitsune", "rearpaint_tengu", "rearpaint_oni"]
+const BOT_ROOF_PAINT: Array[String] = ["roofpaint_01", "roofpaint_03", "roofpaint_06", "roofpaint_09"]
 
 
 ## Pecas de um bot pela semente (mesma semente = mesmas pecas no servidor e em todos os clientes).
@@ -75,6 +79,12 @@ static func bot_part_ids(seed_: int) -> Array[String]:
 	var out: Array[String] = ["fb_basic", BOT_REAR[k % BOT_REAR.size()]]
 	if k % 3 == 0:
 		out.append(BOT_ROCKET[(k / 3) % BOT_ROCKET.size()])
+	if k % 2 == 0:
+		out.append(BOT_MURAL[(k / 2) % BOT_MURAL.size()])
+	if (k / 2) % 2 == 0:
+		out.append(BOT_REAR_PAINT[(k / 4) % BOT_REAR_PAINT.size()])
+	if k % 4 == 1:
+		out.append(BOT_ROOF_PAINT[(k / 4) % BOT_ROOF_PAINT.size()])
 	return out
 
 

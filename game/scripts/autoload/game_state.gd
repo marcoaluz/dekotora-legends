@@ -222,9 +222,9 @@ func parts_for_slot(slot: String) -> Array[PartDef]:
 
 
 const SLOT_ORDER: Array[String] = ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "visor",
-	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "rocket", "box_light_top", "body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
+	"roof_lights", "roof_frame", "roof_ornament", "roof_wing", "andon", "rocket", "box_light_top", "roof_paint", "body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
 	"side_box", "side_ornament", "mural", "box_light_r", "box_light_l", "hubcaps", "rear_bumper", "rear_lamps", "plate", "mudflaps",
-	"rear_ornament"]
+	"rear_ornament", "rear_paint"]
 
 
 ## Slots na ordem logica do caminhao (frente -> teto -> laterais -> traseira).

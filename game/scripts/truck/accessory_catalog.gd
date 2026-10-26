@@ -53,7 +53,7 @@ func entry(id: String) -> Dictionary:
 
 func instantiate(id: String) -> Node3D:
 	var e: Dictionary = entry(id)
-	if e.is_empty():
+	if e.is_empty() or String(e.get("model", "")) == "":     # T-232: pintura nao tem modelo (PaintFit)
 		return null
 	var ps: PackedScene = load(String(e["model"])) as PackedScene
 	if ps == null:
@@ -77,6 +77,12 @@ func attach(truck_model: Node3D, id: String, side: String = "R") -> Node3D:
 	if mount == null:
 		push_warning("AccessoryCatalog: ponto de montagem ausente: %s (peca %s)" % [mount_name, id])
 		return null
+	if PaintFit.handles(e):                           # T-232: pintura (mural/traseira/teto) = quadrado no retangulo medido
+		var pn: Node3D = PaintFit.build(mount.get_meta("sockets", {}), e, side)
+		if pn != null:
+			pn.name = "acc_%s_%s" % [id, side]
+			mount.add_child(pn)
+		return pn
 	var node: Node3D = instantiate(id)
 	if node == null:
 		return null

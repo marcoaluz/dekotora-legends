@@ -24,7 +24,7 @@ func test_all_parts_load_and_reference_existing_models() -> void:
 			continue
 		check(String(p.id) != "" and String(p.slot) != "", "%s tem id e slot" % p.id)
 		check(catalog.entry(p.accessory_id) != {}, "%s: acessorio %s existe no catalogo" % [p.id, p.accessory_id])
-		if catalog.entry(p.accessory_id) != {}:
+		if catalog.entry(p.accessory_id) != {} and not PaintFit.handles(catalog.entry(p.accessory_id)):   # T-232: pintura sem .glb
 			check(ResourceLoader.exists(String(catalog.entry(p.accessory_id)["model"])), "%s: arquivo .glb existe" % p.id)
 		for z in p.zones:
 			check(z in VALID_ZONES, "%s: zona valida (%s)" % [p.id, z])

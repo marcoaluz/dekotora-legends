@@ -62,9 +62,9 @@ static func add_nodes(model: Node3D, glb_path: String) -> void:
 	var host: Node = model.get_child(0) if model.get_child_count() == 1 else model
 	for name in data.get("sockets", {}):
 		var s: Dictionary = data["sockets"][name]
-		if not s.has("anchor") or model.find_child("SOCKET_" + String(name), true, false) != null:
+		if not (s.has("anchor") or s.has("rect")) or model.find_child("SOCKET_" + String(name), true, false) != null:
 			continue
-		var a: Array = s["anchor"]
+		var a: Array = s.get("anchor", [0.0, 0.0, 0.0])          # T-232: pintura (rect) = ponto na origem do modelo
 		var e := Node3D.new()
 		e.name = "SOCKET_" + String(name)
 		e.position = Vector3(float(a[0]), float(a[1]), float(a[2]))

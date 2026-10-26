@@ -12,10 +12,10 @@ const SECTIONS: Array = [["parts", "garage.parts"], ["paint", "garage.paint"], [
 ## Lugar do caminhao -> encaixes (mesma ordem do GameState.SLOT_ORDER). Encaixe fora daqui cai em "other".
 const AREAS: Array = [
 	["front", ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights"]],
-	["roof", ["visor", "andon", "rocket", "box_light_top"]],          # T-231: foguete e contorno do teto do bau                       # T-215: roof_lights/frame/ornament/wing sairam (RetiredParts)
+	["roof", ["visor", "andon", "rocket", "box_light_top", "roof_paint"]],   # T-232: pintura do teto          # T-231: foguete e contorno do teto do bau                       # T-215: roof_lights/frame/ornament/wing sairam (RetiredParts)
 	["side", ["body_ornament", "exhaust_stacks", "side_skirts", "underglow", "fenders", "steps", "side_trim",
 			"side_box", "side_ornament", "mural", "box_light_r", "box_light_l", "hubcaps"]],
-	["rear", ["rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament"]],
+	["rear", ["rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament", "rear_paint"]],   # T-232
 ]
 const SLOT_H: float = 46.0
 

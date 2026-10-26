@@ -21,6 +21,8 @@ func test_every_model_file_loads() -> void:
 	var c := _catalog()
 	for id in c.ids():
 		var e: Dictionary = c.entry(String(id))
+		if PaintFit.handles(e):                      # T-232: pintura = textura (sem .glb), conferida em test_paint_t232
+			continue
 		check(ResourceLoader.exists(String(e["model"])), "arquivo existe: " + String(e["model"]))
 		var n: Node3D = c.instantiate(String(id))
 		check(n != null, "instancia: " + String(id))
@@ -47,6 +49,8 @@ func test_dimensions_and_budgets() -> void:
 	var c := _catalog()
 	for id in c.ids():
 		var e: Dictionary = c.entry(String(id))
+		if PaintFit.handles(e):                      # T-232: pintura sem volume (retangulo medido por caminhao)
+			continue
 		var d: Dictionary = e["dimensions_m"]
 		for k in ["x", "y", "z"]:
 			check(float(d[k]) > 0.0 and float(d[k]) < MAX_DIM, "%s dimensao %s em metros (%.2f)" % [id, k, float(d[k])])
@@ -66,7 +70,10 @@ func test_attach_and_mirror() -> void:
 		check(r != null, "%s monta no lado R" % id)
 		if bool(e.get("mirror_for_left", false)):
 			var l: Node3D = c.attach(truck, String(id), "L")
-			check(l != null and l.scale.x < 0.0, "%s espelhada no lado L" % id)
+			if PaintFit.handles(e):                  # T-232: o lado esquerdo do mural e outra arte (nunca espelhada)
+				check(l != null and l.scale.x > 0.0, "%s: lado L com arte propria, sem espelhar" % id)
+			else:
+				check(l != null and l.scale.x < 0.0, "%s espelhada no lado L" % id)
 	truck.free()
 
 

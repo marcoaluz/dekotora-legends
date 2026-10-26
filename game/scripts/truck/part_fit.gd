@@ -138,6 +138,17 @@ static func socket_parts(catalog: AccessoryCatalog, slots: Array = []) -> Array[
 ## Monta `id` no modelo e devolve os problemas (lista vazia = cabe).
 static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalog, id: String) -> Array[String]:
 	var e: Dictionary = catalog.entry(id)
+	if PaintFit.handles(e):                          # T-232: pintura = retangulo medido, os 2 lados no mural
+		var po: Array[String] = []
+		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):
+			var pn: Node3D = catalog.attach(model, id, side)
+			if pn == null:
+				po.append("nao montou (sem retangulo em %s)" % PaintFit.socket_name(e, side))
+				continue
+			po.append_array(PaintFit.problems(model, data, e, pn, side))
+			pn.get_parent().remove_child(pn)
+			pn.free()
+		return po
 	if StripFit.handles(e):                          # T-231: pecas por modulo (foguete, contorno), os 2 lados
 		var out: Array[String] = []
 		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):

@@ -146,6 +146,7 @@ func _process(_dt: float) -> bool:
 		var img: Image = root.get_viewport().get_texture().get_image()
 		if String(_job["out"]) != "":
 			img.save_png(String(_job["out"]))
-			print("SHOT ", _job["out"])
+			print("SHOT ", _job["out"], " draw=", Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+					" tri=", Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME))   # T-232: custo
 		_job = {}
 	return false

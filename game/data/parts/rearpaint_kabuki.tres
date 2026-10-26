@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"rearpaint_kabuki"
+display_key = "part.rearpaint_kabuki"
+slot = &"rear_paint"
+zones = PackedStringArray("rear")
+fame = 18
+price = 21000
+accessory_id = "rearpaint_kabuki"
+rarity = &"incomum"
+fame_min = 20
