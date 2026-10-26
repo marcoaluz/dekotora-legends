@@ -72,7 +72,7 @@ func update(dt: float, t: TruckSim, countdown: float) -> void:
 			get_node("/root/AudioBus").play_sfx("gear_air_pfft", -14.0, randf_range(0.95, 1.05))   # cambio a ar
 		_last_gear = t.gear
 	var v01: float = clampf(t.speed / 38.9, 0.0, 1.0)
-	_set_loop("wind_speed_loop", v01 * 0.55, -8.0, 0.85 + 0.3 * v01)
+	_set_loop("wind_speed_loop", v01 * 0.55, -8.0 + TruckFeel.current().wind_gain_db, 0.85 + 0.3 * v01)   # T-219: ganho no feel
 	_set_loop("tyre_road_loop", clampf(t.speed / 6.0, 0.0, 1.0) * (0.25 + 0.5 * v01), -9.0, 0.75 + 0.55 * v01)   # T-197: rodagem dos pneus
 	# pneu cantando: so quando passa da velocidade segura da curva (TruckSim.skid); escapando, no maximo
 	_set_loop("tire_screech_loop", 1.0 if t.escaping else t.skid * 0.85, -6.0)

@@ -76,6 +76,7 @@ func _show(id: String) -> void:
 	match id:
 		"controls":
 			_slider(Tr.t("options.touch_size"), _s.touch_scale, 0.7, 1.5, 0.05, func(v: float) -> void: _s.touch_scale = v, true)
+			_toggle(Tr.t("options.haptics"), _s.haptics, func(on: bool) -> void: _s.haptics = on)   # T-219
 			_hint(Tr.t("options.lane_hint"))
 			_hint(Tr.t("options.keys_hint"))
 		"graphics":
@@ -100,6 +101,7 @@ func _show(id: String) -> void:
 			_toggle(Tr.t("options.fx_impact"), _s.fx_impact, func(on: bool) -> void: _s.fx_impact = on)
 			_toggle(Tr.t("options.fx_life"), _s.fx_life, func(on: bool) -> void: _s.fx_life = on)
 			_toggle(Tr.t("options.fx_reduce_flash"), _s.fx_reduce_flash, func(on: bool) -> void: _s.fx_reduce_flash = on)   # T-204
+			_toggle(Tr.t("options.fx_reduce_shake"), _s.fx_reduce_shake, func(on: bool) -> void: _s.fx_reduce_shake = on)   # T-219
 			if UltraLook.available():
 				_toggle(Tr.t("options.fx_motion_blur"), _s.fx_motion_blur, func(on: bool) -> void: _s.fx_motion_blur = on)
 			_hint(Tr.t("options.fx_hint"))

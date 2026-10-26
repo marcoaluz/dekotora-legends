@@ -83,11 +83,13 @@ func camera_extra(speed: float, curve: float, dt: float) -> Array:
 		return [0.0, 0.0, Vector3.ZERO]
 	_lag = lerpf(_lag, curve, minf(1.5 * dt, 1.0))           # a camera "atrasa" ao entrar e sair da curva
 	var kmh: float = speed * 3.6
-	var amp: float = clampf((kmh - 100.0) / 60.0, 0.0, 1.0) * 0.035
+	var f: TruckFeel = TruckFeel.current()          # T-219: numeros no data/feel/truck_feel.tres (antes 100 km/h, 0,035 m)
+	var amp: float = clampf((kmh - f.speed_shake_from_kmh) / 60.0, 0.0, 1.0) * f.speed_shake_m
 	var shake := Vector3(sin(_t * 37.0) + 0.5 * sin(_t * 61.0), sin(_t * 43.0 + 1.3) + 0.5 * sin(_t * 71.0), 0.0) * amp
 	return [_lag * 0.28, -_lag * 0.22, shake]
 
 
 ## Quanto o FOV abre com a velocidade (graus).
 func fov_extra(speed: float) -> float:
-	return speed * (0.42 if enabled else 0.25)
+	var f: TruckFeel = TruckFeel.current()          # T-219 (antes 0,42 grau por m/s, sem teto)
+	return minf(speed * (f.fov_deg_per_mps if enabled else 0.25), f.fov_max_extra_deg)

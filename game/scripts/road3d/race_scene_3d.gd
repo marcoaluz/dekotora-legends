@@ -88,6 +88,7 @@ var _camv: RaceCamView                  # T-198: cameras da corrida (C) e retrov
 var _load_frames: int = 0               # T-208: quadros desde o fim do _ready (picos no log LOAD_T208)
 var _headless: bool = DisplayServer.get_name() == "headless"
 var _toll3d: TollPlaza3D                # T-207: praca de pedagio (cancelas e luz que segue o jogador)
+var _feel: RaceFeel                     # T-219: peso do caminhao (balanco, emendas, congelamento, vibracao, sons)
 var _drawn: Array[Vector2] = []         # T-198: (z, x) interpolados de cada caminhao no ultimo quadro (cameras sem tranco)
 var _amb: RouteAmbience                 # T-217: outra pista, muros de pedra, marcos da rota (so visual)
 var _vis_t: float = 0.0                 # T-217: relogio do cenario vivo (para na camera livre e na pausa)
@@ -274,6 +275,9 @@ func _ready() -> void:
 		lens.append(t.length)
 	_impact.setup(_fx, _trucks, lens, _traffic3d)
 	_impact.sim = sim
+	_feel = RaceFeel.new()
+	add_child(_feel)
+	_feel.setup(path, sim.trucks.size(), player, online, RoadMesh.deck_height(scenery) > 0.0, bridges)
 	_cam = Camera3D.new()
 	_cam.fov = 62.0
 	_cam.near = 0.2
@@ -311,7 +315,7 @@ func _ready() -> void:
 	_hud.event_hud = event_hud                      # T-202: the HUD layout places the warnings
 	event_hud.alert_shown.connect(func(_kind: int) -> void:
 		_audio.event_alert()
-		Input.vibrate_handheld(60))
+		Haptics.pulse(60))
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_autoplay = "--autoplay" in args
 	_debug_events = "--debug-events" in args
@@ -690,6 +694,8 @@ func _process(delta: float) -> void:
 	if online:
 		_process_online(dt)
 		return
+	if _feel.consume_hitstop(delta):                 # T-219: batida grande congela 60-90 ms (so offline; online so a camera)
+		return
 	var racing: bool = _countdown <= 0.0 and (not sim.is_over() or _over_time < _end_delay())
 	if racing:
 		var cmd: Commands = input.poll()
@@ -751,7 +757,8 @@ func _process_online(dt: float) -> void:
 			Net.send_commands(tk, cmd)
 		sync.interpolate(Time.get_ticks_msec(), dt)
 	_update_visuals(1.0, dt)
-	_update_camera(dt)
+	if not _feel.consume_hitstop(dt):                # T-219: online o congelamento da batida e so da camera
+		_update_camera(dt)
 	_update_hud()
 	_update_audio(dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
@@ -777,6 +784,7 @@ func _update_audio(dt: float) -> void:
 	for k in _truck_sfx.size():
 		_truck_sfx[k].update(sim.trucks[k], dt)
 	_turn_audio.update(t)
+	_feel.update_audio(dt, t)                         # T-219: vibracao da carroceria e rangido ao frear
 	for k in _rival_audio.size():
 		var rt: TruckSim = sim.trucks[_rival_idx[k]]
 		var r01: float = clampf((rt.rpm - EngineModel.IDLE_RPM) / (rt.engine.redline_rpm - EngineModel.IDLE_RPM), 0.0, 1.0)
@@ -790,6 +798,7 @@ func _update_audio(dt: float) -> void:
 func _handle_events(events: Array[Dictionary]) -> void:
 	for e in events:
 		_audio.on_event(e, player)
+		_feel.on_event(e)                            # T-219: congelamento, vibracao, pancada grave, fumaca de pneu
 		_demo.on_event(e, player, sim.time)
 		if _debug_events:
 			print("EVENTO frame=%d %s" % [Engine.get_frames_drawn(), e])
@@ -808,13 +817,9 @@ func _handle_events(events: Array[Dictionary]) -> void:
 				_impact.on_event(e, player)
 				_spawn_debris(int(e["a"]), e["broken_a"], String(e["zone_a"]))
 				_spawn_debris(int(e["b"]), e["broken_b"], String(e["zone_b"]))
-				if int(e["a"]) == player or int(e["b"]) == player:
-					Input.vibrate_handheld(int(clampf(40.0 + float(e["force"]) * 10.0, 40.0, 160.0)))
 			"traffic", "event_obstacle":
 				_impact.on_event(e, player)
 				_spawn_debris(int(e["truck"]), e["broken"], String(e["zone"]))
-				if int(e["truck"]) == player:
-					Input.vibrate_handheld(int(clampf(30.0 + float(e["force"]) * 8.0, 30.0, 140.0)))
 			"passing_scare":
 				if int(e["to"]) == player:
 					_shake = maxf(_shake, 0.4)
@@ -845,12 +850,13 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		var al: Vector2 = Vector2.ZERO                  # T-156: manobra de alinhamento no comeco da contagem
 		if _intro != null and _intro.kind == DuelPlan.SHORT and _countdown > 0.0:   # T-204: depois da cheia ja estao no grid
 			al = DuelShots.align_offset(t.x, DuelShots.align_progress(_countdown))
-		node.transform = _impact.jolt(k, path.vehicle_transform(z, x + al.x, t.length, t.body_yaw() + al.y, t.lean() * 0.11))
+		node.transform = _impact.jolt(k, path.vehicle_transform(z, x + al.x, t.length, t.body_yaw() + al.y))
 		node.animate(t.speed, dt, t.lean())
+		_feel.update_truck(k, node, t, z, dt)          # T-219: balanco do bau (roll/pitch/suspensao; antes: lean x 0,11)
 		var hz: bool = t.signal_dir == 0 and HudStatus.hazard(t, sim.time, _countdown <= 0.0)
 		node.set_signal(2 if hz else t.signal_dir)       # T-202: 2 = hazard (both sides)
 		if _cam != null:
-			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights)
+			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights, _feel.tire_smoke(k), _feel.offroad_dust(t))
 	_traffic3d.refresh()
 	if _cam != null:
 		_rail.update(dt, _player_z(), sim.trucks[player].speed, _cam.global_position)
@@ -903,17 +909,17 @@ func _update_camera(dt: float) -> void:
 	var ex: Array = _speed_fx.camera_extra(t.speed, sim.track.curve_at(z + 30.0), dt)   # atraso na curva + tremor
 	var c: Array[Vector3] = _cam_target(z + t.speed * 0.02, _player_x())
 	var right: Vector3 = path.right_at(z) * Track.ROAD_HALF_WIDTH_M
-	var k: float = 1.0 - exp(-14.0 * dt)
+	var k: float = 1.0 - exp(-_feel.feel.cam_follow_rate * dt)     # T-219: camera com leve atraso (antes 14)
 	_cam.global_position = _cam.global_position.lerp(c[0] + right * float(ex[0]), k)
 	var look: Vector3 = c[1] + right * float(ex[1])
 	_shake = maxf(_shake - dt * 2.5, 0.0)
 	_shake = maxf(_shake, _impact.take_shake())
-	var s: float = _shake * 0.25
+	var s: float = _shake * _feel.feel.impact_shake_m * _feel.shake_scale()      # T-219: antes 0,25 m fixo
 	if s > 0.0:
 		_cam.global_position += Vector3(randf_range(-s, s), randf_range(-s, s), randf_range(-s, s))
 	_cam.look_at(look, Vector3.UP)
-	_cam.global_position += _cam.global_basis * ((ex[2] as Vector3) * _camv.rig.fx_scale())
-	_cam.global_position += _cam.global_basis * _impact.sway_camera(player)     # T-152: a camera sente o tranco
+	_cam.global_position += _cam.global_basis * ((ex[2] as Vector3) * _camv.rig.fx_scale() * _feel.shake_scale())
+	_cam.global_position += _cam.global_basis * _impact.sway_camera(player) * _feel.shake_scale()   # T-152: a camera sente o tranco
 	var fov: float = _camv.rig.chase_fov() + (_speed_fx.fov_extra(t.speed) + t.draft * 6.0) * _camv.rig.fx_scale()
 	_cam.fov = lerpf(_cam.fov, fov, minf(3.0 * dt, 1.0))
 	if _camv.rig.blending():                                     # T-198: troca de camera suave
@@ -923,6 +929,7 @@ func _update_camera(dt: float) -> void:
 		_cam.fov = b[2]
 	_speed_fx.update(t.speed, dt)
 	_scrape_sparks(t, dt)
+	_feel.log_frame(dt, t, _cam.fov, _shake)
 
 
 ## T-198: letterbox, retrovisor (com o caminhao mais perto atras) e estado das cameras.
@@ -988,14 +995,14 @@ func _update_hud() -> void:
 func _curve_feedback(t: TruckSim) -> void:
 	var warn_full: bool = _countdown <= 0.0 and t.curve_warning(sim.track) >= 1.0
 	if (t.escaping and not _was_escaping) or (warn_full and not _was_warn_full):
-		Input.vibrate_handheld(220 if t.escaping else 70)
+		Haptics.pulse(220 if t.escaping else 70)
 	if t.escaping:
 		_shake = maxf(_shake, 0.25)
 	if t.hard_braking:                         # T-144: freada forte treme de leve (e vibra no comeco)
 		if _impact.enabled:
 			_shake = maxf(_shake, 0.1 + 0.18 * t.brake_intensity)
 		if not _was_hard_braking:
-			Input.vibrate_handheld(int(30.0 + 50.0 * t.brake_intensity))
+			Haptics.pulse(int(30.0 + 50.0 * t.brake_intensity))
 	_was_hard_braking = t.hard_braking
 	_was_escaping = t.escaping
 	_was_warn_full = warn_full

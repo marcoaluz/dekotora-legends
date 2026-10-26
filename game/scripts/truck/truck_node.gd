@@ -241,6 +241,22 @@ func animate(speed: float, dt: float, steer: float = 0.0) -> void:
 	wheels.animate(speed, dt, steer)
 
 
+## T-219: balanco da carroceria (TruckMotion): inclina o modelo (cabine, bau e pecas) e as rodas ficam no chao.
+## `length` = comprimento do caminhao na pista (pivo do cabeceio no meio dele).
+func set_body_motion(roll: float, pitch: float, heave: float, length: float) -> void:
+	if model == null:
+		return
+	var b: Transform3D = TruckMotion.body_transform(roll, pitch, heave, length)
+	if _model_rest == null:
+		_model_rest = model.transform
+	model.transform = b * (_model_rest as Transform3D)
+	wheels.body = b
+	wheels.apply()
+
+
+var _model_rest: Variant = null           # transform original do modelo (antes do primeiro balanco)
+
+
 func set_headlights(on: bool) -> void:
 	if _headlight:
 		_headlight.visible = on and int(Engine.get_main_loop().root.get_node("Settings").quality) >= 1

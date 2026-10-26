@@ -19,15 +19,23 @@ var radii: PackedFloat32Array = []     # raio de cada roda (m), medido na malha
 var angles: PackedFloat32Array = []    # giro acumulado de cada roda (rad)
 var steer_yaw: float = 0.0             # ultimo esterçamento aplicado (rad)
 var _model: Node3D
+## T-219: balanco da carroceria (TruckNode.set_body_motion inclina o modelo); as rodas compensam e ficam no chao.
+var body: Transform3D = Transform3D.IDENTITY
+var _origins: PackedVector3Array = []  # posicao original de cada roda (no pai dela)
+var _frames: Array[Transform3D] = []   # pai de cada roda no espaco do TruckNode, com o modelo em repouso
+var _model_rest: Transform3D = Transform3D.IDENTITY
 
 
 ## Le as rodas do modelo. `fallback_radius` vale para rodas sem malha propria.
 func setup(model: Node3D, fallback_radius: float) -> void:
 	_model = model
+	_model_rest = model.transform
 	for n in model.find_children("wheel_*", "Node3D", true, false):
 		var w: Node3D = n as Node3D
 		wheels.append(w)
 		rest.append(w.transform.basis)
+		_origins.append(w.position)
+		_frames.append(_model_rest * _rel(w.get_parent()))
 		radii.append(_measure_radius(w, fallback_radius))
 		angles.append(0.0)
 
@@ -51,9 +59,20 @@ func animate(speed: float, dt: float, steer: float) -> void:
 	steer_yaw = -steer * STEER_MAX
 	for i in wheels.size():
 		angles[i] = fmod(angles[i] + speed / radii[i] * dt, TAU)     # fmod: sem perder precisao em corridas longas
+	apply()
+
+
+## Aplica giro, esterçamento e a compensacao do balanco da carroceria (T-219) em cada roda.
+func apply() -> void:
+	var tilted: bool = body != Transform3D.IDENTITY
+	var inv: Transform3D = body.affine_inverse()
+	for i in wheels.size():
 		var yaw: float = steer_yaw if is_front(wheels[i]) else 0.0
 		# ordem: rotacao original do modelo -> giro no eixo X -> esterçamento no eixo vertical
-		wheels[i].transform.basis = Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, -angles[i]) * rest[i]
+		var local := Transform3D(Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, -angles[i]) * rest[i], _origins[i])
+		if tilted:      # a roda fica onde estaria sem o balanco: desfaz a inclinacao do modelo no espaco do pai dela
+			local = _frames[i].affine_inverse() * inv * _frames[i] * local
+		wheels[i].transform = local
 
 
 ## Rodas que aparecem de fora: as duas dianteiras e, em cada eixo traseiro e lado, a mais externa (no rodado duplo
@@ -82,7 +101,7 @@ func part_transform(w: Node3D) -> Transform3D:
 	if mount == null:
 		mount = _model.find_child(FACE_FRONT + side, true, false) as Node3D
 	var i: int = wheels.find(w)
-	var w_rest: Transform3D = _rel(w.get_parent()) * Transform3D(rest[i] if i >= 0 else w.transform.basis, w.position)
+	var w_rest: Transform3D = _rel(w.get_parent()) * Transform3D(rest[i] if i >= 0 else w.transform.basis, _origins[i] if i >= 0 else w.position)
 	var target: Transform3D
 	if mount == null:                                  # sem ponto: encosta a peca na face externa do pneu
 		target = Transform3D(Basis.IDENTITY, w_rest.origin + Vector3(signf(w_rest.origin.x) * 0.17, 0.0, 0.0))

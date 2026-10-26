@@ -96,12 +96,14 @@ func warmup(hidden_pos: Vector3) -> void:
 
 
 ## `night`: a fumaca fica mais escura/acinzentada (sem brilhar no escuro).
-func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: float, night: bool) -> void:
+## T-219: `crash` 0..1 = fumaca de pneu depois de uma batida (RaceFeel.tire_smoke); `dust` = poeira do acostamento.
+func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: float, night: bool, crash: float = 0.0,
+		dust: bool = false) -> void:
 	if not enabled:
 		return
 	var near: bool = node.global_position.distance_to(cam_pos) < MAX_DIST
 	var braking: bool = t.hard_braking and t.brake_intensity > 0.05
-	var on: bool = near and (braking or t.shove_t > 0.0)
+	var on: bool = near and (braking or t.shove_t > 0.0 or crash > 0.0 or dust)
 	var rear: float = -t.length * TrackPath.REAR_AXLE
 	var p: CPUParticles3D = _smoke.get(index)
 	if on and p == null:
@@ -112,9 +114,11 @@ func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: f
 			p.visible = true
 			p.emitting = true
 			_smoke_off_t[index] = 0.0
-			var k: float = t.brake_intensity if braking else 0.55      # empurrao: puff medio
+			var k: float = t.brake_intensity if braking else (maxf(0.55, crash) if crash > 0.0 or t.shove_t > 0.0 else 0.4)
 			var shade: float = 0.82 if night else 0.95
 			p.color = Color(shade, shade, shade * 1.02, 0.55 + 0.45 * k)
+			if dust and not braking and crash <= 0.0:          # T-219: poeira de terra no acostamento
+				p.color = Color(0.62 * shade, 0.52 * shade, 0.4 * shade, 0.6)
 			p.scale_amount_min = 1.1 + 1.0 * k
 			p.scale_amount_max = 2.2 + 2.6 * k
 			p.global_transform = node.global_transform * Transform3D(Basis.IDENTITY, Vector3(0, 0.9, rear))   # alto: o puff nao corta no asfalto
@@ -124,7 +128,7 @@ func update_truck(index: int, node: Node3D, t: TruckSim, cam_pos: Vector3, dt: f
 			_smoke_off_t[index] = off
 			if off > SMOKE_LIFE and p.visible:
 				p.visible = false
-	_update_marks(index, node, rear, on and t.speed > 4.0, dt)
+	_update_marks(index, node, rear, on and not dust and t.speed > 4.0, dt)
 
 
 func _make_smoke() -> CPUParticles3D:
