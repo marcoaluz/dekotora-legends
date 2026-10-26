@@ -586,3 +586,9 @@ Formato em `docs/AGENTES.md`.
 - Validação: build_sockets 23/23 sem problema de projeto; build_t231_parts 2× = .glb idênticos; suíte 520/520; REPORT_ENCAIXE 1126/1126 (lote 2: 413/413); tools/net_test.sh PASSOU (protocolo 16); folhas conferidas.
 - Armadilhas: PackedArray tirado de Dictionary é cópia (append não grava: usar variável e devolver); build_t211_parts.py roda ao ser importado (não importar); Godot não entende caminho /d/... do Git Bash (usar `pwd -W`); TruckNode em teste: `_ready()` direto (fora da árvore); caixa do bau medida por vértices não é a face real (medir o plano por raios).
 - Decisão pendente: nenhuma de design (lanternas de fábrica sem STOCK_*, placa na caixa da peça e preços são escolhas do Claude para o Marco conferir).
+
+## 2026-10-26 · T-229 a T-236 (resumo do coordenador)
+- Marco aprovou T-214 a T-220 (registrado em DECISOES). Lotes de peças em fila: T-231 (concluída), T-232, T-233, T-234.
+- T-231 (especialista): 21 peças (11 para-choques traseiros, 7 foguetes, 3 contornos), protocolo 16, 520 testes, encaixe 1126/1126.
+- T-235 (ajudante): APK 142 MB protocolo 16, REPORT_ENCAIXE regerado sem falhas, FPS PC noite 114–136 com o rival chefe; worktree do commit antigo deu segfault no import, comparação não medida.
+- T-236 (ajudante): skills com a T-231 (commit 5a908f4).
