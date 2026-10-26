@@ -614,3 +614,26 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Armadilha: `-s` com janela precisa de `root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED`, senão o desenho sai esticado.
 - Armadilha: Movie Maker grava em D: (o C: fica sem espaço; cada caso gera ~450 MB de PNG).
 - Pendência: `tools/capture_t219.sh` passa `--feel=res://...` via `EXTRA`, mas a corrida ainda não lê esse flag (só `measure_duel` lê `--feel=legacy`).
+
+## Oficina lote 2 (T-231)
+
+- Traseira, foguete e contorno de LED do baú: `game/scripts/truck/strip_fit.gd` (`class_name StripFit`). Fits:
+  - fit `"stretch"` (foguete): grupos `HEAD_` (ponta de trás), `MID_` (módulo do meio, repetido) e `TAIL_` (ponta da frente).
+  - fit `"strips"` (contorno de LED): o módulo `MID_` é repetido ao longo de cada faixa medida (`strips` do encaixe).
+- Armadilha (PackedArray): ao tirar um PackedArray de um Dictionary ele é COPIADO. Um `append` nessa cópia se perde.
+  Trabalhe numa variável e grave de volta no dicionário.
+- Teste com `TruckNode` fora da árvore: chame `t._ready()` na mão para montar o modelo (ver `game/tests/test_parts_t231.gd`).
+- Material `lamp_tail` (vermelho, `accessory_materials.gd`): está em `LightPatterns.STEADY_LIT` (`light_patterns.gd`), ou seja,
+  acende à noite e fica escuro de dia.
+- Placa de trás: `TruckPlateSpots._rear_holder` (`game/scripts/vehicle/truck_plate_spots.gd`) põe o fundo branco da placa
+  na caixa da placa do para-choque traseiro, quando há peça montada ali.
+- Comandos (ficam em `game/tools_dev/`, não em `tests/`):
+  - `shot_t231.gd`: prints do caminhão inteiro com as peças (precisa de janela, não use `--headless`). Uso no cabeçalho do
+    arquivo: `godot --path game --resolution 960x600 -s res://tools_dev/shot_t231.gd -- --body=base --cab=chata --parts=... --view=... --out=ABS.png`
+    (ou `--batch=ABS.txt`).
+  - `probe_t231.gd`: sonda sem tela, imprime malhas e problemas de encaixe:
+    `godot --headless --path game -s res://tools_dev/probe_t231.gd -- --model=base_chata --parts=rocket_round,boxlight_dash_r`.
+  - `bash tools/capture_t231.sh [PASTA_ABS]` (Git Bash, raiz do projeto): capturas e folhas de contato da T-231.
+- Testes: `-- --only=t231` (roda `game/tests/test_parts_t231.gd`).
+- Protocolo de rede agora 16 (`game/scripts/net/protocol.gd`): pecas do lote 2 e bots com pecas sorteadas. Mudou a massa
+  e o descritor: cliente antigo não entra.

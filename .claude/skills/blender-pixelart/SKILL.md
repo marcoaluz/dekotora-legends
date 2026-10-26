@@ -258,3 +258,14 @@ um problema visual não puder ser entendido pelos renders.
   - `image_settings.media_type = "VIDEO"` antes de `file_format = "FFMPEG"`.
   - Use `se.strips` (não `sequences`) no editor de sequência.
   - `view_settings.view_transform = "Standard"`; com AgX as cores dos quadros do jogo desbotam.
+
+## Oficina lote 2 (T-231)
+
+- Script: `blender/scripts/build_t231_parts.py` (traseira, foguete e contorno do baú). Kit: `accessories/t231_kit.py`
+  e `accessories/rocket_t231.py`.
+- Medidas: `truck_measure.box_edges` (`lib/truck_measure.py`) mede o plano da face da lataria por raios na malha real.
+  Não use os vértices do baú para isso: eles não batem com a face real.
+- Armadilha: NÃO importe `build_t211_parts.py` de outro script. Ele chama `main()` ao ser importado e roda tudo de novo.
+- Nos `.sh` que passam caminhos ao Godot, use `pwd -W` (caminho Windows); senão o Godot não acha a pasta.
+- `_drop_module_ends` (no `build_t231_parts.py`) apaga as tampas escondidas nas pontas do módulo do meio (tubo, trilho):
+  menos triângulos por metro.
