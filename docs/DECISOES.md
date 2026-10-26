@@ -1230,3 +1230,13 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   emenda sem clique por correlação + cruzamento + passagem por zero, confere o resultado). Testada com os loops atuais.
 - Nada mudou na simulação nem na rede (o áudio só lê o estado). O servidor sem tela não cria som.
 
+
+## 2026-10-26 · Marco aprova T-214 a T-220 ("aprovo tudo, está tudo excelente")
+
+- Tudo o que estava como **proposta** fica como está no código hoje:
+  - T-214/T-215/T-216: deque, viseira, cores de LED/neon, empilhamento e canhões à frente.
+  - T-217: lugares de muros, farol, porto, cachoeira e obra; 2 faixas na contrária; flores na cerca viva; densidade do trânsito contrário; lâmpada laranja nos postes novos; carros únicos do lado esquerdo.
+  - T-218: preços/Fama dos 5 caminhões de homenagem; comprar repinta na cor de fábrica; rivais fixos por rota; cabines novas só no próprio caminhão; marca HAYATE e empresa 銀河運輸.
+  - T-219: números do `truck_feel.tres`; prazos das rotas **mantidos** (sem os +3 s).
+  - T-220: estrutura do som aprovada; o padrão continua `loops` até o Marco escolher outro na cena de teste/Opções.
+- Próximo: continuar as peças pela ordem da seção 16.2 de `docs/REFERENCIA_PECAS.md`, um lote por vez (T-231 a T-234), sem esperar aprovação entre lotes, salvo decisão que mude o design.
