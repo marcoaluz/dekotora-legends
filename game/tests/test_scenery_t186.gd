@@ -94,8 +94,9 @@ func test_two_lamp_models_by_stretch() -> void:
 	var bridge: Array[Vector2] = [Vector2(2200.0, 300.0)]
 	check_eq(Roadside3D.lamp_model(150.0, 9.0, &"city", none), "lamp_post", "praca do pedagio: poste antigo")
 	check_eq(Roadside3D.lamp_model(1200.0, 9.0, &"city", none), "lamp_bridge", "viaduto da cidade: poste da ponte")
-	check_eq(Roadside3D.lamp_model(1200.0, 0.0, &"mountain", none), "lamp_bridge", "serra: poste da ponte")
-	check_eq(Roadside3D.lamp_model(1200.0, 0.0, &"coast", none), "lamp_post", "litoral urbano: poste antigo")
+	# T-217: no chao (serra e litoral) o poste de braco curvo longo (lamp_arc); antes lamp_bridge / lamp_post
+	check_eq(Roadside3D.lamp_model(1200.0, 0.0, &"mountain", none), "lamp_arc", "serra: braco curvo (T-217)")
+	check_eq(Roadside3D.lamp_model(1200.0, 0.0, &"coast", none), "lamp_arc", "litoral: braco curvo (T-217)")
 	check_eq(Roadside3D.lamp_model(2300.0, 0.0, &"coast", bridge), "lamp_bridge", "ponte do litoral: poste da ponte")
 
 
