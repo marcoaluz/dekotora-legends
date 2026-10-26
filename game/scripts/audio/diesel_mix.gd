@@ -17,9 +17,10 @@ const SOUND_SPEED: float = 343.0
 const DOPPLER_MAX: float = 0.06
 
 
-## Loop file of a voice: syn_<voice>_<kind>_<rpm> (kind = on | off | jake | open).
-static func layer(voice: String, kind: String, rpm: float) -> String:
-	return "syn_%s_%s_%d" % [voice, kind, int(rpm)]
+## Loop file of a voice: <src>_<voice>_<kind>_<rpm> (kind = on | off | jake | open; src = syn (synthesized, T-197) or
+## rec (real recordings cut by tools/cut_loops.py, T-220)).
+static func layer(voice: String, kind: String, rpm: float, src: String = "syn") -> String:
+	return "%s_%s_%s_%d" % [src, voice, kind, int(rpm)]
 
 
 ## Weight of each RPM point: the two neighbours, equal power (no loudness dip in the middle).

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EngineAudioConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/engine_audio_config.gd" id="1_ea"]
+
+[resource]
+script = ExtResource("1_ea")
+mode = "loops"
+mode_mobile = "loops"
+crossover_hz = 300.0
+rate_pc = 22050
+rate_light = 11025
+light_on_mobile = true
+buffer_s = 0.08
+synth_db = 2.0

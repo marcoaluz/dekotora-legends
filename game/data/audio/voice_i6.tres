@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EngineVoiceDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/engine_voice_def.gd" id="1_ev"]
+
+[resource]
+script = ExtResource("1_ev")
+id = "i6"
+cylinders = 6
+strokes = 4
+cyl_bias = 0.1
+amp_sigma_idle = 0.15
+amp_sigma = 0.14
+jitter_idle = 0.014
+jitter = 0.01
+rpm_wobble = 0.004
+pulse_width = 0.07
+width_sigma = 0.2
+blowdown = 0.9
+burst = 0.85
+burst_ms = 6.0
+clatter = 0.3
+clatter_ms = 0.9
+flow = 0.5
+boom_hz = 105.0
+boom_db = 6.0
+mid_hz = 520.0
+mid_db = 7.0
+presence_hz = 900.0
+presence_db = 5.0
+lp_idle_hz = 1900.0
+lp_high_hz = 3400.0
+drive = 0.35
+echo_ms = 7.5
+echo_db = -9.0
+level_db = 0.0
+seed = 11

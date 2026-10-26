@@ -26,6 +26,7 @@ var fx_motion_blur: bool = false        # T-189: borrao de velocidade (so Ultra;
 var fx_reduce_flash: bool = false       # T-204: reduzir claroes (raio da abertura, saida de tunel): sem tela branca
 var fx_reduce_shake: bool = false       # T-219: reduzir tremor da camera (tremores x TruckFeel.reduced_shake_scale, sem congelar)
 var haptics: bool = true                # T-219: vibracao do celular (batidas, curva, freada)
+var engine_sound: String = ""           # T-220: som do motor "" padrao (data/audio/engine_audio.tres) | loops | synth | mix
 var race_cam: String = "standard"       # T-198: camera da corrida (RaceCamRig.IDS); a ultima escolhida
 var race_cam_routes: Dictionary = {}    # T-198: rota -> camera usada nela da ultima vez
 var mirror_mode: int = 0                # T-198: retrovisor 0 automatico (RaceCamView.mirror_auto_on), 1 ligado, 2 desligado
@@ -74,6 +75,7 @@ func load_settings(path: String = PATH) -> void:
 	tilt_invert = bool(cfg.get_value("controls", "tilt_invert", tilt_invert))
 	music_volume = float(cfg.get_value("audio", "music_volume", music_volume))
 	sfx_volume = float(cfg.get_value("audio", "sfx_volume", sfx_volume))
+	engine_sound = String(cfg.get_value("audio", "engine_sound", engine_sound))
 	language = String(cfg.get_value("general", "language", language))
 	player_name = String(cfg.get_value("net", "player_name", player_name))
 	server_address = String(cfg.get_value("net", "server_address", server_address))
@@ -107,6 +109,7 @@ func save_settings(path: String = PATH) -> void:
 	cfg.set_value("controls", "tilt_invert", tilt_invert)
 	cfg.set_value("audio", "music_volume", music_volume)
 	cfg.set_value("audio", "sfx_volume", sfx_volume)
+	cfg.set_value("audio", "engine_sound", engine_sound)
 	cfg.set_value("general", "language", language)
 	cfg.set_value("net", "player_name", player_name)
 	cfg.set_value("net", "server_address", server_address)

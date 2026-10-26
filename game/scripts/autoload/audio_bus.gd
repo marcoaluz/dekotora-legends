@@ -55,6 +55,16 @@ func _setup_buses() -> void:
 		eq.set_band_gain_db(0, 5.0)              # 32 Hz: a cabine treme
 		eq.set_band_gain_db(1, 4.0)              # 100 Hz
 		AudioServer.add_bus_effect(cab, eq)
+	# T-220: loops do motor no modo "mix": so medios/agudos (os graves vem do diesel procedural, EngineSynthVoice)
+	if AudioServer.get_bus_index("EngineLoopsHP") < 0:
+		AudioServer.add_bus()
+		var hpi: int = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(hpi, "EngineLoopsHP")
+		AudioServer.set_bus_send(hpi, "Engine")
+		var hp := AudioEffectHighPassFilter.new()
+		hp.cutoff_hz = EngineSoundMode.config().crossover_hz
+		hp.resonance = 0.5
+		AudioServer.add_bus_effect(hpi, hp)
 
 
 func apply_settings() -> void:

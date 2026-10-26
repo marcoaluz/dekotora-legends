@@ -7,6 +7,9 @@ extends Node
 ## setup("i6_std", "turbo_single", true, false) continua valendo (formato antigo, sem perfil de escapamento).
 ## T-197: spec com "voice" = diesel sintetizado (DieselMix): loops por RPM real com carga (ON/OFF), troca de marcha
 ## (queda e retomada, derivada do RPM), freio-motor por RPM, ronco de escape aberto, estalos, cabine e Doppler.
+## T-220: modo do som (EngineSoundMode): "loops" (acima), "synth" (diesel procedural EngineSynthVoice no lugar dos
+## loops ON/OFF) ou "mix" (procedural nos graves + loops so nos medios/agudos, barramento EngineLoopsHP). Gravacoes
+## reais recortadas (rec_<voz>_<on|off>_<rpm>, tools/cut_loops.py) substituem os loops syn_ quando existem.
 
 const BANDS: Array[String] = ["idle", "low", "mid", "high"]
 const CENTERS: Array[float] = [0.0, 0.3, 0.62, 0.95]       # rpm normalizado (0..1) onde cada camada e mais forte
@@ -59,6 +62,13 @@ var _pop_t: float = 0.0
 var _pop_rng := RandomNumberGenerator.new()
 var _doppler: float = 1.0
 var _prev_dist: float = -1.0
+# T-220
+## "" = EngineSoundMode.current(); "loops" | "synth" | "mix" forca (cena de teste). Vale antes do setup_spec.
+var mode_override: String = ""
+var sound_mode: String = "loops"
+var proc: EngineSynthVoice = null
+var _src: String = "syn"
+var _health: float = 1.0
 
 
 ## Formato antigo (engine_set = prefixo dos loops de 4 camadas).
@@ -90,6 +100,8 @@ func setup_spec(s: Dictionary, jake: bool = false) -> void:
 	has_jake = jake
 	for c in get_children():
 		c.queue_free()
+	proc = null
+	sound_mode = "loops"
 	_players.clear()
 	_lazy.clear()
 	_voice = String(s.get("voice", ""))
@@ -113,9 +125,22 @@ func _setup_diesel(s: Dictionary) -> void:
 	_gain_db = float(s.get("gain_db", 0.0)) + DIESEL_DB
 	_pops = bool(s.get("pops", false))
 	_pop_rng.seed = hash(_voice) + get_instance_id()
-	for r in DieselMix.RPM_POINTS:
-		_add_layer(DieselMix.layer(_voice, "on", r), true)
-		_add_layer(DieselMix.layer(_voice, "off", r), true)
+	_src = "rec" if EngineSounds.has_engine_file(DieselMix.layer(_voice, "on", DieselMix.IDLE_RPM, "rec")) else "syn"
+	var vdef: EngineVoiceDef = null
+	if not positional:                                   # T-220: outros caminhoes ficam nos loops (custo)
+		var m: String = mode_override if mode_override in EngineSoundMode.MODES else EngineSoundMode.current()
+		vdef = EngineSoundMode.voice_def(_voice)
+		if vdef != null:
+			sound_mode = m
+	var loop_bus: String = "EngineLoopsHP" if sound_mode == "mix" and AudioServer.get_bus_index("EngineLoopsHP") >= 0 else ""
+	if sound_mode != "synth":
+		for r in DieselMix.RPM_POINTS:
+			_add_layer(DieselMix.layer(_voice, "on", r, _src), true, loop_bus)
+			_add_layer(DieselMix.layer(_voice, "off", r, _src), true, loop_bus)
+	if sound_mode != "loops":
+		_add_proc(vdef)
+	if not positional and "--synth-log" in OS.get_cmdline_user_args():
+		print("ENGINE_SOUND voz=%s modo=%s fonte=%s" % [_voice, sound_mode, _src])
 	if _open_db > -60.0:
 		for r in DieselMix.OPEN_POINTS:
 			_add_layer(DieselMix.layer(_voice, "open", r), true)
@@ -144,7 +169,22 @@ func active_layers() -> Array[String]:
 	return out
 
 
-func _add_layer(sound: String, lazy: bool = false) -> void:
+## T-220: diesel procedural do caminhao do jogador (so cliente; o no nao toca sem janela).
+func _add_proc(vdef: EngineVoiceDef) -> void:
+	var cfg: EngineAudioConfig = EngineSoundMode.config()
+	var send: String = "EngineCab" if interior and AudioServer.get_bus_index("EngineCab") >= 0 else bus
+	var hp: int = AudioServer.get_bus_index("EngineLoopsHP")
+	if hp >= 0:
+		AudioServer.set_bus_send(hp, send)
+	proc = EngineSynthVoice.new()
+	proc.name = "DieselSynth"
+	proc.redline = _redline
+	proc.configure(vdef, EngineSoundMode.light(), send, cfg.crossover_hz if sound_mode == "mix" else 0.0, cfg)
+	proc.base_db += _gain_db
+	add_child(proc)
+
+
+func _add_layer(sound: String, lazy: bool = false, bus_override: String = "") -> void:
 	var audio: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("AudioBus")   # vale fora da arvore tambem
 	if audio == null:
 		return
@@ -153,6 +193,8 @@ func _add_layer(sound: String, lazy: bool = false) -> void:
 		return
 	var p: Node
 	var b: String = "EngineCab" if interior and AudioServer.get_bus_index("EngineCab") >= 0 else bus
+	if bus_override != "":
+		b = bus_override
 	if positional:
 		var p3 := AudioStreamPlayer3D.new()
 		p3.max_distance = max_distance
@@ -224,6 +266,7 @@ func _set_layer(name: String, weight: float, pitch: float, gain_db: float = 0.0)
 ## engine_health 0..1 (1 = saudavel).
 func update(dt: float, rpm01: float, throttle: float, boost: float, engine_health: float = 1.0, speed: float = 0.0) -> void:
 	boost = clampf(boost, 0.0, 1.0)                                # T-178: boost fora de 0..1 dava guincho agudo
+	_health = engine_health
 	_smooth_throttle = lerpf(_smooth_throttle, throttle, minf(6.0 * dt, 1.0))
 	_smooth_rpm = lerpf(_smooth_rpm, rpm01, minf(10.0 * dt, 1.0))
 	if synth_boost:
@@ -272,8 +315,13 @@ func _update_diesel(dt: float, throttle: float, speed: float) -> void:
 	for i in DieselMix.RPM_POINTS.size():
 		var r: float = DieselMix.RPM_POINTS[i]
 		var p: float = DieselMix.point_pitch(rpm, r) * _pitch_mul
-		_set_layer(DieselMix.layer(_voice, "on", r), pw[i] * lw.x, p, _gain_db)
-		_set_layer(DieselMix.layer(_voice, "off", r), pw[i] * lw.y * (1.0 - _jake), p, _gain_db)
+		_set_layer(DieselMix.layer(_voice, "on", r, _src), pw[i] * lw.x, p, _gain_db)
+		_set_layer(DieselMix.layer(_voice, "off", r, _src), pw[i] * lw.y * (1.0 - _jake), p, _gain_db)
+	if proc != null:                                     # T-220: diesel procedural segue o RPM continuo
+		proc.target_rpm = rpm
+		proc.target_load = _load
+		proc.health = _health
+		proc.master = 1.0 - _jake * (1.0 - _load)
 	if _open_db > -60.0:
 		var ow: Array[float] = DieselMix.point_weights(rpm, DieselMix.OPEN_POINTS)
 		for i in DieselMix.OPEN_POINTS.size():
