@@ -576,3 +576,6 @@ Formato em `docs/AGENTES.md`.
 - Sintoma: no APK, a aba DECORAÇÃO > PEÇAS da garagem não mostrava encaixes (teto, para-choque etc.).
 - Causa: GameState.all_parts() listava res://data/parts/ procurando "*.tres", mas no export os arquivos viram "*.tres.remap" (confirmado: 84 .tres.remap dentro do APK). No PC, com o projeto aberto, funcionava. Bug desde a fase 4; os outros 5 listadores já tiravam o ".remap".
 - Correção: trim_suffix(".remap") em all_parts(). Teste novo test_export_listing_t229.gd: peças/encaixes aparecem e nenhum script usa DirAccess.get_files_at sem tratar ".remap". 513/513 testes. Commit 49d2bd0. Delegado: T-230 (APK).
+
+## 2026-10-26 · T-230 (ajudante-rapido, delegada da T-229) · concluída
+- APK de teste com a correção da garagem, 141 MB, protocolo 15, 84 peças .tres.remap dentro. Commit 166e6ab.

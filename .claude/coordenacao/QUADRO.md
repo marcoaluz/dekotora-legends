@@ -5,7 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-230 | APK de teste com a correção da T-229 (peças na garagem do celular) e linha no STATUS | delegado da T-229 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
+| T-230 | APK de teste com a correção da T-229 (peças na garagem do celular) e linha no STATUS | delegado da T-229 | fácil | ajudante-rapido | concluída (APK 141 MB protocolo 15, commit 166e6ab; precisa Marco: conferir DECORAÇÃO > PEÇAS no celular) | 2026-10-26 | 2026-10-26 |
 | T-229 | No APK do celular, a personalização do caminhão não mostra as opções de trocar teto, para-choque e outras peças | pedido do Marco (teste do APK) | médio | coordenador | concluída (commit 49d2bd0; 513 testes ok; precisa Marco: testar no APK da T-230) | 2026-10-26 | 2026-10-26 |
 | T-228 | APK de teste com a T-220 (opção Som do motor; protocolo 15) e linha no STATUS | delegado da T-220 | fácil | ajudante-rapido | concluída (APK 141 MB protocolo 15, commit 8992237; precisa Marco: instalar e ouvir) | 2026-10-26 | 2026-10-26 |
 | T-227 | Skills: seção "Peso do caminhão (T-219)" na godot-dekotora e vídeo no Blender 5 na blender-pixelart | delegado da T-219 | fácil | ajudante-rapido | concluída (commit fe3f525) | 2026-10-26 | 2026-10-26 |
