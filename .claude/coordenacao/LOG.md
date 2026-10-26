@@ -604,3 +604,7 @@ Formato em `docs/AGENTES.md`.
 - 12 murais (dois lados diferentes), 12 traseiras, 9 tetos com Yuji; arte 100% por código, referências de domínio público só de composição (CREDITOS_MURAIS). PaintFit 5 mm fora da lataria; acende à noite no Compatibility. +4 chamadas/caminhão, ~+16 MB no APK. Protocolo 17, 528 testes, encaixe 1654/1654.
 - Revisão do coordenador: folha "dekotora completo" de noite convincente; tigres e figuras humanas com cara de desenho animado (anotado pelo próprio especialista).
 - Delegado: T-237 (APK), T-238 (skills). Próximo: T-233.
+
+## 2026-10-26 · T-237 e T-238 (ajudante) · concluídas
+- T-237: APK 157 MB (+16,5 MB das pinturas), protocolo 17, 108 PNG de pintura com .ctex. Commit 25227d4.
+- T-238: skills com as pinturas (48b3bd9); coordenador corrigiu o caminho no comentário do build_t232_paint (31b1fb7).

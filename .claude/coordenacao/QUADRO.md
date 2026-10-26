@@ -5,8 +5,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-238 | Skills: seção "Pinturas (T-232)" na blender-pixelart e na godot-dekotora | delegado da T-232 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
-| T-237 | APK protocolo 17 (T-232 murais/pinturas) e linha no STATUS | delegado da T-232 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
+| T-238 | Skills: seção "Pinturas (T-232)" na blender-pixelart e na godot-dekotora | delegado da T-232 | fácil | ajudante-rapido | concluída (commit 48b3bd9) | 2026-10-26 | 2026-10-26 |
+| T-237 | APK protocolo 17 (T-232 murais/pinturas) e linha no STATUS | delegado da T-232 | fácil | ajudante-rapido | concluída (APK 157 MB protocolo 17, commit 25227d4; precisa Marco: instalar e testar) | 2026-10-26 | 2026-10-26 |
 | T-236 | Skills: "Oficina lote 2 (T-231)" na godot-dekotora e na blender-pixelart | delegado da T-231 | fácil | ajudante-rapido | concluída (commit 5a908f4) | 2026-10-26 | 2026-10-26 |
 | T-235 | APK protocolo 16 (T-231) + cabeçalho e regerar REPORT_ENCAIXE + FPS noturno com o rival chefe | delegado da T-231 | fácil | ajudante-rapido | concluída (APK 142 MB protocolo 16, commit 1b1c591; FPS PC noite 114–136 com o chefe; comparação antes não medida) | 2026-10-26 | 2026-10-26 |
 | T-234 | Peças LOTE 5: lacunas da seção 19 (rodas, escapamento, grade, buzina, interior, adesivos com fonte Yuji e as 9 frases), modelar pelas propostas | pedido do Marco (continuar peças) | difícil | especialista | fila | 2026-10-26 | |
