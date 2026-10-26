@@ -200,6 +200,9 @@ Cores: prata + azul-marinho ou preto + ciano.
 
 ## 4. Traseira (063–084)
 
+> **FEITO na T-231 (2026-10-26)**: as 11 peças abaixo estão no jogo (`blender/scripts/accessories/rear_t231.py`), na
+> largura do baú de todos os caminhões, com lanternas próprias e caixa da placa (ver `docs/DECISOES.md`, T-231).
+
 **O que as imagens mostram.** Câmera em 3/4 por trás-esquerda, baixa e **inclinada** (horizonte torto), enquadrando as portas
 do baú e o para-choque. A peça é o **para-choque traseiro junto com o painel de lanternas**: largura do baú (~2,4 m),
 0,4–0,9 m de altura, abaixo das portas. 063 é o **de fábrica** (branco, placa laranja). As outras têm:
@@ -266,6 +269,9 @@ passam da frente do baú no Canter e no baú leve (`docs/ACESSORIOS.md`, T-172).
 
 ## 6. Foguete (095–101)
 
+> **FEITO na T-231**: os 7 foguetes estão no jogo (`accessories/rocket_t231.py`), um par por compra, esticados pelo
+> comprimento do baú (encaixes `rocket_r`/`rocket_l` medidos por raios). Só baú fechado.
+
 **O que as imagens mostram.** Câmera em 3/4 por cima do baú, por trás. A peça são **2 tubos ao longo das bordas do teto
 do baú**, do comprimento do baú, ~0,15–0,25 m de diâmetro, pretos ou cromados, com **ponta de neon ciano** atrás: tubos
 redondos (095), quadrados com ponta dupla (096), 2 pares (097), tubo com fita de **LED verde** (098), calhas baixas com
@@ -291,6 +297,9 @@ neon tracejado (099), tubos com neon tracejado (100) e uma **moldura** em volta 
 ---
 
 ## 7. Luzes do baú: lateral direita, lateral esquerda, superior (102, 103, 104)
+
+> **FEITO na T-231**: os 3 contornos estão no jogo (módulo de 0,30 m repetido nas faixas medidas por raios em cada
+> caminhão, `box_light_*`). Só baú fechado.
 
 **O que as imagens mostram.** 102 de lado (direita), 103 de lado (esquerda, aparece a porta lateral do baú), 104 de cima.
 É um **contorno tracejado de LED verde** nas 4 bordas de cada face do baú, colado na quina, sem relevo.
@@ -581,7 +590,7 @@ Ordem pensada no que a câmera da corrida mais mostra (atrás e acima do baú).
 | Etapa | O quê | Peças | Esforço |
 | --- | --- | --- | --- |
 | 2 | Base: `sockets.json`, caixas-limite, escala automática, separar peças de fábrica nos `.glb`, materiais do teto/traseira, dano sem buraco, teste + `REPORT_ENCAIXE.md` | 0 | 2 sessões |
-| 3 | Traseira + foguete + contorno do baú | 11 + 7 + 3 = 21 | 2 sessões |
+| 3 | Traseira + foguete + contorno do baú — **FEITO (T-231)** | 11 + 7 + 3 = 21 | 2 sessões |
 | 4 | Murais + pintura da traseira + pintura do teto (com `CREDITOS_MURAIS.md`) | 12 + 12 + 9 = 33 | 2–3 sessões |
 | 5 | Deque frontal (shader de LED, atlas de letreiros) | 17 | 2 sessões |
 | 6 | Frente: viseira (4 bases), para-choque, retrovisor, escada, saias | 14 + 11 + 6 + 3 + 8 = 42 | 3 sessões |

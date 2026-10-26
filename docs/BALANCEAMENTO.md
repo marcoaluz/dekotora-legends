@@ -486,6 +486,43 @@ Cor L/R: tabela da seção 18 do catálogo (comum 2.000 ¥, metálica 6.000 ¥, 
 | `visor_chrome_louver` | Viseira | Frente | 95 | 80 | 22 | 34.000 | 60 | Rara |
 | `visor_neon_frame` | Viseira | Frente | 50 | 35 | 22 | 28.000 | 20 | Incomum |
 
+## Peças da oficina, lote 2: traseira, foguete e contorno do baú (T-231) — PROPOSTA
+
+Valores **propostos** (catálogo `docs/REFERENCIA_PECAS.md`, seções 4, 6 e 7), iguais aos do catálogo. Mesmas regras do
+lote 1: raridade e Fama sugerida só nos dados (não travam), cor L/R e cor das luzes com o preço da seção 18.
+- **Para-choque traseiro**: substitui o `rb_basic`/`rb_chrome` no mesmo encaixe; traz lanternas próprias (vermelhas, não
+  mudam com a cor L/R) e a caixa da placa. Peso 140–380 kg (o `rb_basic` pesa 100 kg).
+- **Foguete**: um par (os 2 lados) por compra; estica no comprimento do baú. **Só baú fechado**: na graneleira, lona,
+  tanque e caçamba fica guardado (não aparece, não pesa, não conta destaque).
+- **Contorno do baú**: 3 peças separadas (direita, esquerda, teto), 6.000 ¥ cada. Só baú fechado.
+- **Bots** (T-231): para-choque da frente básico + um para-choque traseiro novo sorteado pela semente
+  (`TruckConfig.BOT_REAR`) e, em 1 de cada 3, um foguete (`BOT_ROCKET`). Rivais: chefe = `rb_grand_panel` + `rocket_frame` +
+  3 contornos; Trovão Rosa = `rb_neon_rows` + `rocket_neon_dash`; Lua Cromada = `rb_target`; Dragão de Aço = `rb_torpedo`.
+
+| ID | Encaixe | Zona | Peso (kg) | Durab. | Destaque | Preço (¥) | Fama sugerida | Raridade |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `rb_square_row` | Para-choque traseiro | Traseira | 140 | 110 | 12 | 16.000 | 20 | Incomum |
+| `rb_round_twin` | Para-choque traseiro | Traseira | 220 | 150 | 20 | 28.000 | 20 | Incomum |
+| `rb_square_grid` | Para-choque traseiro | Traseira | 230 | 150 | 20 | 29.000 | 20 | Incomum |
+| `rb_round_grid` | Para-choque traseiro | Traseira | 230 | 150 | 22 | 31.000 | 60 | Rara |
+| `rb_target` | Para-choque traseiro | Traseira | 260 | 160 | 26 | 36.000 | 60 | Rara |
+| `rb_double_deck` | Para-choque traseiro | Traseira | 260 | 170 | 26 | 38.000 | 60 | Rara |
+| `rb_neon_rows` | Para-choque traseiro | Traseira | 240 | 150 | 26 | 36.000 | 60 | Rara |
+| `rb_neon_plate` | Para-choque traseiro | Traseira | 230 | 150 | 24 | 34.000 | 60 | Rara |
+| `rb_bullet` | Para-choque traseiro | Traseira | 270 | 170 | 30 | 44.000 | 60 | Rara |
+| `rb_torpedo` | Para-choque traseiro | Traseira | 300 | 170 | 36 | 52.000 | 120 | Lendária |
+| `rb_grand_panel` | Para-choque traseiro | Traseira | 380 | 240 | 40 | 72.000 | 120 | Lendária |
+| `rocket_round` | Foguete | Teto | 60 | 50 | 10 | 12.000 | 0 | Comum |
+| `rocket_square` | Foguete | Teto | 65 | 50 | 11 | 13.000 | 0 | Comum |
+| `rocket_twin` | Foguete | Teto | 90 | 60 | 14 | 18.000 | 20 | Incomum |
+| `rocket_led` | Foguete | Teto | 70 | 45 | 16 | 20.000 | 20 | Incomum |
+| `rocket_flat_neon` | Foguete | Teto | 55 | 40 | 16 | 19.000 | 20 | Incomum |
+| `rocket_neon_dash` | Foguete | Teto | 65 | 45 | 18 | 22.000 | 20 | Incomum |
+| `rocket_frame` | Foguete | Teto | 110 | 60 | 26 | 34.000 | 60 | Rara |
+| `boxlight_dash_r` | Contorno – direita | Direita | 12 | 15 | 6 | 6.000 | 0 | Comum |
+| `boxlight_dash_l` | Contorno – esquerda | Esquerda | 12 | 15 | 6 | 6.000 | 0 | Comum |
+| `boxlight_dash_top` | Contorno – teto | Teto | 12 | 15 | 6 | 6.000 | 0 | Comum |
+
 ## Caminhões de homenagem (T-218) — PROPOSTA
 
 Dados em `game/data/bodies/<id>.tres`. Todos com 12 m na pista (chassi do baú médio) e motor normal (torque ×1,0).

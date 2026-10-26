@@ -34,6 +34,41 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 
 **Total: 713 de 713 combinações cabem** (peça dentro da caixa, fora da lataria e de toda zona protegida).
 
+## Matriz caminhão × lote 2 (T-231: 11 para-choques traseiros, 7 foguetes, 3 contornos do baú)
+
+| Caminhão | Para-choques OK | Escala | Foguetes OK | Faixa / comprimento do foguete | Contornos OK | Contorno (m: dir/esq/teto) | Falhas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| alubox | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
+| base_americana | 11/11 | 1.08 | 7/7 | 0.16 / 8.19 m | 3/3 | 20.6/20.6/21.5 | nenhuma |
+| base_chata | 11/11 | 1.08 | 7/7 | 0.16 / 8.19 m | 3/3 | 20.6/20.6/21.5 | nenhuma |
+| base_curta | 11/11 | 1.08 | 7/7 | 0.16 / 9.39 m | 3/3 | 23.0/23.0/23.9 | nenhuma |
+| base_jac | 11/11 | 1.08 | 7/7 | 0.16 / 8.84 m | 3/3 | 21.9/21.9/22.8 | nenhuma |
+| canter | 11/11 | 0.95 | 7/7 | 0.34 / 4.54 m | 3/3 | 13.1/13.1/14.4 | nenhuma |
+| carreta (guardada) | 11/11 | 1.03 | 7/7 | 0.34 / 13.09 m | 3/3 | 28.7/28.7/31.1 | nenhuma |
+| dump | 11/11 | 1.06 | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_americana | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_chata | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_curta | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_jac | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
+| leve_americana | 11/11 | 1.03 | 7/7 | 0.34 / 5.09 m | 3/3 | 13.4/13.4/15.4 | nenhuma |
+| leve_chata | 11/11 | 1.03 | 7/7 | 0.34 / 5.19 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
+| leve_curta | 11/11 | 1.03 | 7/7 | 0.13 / 6.39 m | 3/3 | 15.6/15.6/17.9 | nenhuma |
+| leve_jac | 11/11 | 1.03 | 7/7 | 0.13 / 5.84 m | 3/3 | 15.3/15.3/16.8 | nenhuma |
+| longo_americana | 11/11 | 1.03 | 7/7 | 0.34 / 9.49 m | 3/3 | 22.0/22.0/24.2 | nenhuma |
+| longo_chata | 11/11 | 1.03 | 7/7 | 0.34 / 9.59 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
+| longo_curta | 11/11 | 1.03 | 7/7 | 0.34 / 10.49 m | 3/3 | 24.3/24.3/26.7 | nenhuma |
+| longo_jac | 11/11 | 1.03 | 7/7 | 0.34 / 9.99 m | 3/3 | 23.3/23.3/25.6 | nenhuma |
+| pinkbox | 11/11 | 1.03 | 7/7 | 0.13 / 7.99 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
+| tanker | 11/11 | 0.97 | só baú fechado | — | só baú fechado | — | nenhuma |
+| tarp | 11/11 | 1.03 | só baú fechado | — | só baú fechado | — | nenhuma |
+
+Lote 2: **413 de 413** combinações cabem. Para-choque traseiro: largura do baú, atrás de tudo o que fica
+embaixo dele (substitui o para-choque e as lanternas de fábrica de baixo: leva lanternas próprias e a caixa da
+placa), topo a 0,93 m (abaixo das setas). Foguete e contorno: faixas medidas por raios na lataria real
+(`truck_measure.box_edges`); conferidos vértice a vértice (`StripFit.problems`).
+
+**Total geral (lotes 1 e 2): 1126 de 1126 combinações cabem.**
+
 ## Falhas
 
 Nenhuma. (Na 1ª rodada o teste reprovou ~70 combinações: deques 2–3 cm mais largos que a caixa e canhões fundos
@@ -43,10 +78,11 @@ largura do teto. Imagem das caixas e zonas: `docs/capturas_t211/encaixes_zonas.p
 ## Zonas protegidas e encaixes (exemplos)
 
 **base_chata**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_L_3, wheel_r_R_1, wheel_r_R_3, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket (stretch9), box_light_top (face), box_light_r (face), box_light_l (face), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
 **canter**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_R_1, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket (stretch9), box_light_top (face), box_light_r (face), box_light_l (face), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
 
 Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo
-leva a seta junto) para `front_bumper`; `rear_plate` para `rear_bumper`; rodas para `hubcaps`.
+leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da
+placa próprias) para `rear_bumper`; rodas para `hubcaps`.
 

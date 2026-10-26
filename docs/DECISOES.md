@@ -1240,3 +1240,32 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   - T-219: números do `truck_feel.tres`; prazos das rotas **mantidos** (sem os +3 s).
   - T-220: estrutura do som aprovada; o padrão continua `loops` até o Marco escolher outro na cena de teste/Opções.
 - Próximo: continuar as peças pela ordem da seção 16.2 de `docs/REFERENCIA_PECAS.md`, um lote por vez (T-231 a T-234), sem esperar aprovação entre lotes, salvo decisão que mude o design.
+
+## 2026-10-26 · T-231 · Oficina lote 2: traseira, foguete e contorno do baú (seção 16.2, etapa 3)
+
+- **Lanternas de fábrica: NÃO viraram nós `STOCK_*`** (decisão do Claude, a opção mais limpa; Marco confere). O para-choque
+  traseiro novo vai **atrás de tudo o que fica embaixo do baú** (medido nos `.glb`: z de trás do para-choque/lanternas de
+  fábrica + 1 cm), na **largura do baú**, com topo a 0,93 m (as setas de trás começam em 0,95 m) e **traz lanternas
+  próprias** (material `lamp_tail`: acendem à noite, vermelho-escuro de dia, não piscam com o padrão das luzinhas) e a
+  **caixa da placa** (a placa de trás do caminhão vai para ela, `TruckPlateSpots._rear_holder`). Assim ele substitui o
+  para-choque e as lanternas de fábrica de baixo **sem regerar os 23 `.glb`** e sem buraco quando a peça é retirada (a de
+  fábrica continua lá atrás). Zona protegida `rear_lamp_*` passa a ser isenta para `rear_bumper` (como a seta da frente é
+  isenta para o para-choque da frente). As lanternas verticais do baú (colunas âmbar/vermelha/branca) e as setas continuam
+  livres. Antes a caixa do encaixe tinha 1,5 m (e só 8 cm no Canter e 3 cm no tanque: as lanternas de fábrica deles
+  são uma barra larga) — agora 2,3–2,6 m em todos.
+- **Foguete**: uma faixa por borda do teto do baú, medida por raios: por dentro do contorno de LED do teto e por fora do
+  andon de fábrica do teto (0,13–0,34 m de largura, 4,5–10,5 m de comprimento). A peça vem em 3 grupos (ponta de trás,
+  módulo de 1 m, ponta da frente) e o jogo repete o módulo até o comprimento (`StripFit`, fit "stretch"); a seção encolhe
+  até 0,70 onde a faixa é estreita, nunca cresce. Um par por compra (lado esquerdo espelhado).
+- **Contorno de LED**: 3 encaixes (direita, esquerda, teto). As faixas são **medidas por raios** em cada caminhão: da
+  quina para dentro, a primeira linha onde a lataria está no plano da face, sem nada saliente nem lanterna de fábrica a
+  menos de 1,2 cm (as fileiras de luzinhas de fábrica ficam livres). O jogo repete um módulo de 0,30 m (trilho + traço de
+  LED) ao longo de cada trecho, numa malha por material.
+- **Só baú fechado**: foguete e contorno não existem na graneleira, lona, tanque e caçamba; lá a peça comprada fica
+  guardada (não aparece, não pesa, não conta destaque) e a garagem avisa ("Só para baú fechado").
+- **Dano sem buraco**: quebrada fica no lugar; o foguete só tomba 5° de lado (sem levantar a ponta de 8 m), o contorno não
+  inclina (o nó dele fica na origem do caminhão); luzes apagam (inclusive as lanternas `lamp_tail`) e cromo vira aço.
+- **Escada (lote futuro)**: a caixa do encaixe `ladder_*` foi empurrada para fora do contorno de LED da lateral.
+- **Bots e rivais**: bots sorteiam um para-choque traseiro novo (e, em 1 de 3, um foguete) pela semente — mesmo resultado
+  no servidor e nos clientes; rivais com peças novas (tabela em `BALANCEAMENTO.md`). **Protocolo 16.**
+- Preços, pesos e destaque: os do catálogo, como proposta (`BALANCEAMENTO.md`, seção T-231).
