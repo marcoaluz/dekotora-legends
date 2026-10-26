@@ -546,3 +546,18 @@ Formato em `docs/AGENTES.md`.
 - Validação: 502 testes OK; net_test.sh PASSOU (PRED médio 0,17–0,20 m); probe 0–100 padrão 22,6→23,7 s, troca 90% 1,00→1,13 s, baú cheio 1,17→1,67 s; duelo 12 sementes litoral +2,8 s, viaduto +3,8 s, montanha −3,8 s (ruído). Vídeos MP4 antes|depois + tiras + gráficos em docs/capturas_t219/.
 - Armadilhas: (1) disco C: com <1 GB livre — gravar Movie Maker em D: (frames de 1440x810 PNG = ~450 MB por caso); (2) Blender 5: `image_settings.media_type = "VIDEO"` antes de `FFMPEG`, `se.strips` (não `sequences`) e view_transform "Standard" (AgX desbota); (3) script -s com janela: `root.content_scale_mode = DISABLED` senão o desenho sai esticado; (4) com aceleração mais lenta o bot ficava seguindo na borda do horizonte (obstáculo pisca) e nunca ultrapassava — teste `test_bot_does_not_get_stuck_trailing_a_bus`.
 - Decisão pendente: prazos das rotas (manter, ou +3 s no litoral e viaduto) e se a inércia/troca de faixa está no ponto (ajustar no .tres jogando).
+
+## 2026-10-26 · T-219 (especialista) · precisa Marco
+- TruckFeel em game/data/feel/truck_feel.tres (sim_* mexe na simulação/protocolo; resto só visual/som/haptic). Balanço do baú, cabeceio, suspensão e emendas, câmera com atraso/FOV/tremor, hit-stop 75 ms só local, fumaça de pneu, 4 sons procedurais, vibração com opção, "Reduzir tremor". Bot não trava mais atrás de ônibus (blocked_hysteresis). Protocolo 15. 502/502 testes, net_test ok.
+- 0–100 padrão 22,6→23,7 s; troca de faixa baú cheio 1,17→1,67 s. Vídeos MP4 antes/depois em docs/capturas_t219/.
+- Disco C: com 0,8 GB livres (alerta ao Marco). Delegado: T-226 (APK), T-227 (skills).
+
+## 2026-10-26 08:29 · T-226 · ajudante-rapido · CONCLUÍDA
+- Feito: APK de teste protocolo 15 (com T-219: peso do caminhão) gerado; Min/Target SDK vazios só na cópia durante o export, preset restaurado (git diff vazio); STATUS atualizado; commit 8eb8373 (só docs/STATUS.md).
+- Arquivos: builds/kaido-bakuso-debug.apk (147.770.853 bytes, +84.230 vs T-224; SHA-256 920c4356c62dffe261229254c71e3eb5fa1f002d27c59c404b9898c80c51f535), builds/t226_export.log, docs/STATUS.md, .claude/coordenacao/LOG.md (sem commit).
+- Observação: C: 0,828 GB livres antes e 0,825 GB depois; memória livre 7,39 GB; export EXIT=0, sem erros/avisos no log, assinado com chave de debug. Celular não testado.
+
+## 2026-10-26 08:30 · T-227 · ajudante-rapido · CONCLUÍDA
+- Feito: skills com o peso do caminhão da T-219 (Godot: TruckFeel, sim_*, RaceFeel, TruckMotion, flags, captura, armadilhas; Blender: video_t219.py e armadilhas do Blender 5). Commit fe3f525.
+- Arquivos: .claude/skills/godot-dekotora/SKILL.md, .claude/skills/blender-pixelart/SKILL.md.
+- Observação: `--feel=res://...` que `tools/capture_t219.sh` passa via EXTRA não é lido pela corrida (só `measure_duel --feel=legacy`); registrado na skill como pendência. Ainda não existe `--feel=CAMINHO` no jogo. LOG não commitado (há alterações de outros agentes no arquivo).
