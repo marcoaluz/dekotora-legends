@@ -15,8 +15,11 @@ FRONT_PLATE_Y = {"chata": 0.775, "jac": 0.70, "curta": 0.62, "americana": 0.50, 
                  "flat_wide": 0.66, "flat_quad": 0.66}
 PLATE_HALF = (0.30, 0.13)          # meia largura/altura da área da placa (placa 0,44 x 0,22 + folga)
 SCALE_MIN, SCALE_MAX = 0.85, 1.15  # escala automática "uniform"
+ROCKET_H = 0.38                    # m: altura máxima do foguete acima do teto do baú (T-231)
+RB_DEPTH = 0.55                    # m: fundo máximo do para-choque traseiro com as lanternas (T-231)
+STRIP_W, STRIP_T = 0.025, 0.03     # m: largura e espessura reservadas ao contorno de LED (T-231)
 # Encaixes que só existem em baú fechado (a graneleira é aberta).
-BOX_ONLY = ("rocket", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint")
+BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint")
 
 
 def _box(x0, y0, z0, x1, y1, z1) -> list:
@@ -44,7 +47,10 @@ def protected_zones(m: dict, cab: str, extra_stacks: list) -> dict:
         z[f"blinker_front_{side}"] = {"box": _box(sx * 1.05, 0.85, fz - 1.0, sx * 1.39, 1.05, fz + 0.07), "exempt": ["front_bumper"]}
         z[f"blinker_rear_{side}"] = {"box": _box(sx * 1.05, 0.95, max(0.05, rz + 0.01), sx * 1.39, 1.15, 0.9), "exempt": []}
     for side, b in m["rear_lamps"].items():
-        z[f"rear_lamp_{side}"] = {"box": _box(b[0][0], b[0][1], max(b[0][2], rz + 0.01), b[1][0], b[1][1], b[1][2] + 0.8), "exempt": []}
+        # T-231: o para-choque traseiro novo SUBSTITUI as lanternas de fábrica de baixo (fica atrás delas e leva
+        # lanternas próprias, que acendem): isento desta zona, como o da frente é isento da seta
+        z[f"rear_lamp_{side}"] = {"box": _box(b[0][0], b[0][1], max(b[0][2], rz + 0.01), b[1][0], b[1][1], b[1][2] + 0.8),
+                                  "exempt": ["rear_bumper"]}
     fy = FRONT_PLATE_Y.get(cab, 0.7)
     fb = m["mounts"].get("MOUNT_FRONT_BUMPER", [0, 0.5, fz])
     z["front_plate"] = {"box": _box(-PLATE_HALF[0], fy - PLATE_HALF[1], fb[2] - 0.6, PLATE_HALF[0], fy + PLATE_HALF[1], fb[2] - 0.12),
@@ -113,17 +119,33 @@ def sockets(m: dict, extra_stacks: list) -> dict:
     bx = m.get("box")
     if bx:
         bh, top, bot, bf, rz = bx["half_w"], bx["top_y"], bx["bottom_y"], bx["front_z"], bx["rear_z"]
-        # escada: na lateral do baú, logo atrás da quina da frente (e atrás dos escapamentos)
+        ed = m.get("edges", {})
+        # escada: na lateral do baú, logo atrás da quina da frente (e atrás dos escapamentos); T-231: por fora do
+        # contorno de LED da lateral
         lz0 = max(bf + 0.08, stack_zmax + 0.03)
         for side, sx in (("r", 1), ("l", -1)):
-            s["ladder_" + side] = {"box": _box(sx * (bh + 0.04), bot, lz0, sx * (bh + 0.32), top, lz0 + 0.34),
-                                   "anchor": [sx * round(bh + 0.04, 3), round(bot, 3), round(lz0 + 0.17, 3)], "fit": "stretch_y"}
+            segs = ed.get("strips", {}).get("box_light_" + side, [])
+            lx = max([bh + 0.04] + [abs(g["a"][0]) + STRIP_T + 0.01 for g in segs])
+            s["ladder_" + side] = {"box": _box(sx * lx, bot, lz0, sx * (lx + 0.28), top, lz0 + 0.34),
+                                   "anchor": [sx * round(lx, 3), round(bot, 3), round(lz0 + 0.17, 3)], "fit": "stretch_y"}
         if not m.get("open_body"):
-            s["rocket"] = {"box": _box(-(bh + 0.03), top + 0.025, bf + 0.05, bh + 0.03, top + 0.40, rz - 0.05),
-                           "anchor": [0.0, round(top + 0.025, 3), round(rz - 0.05, 3)], "length": round(rz - bf - 0.10, 3), "fit": "stretch9"}
-            s["box_light_top"] = {"box": _box(-bh, top, bf, bh, top + 0.02, rz), "fit": "face"}
+            # T-231: foguete = uma faixa em cada borda do teto (entre o andon de fábrica do teto e a borda), medida por
+            # raios; a peça estica no comprimento (fit "stretch") e encolhe na largura da faixa
             for side, sx in (("r", 1), ("l", -1)):
-                s["box_light_" + side] = {"box": _box(sx * bh, bot, bf, sx * (bh + 0.03), top, rz), "fit": "face"}
+                rk = ed.get("rocket_" + side)
+                if not rk:
+                    continue
+                xa, xb = sx * rk["inner"], sx * rk["outer"]
+                # ponto na borda de FORA da faixa (a peça cresce para dentro; a do lado esquerdo é espelhada)
+                s["rocket_" + side] = {"box": _box(xa, rk["top"] - 0.005, rk["z0"], xb, rk["top"] + ROCKET_H, rk["z1"]),
+                                       "anchor": [round(xb, 3), rk["top"], rk["z1"]],
+                                       "length": round(rk["z1"] - rk["z0"], 3), "band": round(rk["outer"] - rk["inner"], 3),
+                                       "fit": "stretch"}
+            # T-231: contorno de LED = faixas nas bordas de cada face, só onde a lataria está livre (raios)
+            for k, segs in ed.get("strips", {}).items():
+                if not segs:
+                    continue
+                s[k] = {"anchor": [0.0, 0.0, 0.0], "strips": segs, "boxes": [strip_box(g) for g in segs], "fit": "strips"}
         # saia lateral: embaixo do baú, entre a roda da frente e a 1ª de trás
         fw = [b for n, b in m["wheels"].items() if n.startswith("wheel_f")]
         rw = [b for n, b in m["wheels"].items() if n.startswith("wheel_r")]
@@ -132,12 +154,15 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         for side, sx in (("r", 1), ("l", -1)):
             s["side_skirts_" + side] = {"box": _box(sx * (bh - 0.40), 0.22, z0, sx * (bh + 0.02), bot - 0.02, z1),
                                         "anchor": [sx * round(bh, 3), 0.22, round(z0, 3)], "length": round(z1 - z0, 3), "fit": "stretch9"}
-        # para-choque de trás: embaixo das portas, atrás do baú, sem cobrir as lanternas
-        # (sem cobrir as lanternas de fábrica e as setas: a parte do meio, entre as lanternas)
-        rl = [min(abs(b[0][0]), abs(b[1][0])) for b in m["rear_lamps"].values()] or [0.8]
-        rbx = min(rl) - 0.03
-        s["rear_bumper"] = {"box": _box(-rbx, 0.15, rz + 0.01, rbx, bot + 0.10, rz + 0.55),
-                            "anchor": [0.0, 0.15, round(rz + 0.01, 3)], "width": round(2 * rbx, 3), "fit": "uniform"}
+        # para-choque de trás (T-231): largura do baú, atrás de tudo o que fica embaixo dele (substitui o para-choque e
+        # as lanternas de fábrica, levando lanternas próprias), topo abaixo das setas de trás; a placa vai na caixa da
+        # placa da peça. Antes (T-211) a caixa ficava entre as lanternas de fábrica (1,5 m; 8 cm no Canter).
+        rr = ed.get("rear")
+        if rr:
+            hwr = rr["half_w"] - 0.01
+            s["rear_bumper"] = {"box": _box(-(hwr + 0.03), 0.12, rr["back_z"] - 0.005, hwr + 0.03, rr["top_y"] + 0.005,
+                                            rr["back_z"] + RB_DEPTH),
+                                "anchor": [0.0, rr["top_y"], rr["back_z"]], "width": round(2 * hwr, 3), "fit": "uniform"}
     # superfícies (sem volume: textura do material) e itens sem lugar físico
     for k in ("mural_r", "mural_l", "roof_paint", "rear_paint"):
         s[k] = {"fit": "face"}
@@ -149,6 +174,28 @@ def sockets(m: dict, extra_stacks: list) -> dict:
     return s
 
 
+def strip_box(g: dict) -> list:
+    """Caixa reservada a um segmento do contorno de LED: largura STRIP_W em volta da linha (+1 cm nas pontas), de 4 mm
+    para dentro da face até STRIP_T para fora."""
+    a, b, n, w = g["a"], g["b"], g["n"], g["w"]
+    lo, hi = [0.0] * 3, [0.0] * 3
+    for i in range(3):
+        if n[i] > 0.5:
+            lo[i], hi[i] = a[i] - 0.004, a[i] + STRIP_T
+        elif n[i] < -0.5:
+            lo[i], hi[i] = a[i] - STRIP_T, a[i] + 0.004
+        elif abs(w[i]) > 0.5:
+            lo[i], hi[i] = min(a[i], b[i]) - STRIP_W * 0.6, max(a[i], b[i]) + STRIP_W * 0.6
+        else:
+            lo[i], hi[i] = min(a[i], b[i]) - 0.01, max(a[i], b[i]) + 0.01
+    return _box(lo[0], lo[1], lo[2], hi[0], hi[1], hi[2])
+
+
+def boxes_of(v: dict) -> list:
+    """Caixas de um encaixe: a única ("box") ou as várias ("boxes", T-231: contorno de LED)."""
+    return v["boxes"] if "boxes" in v else ([v["box"]] if "box" in v else [])
+
+
 def overlap(a: list, b: list, eps: float = 0.001) -> bool:
     """Caixas se cruzam (mais que `eps` em todos os eixos)? Encostar não conta."""
     return all(min(a[1][i], b[1][i]) - max(a[0][i], b[0][i]) > eps for i in range(3))
@@ -157,10 +204,10 @@ def overlap(a: list, b: list, eps: float = 0.001) -> bool:
 def check(sk: dict, zones: dict) -> list:
     """Problemas de projeto: encaixes que se cruzam e encaixes que entram numa zona protegida (sem isenção)."""
     probs = []
-    vol = [(k, v["box"]) for k, v in sk.items() if "box" in v]
+    vol = [(k, b) for k, v in sk.items() for b in boxes_of(v)]
     for i, (ka, a) in enumerate(vol):
         for kb, b in vol[i + 1:]:
-            if overlap(a, b):
+            if ka != kb and overlap(a, b):
                 probs.append(f"encaixes {ka} x {kb} se cruzam")
         for zk, zv in zones.items():
             base = ka[:-2] if ka[-2:] in ("_r", "_l") else ka

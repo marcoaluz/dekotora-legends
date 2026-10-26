@@ -64,6 +64,7 @@ def build_one(path: str) -> dict:
     m = TM.measure(data, body)
     m["open_body"] = body in OPEN_BODIES
     m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
+    m["edges"] = TM.box_edges(data, m)                          # T-231: traseira, foguete e contorno do baú
     st = stacks(body, cab)
     sk = R.sockets(m, st)
     zones = R.protected_zones(m, cab, st)
@@ -73,7 +74,7 @@ def build_one(path: str) -> dict:
         "model": stem, "body": body, "cab": cab, "version": 1,
         "units": "metros; Godot: x direita, y cima, frente = -z, traseira do bau em z = 0",
         "scale_limits": [R.SCALE_MIN, R.SCALE_MAX],
-        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf")},
+        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges")},
         "sockets": sk, "protected": zones, "design_problems": probs,
         "surfaces": stem + ".surf.json",
     }
@@ -90,6 +91,16 @@ def build_one(path: str) -> dict:
     print(f"[sockets] {stem:34s} cabine larg {2 * c['half_w']:.2f} teto y {c['roof_y']:.2f} z {c['roof_front_z']:.2f}..{c['roof_back_z']:.2f}"
           f" para-brisa topo {c['windshield'][1][1]:.2f} viseira z {c['visor_back_z']:.2f} | {len(sk)} encaixes, {len(zones)} zonas,"
           f" {len(probs)} problemas")
+    rb = sk.get("rear_bumper", {})
+    txt = f"para-choque tras larg {rb.get('width', 0):.2f} topo {rb.get('anchor', [0, 0])[1]:.2f} z {rb.get('anchor', [0, 0, 0])[2]:.2f}"
+    for k in ("rocket_r", "rocket_l"):
+        if k in sk:
+            txt += f" | {k} faixa {sk[k]['band']:.2f} compr {sk[k]['length']:.2f}"
+    for k in ("box_light_r", "box_light_l", "box_light_top"):
+        if k in sk:
+            tot = sum(sum((g["b"][i] - g["a"][i]) ** 2 for i in range(3)) ** 0.5 for g in sk[k]["strips"])
+            txt += f" | {k} {len(sk[k]['strips'])} trechos {tot:.1f} m"
+    print(f"[sockets] {stem:34s} {txt}")
     for p in probs:
         print("   PROBLEMA:", p)
     return out
@@ -133,8 +144,9 @@ def preview(path: str, data: dict, out_dir: str) -> list:
     blue, red = _mat("sock", (0.1, 0.5, 1.0, 0.35)), _mat("zone", (1.0, 0.1, 0.1, 0.30))
     objs = [o for o in bpy.data.objects if o.type == "MESH"]
     for k, v in data["sockets"].items():
-        if "box" in v and v.get("fit") != "face":
-            objs.append(_box_obj("S_" + k, v["box"], blue))
+        for i, b in enumerate(R.boxes_of(v)):
+            if v.get("fit") != "face":
+                objs.append(_box_obj(f"S_{k}_{i}", b, blue))
     for k, v in data["protected"].items():
         objs.append(_box_obj("Z_" + k, v["box"], red))
     c = data["measure"]["cab"]

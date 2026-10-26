@@ -238,3 +238,204 @@ def surfaces(m: dict) -> dict:
         "lean": round(lean, 4),
         "glass_top": [round(float(a[:, 0].max()), 3), round(float(a[a[:, 0].argmax(), 1]), 3)] if len(a) else None,
     }
+
+
+# ----------------------------------------------------------------------------- traseira, foguete e contorno do baú (T-231)
+
+EDGE_STEP = 0.05                  # m: passo das células ao longo das bordas do baú
+STRIP_W = 0.025                   # m: largura da faixa do contorno de LED
+STRIP_MIN = 0.25                  # m: trecho livre mais curto que isto não leva contorno
+STRIP_LO, STRIP_HI = 0.025, 0.012 # m: a lataria embaixo da faixa pode estar até isto abaixo/acima do plano da face
+LAMP_GAP = 0.012                  # m: distância mínima entre a faixa e uma lanterna de fábrica
+RB_TOP_MAX = 0.93                 # m: topo do para-choque traseiro (as setas de trás começam em 0,95)
+ROCKET_MIN_W = 0.12               # m: faixa do foguete mais estreita que isto não serve
+ROCKET_GAP = 0.012                # m: folga entre o foguete e o contorno de LED do teto
+
+
+def _protrusion(tree, p, n, reach=0.6):
+    """Quanto a lataria em `p` (Godot) sai para fora da face de normal `n` (raio vindo de fora). None = nada."""
+    from mathutils import Vector
+    o = Vector((p[0] + n[0] * reach, -(p[2] + n[2] * reach), p[1] + n[1] * reach))
+    d = Vector((-n[0], n[2], -n[1]))
+    hit = tree.ray_cast(o, d, reach + 0.3)
+    if hit[0] is None:
+        return None
+    return reach - hit[3]
+
+
+def _line_cells(tree, lamps, a, b, n, across):
+    """Saliência da lataria nas células de a até b (3 pontos na largura) e células com lanterna de fábrica perto."""
+    av, bv = np.array(a, float), np.array(b, float)
+    length = float(np.linalg.norm(bv - av))
+    u = (bv - av) / length
+    acr, nv = np.array(across, float), np.array(n, float)
+    cells = max(1, int(round(length / EDGE_STEP)))
+    step = length / cells
+    prs = []
+    for i in range(cells):
+        c = av + u * (step * (i + 0.5))
+        prs.append([_protrusion(tree, c + acr * (STRIP_W * k), n) for k in (-0.5, 0.0, 0.5)])
+    lamp = np.zeros(cells, bool)
+    if len(lamps):
+        rel = lamps - av
+        t = rel @ u
+        near = (np.abs(rel @ acr) <= STRIP_W / 2 + LAMP_GAP) & (np.abs(rel @ nv) <= 0.10) & (t > -LAMP_GAP) & (t < length + LAMP_GAP)
+        for tt in t[near]:
+            for i in range(max(0, int((tt - LAMP_GAP) // step)), min(cells, int((tt + LAMP_GAP) // step) + 1)):
+                lamp[i] = True
+    return prs, lamp, step, length
+
+
+def _runs(prs, lamp, step):
+    """Plano da face (mediana das saliências do meio) e trechos livres [[t0, t1], ...] em metros."""
+    mids = [p[1] for p in prs if p[1] is not None]
+    if not mids:
+        return [], 0.0
+    plane = float(np.median(mids))
+    free = [not lamp[i] and all(q is not None and plane - STRIP_LO <= q <= plane + STRIP_HI for q in p) for i, p in enumerate(prs)]
+    runs, start = [], None
+    for i, f in enumerate(free + [False]):
+        if f and start is None:
+            start = i
+        elif not f and start is not None:
+            if (i - start) * step >= STRIP_MIN:
+                runs.append([round(start * step, 3), round(i * step, 3)])
+            start = None
+    return runs, plane
+
+
+def _best_line(tree, lamps, line, params, n, across):
+    """Entre as posições `params` (da borda para dentro), a primeira cuja cobertura livre é >= 90% da melhor.
+    `line(p)` -> (a, b). Devolve (p, a, b, trechos, plano) ou None."""
+    found = []
+    for p in params:
+        a, b = line(p)
+        prs, lamp, step, length = _line_cells(tree, lamps, a, b, n, across)
+        runs, plane = _runs(prs, lamp, step)
+        found.append((sum(r[1] - r[0] for r in runs), p, a, b, runs, plane))
+    best = max(f[0] for f in found) if found else 0.0
+    if best < STRIP_MIN:
+        return None
+    for f in found:
+        if f[0] >= best * 0.9:
+            return f[1:]
+    return None
+
+
+def _strip(a, b, n, across, runs, plane):
+    """Segmentos da faixa (Godot), já no plano da face (+3 mm para não brigar com ela)."""
+    av, bv = np.array(a, float), np.array(b, float)
+    u = (bv - av) / float(np.linalg.norm(bv - av))
+    off = np.array(n, float) * (plane + 0.003)
+    out = []
+    for t0, t1 in runs:
+        p0, p1 = av + u * t0 + off, av + u * t1 + off
+        out.append({"a": [round(float(x), 3) for x in p0], "b": [round(float(x), 3) for x in p1],
+                    "n": [float(x) for x in n], "w": [float(x) for x in across]})
+    return out
+
+
+def _span(vals, lo, hi, step=0.01):
+    return [round(float(v), 3) for v in np.arange(lo, hi, step if hi > lo else -step)]
+
+
+def _longest_free(col):
+    """Maior sequência de False numa lista de bool: (tamanho, início, fim exclusivo)."""
+    best, run, start = (0, 0, 0), 0, 0
+    for j, o in enumerate(list(col) + [True]):
+        if not o:
+            if run == 0:
+                start = j
+            run += 1
+        else:
+            if run > best[0]:
+                best = (run, start, j)
+            run = 0
+    return best
+
+
+def box_edges(data: dict, m: dict) -> dict:
+    """Medidas da traseira, do teto e das bordas do baú (T-231), em coordenadas do Godot:
+    - rear: z de trás de tudo o que fica embaixo do baú (o para-choque traseiro novo encosta ali, atrás das lanternas e
+      do para-choque de fábrica, que ele substitui) e o topo dele (abaixo das setas de trás);
+    - strips: faixas do contorno de LED nas 4 bordas de cada lateral e do teto. Para cada borda procura, da quina para
+      dentro, a primeira linha onde a lataria está no plano da face (nada saliente, nada vazado, nenhuma lanterna de
+      fábrica a menos de 1,2 cm) em >= 90% do comprimento da melhor linha; a faixa só existe nos trechos livres;
+    - rocket_r/l: faixa livre do teto por dentro do contorno de LED, até o andon de fábrica do teto.
+    Raios na malha real (BVH), determinístico."""
+    objs = data["objs"]
+    bx = m["box"]
+    bh, top, bot, bf, rz = bx["half_w"], bx["top_y"], bx["bottom_y"], bx["front_z"], bx["rear_z"]
+    out = {}
+    rb_top = round(min(bot - 0.02, RB_TOP_MAX), 3)
+    allv = _cat(objs, [k for k in objs if not k.startswith("wheel_")])
+    sel = allv[(np.abs(allv[:, 0]) <= bh + 0.1) & (allv[:, 1] >= 0.10) & (allv[:, 1] <= rb_top + 0.03) & (allv[:, 2] >= rz - 0.8)]
+    back = float(sel[:, 2].max()) if len(sel) else rz
+    out["rear"] = {"top_y": rb_top, "back_z": round(max(back, rz) + 0.01, 3), "half_w": round(min(bh, 1.30), 3)}
+    if m.get("open_body"):
+        return out
+    tree = _bvh()
+    lamps = _cat(objs, [k for k in objs if k.startswith("truck_lamp")])
+    strips = {"box_light_r": [], "box_light_l": [], "box_light_top": []}
+    # --- laterais: linha de cima, de baixo, da frente e de trás
+    for side, sx in (("r", 1), ("l", -1)):
+        n = (sx, 0, 0)
+        x = sx * bh
+        zf0, zr0 = bf + 0.05, rz - 0.05
+        tl = _best_line(tree, lamps, lambda y: ((x, y, zf0), (x, y, zr0)), _span(None, top - 0.02, top - 0.32), n, (0, 1, 0))
+        bl = _best_line(tree, lamps, lambda y: ((x, y, zf0), (x, y, zr0)), _span(None, bot + 0.02, bot + 0.32), n, (0, 1, 0))
+        key = "box_light_" + side
+        for f in (tl, bl):
+            if f:
+                strips[key] += _strip(f[1], f[2], n, (0, 1, 0), f[3], f[4])
+        ya = bl[0] if bl else bot + 0.05
+        yb = tl[0] if tl else top - 0.05
+        for zs in (_span(None, bf + 0.02, bf + 0.30), _span(None, rz - 0.02, rz - 0.30)):
+            f = _best_line(tree, lamps, lambda z: ((x, ya, z), (x, yb, z)), zs, n, (0, 0, 1))
+            if f:
+                strips[key] += _strip(f[1], f[2], n, (0, 0, 1), f[3], f[4])
+    # --- teto: as 2 bordas compridas e as 2 pontas
+    n = (0, 1, 0)
+    sides = {}
+    for sx in (1, -1):
+        f = _best_line(tree, lamps, lambda xx: ((sx * xx, top, bf + 0.05), (sx * xx, top, rz - 0.05)),
+                       _span(None, bh - 0.015, bh - 0.30), n, (1, 0, 0))
+        if f:
+            sides[sx] = f
+            strips["box_light_top"] += _strip(f[1], f[2], n, (1, 0, 0), f[3], f[4])
+    xe = min(sides[1][0] if 1 in sides else bh - 0.05, sides[-1][0] if -1 in sides else bh - 0.05)
+    cross = [bf + 0.02, rz - 0.02]                   # z das pontas do contorno do teto (o foguete fica entre elas)
+    for k, zs in enumerate((_span(None, bf + 0.015, bf + 0.30), _span(None, rz - 0.015, rz - 0.30))):
+        f = _best_line(tree, lamps, lambda z: ((-xe, top, z), (xe, top, z)), zs, n, (0, 0, 1))
+        if f:
+            cross[k] = f[0]
+            strips["box_light_top"] += _strip(f[1], f[2], n, (0, 0, 1), f[3], f[4])
+    out["strips"] = strips
+    # --- foguete: por dentro do contorno do teto; plano do teto = mediana das saliências na faixa
+    roof_plane = float(np.median([s[4] for s in sides.values()])) if sides else 0.0
+    zs = np.arange(cross[0] + STRIP_W / 2 + ROCKET_GAP + EDGE_STEP / 2, cross[1] - STRIP_W / 2 - ROCKET_GAP - EDGE_STEP / 2 + 1e-6,
+                   EDGE_STEP)
+    for side, sx in (("r", 1), ("l", -1)):
+        edge = sides[sx][0] if sx in sides else bh - 0.05
+        outer = edge - STRIP_W / 2 - ROCKET_GAP
+        xs = np.round(np.arange(outer, outer - 0.34, -0.01), 3)
+        occ = np.zeros((len(xs), len(zs)), bool)
+        for i, xx in enumerate(xs):
+            for j, z in enumerate(zs):
+                pr = _protrusion(tree, (sx * float(xx), top, float(z)), (0, 1, 0))
+                occ[i, j] = pr is None or pr > roof_plane + 0.006 or pr < roof_plane - 0.03
+        cands = []
+        for i in range(int(round(ROCKET_MIN_W / 0.01)), len(xs)):
+            run, j0, j1 = _longest_free(occ[: i + 1].any(0))
+            cands.append((run * EDGE_STEP, i, j0, j1))
+        if not cands:
+            continue
+        longest = max(c[0] for c in cands)
+        if longest < 2.0:
+            continue
+        ln, i, j0, j1 = max((c for c in cands if c[0] >= longest * 0.97), key=lambda c: c[1])
+        out["rocket_" + side] = {"inner": round(float(xs[i]), 3), "outer": round(float(outer), 3),
+                                 "z0": round(float(zs[j0]) - EDGE_STEP / 2 + 0.005, 3),
+                                 "z1": round(float(zs[j1 - 1]) + EDGE_STEP / 2 - 0.005, 3),
+                                 "top": round(top + roof_plane, 3)}
+    return out
