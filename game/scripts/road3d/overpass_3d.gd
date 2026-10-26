@@ -115,6 +115,11 @@ func _pier(st: SurfaceTool, path: TrackPath, at: Vector3, lat: Vector3, top: flo
 	if float(near["dist"]) < OverpassLayout.PIER_ROAD_GAP:
 		counts["pier_skip_road"] = int(counts.get("pier_skip_road", 0)) + 1
 		return
+	var nz: float = float(near["z"])                                   # T-217: nor on the other carriageway
+	var side_lat: float = (at - path.center_at(nz)).dot(path.right_at(nz))
+	if not OppositeLayout.free_at(path, nz, side_lat, 3.0):
+		counts["pier_skip_road"] = int(counts.get("pier_skip_road", 0)) + 1
+		return
 	for l in rail_lines:
 		for q in (l as RailLine).pts:
 			if Vector2(q.x - at.x, q.z - at.z).length() < 8.0:

@@ -86,6 +86,10 @@ var _load_frames: int = 0               # T-208: quadros desde o fim do _ready (
 var _headless: bool = DisplayServer.get_name() == "headless"
 var _toll3d: TollPlaza3D                # T-207: praca de pedagio (cancelas e luz que segue o jogador)
 var _drawn: Array[Vector2] = []         # T-198: (z, x) interpolados de cada caminhao no ultimo quadro (cameras sem tranco)
+var _amb: RouteAmbience                 # T-217: outra pista, muros de pedra, marcos da rota (so visual)
+var _vis_t: float = 0.0                 # T-217: relogio do cenario vivo (para na camera livre e na pausa)
+var _exposure: ExposureAdapt            # T-217: adaptacao do olho na boca dos tuneis (PC Forward+; null = celular)
+var _world_env: Environment
 
 
 func _ready() -> void:
@@ -136,6 +140,7 @@ func _ready() -> void:
 	var bridges: Array[Vector2] = route.bridges if route != null else ([] as Array[Vector2])   # T-153
 	if sim.track.lane_sections.is_empty():
 		bridges = []
+	RouteAmbience.prepare(path, String(route.id) if route != null else "", scenery, tunnels, bridges)   # T-217
 	var road := RoadMesh.new()
 	add_child(road)
 	road.bridges = bridges
@@ -168,6 +173,9 @@ func _ready() -> void:
 		add_child(_toll3d)
 		_toll3d.build(path, tod, q)
 	_tunnel = Tunnel3D.new()
+	_tunnel.glare_peak = lerpf(0.35, 1.6, tod.day_amount)   # T-217: brilho da saida visto de dentro
+	_tunnel.tod = tod
+	_world_env = world["env"] as Environment
 	add_child(_tunnel)
 	_tunnel.build(path, tunnels, scenery, world["sun"], world["env"])
 	var lane_signals := TunnelSignals3D.new()      # T-164: seta verde / X vermelho por faixa, ligados aos eventos
@@ -191,7 +199,11 @@ func _ready() -> void:
 			busy.append(Vector2(t.x, t.x + t.y))
 		for o in OverpassLayout.for_route(rid):
 			busy.append(Vector2(float(o["z"]), float(o["z"])))
+		if CutLayout.of(path) != null:                 # T-217: not in a stone-wall cut
+			busy.append_array(CutLayout.of(path).spans())
 		uniq_z = UniqueCar.spot_z(sim.track, rid, busy)
+		if DanchiLayout.of(path) != null:              # T-217: no apartment block on the unique car's lot
+			DanchiLayout.of(path).clear_around(uniq_z, 30.0)
 		var spot: Array = UniqueCar.SPOTS.get(rid, UniqueCar.DEFAULT_SPOT)
 		over_out = over_out + UniqueCar.keep_out(path, uniq_z, float(spot[1]) * float(spot[2]))
 	var city := CityBuilder.new()
@@ -224,8 +236,13 @@ func _ready() -> void:
 		var arrival := ArrivalCity.new()
 		add_child(arrival)
 		arrival.build(path, rid, scenery, tod, city.keep_out, side)
+	side.left_taken = signs._taken                 # T-217: the green signs that move left keep clear of these
 	side.build(path, scenery, tod, tunnels)
 	PeopleKit.populate(self, path, rid, tod)       # T-186: pessoas no pedagio e no viaduto
+	_amb = RouteAmbience.new()                     # T-217: outra pista com transito, muros de pedra, marcos da rota
+	add_child(_amb)
+	_amb.build(path, rid, scenery, tod, q, scenic.field, func() -> float: return _vis_t, road.soft_spec,
+		route.places if route != null else PackedStringArray(), tunnels)
 	LoadClock.mark("cenario")
 	if RaceLife.enabled():                         # T-189: vento, passaros, fumaca, insetos, sombras de nuvem
 		_life = RaceLife.new()
@@ -593,6 +610,19 @@ func _toggle_pause() -> void:
 		get_tree().create_timer(0.8, true).timeout.connect(func() -> void: _demo.snap(get_viewport(), "pausa"))
 
 
+## T-217: adaptacao do olho na entrada/saida dos tuneis (so no PC com Forward+).
+func _adapt_exposure(dt: float) -> void:
+	if _exposure == null:
+		if not ExposureAdapt.enabled() or _world_env == null:
+			return
+		_exposure = ExposureAdapt.new(_world_env, tod.day_amount, Settings.fx_reduce_flash)
+	_exposure.step(dt, _tunnel.amount)
+
+
+func _exit_tree() -> void:
+	RouteAmbience.release()                          # T-217: as tabelas da rota nao vazam para outra cena/teste
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
 		_toggle_pause()
@@ -616,6 +646,7 @@ func _process(delta: float) -> void:
 			_fps_n = 0
 			_fps_max_calls = 0
 	var dt: float = minf(delta, 0.1)
+	_vis_t += dt                                     # T-217: relogio do cenario vivo (transito da outra pista)
 	if _load_frames < 400 and not _headless:         # T-208: picos dos primeiros quadros (shaders compilando)
 		_load_frames += 1
 		if delta > 0.05:
@@ -672,6 +703,7 @@ func _process(delta: float) -> void:
 	_update_audio(dt)
 	_demo.update(get_viewport(), sim.trucks[player], dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
+	_adapt_exposure(dt)
 	if _toll3d != null:
 		_toll3d.update(sim, _player_z(), sim.trucks[player].x, dt)
 	for k in sim.trucks.size():
@@ -709,6 +741,7 @@ func _process_online(dt: float) -> void:
 	_update_hud()
 	_update_audio(dt)
 	_tunnel.track_player(_player_z(), _trucks[player].global_position)
+	_adapt_exposure(dt)
 	if _toll3d != null:
 		_toll3d.update(sim, _player_z(), sim.trucks[player].x, dt)
 	for k in sim.trucks.size():

@@ -16,11 +16,18 @@ const TUNNEL_GAP: float = 90.0          # morro em volta das bocas
 const SECTION_GAP: float = 80.0
 const SIGN_GAP: float = 5.0             # placa verde grande (Track.objects "sign_green", direita, 13,7 m +- 2,4)
 
+## T-217: lateral of the poles on this side; on the right they stand beyond the other carriageway (OppositeLayout).
+static func lateral(side: float, path: TrackPath = null) -> float:
+	if side > 0.0 and path != null and OppositeLayout.of(path) != null:
+		return LATERAL_M + OppositeLayout.SHIFT
+	return LATERAL_M
+
+
 ## Trechos [inicio, fim, lado] de cada rota.
 static func runs_for(route_id: String, kind: StringName, length_m: float) -> Array:
 	match route_id:
 		"kanto_1_coast":
-			return [[320.0, 2300.0, -1.0]]
+			return [[320.0, 2140.0, -1.0]]                  # T-217: before the stone wall cut (2,165 m)
 		"kanto_2_viaduct":
 			return []
 		"kanto_3_mountain":

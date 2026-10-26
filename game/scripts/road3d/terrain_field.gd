@@ -28,6 +28,10 @@ var _side := FastNoiseLite.new()
 var _cells: Dictionary = {}       # Vector2i -> PackedInt32Array (indices of road samples)
 var _pts: PackedVector2Array = PackedVector2Array()
 var _zs: PackedFloat32Array = PackedFloat32Array()
+var opp: OppositeLayout           # T-217: the other carriageway (ground dips under it; the coast beach moves out)
+var sea_shift: float = 0.0        # T-217: coast, sea side: the beach starts this much further out
+var cuts: CutLayout               # T-217: stone retaining walls (the ground behind them is a terrace at the wall top)
+const OPP_DIP: float = -0.3       # ground under the median and the other carriageway (they are drawn on top)
 
 
 func _init(path_: TrackPath, kind_: StringName, zone_: Vector2, keep_out_: Array = [], seed_: int = 188) -> void:
@@ -44,6 +48,10 @@ func _init(path_: TrackPath, kind_: StringName, zone_: Vector2, keep_out_: Array
 	_detail.frequency = 0.03
 	_side.seed = seed_ + 2
 	_side.frequency = 0.0025
+	opp = OppositeLayout.of(path)
+	if opp != null and kind == &"coast":
+		sea_shift = OppositeLayout.SHIFT
+	cuts = CutLayout.of(path)
 	var z: float = 0.0
 	while z <= path.end_m():                               # T-195: + continuacao depois da chegada
 		var c: Vector3 = path.center_at(z)
@@ -90,8 +98,19 @@ func rel_height(z: float, lat: float, wp: Vector2) -> float:
 	var w: float = ScenicZone.weight(zone, z)
 	if kind == &"city":
 		return 0.0
+	if opp != null and lat > OppositeLayout.MEDIAN_IN - 0.4 and lat < OppositeLayout.CLEAR + 0.5 and opp.has(z):
+		return OPP_DIP
 	if kind == &"coast" and lat > 0.0:
-		return _sea_side(lat, wp)
+		return _sea_side(lat - sea_shift, wp) if lat > OppositeLayout.CLEAR else _sea_side(minf(lat, BEACH.y), wp)
+	var cut: float = cuts.terrace(z, lat) if cuts != null else 0.0
+	if cut > 0.0:
+		return maxf(cut, _hills_at(z, lat, wp, w))
+	if w <= 0.0:
+		return 0.0
+	return _hills_at(z, lat, wp, w)
+
+
+func _hills_at(z: float, lat: float, wp: Vector2, w: float) -> float:
 	if w <= 0.0:
 		return 0.0
 	var d: float = absf(lat)
@@ -143,13 +162,24 @@ func _corridor_flat(wp: Vector2) -> float:
 	return f
 
 
+## T-217: columns of the coast sea-side grid (TerrainPatch), moved out with the beach when the other carriageway is there.
+func sea_lats(base: PackedFloat32Array) -> PackedFloat32Array:
+	if sea_shift <= 0.0:
+		return base
+	var out := PackedFloat32Array([13.0, 16.0, 21.0, 26.0, OppositeLayout.CLEAR + 0.5])
+	for l in base:
+		if l > 20.0:
+			out.append(l + sea_shift)
+	return out
+
+
 ## Vertex paint for the terrain shader at this point: r = sand, g = forest, b = city ground.
 func paint(lat: float, rel: float, wp: Vector2) -> Color:
 	if kind == &"city":
 		return Color(0.0, 0.0, 1.0, 1.0) if absf(lat) > RoadMesh.BARRIER_IN + 0.6 else Color(0, 0, 0, 1)
 	var sand: float = 0.0
 	if kind == &"coast" and lat > 0.0:
-		sand = smoothstep(BEACH.x, BEACH.y, lat) * (1.0 - smoothstep(FAR_SHORE.y, FAR_SHORE.y + 25.0, lat))
+		sand = smoothstep(BEACH.x + sea_shift, BEACH.y + sea_shift, lat) * (1.0 - smoothstep(FAR_SHORE.y, FAR_SHORE.y + 25.0, lat))
 	var patch: float = _detail.get_noise_2d(wp.x * 0.25 + 50.0, wp.y * 0.25) * 0.5 + 0.5
 	var forest: float = smoothstep(3.0, 16.0, rel) * (0.75 + 0.25 * patch)
 	if kind == &"coast":

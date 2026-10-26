@@ -44,10 +44,24 @@ func build(field_: TerrainField, tod: TimeOfDay) -> void:
 			_strip(za, zb, both, mat)
 		else:
 			_strip(za, zb, _negated(LATS), mat)
-			_strip(za, zb, SEA_LATS if field.kind == &"coast" else LATS, mat)
+			_strip(za, zb, field.sea_lats(SEA_LATS) if field.kind == &"coast" else _right_lats(), mat)
 			if field.kind == &"coast":
 				_strip(za, zb, SHORE_LATS, mat)
 		r0 = r1
+
+
+## T-217: right-side columns; the other carriageway band gets an edge column at CLEAR (no slope under its barrier).
+func _right_lats() -> PackedFloat32Array:
+	if field.opp == null:
+		return LATS
+	var edge: float = OppositeLayout.CLEAR + 0.5
+	var out := PackedFloat32Array()
+	for l in LATS:
+		if out.size() > 0 and out[out.size() - 1] < edge and l > edge:
+			out.append(edge)
+		if absf(l - edge) > 2.0:
+			out.append(l)
+	return out
 
 
 func _negated(lats: PackedFloat32Array) -> PackedFloat32Array:

@@ -12,9 +12,9 @@ const MODEL := "res://assets/vehicles/traffic/car_skyline.glb"
 const PAINT := Color("#1f4fa8")                 # "Bayside" style blue
 ## route: [fraction of the route, side (+1 right / -1 left), lateral distance (m) of the car centre]
 const SPOTS := {
-	"kanto_1_coast": [0.45, 1.0, 17.5],          # sea side, on the grass before the sand: lookout over the bay
-	"kanto_2_viaduct": [0.22, 1.0, 26.0, true],  # city: on the ground beside the viaduct, before the first street,
-	                                             # where the viaduct has no sound wall (seen from the deck)
+	"kanto_1_coast": [0.45, -1.0, 17.5],         # T-217: land side (the sea side is the other carriageway now)
+	"kanto_2_viaduct": [0.22, -1.0, 23.0, true], # city: on the ground beside the viaduct (left: the right side is the
+	                                             # other deck now), where the viaduct has no sound wall (seen from the deck)
 	"kanto_3_mountain": [0.45, -1.0, 17.0],       # mountain: lay-by on the hill side
 }
 const DEFAULT_SPOT: Array = [0.5, 1.0, 17.0]
@@ -34,14 +34,14 @@ static func spot_z(track: Track, route_id: String, blocked: Array[Vector2]) -> f
 	var spot: Array = SPOTS.get(route_id, DEFAULT_SPOT)
 	var start: float = track.length_m * float(spot[0])
 	var zz: float = start
-	while true:                                   # from the fraction to the end, then from 300 m to the fraction
+	var tries: int = int(track.length_m / 10.0) + 2   # T-217: at most one lap (the old stop test could miss the start)
+	while tries > 0:                              # from the fraction to the end, then from 300 m to the fraction
 		if _free(track, spot, blocked, zz):
 			return zz
 		zz += 10.0
 		if zz > track.length_m - 300.0:
 			zz = 300.0
-		if absf(zz - start) < 5.0:
-			break
+		tries -= 1
 	return start
 
 

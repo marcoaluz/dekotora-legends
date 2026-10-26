@@ -189,7 +189,10 @@ func _piers(l: RailLine, li: int) -> void:
 ## Pilar longe da pista e da mureta (o viaduto passa por cima sem apoio no meio).
 func _clear_of_road(p: Vector3, z: float) -> bool:
 	var c: Vector3 = path.center_at(z)
-	return absf((p - c).dot(path.right_at(z))) > RoadMesh.BARRIER_IN + 4.0
+	var lat: float = (p - c).dot(path.right_at(z))
+	if lat > 0.0 and not OppositeLayout.free_at(path, z, lat, 4.0):   # T-217: nor on the other carriageway
+		return false
+	return absf(lat) > RoadMesh.BARRIER_IN + 4.0
 
 
 func _clear_of_lines(p: Vector3, li: int) -> bool:

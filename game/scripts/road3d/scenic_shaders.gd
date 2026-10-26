@@ -109,14 +109,18 @@ uniform float tint = 1.0;
 uniform float night_lift = 0.0;   // moonlit fill (the sky ambient is too dark at night)
 varying float half_sel;
 varying float shade;
+varying float hue;
 void vertex() {
 	half_sel = INSTANCE_CUSTOM.x;
 	shade = INSTANCE_CUSTOM.y;
+	hue = INSTANCE_CUSTOM.z;                                 // T-217: -1 bluish (cedar) .. +1 yellowish (broadleaf)
 	UV = vec2(UV.x * 0.5 + half_sel * 0.5, UV.y);
 }
 void fragment() {
 	vec4 c = texture(cards, UV);
-	ALBEDO = c.rgb * tint * shade;
+	float base = mix(1.0, 0.55, smoothstep(0.35, 1.0, UV.y));   // T-217: dense forest: darker under the crowns
+	vec3 h = mix(vec3(0.85, 0.95, 1.12), vec3(1.15, 1.08, 0.78), hue * 0.5 + 0.5);
+	ALBEDO = c.rgb * tint * shade * base * h;
 	EMISSION = c.rgb * shade * night_lift * vec3(0.55, 0.68, 1.0);
 	ALPHA = c.a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
@@ -133,6 +137,11 @@ static var _cache: Dictionary = {}
 
 static func terrain(tod: TimeOfDay) -> ShaderMaterial:
 	return _mat("terrain", TERRAIN, tod)
+
+
+## T-217: the same ground drawn on both sides (hill over the tunnels, built without a fixed winding).
+static func terrain_two_sided(tod: TimeOfDay) -> ShaderMaterial:
+	return _mat("terrain2s", TERRAIN.replace("render_mode cull_back;", "render_mode cull_disabled;"), tod)
 
 
 static func ridge(tod: TimeOfDay, kind: StringName) -> ShaderMaterial:

@@ -20,7 +20,9 @@ var overpass_out: Array = []      # T-164 (OverpassLayout.keep_out): nada de pos
 const WIRE_LANE: Vector2 = Vector2(14.5, 20.0)   # T-163: faixa lateral (m) dos fios; a arvore vai para fora dela
 const TREE_LOD_M: float = 140.0   # T-186: arvore troca para o LOD1 a partir desta distancia (centro do bloco)
 const VIEW_M: float = 450.0
-const LAMPS: Array[String] = ["lamp_post", "lamp_bridge"]
+const LAMPS: Array[String] = ["lamp_post", "lamp_bridge", "lamp_arc", "lamp_arc_twin"]
+const ARC_REACH: float = 4.95     # T-217: lamp_arc: from the pole to the centre of the luminaire (build_t217_lamps.py)
+const ARC_LAT: float = RoadMesh.BARRIER_IN + 0.9   # T-217: the curved-arm lamps stand right behind the barrier
 const TOLL_ZONE: Vector2 = Vector2(0.0, 420.0)   # T-186: o poste antigo fica na praca do pedagio (z = 150)
 var rails: Array = []             # T-186: Array[RailLine] (Railway3D.lines): arvore fora da ferrovia paralela
 var route_seed: int = 0           # T-186: semente dos bosques (mesma rota -> mesmas arvores)
@@ -28,6 +30,10 @@ var tree_count: int = 0           # T-186: quantas arvores foram plantadas (test
 var field: TerrainField           # T-188: chao do trecho-piloto (null = chao plano de antes)
 var extra_objects: Array[Dictionary] = []   # T-195: lamps of the arrival avenue (after the finish line; no rng)
 var _pool_mesh: PlaneMesh
+var _opp: OppositeLayout          # T-217: the other carriageway on the right (null = none)
+var _cuts: CutLayout              # T-217: stone retaining walls (null = none)
+var _danchi: DanchiLayout         # T-217: apartment blocks beside the urban expressway (null = none)
+var left_taken: Array[float] = [] # T-217: z of the RoadSigns plates on the left (RoadSigns._taken)
 var _lamp_off: Dictionary = {}
 
 
@@ -35,6 +41,9 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 	path = path_
 	tod = tod_ if tod_ != null else TimeOfDay.by_id(&"night")
 	var deck: float = RoadMesh.deck_height(kind)    # viaduto: o que fica alem da mureta esta la embaixo, no chao
+	_opp = OppositeLayout.of(path)
+	_cuts = CutLayout.of(path)
+	_danchi = DanchiLayout.of(path)
 	var groups: Dictionary = {}     # nome do modelo -> Array[Transform3D]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
@@ -55,6 +64,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 			if k == "lamp_post":                      # o poste vai para cima da mureta que estreitou
 				var p: Vector3 = LaneSections.profile(path.track.events, z)
 				xu = signf(xu) * ((p.x if xu < 0.0 else p.y) + 0.35) / Track.ROAD_HALF_WIDTH_M
+		if k == "sign_green" and xu > 0.0 and _opp != null and _opp.has(z) and _left_free(z) and (_cuts == null or not _cuts.blocks(z, -16.5, 0.0)):
+			xu = -xu                                  # T-217: the median is the other carriageway; roadside signs go left
 		var outside: bool = absf(xu) * Track.ROAD_HALF_WIDTH_M > RoadMesh.BARRIER_IN
 		var base: Vector3 = path.world_point(z, xu, -deck if outside else 0.0)
 		if not overpass_out.is_empty() and k != "guardrail" and OverpassLayout.blocked(overpass_out, base, 1.5):
@@ -65,10 +76,23 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 		match k:
 			"lamp_post":
 				model = lamp_model(z, deck, kind, bridges)
+				var head: Array[float] = [xu * 0.6]           # laterals (units) of the light pools
+				if model == "lamp_arc":                       # T-217: long curved arm over the road
+					var narrow: bool = LaneSections.at(path.track.events, z, 4.0) != null
+					var lat: float = absf(xu) * Track.ROAD_HALF_WIDTH_M if narrow else ARC_LAT
+					if xu > 0.0 and _opp != null and _opp.has(z) and not narrow:
+						model = "lamp_arc_twin"                   # in the median: one arm over each carriageway
+						lat = OppositeLayout.HEDGE_LAT
+						head = [(lat - ARC_REACH) / Track.ROAD_HALF_WIDTH_M, (lat + ARC_REACH) / Track.ROAD_HALF_WIDTH_M]
+					else:
+						head = [signf(xu) * (lat - ARC_REACH) / Track.ROAD_HALF_WIDTH_M]
+					xu = signf(xu) * lat / Track.ROAD_HALF_WIDTH_M
+					base = path.world_point(z, xu, 0.0)
 				if xu < 0.0:
 					b = Basis(Vector3.UP, yaw + PI)   # o braco aponta para a pista
 				if tod.lamps_on and tod.pool_energy > 0.0:
-					_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, xu * 0.6, 0.06)))
+					for hx in head:
+						_put(groups, POOL, Transform3D(Basis(Vector3.UP, yaw), path.world_point(z, hx, 0.06)))
 			"tree":
 				if groves_enabled():                  # T-186: os bosques (RoadsideTrees) entram no lugar
 					for _i in 4:
@@ -91,7 +115,8 @@ func build(path_: TrackPath, kind: StringName = &"city", tod_: TimeOfDay = null,
 	_extras(groups, kind, rng, deck, tunnels)
 	if groves_enabled():
 		var blocked: Callable = func(zz: float, lat: float, pos: Vector3) -> bool: return _tree_blocked(zz, lat, pos, tunnels)
-		for t in RoadsideTrees.place(path, kind, 186 + route_seed, deck, blocked, rails):
+		var shift: float = OppositeLayout.SHIFT if _opp != null else 0.0
+		for t in RoadsideTrees.place(path, kind, 186 + route_seed, deck, blocked, rails, shift):
 			_put(groups, String(t[0]), t[1])
 			tree_count += 1
 	var pool_mat: StandardMaterial3D = _pool_material()
@@ -126,7 +151,11 @@ static func lamp_model(z: float, deck: float, kind: StringName, bridges_: Array[
 		return "lamp_post"
 	if z >= TOLL_ZONE.x and z <= TOLL_ZONE.y:
 		return "lamp_post"
-	if deck > 0.0 or kind == &"mountain" or RoadMesh.in_tunnel(z, bridges_, 12.0):
+	if deck > 0.0 or RoadMesh.in_tunnel(z, bridges_, 12.0):
+		return "lamp_bridge"
+	if ScenicZone.enabled() and ResourceLoader.exists(DIR + "lamp_arc.glb"):
+		return "lamp_arc"                          # T-217: curved long arm on the ground stretches (coast, mountain)
+	if kind == &"mountain":
 		return "lamp_bridge"
 	return "lamp_post"
 
@@ -137,17 +166,31 @@ func _tree_blocked(z: float, lat: float, pos: Vector3, tunnels: Array[Vector2]) 
 		return true
 	if not overpass_out.is_empty() and OverpassLayout.blocked(overpass_out, pos, 3.0):
 		return true
-	if absf(lat) >= WIRE_LANE.x - 1.0 and absf(lat) <= WIRE_LANE.y + 1.0:
+	if _opp != null and _opp.occupies(z, lat, 2.0):     # T-217: the other carriageway
+		return true
+	if _cuts != null and _cuts.blocks(z, lat):          # T-217: on the stone wall / right behind it
+		return true
+	if _danchi != null and _danchi.blocks_at(z, lat):   # T-217: inside an apartment block
+		return true
+	var wl: Vector2 = wire_lane(signf(lat))
+	if absf(lat) >= wl.x - 1.0 and absf(lat) <= wl.y + 1.0:
 		for r in pole_runs:
 			if z >= float(r[0]) - 20.0 and z <= float(r[1]) + 20.0 and signf(lat) == float(r[2]):
 				return true
 	return false
 
 
+## T-217: lateral band of the power wires on this side (WIRE_LANE moved with the poles, PowerLineLayout.lateral).
+func wire_lane(side: float) -> Vector2:
+	var d: float = PowerLineLayout.lateral(side, path) - PowerLineLayout.LATERAL_M
+	return WIRE_LANE + Vector2(d, d)
+
+
 ## T-163: arvore no caminho dos fios dos postes de energia vai 6 m para fora (mesmo sorteio, so muda o lugar).
 func _off_wires(z: float, xu: float, base: Vector3, deck: float) -> Vector3:
 	var lat: float = absf(xu) * Track.ROAD_HALF_WIDTH_M
-	if lat < WIRE_LANE.x or lat > WIRE_LANE.y:
+	var wl: Vector2 = wire_lane(signf(xu))
+	if lat < wl.x or lat > wl.y:
 		return base
 	for r in pole_runs:
 		if z >= float(r[0]) - 20.0 and z <= float(r[1]) + 20.0 and signf(xu) == float(r[2]):
@@ -195,6 +238,20 @@ func _on_terrain(p: Vector3, sink: bool) -> Vector3:
 	return Vector3(p.x, h - (0.25 if sink else 0.05), p.z)
 
 
+## T-217: no RoadSigns plate on the left within 30 m (a green sign moving left would stand on top of it).
+func _left_free(z: float) -> bool:
+	for u in left_taken:
+		if absf(u - z) < 30.0:
+			return false
+	return true
+
+
+## T-217: signed lateral of a point beside the road (extras placed with world_point).
+func left_lat(p: Vector3) -> float:
+	var n: Vector3 = field.nearest(Vector2(p.x, p.z)) if field != null else Vector3(15.0, 0.0, -1.0)
+	return n.x * n.z if n.x != INF else -15.0
+
+
 ## Vegetacao extra fora da pista (arbustos ao pe da mureta, pedras na praia/encosta).
 func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator, deck: float, tunnels: Array[Vector2]) -> void:
 	var z: float = 10.0
@@ -207,9 +264,11 @@ func _extras(groups: Dictionary, kind: StringName, rng: RandomNumberGenerator, d
 		if RoadMesh.in_tunnel(z, tunnels, 6.0) or RoadMesh.in_tunnel(z, bridges, 14.0):
 			z += 20.0
 			continue
-		_put(groups, "bush" if kind != &"mountain" else "rock", Transform3D(b, left))
+		if (_cuts == null or not _cuts.blocks(z, -19.0)) and (_danchi == null or not _danchi.blocks_at(z, left_lat(left))):
+			_put(groups, "bush" if kind != &"mountain" else "rock", Transform3D(b, left))
 		if kind == &"coast":                     # pedras na areia, perto do mar
-			var beach: Vector3 = path.world_point(z + 6.0, rng.randf_range(27.0, 36.0) / hw, -1.0)
+			var bl: float = rng.randf_range(27.0, 36.0) + (OppositeLayout.SHIFT if _opp != null else 0.0)   # T-217
+			var beach: Vector3 = path.world_point(z + 6.0, bl / hw, -1.0)
 			_put(groups, "rock", Transform3D(Basis(Vector3.UP, yaw + rng.randf()) * Basis.from_scale(Vector3.ONE * rng.randf_range(0.7, 1.8)), beach))
 		z += rng.randf_range(14.0, 30.0)
 

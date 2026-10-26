@@ -9,6 +9,9 @@ const CHUNK_M: float = 200.0
 const VIEW_M: float = 1300.0
 const LAT: Vector2 = Vector2(52.0, 330.0)
 const STEP_M: float = 9.0               # one try every STEP_M along the road, per side, per lateral band
+## T-217: denser forest (tries per band and step by quality: low 1, medium 2, high/Ultra 3; the mountain 1 more),
+## a third card at 45 degrees (fuller crowns), per-tree hue (cedar bluish, broadleaf yellowish) and darker far away.
+const TRIES: Array[int] = [1, 2, 3, 3]
 
 var count: int = 0
 var _mesh: ArrayMesh
@@ -16,6 +19,10 @@ var _mesh: ArrayMesh
 
 func build(field: TerrainField, tod: TimeOfDay, seed_: int) -> void:
 	var path: TrackPath = field.path
+	var q: int = clampi(int(Engine.get_main_loop().root.get_node("Settings").quality), 0, 3)
+	var tries: int = TRIES[q] + (1 if field.kind == &"mountain" and q >= 1 else 0)
+	if not ScenicZone.enabled() or "--old-forest" in OS.get_cmdline_user_args():
+		tries = 1
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_ + 31
 	var conifer: float = 0.8 if field.kind == &"mountain" else 0.15
@@ -25,7 +32,8 @@ func build(field: TerrainField, tod: TimeOfDay, seed_: int) -> void:
 		for side in [-1.0, 1.0]:
 			if field.kind == &"coast" and side > 0.0:
 				continue                                   # the sea
-			for band in 4:
+			for slot in 4 * tries:
+				var band: int = slot % 4
 				var lat: float = side * rng.randf_range(LAT.x + band * 70.0, LAT.x + (band + 1) * 70.0)
 				var zz: float = z + rng.randf_range(0.0, STEP_M)
 				var roll: float = rng.randf()
@@ -43,7 +51,9 @@ func build(field: TerrainField, tod: TimeOfDay, seed_: int) -> void:
 				var key: int = int(zz / CHUNK_M) * 2 + (0 if side < 0.0 else 1)
 				if not groups.has(key):
 					groups[key] = []
-				groups[key].append([Transform3D(b, at), Color(kind_sel, rng.randf_range(0.8, 1.1), 0.0, 0.0)])
+				var far_k: float = lerpf(1.0, 0.72, clampf((absf(lat) - LAT.x) / (LAT.y - LAT.x), 0.0, 1.0))
+				var hue: float = rng.randf_range(-1.0, 0.1) if kind_sel < 0.5 else rng.randf_range(-0.2, 1.0)
+				groups[key].append([Transform3D(b, at), Color(kind_sel, rng.randf_range(0.78, 1.1) * far_k, hue, 0.0)])
 				count += 1
 		z += STEP_M
 	var mat: ShaderMaterial = ScenicShaders.cards(tod)
@@ -77,7 +87,7 @@ func _cards() -> ArrayMesh:
 		return _mesh
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for axis in [Vector3.RIGHT, Vector3.BACK]:
+	for axis in [Vector3.RIGHT, Vector3.BACK, Vector3(1.0, 0.0, 1.0).normalized()]:
 		var a: Vector3 = -axis * 0.5
 		var b: Vector3 = axis * 0.5
 		var quad: Array = [[a, Vector2(0, 1)], [b + Vector3.UP, Vector2(1, 0)], [b, Vector2(1, 1)],

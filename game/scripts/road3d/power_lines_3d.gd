@@ -94,7 +94,14 @@ static func filter_overpass(path: TrackPath, list: Array, corridors: Array) -> A
 ## Transform do poste [z, lado, ...]: na lateral LATERAL_M do lado dele, travessa atravessando a pista.
 static func transform_of(path: TrackPath, p: Array) -> Transform3D:
 	var z: float = float(p[0])
-	var pos: Vector3 = path.world_point(z, float(p[1]) * PowerLineLayout.LATERAL_M / Track.ROAD_HALF_WIDTH_M, -0.15)
+	var side: float = float(p[1])
+	var lat: float = PowerLineLayout.lateral(side, path)
+	var up: float = -0.15
+	var cuts: CutLayout = CutLayout.of(path)                   # T-217: on the terrace behind a stone wall
+	if cuts != null and cuts.height(z, side) > 0.05:
+		lat = maxf(lat, cuts.top(z, side) + 2.5)
+		up += cuts.terrace(z, side * lat)
+	var pos: Vector3 = path.world_point(z, side * lat / Track.ROAD_HALF_WIDTH_M, up)
 	return Transform3D(Basis(Vector3.UP, path.yaw_at(z)), pos)
 
 

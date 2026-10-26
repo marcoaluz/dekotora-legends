@@ -35,6 +35,16 @@ var _sun_base: float = 1.0
 var _amb_base: float = 1.0
 var _bg_base: float = 1.0
 var _omni: OmniLight3D
+var _twin: bool = false                 # T-217: the other carriageway has its own bore (TunnelTwin)
+var tod: TimeOfDay                     # T-217: for the terrain material of the hill over the tunnel
+var _wing: SurfaceTool                  # T-217: stone wing walls of the portals (null in the city: concrete box)
+var _head: Vector2 = Vector2.ZERO       # T-217: lateral span of the concrete headwall of the portal being built
+const HEADWALL := Color(0.62, 0.62, 0.6)
+const COVER_BACK: float = 12.0          # T-217: the hill over a mountain tunnel reaches its top this far behind the portal
+var _glare_at: Array[float] = []        # T-217: z of each exit (white glare plane seen from inside)
+var _glare: Array[MeshInstance3D] = []
+var _glare_mat: StandardMaterial3D
+var glare_peak: float = 1.6             # day; the race lowers it at night (set before build)
 
 
 func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: DirectionalLight3D, env: Environment) -> void:
@@ -57,6 +67,12 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 	var stone := SurfaceTool.new()
 	stone.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var has_stone: bool = false
+	var fixtures := SurfaceTool.new()               # T-217: jet fans and wall boxes (pre-lit)
+	fixtures.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_twin = OppositeLayout.of(path) != null
+	if kind != &"city" and ScenicZone.enabled():
+		_wing = SurfaceTool.new()
+		_wing.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for n in tunnels.size():
 		var t: Vector2 = tunnels[n]
 		_arch = _arch_of(t)
@@ -65,6 +81,17 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 		_tube(inner, t, old)
 		_portal(stone if old else portal, t.x, 1.0, old)
 		_portal(stone if old else portal, t.x + t.y, -1.0, old)
+		if _twin:                                    # T-217: twin bore of the other carriageway
+			TunnelTwin.tube(self, inner, t)
+			TunnelTwin.lamps(self, t, lamps)
+			for e in [[t.x, 1.0], [t.x + t.y, -1.0]]:
+				TunnelTwin.hood(self, portal, float(e[0]), float(e[1]), TunnelTwin.opp_arch(), Color(0.62, 0.62, 0.6))
+			TunnelTwin.fixtures(self, fixtures, t, OppositeLayout.CENTER, 7.1, OppositeLayout.CENTER - 5.6)
+		if not old:
+			for e in [[t.x, 1.0], [t.x + t.y, -1.0]]:
+				TunnelTwin.hood(self, portal, float(e[0]), float(e[1]), _arch, Color(0.62, 0.62, 0.6))
+			TunnelTwin.fixtures(self, fixtures, t, 0.0, 8.2, -13.6)
+		_glare_at.append(t.x + t.y)
 		has_stone = has_stone or old
 		_cover(outer, t, kind)
 		_caps(portal if kind == &"city" else outer, t, kind)
@@ -84,9 +111,14 @@ func build(path_: TrackPath, tunnels_: Array[Vector2], kind: StringName, sun: Di
 	_add_mesh(portal, _outer_mat(&"city"), false)
 	if has_stone:
 		_add_mesh(stone, _outer_mat(&"stone"), false)
-	_add_mesh(outer, _outer_mat(kind))
+	_add_mesh(outer, ScenicShaders.terrain_two_sided(tod) if _terrain_cover(kind) else _outer_mat(kind))   # T-217: forest
 	_add_lamps(lamps)
+	_add_mesh(fixtures, _inner_mat(), false)
+	if _wing != null:
+		_wing.generate_tangents()
+		_add_mesh(_wing, _wing_mat(), false)
 	TunnelLightPools.build(self, _pools)
+	_build_glare()
 	_omni = OmniLight3D.new()
 	_omni.light_color = Color(1.0, 0.6, 0.25)
 	_omni.omni_range = 20.0
@@ -111,6 +143,7 @@ func track_player(z: float, truck_pos: Vector3) -> void:
 		_env.background_energy_multiplier = _bg_base * (1.0 - 0.7 * f)   # tira o reflexo azul do ceu no cromo e na pintura
 	if _prev_amount > 0.5 and f <= 0.5 and f < _prev_amount:
 		exited.emit()
+	_update_glare(z)
 	_prev_amount = f
 	amount = f
 	_omni.visible = f > 0.01
@@ -193,7 +226,7 @@ func _tube(st: SurfaceTool, t: Vector2, old: bool = false) -> void:
 
 ## Boca do tunel: placa de concreto (pedra no tunel antigo) com o furo do arco. `facing` = 1 na entrada, -1 na saida.
 func _portal(st: SurfaceTool, z: float, facing: float, old: bool = false) -> void:
-	var col: Color = OLD_STONE if old else Color(0.3, 0.3, 0.32)
+	var col: Color = OLD_STONE if old else HEADWALL
 	var lf: float = float(_arch[0][0])
 	var rf: float = float(_arch[_arch.size() - 1][0])
 	var c: float = (lf + rf) * 0.5
@@ -201,6 +234,8 @@ func _portal(st: SurfaceTool, z: float, facing: float, old: bool = false) -> voi
 	var top: float = PORTAL_H if not old else 10.0
 	var lw: float = (lf - 2.6) if old else lf                            # tunel antigo: so a moldura de pedra em volta do arco
 	var rw: float = (rf + 2.6) if old else rf
+	# T-217: concrete headwall only around the arches; beyond it the wing walls (stone masonry, _wing) up to +-30 m
+	_head = Vector2(lw - (0.0 if old else 3.5), (TunnelTwin.opp_right() if _twin else rw) + 3.5)
 	for k in _arch.size() - 1:                                          # do arco ate o topo
 		var p0: Array = _arch[k]
 		var p1: Array = _arch[k + 1]
@@ -209,12 +244,34 @@ func _portal(st: SurfaceTool, z: float, facing: float, old: bool = false) -> voi
 		_face(st, z, facing, [Vector2(lw, 0), Vector2(lf, 0), Vector2(lf, top), Vector2(lw, top)], col)
 		_face(st, z, facing, [Vector2(rf, 0), Vector2(rw, 0), Vector2(rw, top), Vector2(rf, top)], col)
 		var hill := Color(0.24, 0.3, 0.21)                              # o morro em volta e por cima da boca de pedra
-		_face(st, z, facing, [Vector2(c - w, 0), Vector2(lw, 0), Vector2(lw, PORTAL_H), Vector2(c - w, PORTAL_H)], hill)
-		_face(st, z, facing, [Vector2(rw, 0), Vector2(c + w, 0), Vector2(c + w, PORTAL_H), Vector2(rw, PORTAL_H)], hill)
-		_face(st, z, facing, [Vector2(lw, top), Vector2(rw, top), Vector2(rw, PORTAL_H), Vector2(lw, PORTAL_H)], hill)
+		_side(st, z, facing, c - w, lw, PORTAL_H, hill)
+		if _twin:                                                         # T-217: the twin bore of the other carriageway
+			TunnelTwin.portal_right(self, st, z, facing, rw, c + w, PORTAL_H, HEADWALL)
+		else:
+			_side(st, z, facing, rw, c + w, PORTAL_H, hill)
+		_face(_wing if _wing != null else st, z, facing, [Vector2(lw, top), Vector2(rw, top), Vector2(rw, PORTAL_H), Vector2(lw, PORTAL_H)], hill)
 		return
-	_face(st, z, facing, [Vector2(c - w, 0), Vector2(lf, 0), Vector2(lf, top), Vector2(c - w, top)], col)
-	_face(st, z, facing, [Vector2(rf, 0), Vector2(c + w, 0), Vector2(c + w, top), Vector2(rf, top)], col)
+	_side(st, z, facing, c - w, lf, top, col)
+	if _twin:                                                             # T-217: second hole for the twin bore
+		TunnelTwin.portal_right(self, st, z, facing, rf, c + w, top, col)
+		return
+	_side(st, z, facing, rf, c + w, top, col)
+
+
+## T-217: flat part of a portal from x0 to x1: headwall (concrete) inside _head, wing wall (stone) outside it.
+func _side(st: SurfaceTool, z: float, facing: float, x0: float, x1: float, top: float, col: Color) -> void:
+	var cuts: Array[float] = [x0]
+	for e in [_head.x, _head.y]:
+		if e > x0 and e < x1:
+			cuts.append(e)
+	cuts.append(x1)
+	for k in cuts.size() - 1:
+		var a: float = cuts[k]
+		var b: float = cuts[k + 1]
+		var mid: float = (a + b) * 0.5
+		var wing: bool = _wing != null and (mid < _head.x or mid > _head.y)
+		_face(_wing if wing else st, z, facing, [Vector2(a, 0), Vector2(b, 0), Vector2(b, top), Vector2(a, top)],
+			Color(0.9, 0.9, 0.88) if wing else col)
 
 
 ## Tunel antigo: lampadas fracas nas paredes, alternando os lados; placa verde de emergencia mais rara.
@@ -291,12 +348,38 @@ func _caps(st: SurfaceTool, t: Vector2, kind: StringName) -> void:
 	var top: float = _cover_top(kind)
 	var spread: float = _cover_spread(kind)
 	var col := Color(0.3, 0.3, 0.32) if kind == &"city" else Color(0.22, 0.28, 0.2)   # concreto ou encosta
+	if _terrain_cover(kind):
+		col = Color(0.0, 0.55, 0.0, 1.0)                 # T-217: terrain shader paint (g = forest canopy)
 	for e in [[t.x, 1.0], [t.x + t.y, -1.0]]:
 		var zc: float = e[0]
+		if _terrain_cover(kind):                     # T-217: the hill slopes back from the portal (no vertical wall)
+			var zb: float = zc + float(e[1]) * COVER_BACK
+			_tri3(st, [[zc, -spread, 0.0], [zc, -30.0, 0.0], [zb, -30.0, top]], col)
+			_tri3(st, [[zc, 30.0, 0.0], [zc, spread, 0.0], [zb, 30.0, top]], col)
+			_tri3(st, [[zc, -30.0, PORTAL_H], [zc, 30.0, PORTAL_H], [zb, 30.0, top]], col)
+			_tri3(st, [[zc, -30.0, PORTAL_H], [zb, 30.0, top], [zb, -30.0, top]], col)
+			_tri3(st, [[zc, -30.0, 0.0], [zc, -30.0, PORTAL_H], [zb, -30.0, top]], col)
+			_tri3(st, [[zc, 30.0, 0.0], [zb, 30.0, top], [zc, 30.0, PORTAL_H]], col)
+			continue
 		_face(st, zc, e[1], [Vector2(-spread, 0), Vector2(-30, 0), Vector2(-30, top), Vector2(-30, top)], col)
 		_face(st, zc, e[1], [Vector2(30, 0), Vector2(spread, 0), Vector2(30, top), Vector2(30, top)], col)
 		if top > PORTAL_H:
 			_face(st, zc, e[1], [Vector2(-30, PORTAL_H), Vector2(30, PORTAL_H), Vector2(30, top), Vector2(-30, top)], col)
+
+
+## T-217: triangle from [z, lateral, height] points (normal fixed later by generate_normals; material without cull).
+func _tri3(st: SurfaceTool, pts: Array, col: Color) -> void:
+	for p in pts:
+		var v: Vector3 = _edge(float(p[0]), float(p[1]), float(p[2]))
+		st.set_normal(Vector3.UP)
+		st.set_color(col)
+		st.set_uv(Vector2(v.x, v.z) / 8.0)
+		st.add_vertex(v)
+
+
+## T-217: the hill over the tunnel uses the terrain shader (forest canopy, rock on the steep sides).
+func _terrain_cover(kind: StringName) -> bool:
+	return kind != &"city" and ScenicZone.enabled() and tod != null
 
 
 func _cover_top(kind: StringName) -> float:
@@ -309,12 +392,15 @@ func _cover_spread(kind: StringName) -> float:
 
 ## Por fora: morro sobre o tunel (montanha) ou laje de concreto (cidade).
 func _cover(st: SurfaceTool, t: Vector2, kind: StringName) -> void:
-	var z: float = t.x
+	var back: float = COVER_BACK if _terrain_cover(kind) else 0.0     # T-217: starts behind the sloped front
+	var z: float = t.x + back
 	var top: float = _cover_top(kind)
 	var spread: float = _cover_spread(kind)
 	var col := Color(0.32, 0.38, 0.26) if kind != &"city" else Color(0.55, 0.55, 0.57)
-	while z < t.x + t.y:
-		var z1: float = minf(z + 8.0, t.x + t.y)
+	if _terrain_cover(kind):
+		col = Color(0.0, 0.95, 0.0, 1.0)                 # T-217: forest on top of the tunnel (terrain shader)
+	while z < t.x + t.y - back:
+		var z1: float = minf(z + 8.0, t.x + t.y - back)
 		for seg in [[-spread, 0.0, -30.0, top], [-30.0, top, 30.0, top], [30.0, top, spread, 0.0]]:
 			var a: Vector3 = _edge(z, seg[0], seg[1])
 			var b: Vector3 = _edge(z, seg[2], seg[3])
@@ -344,6 +430,22 @@ func _outer_mat(kind: StringName) -> StandardMaterial3D:
 	var tex: String = "res://assets/textures/grass.png" if kind != &"city" and kind != &"stone" else "res://assets/textures/concrete_streaks.png"
 	if ResourceLoader.exists(tex):
 		m.albedo_texture = load(tex) as Texture2D
+	return m
+
+
+## T-217: stone masonry of the portal wing walls (same texture as the stone retaining walls, StoneWalls3D).
+func _wing_mat() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = TexSlots.albedo("stone_wall")
+	m.normal_enabled = true
+	m.normal_texture = TexSlots.normal("stone_wall")
+	m.normal_scale = 1.3
+	m.vertex_color_use_as_albedo = true
+	m.roughness = 0.92
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.uv1_scale = Vector3(4.0, 4.0, 1.0) / TexSlots.tile_m("stone_wall", 4.5)
+	m.albedo_color = Color(1.12, 1.05, 0.92)
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	return m
 
 
@@ -382,3 +484,41 @@ void fragment() { ALBEDO = tint.rgb * 3.0; }
 	mi.material_override = m
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+
+
+## T-217: white glare plane filling each exit, seen only from inside: the bright hole ahead (the eyes are used to the
+## dark). Grows from 160 m before the exit; unshaded and additive, so glow/bloom spreads it. Visible only near it.
+func _build_glare() -> void:
+	if _glare_at.is_empty():
+		return
+	_glare_mat = StandardMaterial3D.new()
+	_glare_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_glare_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_glare_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_glare_mat.albedo_color = Color(1.0, 0.98, 0.92, 0.0)
+	_glare_mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	for z in _glare_at:
+		var q := QuadMesh.new()
+		q.size = Vector2(27.0, 8.6)
+		var mi := MeshInstance3D.new()
+		mi.mesh = q
+		mi.material_override = _glare_mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var b := Basis(Vector3.UP, path.yaw_at(z) + PI)              # faces back into the tunnel
+		mi.transform = Transform3D(b, _edge(z + 0.6, 0.0, 4.2))
+		mi.visible = false
+		add_child(mi)
+		_glare.append(mi)
+
+
+func _update_glare(z: float) -> void:
+	if _glare.is_empty():
+		return
+	var a: float = 0.0
+	for k in _glare.size():
+		var d: float = _glare_at[k] - z
+		var on: bool = d > -2.0 and d < 170.0 and RoadMesh.in_tunnel(z, tunnels)
+		_glare[k].visible = on
+		if on:
+			a = maxf(a, smoothstep(170.0, 25.0, d))
+	_glare_mat.albedo_color = Color(1.0, 0.98, 0.92, a * glare_peak * 0.6)

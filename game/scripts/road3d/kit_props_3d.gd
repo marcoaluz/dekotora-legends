@@ -51,7 +51,13 @@ func _billboards(path: TrackPath, kind: StringName, tod: TimeOfDay, tunnels: Arr
 			continue
 		var side: float = -1.0 if kind == &"coast" or k % 2 == 0 else 1.0   # litoral: o mar fica a direita
 		var b := Basis(Vector3.UP, path.yaw_at(z) - side * TURN)
-		var base: Vector3 = path.world_point(z, side * LATERAL_M / Track.ROAD_HALF_WIDTH_M, -deck)
+		var lat_m: float = OppositeLayout.push_right(path, LATERAL_M) if side > 0.0 else LATERAL_M   # T-217
+		var cuts: CutLayout = CutLayout.of(path)
+		var dl: DanchiLayout = DanchiLayout.of(path)
+		if (cuts != null and (cuts.height(z, side) > 0.05 or cuts.blocks(z, side * lat_m, 0.0))) 				or (dl != null and dl.blocks_at(z, side * lat_m, 5.0)):
+			z += 90.0
+			continue
+		var base: Vector3 = path.world_point(z, side * lat_m / Track.ROAD_HALF_WIDTH_M, -deck)
 		_boards.add(mesh, Transform3D(b, base), z)
 		_art(b, base + Vector3.UP * (leg + RoadsideKit.BILL_ART.y * 0.5) + b.z * 0.02, k % RoadsideKit.ART_COUNT + 1, level)
 		counts["billboard"] = int(counts.get("billboard", 0)) + 1

@@ -26,7 +26,10 @@ const COMPANION: float = 0.3                    # chance that a tree of a grove 
 
 ## Trees for the route: Array of [model: String, xf: Transform3D]. `blocked(z, lat_signed, pos) -> bool` filters the
 ## places Roadside3D already knows (tunnels, bridges, overpass, wires); `rails` = Array[RailLine] (parallel lines).
-static func place(path: TrackPath, kind: StringName, seed_: int, deck: float, blocked: Callable, rails: Array) -> Array:
+## T-217: `right_shift` moves the right-side groves out (beyond the other carriageway, OppositeLayout.SHIFT); the
+## draws are the same, only the place changes.
+static func place(path: TrackPath, kind: StringName, seed_: int, deck: float, blocked: Callable, rails: Array,
+		right_shift: float = 0.0) -> Array:
 	var out: Array = []
 	var mix: Array = MIX.get(kind, MIX[&"city"])
 	var rng := RandomNumberGenerator.new()
@@ -44,6 +47,8 @@ static func place(path: TrackPath, kind: StringName, seed_: int, deck: float, bl
 				var p: Vector2 = _spot(rng, Vector2(z, centre), radius, placed)
 				if p.x < 0.0:
 					continue
+				if side > 0.0:
+					p.y += right_shift
 				var model: String = species if rng.randf() >= COMPANION else _pick(rng, mix, kind, side)
 				var sc: float = rng.randf_range(0.8, 1.3)
 				var yaw: float = rng.randf() * TAU
@@ -52,7 +57,7 @@ static func place(path: TrackPath, kind: StringName, seed_: int, deck: float, bl
 				var pos: Vector3 = path.world_point(p.x, side * p.y / Track.ROAD_HALF_WIDTH_M, -deck)
 				if blocked.call(p.x, side * p.y, pos):
 					continue
-				placed.append(p)
+				placed.append(p if side < 0.0 else p - Vector2(0.0, right_shift))
 				out.append([model, Transform3D(Basis(Vector3.UP, yaw) * Basis.from_scale(Vector3.ONE * sc), pos)])
 			z += radius + rng.randf_range(GAP.x, GAP.y)
 	return out

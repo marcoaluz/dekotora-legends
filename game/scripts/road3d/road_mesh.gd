@@ -360,6 +360,8 @@ func _build_chunk(s0: int, s1: int) -> void:
 				_strip(sts["ground"], i, j, bo, bo + GRASS_WIDTH, -_deck, -_deck)
 			if q >= 1 and sound_wall_at(z) and not tunnel:
 				for side in [-1.0, 1.0]:
+					if side > 0.0 and OppositeLayout.of(path) != null:
+						continue                                            # T-217: on the outer edge of the other deck
 					_glass_blade(sts["glass"], i, j, side * (BARRIER_IN + 0.45), 0.85, 4.0)
 			continue
 		if not _bare(z):
