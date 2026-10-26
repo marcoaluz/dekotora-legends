@@ -278,3 +278,26 @@ igual). Nada para gerar no ElevenLabs: tudo já está no jogo. Os arquivos ficam
 
 Não recomendo voltar a gerar **motores** no ElevenLabs: o gerador não segura um giro fixo (o tom e o ritmo mudam
 dentro do arquivo), e o jogo precisa de loops em RPM exato para a troca de marcha e o freio-motor soarem certos.
+
+## 10. Peso do caminhão — T-219 (sons procedurais; ElevenLabs só se o Marco aprovar)
+
+Já estão no jogo, **gerados por código** (`python tools/synth_feel_audio.py`, numpy, sempre iguais). O volume de cada um fica
+em `game/data/feel/truck_feel.tres` (grupo "Som"; −80 desliga).
+
+| Arquivo | Quando toca |
+| --- | --- |
+| `sfx/crash/impact_thud_deep.wav` | pancada GRAVE somada às batidas do jogador (força ≥ 4 m/s) |
+| `sfx/truck/chassis_creak.wav` | rangido da estrutura ao começar uma freada forte e no balanço grande do baú (no máx. 1 a cada 2,2 s) |
+| `sfx/truck/road_joint_thump.wav` | "ta-dum" das rodas em cada emenda do viaduto da cidade e das pontes |
+| `sfx/truck/body_rumble_loop.wav` | vibração da carroceria, sobe volume e tom com a velocidade |
+| (já existia) `sfx/ambient/wind_speed_loop.mp3` | vento: agora +2 dB (`wind_gain_db`) |
+
+Se o sintetizado não agradar, gere com **o mesmo nome em `.mp3`** (o jogo usa o mp3 primeiro). **Não gerar sem o Marco aprovar**
+(créditos). Prompts sugeridos (2–3 versões de cada):
+
+| Arquivo | Duração | Prompt |
+| --- | --- | --- |
+| `impact_thud_deep.mp3` | 1 s | Deep heavy low-frequency thud of a loaded 12 ton truck chassis slamming into a car, body and frame boom, sub-bass impact, no glass, no metal scrape, no voices, no music |
+| `chassis_creak.mp3` | 1 s | Heavy truck cargo box and steel frame creaking and groaning under hard braking, slow metal twisting stress sound, close, no brakes hiss, no engine, no music |
+| `road_joint_thump.mp3` | 0.5 s | Truck tyres hitting a highway bridge expansion joint at speed, two quick low thumps "ta-dum" front and rear axle, dull and heavy, no engine, no music |
+| `body_rumble_loop.mp3` | 10 s | Loopable low rumble and vibration inside a heavy truck body at highway speed, steady sub-bass road drone with slight rattling panels, no engine note, no wind gusts, no music |

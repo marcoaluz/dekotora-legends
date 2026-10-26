@@ -502,3 +502,47 @@ Referência: começa-se com 50.000 ¥ e um frete de Kanto paga 20–45 mil ¥ (2
 | Carga nova | Peso (t) | Pagamento | Fragilidade | Tipo | Carroceria |
 | --- | --- | --- | --- | --- | --- |
 | Combustível (diesel) | 8–14 | ×1,2 | 0,8 | pesada | **só o tanque** |
+
+## Peso do caminhão (T-219) — PROPOSTA
+
+Todos os números em `game/data/feel/truck_feel.tres` (campos `sim_*` = simulação; o resto é só visual/som). Antes da
+T-219 = `TruckFeel.legacy()`. Medidos com `godot --headless --path game -s res://tools_dev/probe_feel_t219.gd`.
+
+| Campo | Antes | Depois | O que faz |
+| --- | --- | --- | --- |
+| `sim_traction_limit_n` | 32.000 N | 29.000 N | força máxima na arrancada (marchas baixas) |
+| `sim_shift_time_s` | 0,35 s | 0,45 s | corte de torque em cada troca de marcha |
+| `sim_steer_response` | 3,2 /s | 2,6 /s | inércia no começo da troca de faixa |
+| `sim_lane_gain` | 1,9 /s | 1,7 /s | quanto corre atrás da faixa nova (fim "arrasta") |
+| `sim_lane_max_vel` | 0,95 | 0,95 | velocidade lateral máxima (x/s) |
+| `sim_lane_mass_exp` | 0 | 0,4 | troca de faixa × (12 t / massa de inércia)^0,4 (teto 1,05) |
+| `sim_cargo_inertia` | 1,0 | 1,25 | cada kg de carga ACIMA de 4 t pesa 1,25 kg na inércia |
+| `sim_parts_inertia` | 1,0 | 1,5 | cada kg de peça/motor pesa 1,5 kg na inércia |
+
+Massa de inércia = massa vazia + carga + (carga − 4 t) × 0,25 + peças × 1,5. Vale para aceleração e troca de faixa; colisão,
+aderência na curva e dano usam a massa real.
+
+| Caminhão | 0–60 km/h | 0–100 km/h | Troca de faixa a 80 km/h (90% / 98%) |
+| --- | --- | --- | --- |
+| Padrão (8 t + 4 t, para-choques básicos) | 9,3 → 10,1 s | 22,6 → 23,7 s | 1,00 / 1,17 → 1,13 / 1,33 s |
+| Baú cheio (contrato de 12 t) | 15,1 → 17,7 s | 38,4 → 43,5 s | 1,17 / 1,37 → 1,67 / 1,93 s |
+| Baú vazio | 6,5 → 7,2 s | 15,4 → 16,4 s | 0,90 / 1,03 → 0,97 / 1,10 s |
+| "Tanque" (peças ~1,3 t + V8) | 8,6 → 10,0 s | 17,4 → 19,5 s | 1,03 / 1,20 → 1,23 / 1,43 s |
+| Canter | 7,2 → 7,7 s | 19,3 → 20,3 s | 0,77 / 0,87 → 0,80 / 0,93 s |
+
+Corridas (duelo 1 contra 1, `tools_dev/measure_duel.gd -- --seeds=12 --modes=1x1`, "jogador" = bot difícil sem duelo;
+`--feel=legacy --no-hysteresis` = antes):
+
+| Rota (prazo) | Antes: jogador / rival, fora do prazo | Depois | Diferença |
+| --- | --- | --- | --- |
+| Litoral (133 s) | 125,2 / 123,4 s, 1 de 12 | 128,0 / 125,1 s, 2 de 12 | +2,8 / +1,7 s |
+| Viaduto (130 s) | 126,0 / 124,3 s, 1 de 12 | 129,8 / 125,8 s, 1 de 12 | +3,8 / +1,5 s |
+| Montanha (150 s) | 139,2 / 138,6 s, 0 de 12 | 135,4 / 135,4 s, 0 de 12 | −3,8 / −3,2 s (o bot ultrapassa melhor com a correção; ruído) |
+
+- Rival e bots usam as MESMAS regras: a diferença entre eles e o jogador não muda; só o tempo absoluto sobe ~2–4 s.
+- Com os números "cheios" do 1º teste (tração 27 kN, troca 0,5 s, inércia 2,4, ganho 1,6, expoente 0,5) o litoral ficava
+  +7 s e 5–6 de 12 corridas estouravam o prazo: por isso a proposta é a moderada acima.
+- **Prazos não mudaram** (decisão do Marco: manter, ou +3 s no litoral e no viaduto).
+- Visual (não muda resultado): inclinação 0,35°/m/s² (máx. 4°, troca de faixa ~3,5°, curvas longas ~1°), mola 1,05 Hz com
+  amortecimento 0,38; cabeceio 0,5°/m/s² (máx. 2,5°); suspensão 3,5 cm/m/s² (máx. 12 cm), emenda a cada 32 m; câmera 8/s;
+  FOV +0,45°/m/s (teto 20°); tremor de 95 km/h, 4,5 cm; batida 0,32 m; congelamento 75 ms a partir de 9 m/s.

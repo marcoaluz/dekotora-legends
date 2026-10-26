@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-26 | **Peso do caminhão (T-219, pedido do Marco, item 15) — PROPOSTA, números num arquivo só (`game/data/feel/truck_feel.tres`).** Simulação: arrancada e trocas de marcha mais lentas, troca de faixa com mais inércia e "arrasto" no fim, carga acima de 4 t (×1,25) e peças (×1,5) pesam a mais na inércia; padrão 0–100 km/h 22,6 → 23,7 s, troca de faixa 1,00 → 1,13 s (baú cheio 1,17 → 1,67 s). Visual: baú inclina para fora com mola (atraso e volta), cabeceio, suspensão nas baixadas e emendas do viaduto, câmera com mais atraso e FOV com teto, congelamento de 75 ms nas batidas (online só a câmera), fumaça de pneu/poeira, pancada grave, rangido, vibração da carroceria, vento; opções "Vibração do celular" e "Reduzir tremor da câmera". Bot que ficava preso atrás de um lento corrigido. Protocolo 15. | Pedido do Marco (T-219). Detalhes na seção "T-219" no fim |
 | 2026-10-23 | **Pedágio de verdade, com física (T-207, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** No km 0,15 de toda rota a pista se divide em **duas passagens** em volta de uma **ilha central** (a faixa do meio inteira, ±1,8 m, de 132 a 164 m) com a cabine; o acostamento acaba num **funil** de barreiras (60 m) e cada passagem tem 3,8 m (faixas 1 e 3 sempre cabem). **Bater no nariz da ilha = batida de frente como num veículo parado** (mesma regra/massa dos obstáculos da T-139: dano, carga, para a 6 m/s e sai para a passagem do lado, x = 0 vai para a esquerda); de lado = empurrado para fora (batida lateral ou raspada); encostar = raspada; acostamento = raspa e entra na passagem. Bots, rival e trânsito saem da faixa do meio antes (mesmas consultas de faixa fechada), o bot preso ao lado de alguém cai para trás dele para entrar ("zíper"), troca de faixa para a ilha é recusada perto dela. **Sem limite de velocidade nem parada** (é corrida: o ETC real pede 20 km/h). Passagem da esquerda **ETC/一般** (verde), da direita **ETC専用** (roxa); saiu o 止まれ/pare do acostamento. Duelo (largada nas faixas 1 e 3): custo 0 s; corrida rápida (jogador larga no meio, entre 2 bots): o último a passar perde ~4 s. Protocolo 10. | Pedido do Marco (T-207). Detalhes na seção "T-207" no fim |
 | 2026-10-23 | **Abertura do duelo mais lenta e abrindo na hora (T-208, relato do Marco: "demorou para abrir e foi rápido demais").** Cena de **8,9 s + 3 s de contagem = 11,9 s** (antes 5 + 3): entrada 2,6 s (param em 2,1 s e respiram), guardiões 1,3 s, 対決 sozinho 1,2 s, **fase nova "faixas" 1,9 s** (faixas dos pilotos paradas ~2,5 s para ler), raio 0,9 s, arrancada 1,0 s. O relógio da cena começa no **1º quadro liso**: antes dele um preparo com tela preta + neblina roxa aquece os shaders (pista uma vez, estúdio com tudo aceso uma vez). O menu lê a corrida em segundo plano e a troca de tela mostra preto + neblina desde o clique. **Online: o servidor só começa a contar quando todos montaram a corrida** (`c_race_loaded`, no máximo 30 s) e avisa todos no mesmo instante (`s_state(COUNTDOWN)`); protocolo 11. | Relato do Marco no celular (T-208). Medidas em `docs/capturas_t208/medidas.txt`; detalhes na seção "T-208" no fim |
 | 2026-10-23 | **Abertura do duelo refeita (T-204, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** Estúdio preto com neblina roxa rasteira (volumétrica só no PC Ultra; no celular, planos de névoa baratos); os 2 caminhões DE VERDADE entram pelos lados em ângulo e param lado a lado de frente para a câmera, faróis e neon acesos; atrás deles sobem os guardiões **Raijin** (atrás do jogador, à esquerda) e **Fujin** (atrás do rival, à direita), arte NOSSA desenhada por código, cada um numa aura de chamas; **対決** entra com o taiko; as faixas dos dois pilotos aparecem juntas embaixo (sem a fala de provocação: não dá tempo de ler); um **raio** cai entre os dois com **UM clarão de 0,15 s** e trovão (opção nova **"Reduzir clarões"** troca por um brilho violeta suave e também suaviza o clarão da saída do túnel); corte: os dois arrancam para a câmera; na pista a contagem começa com eles já lado a lado no grid. **8 s no total (5 s de cena + 3 s de contagem)**, antes 9,4 s. Protocolo de rede 9. Saíram: área de descanso/praça de pedágio, detalhes de para-choque/viseira/mural, banner VS e o pisca-pisca de farol de provocação. | Pedido do Marco (T-204). Detalhes na seção "T-204" no fim |
@@ -1157,3 +1158,35 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   | `base` | 673 (mín. 663, máx. 682) | 673 | 55,5 | 20,5 (mediana 12,5) |
   Leitura: o baú rosa (rival novo) deu ~30 chamadas a menos que o rival antigo; FPS igual dentro do ruído. A medida no
   celular continua pendente (o APK de teste é do protocolo 14).
+
+## 2026-10-26 · T-219 · Sentir o peso do caminhão (pedido do Marco, item 15) — PROPOSTA, Marco testa e ajusta
+
+- **Um arquivo só para ajustar**: `game/data/feel/truck_feel.tres` (classe `TruckFeel`, `scripts/data/truck_feel.gd`; cada
+  campo tem a explicação em português). Dois grupos: **simulação** (`sim_*`, vale para jogador, bots, servidor e predição;
+  mudou = APK novo e protocolo) e **visual/som/vibração** (só o aparelho, pode mudar à vontade). Os números de antes ficam em
+  `TruckFeel.legacy()` (comparação e testes).
+- **Simulação (inércia)** — proposta, ver `BALANCEAMENTO.md` seção T-219: tração na arrancada 32 → 29 kN, corte na troca de
+  marcha 0,35 → 0,45 s, inércia lateral 3,2 → 2,6/s, ganho da faixa 1,9 → 1,7/s (o fim da troca "arrasta" mais), a massa entra
+  na troca de faixa (`(12 t / massa de inércia)^0,4`, teto 1,05 para os leves), **carga acima de 4 t pesa ×1,25** e **peças e
+  motor pesam ×1,5** só na inércia (aceleração e troca de faixa). Colisão, aderência na curva e dano continuam com a massa real.
+  Resultado: caminhão padrão 0–100 km/h 22,6 → 23,7 s e troca de faixa (90%) 1,00 → 1,13 s; baú cheio de 12 t 38,4 → 43,5 s
+  e 1,17 → 1,67 s. Corridas dos bots +2 a +4 s no litoral/viaduto (prazos não mudaram; ver PRECISA DECISÃO na T-219).
+- **Bot preso atrás de um lento (correção)**: com a aceleração mais lenta o bot difícil podia ficar 45 s seguindo um ônibus
+  exatamente na borda do horizonte de visão (o obstáculo "piscava", o relógio de "preso" zerava e ele nunca ultrapassava).
+  Agora o relógio continua com o lento até 25% mais longe (`BotDriver.blocked_hysteresis`); a velocidade segue a regra antiga.
+- **Visual (só o aparelho)**: o baú balança como mola com amortecedor (`truck/truck_motion.gd`): **inclina para fora** na troca de
+  faixa e nas curvas, com atraso e balanço de volta (antes: inclinava para DENTRO da troca, sem mola); **cabeceio** (acelerando
+  o nariz sobe, freando afunda, batida de frente mergulha); **suspensão** comprime nas baixadas, estica nos topos e dá um tranco
+  em cada **emenda de dilatação** (a cada 32 m no viaduto da cidade e nas pontes) com o "ta-dum" no som. As rodas ficam no chão
+  (só a cabine, o baú e as peças inclinam).
+- **Câmera**: segue com mais atraso (14 → 8/s), FOV abre 0,45°/m/s com teto de 20°, tremor leve a partir de 95 km/h (antes 100),
+  tremor da batida 0,25 → 0,32 m, **congelamento de 75 ms** nas batidas do jogador a partir de 9 m/s: offline a corrida para;
+  **online só a câmera para** (a simulação é do servidor).
+- **Batidas**: além de faíscas, pedaços e fumaça (T-141), fumaça de pneu por 0,9 s depois da batida, poeira de terra no
+  acostamento, pancada grave somada ao som da batida, vibração do celular centralizada (`input/haptics.gd`).
+- **Som**: vento +2 dB, vibração da carroceria que cresce com a velocidade, rangido da estrutura ao frear forte (e no balanço
+  grande). Sons **procedurais** (`python tools/synth_feel_audio.py`); versão ElevenLabs só se o Marco aprovar (lista em
+  `docs/AUDIO_ELEVENLABS.md` seção 10). O motor (T-220) não foi mexido.
+- **Opções novas**: Controles > "Vibração do celular" (liga/desliga) e Gráficos > "Reduzir tremor da câmera" (tremores ×0,25 e
+  sem congelamento). `--reduce-shake` força sem gravar.
+- **Protocolo 15** (a simulação mudou). Vídeos e tiras antes/depois em `docs/capturas_t219/`.
