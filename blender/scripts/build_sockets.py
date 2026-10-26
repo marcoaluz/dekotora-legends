@@ -22,7 +22,7 @@ import bpy
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import socket_rules as R, truck_measure as TM  # noqa: E402
+from lib import paint_measure as PM, socket_rules as R, truck_measure as TM  # noqa: E402
 
 TRUCK_DIR = "game/assets/vehicles/dekotora/truck"
 OUT_DIR = TRUCK_DIR + "/sockets"
@@ -66,15 +66,16 @@ def build_one(path: str) -> dict:
     m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
     m["edges"] = TM.box_edges(data, m)                          # T-231: traseira, foguete e contorno do baú
     st = stacks(body, cab)
-    sk = R.sockets(m, st)
     zones = R.protected_zones(m, cab, st)
+    m["paint"] = PM.paint_faces(data, m, m["edges"], zones["rear_doors"]["box"]) if "rear_doors" in zones else {}   # T-232
+    sk = R.sockets(m, st)
     probs = R.check(sk, zones)
     probs += [f"{k}: {v['problem']}" for k, v in sk.items() if "problem" in v]
     out = {
         "model": stem, "body": body, "cab": cab, "version": 1,
         "units": "metros; Godot: x direita, y cima, frente = -z, traseira do bau em z = 0",
         "scale_limits": [R.SCALE_MIN, R.SCALE_MAX],
-        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges")},
+        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges", "paint")},
         "sockets": sk, "protected": zones, "design_problems": probs,
         "surfaces": stem + ".surf.json",
     }
@@ -101,6 +102,10 @@ def build_one(path: str) -> dict:
             tot = sum(sum((g["b"][i] - g["a"][i]) ** 2 for i in range(3)) ** 0.5 for g in sk[k]["strips"])
             txt += f" | {k} {len(sk[k]['strips'])} trechos {tot:.1f} m"
     print(f"[sockets] {stem:34s} {txt}")
+    for k in ("mural_r", "mural_l", "rear_paint", "roof_paint"):
+        r = sk.get(k, {}).get("rect")
+        if r:
+            print(f"[sockets] {stem:34s} {k} {r['w']:.2f} x {r['h']:.2f} m centro {r['c']}")
     for p in probs:
         print("   PROBLEMA:", p)
     return out

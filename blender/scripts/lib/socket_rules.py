@@ -19,7 +19,9 @@ ROCKET_H = 0.38                    # m: altura máxima do foguete acima do teto 
 RB_DEPTH = 0.55                    # m: fundo máximo do para-choque traseiro com as lanternas (T-231)
 STRIP_W, STRIP_T = 0.025, 0.03     # m: largura e espessura reservadas ao contorno de LED (T-231)
 # Encaixes que só existem em baú fechado (a graneleira é aberta).
-BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint")
+# T-232: o mural também (a graneleira/lona/tanque/caçamba não têm lateral de baú fechado)
+BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint",
+            "mural_r", "mural_l")
 
 
 def _box(x0, y0, z0, x1, y1, z1) -> list:
@@ -70,7 +72,7 @@ def protected_zones(m: dict, cab: str, extra_stacks: list) -> dict:
     if "box" in m and not m.get("open_body"):
         bx = m["box"]
         z["rear_doors"] = {"box": _box(-(bx["half_w"] - 0.1), bx["bottom_y"] + 0.12, bx["rear_z"] + 0.01,
-                                       bx["half_w"] - 0.1, bx["top_y"] - 0.1, bx["rear_z"] + 0.35), "exempt": []}
+                                       bx["half_w"] - 0.1, bx["top_y"] - 0.1, bx["rear_z"] + 0.35), "exempt": ["rear_paint"]}   # T-232: tinta na porta
     return z
 
 
@@ -166,6 +168,8 @@ def sockets(m: dict, extra_stacks: list) -> dict:
     # superfícies (sem volume: textura do material) e itens sem lugar físico
     for k in ("mural_r", "mural_l", "roof_paint", "rear_paint"):
         s[k] = {"fit": "face"}
+        if k in m.get("paint", {}):                  # T-232: retângulo medido por raios no plano real da face
+            s[k]["rect"] = m["paint"][k]
     for k in ("hubcaps", "horn", "interior", "decals"):
         s[k] = {"fit": "none"}
     if m.get("open_body"):

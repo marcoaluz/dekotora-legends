@@ -635,12 +635,6 @@
    "width": 2.55,
    "fit": "uniform"
   },
-  "mural_r": {
-   "fit": "face"
-  },
-  "mural_l": {
-   "fit": "face"
-  },
   "hubcaps": {
    "fit": "none"
   },
