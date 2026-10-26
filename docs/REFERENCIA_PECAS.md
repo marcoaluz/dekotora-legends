@@ -382,6 +382,9 @@ no material `mural`. Brilho à noite pronto (`MuralGlow`, T-155).
 
 **Peças novas:** 12 murais nossos (plano na seção 14). **As capturas do documento não serão usadas nem recortadas.**
 
+**FEITO (T-232):** 12 murais `mural_*` com desenho diferente em cada lado, arte nossa por código (`docs/CREDITOS_MURAIS.md`,
+`docs/capturas_t232/`).
+
 ---
 
 ## 11. Pintura no teto (134–142)
@@ -399,6 +402,8 @@ fica atrás e acima do baú, o teto aparece muito**: é uma peça barata com mui
 9 letreiros, `roofpaint_01` … `roofpaint_09`. Peso 0, destaque 10–16, preço 12.000–20.000 ¥ (Fama 0 ou 20; Comum ou
 Incomum). As **frases** são decisão do Marco (seção 17, decisão 7).
 
+**FEITO (T-232):** `roofpaint_01` … `roofpaint_09` com as 9 frases aprovadas, na vertical ao longo do teto (Yuji Syuku).
+
 ---
 
 ## 12. Pintura da traseira, "focado no rosto" (143–147)
@@ -413,6 +418,9 @@ visíveis). As 5 são **dragões** com a **cabeça centralizada** e kanji na lat
 **Peças novas** (encaixe novo `rear_paint`, zona `rear`, sem durabilidade): uma por mural, **recortada do nosso mural
 com o rosto no centro** + frestas e ferragens das portas por cima (`rearpaint_<tema>`). Destaque 14–24, preço
 15.000–28.000 ¥.
+
+**FEITO (T-232), com a decisão 8 do Marco (arte separada, não recorte do mural):** 12 traseiras `rearpaint_*` (rostos e
+máscaras: dragão, tigre, hannya, oni, kitsune, tengu, Noh, kabuki, gueixa, leão do kabuki, fênix, carpas) com kanji vertical.
 
 ---
 
@@ -591,7 +599,7 @@ Ordem pensada no que a câmera da corrida mais mostra (atrás e acima do baú).
 | --- | --- | --- | --- |
 | 2 | Base: `sockets.json`, caixas-limite, escala automática, separar peças de fábrica nos `.glb`, materiais do teto/traseira, dano sem buraco, teste + `REPORT_ENCAIXE.md` | 0 | 2 sessões |
 | 3 | Traseira + foguete + contorno do baú — **FEITO (T-231)** | 11 + 7 + 3 = 21 | 2 sessões |
-| 4 | Murais + pintura da traseira + pintura do teto (com `CREDITOS_MURAIS.md`) | 12 + 12 + 9 = 33 | 2–3 sessões |
+| 4 | Murais + pintura da traseira + pintura do teto (com `CREDITOS_MURAIS.md`) — **FEITO (T-232)** | 12 + 12 + 9 = 33 | 2–3 sessões |
 | 5 | Deque frontal (shader de LED, atlas de letreiros) | 17 | 2 sessões |
 | 6 | Frente: viseira (4 bases), para-choque, retrovisor, escada, saias | 14 + 11 + 6 + 3 + 8 = 42 | 3 sessões |
 | 7 | Cor L/R por peça, raridade, filtros da loja, rede (descritor + protocolo novo), APK, medida no celular | — | 1–2 sessões |

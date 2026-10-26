@@ -67,7 +67,40 @@ embaixo dele (substitui o para-choque e as lanternas de fábrica de baixo: leva 
 placa), topo a 0,93 m (abaixo das setas). Foguete e contorno: faixas medidas por raios na lataria real
 (`truck_measure.box_edges`); conferidos vértice a vértice (`StripFit.problems`).
 
-**Total geral (lotes 1 e 2): 1126 de 1126 combinações cabem.**
+## Matriz caminhão × pinturas (T-232: 12 murais com os 2 lados, 12 traseiras, 9 tetos)
+
+| Caminhão | Murais OK | Lateral (m) | Traseiras OK | Traseira (m) | Tetos OK | Teto (m) | Falhas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| alubox | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
+| base_americana | 12/12 | 8.13 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 8.15 | nenhuma |
+| base_chata | 12/12 | 8.13 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 8.15 | nenhuma |
+| base_curta | 12/12 | 9.40 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 9.38 | nenhuma |
+| base_jac | 12/12 | 8.82 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 8.80 | nenhuma |
+| canter | 12/12 | 4.42 × 1.73 | 12/12 | 2.10 × 1.83 | 9/9 | 2.17 × 4.83 | nenhuma |
+| carreta (guardada) | 12/12 | 13.05 × 1.85 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 13.07 | nenhuma |
+| dump | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_americana | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_chata | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_curta | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| graneleira_jac | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| leve_americana | 12/12 | 4.80 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 5.10 | nenhuma |
+| leve_chata | 12/12 | 4.80 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 5.20 | nenhuma |
+| leve_curta | 12/12 | 6.03 × 1.80 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 6.38 | nenhuma |
+| leve_jac | 12/12 | 5.45 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 5.85 | nenhuma |
+| longo_americana | 12/12 | 9.20 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 9.53 | nenhuma |
+| longo_chata | 12/12 | 9.20 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 9.60 | nenhuma |
+| longo_curta | 12/12 | 10.43 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 10.78 | nenhuma |
+| longo_jac | 12/12 | 9.85 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 10.25 | nenhuma |
+| pinkbox | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
+| tanker | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+| tarp | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
+
+Pinturas: **528 de 528** combinações cabem (os murais contam os 2 lados numa combinação). Cada face é um retângulo
+medido por raios no plano real da lataria (`blender/scripts/lib/paint_measure.py`), por dentro do contorno de LED;
+a arte nunca sai espelhada (u × v = normal) e fica fora das zonas protegidas (a traseira é tinta na porta: isenta só
+de `rear_doors`). Conferido por `PaintFit.problems`.
+
+**Total geral (lotes 1 e 2 e pinturas): 1654 de 1654 combinações cabem.**
 
 ## Falhas
 
@@ -84,5 +117,5 @@ encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (un
 
 Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo
 leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da
-placa próprias) para `rear_bumper`; rodas para `hubcaps`.
+placa próprias) para `rear_bumper`; rodas para `hubcaps`; `rear_doors` para `rear_paint` (T-232: tinta na porta).
 

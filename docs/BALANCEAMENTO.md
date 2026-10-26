@@ -583,3 +583,50 @@ Corridas (duelo 1 contra 1, `tools_dev/measure_duel.gd -- --seeds=12 --modes=1x1
 - Visual (não muda resultado): inclinação 0,35°/m/s² (máx. 4°, troca de faixa ~3,5°, curvas longas ~1°), mola 1,05 Hz com
   amortecimento 0,38; cabeceio 0,5°/m/s² (máx. 2,5°); suspensão 3,5 cm/m/s² (máx. 12 cm), emenda a cada 32 m; câmera 8/s;
   FOV +0,45°/m/s (teto 20°); tremor de 95 km/h, 4,5 cm; batida 0,32 m; congelamento 75 ms a partir de 9 m/s.
+
+## Pinturas: murais, traseira e teto (T-232) — PROPOSTA
+
+Valores **propostos** (catálogo `docs/REFERENCIA_PECAS.md`, seções 10–12; tabela única em `blender/scripts/lib/t232_registry.py`,
+gerada por `python tools/gen_t232_data.py`). Regras de sempre das pinturas: **peso 0, sem durabilidade** (não amassa nem cai;
+cada batida lateral **risca**: −10% do destaque até repintar, repintar = 30% do preço). Raridade e Fama sugerida só nos dados.
+- **Mural**: uma compra = os 2 lados (desenho diferente em cada lado), no encaixe `mural` (o mesmo dos murais Clássicos).
+- **Só baú fechado**: na graneleira, lona, tanque e caçamba a pintura fica guardada (não aparece nem conta destaque).
+- **Bots** (T-232): mural em 1 de 2 (`TruckConfig.BOT_MURAL`), traseira em 1 de 2 (`BOT_REAR_PAINT`), teto em 1 de 4
+  (`BOT_ROOF_PAINT`), pela semente. Rivais: chefe = `mural_ryu_kumo` + `rearpaint_ryu` + `roofpaint_05`; Trovão Rosa (baú rosa,
+  mantém a gueixa de fábrica) = `rearpaint_bijin` + `roofpaint_07`.
+
+| ID | Encaixe | Zona | Nome | Destaque | Preço (¥) | Fama sugerida | Raridade |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `mural_ryu_kumo` | Mural (2 lados) | Laterais | Dragão nas nuvens | 40 | 58.000 | 120 | Lendária |
+| `mural_ryu_nami` | Mural (2 lados) | Laterais | Dragão e ondas | 38 | 54.000 | 120 | Lendária |
+| `mural_tora_take` | Mural (2 lados) | Laterais | Tigre no bambuzal | 32 | 44.000 | 60 | Rara |
+| `mural_tora_yuki` | Mural (2 lados) | Laterais | Tigre na neve | 32 | 46.000 | 60 | Rara |
+| `mural_nami_fuji` | Mural (2 lados) | Laterais | Grande onda e Fuji | 22 | 26.000 | 20 | Incomum |
+| `mural_kabuki` | Mural (2 lados) | Laterais | Kabuki | 30 | 40.000 | 60 | Rara |
+| `mural_musha` | Mural (2 lados) | Laterais | Guerreiro samurai | 34 | 48.000 | 60 | Rara |
+| `mural_bijin_ogi` | Mural (2 lados) | Laterais | Dama do leque | 28 | 34.000 | 60 | Rara |
+| `mural_bijin_tsuki` | Mural (2 lados) | Laterais | Dama sob a lua | 28 | 36.000 | 60 | Rara |
+| `mural_hoo` | Mural (2 lados) | Laterais | Fênix e grous | 28 | 34.000 | 60 | Rara |
+| `mural_men` | Mural (2 lados) | Laterais | Máscaras do Japão | 30 | 38.000 | 60 | Rara |
+| `mural_koi` | Mural (2 lados) | Laterais | Carpas | 22 | 28.000 | 20 | Incomum |
+| `rearpaint_ryu` | Pintura da traseira | Traseira | Traseira: dragão | 24 | 28.000 | 20 | Incomum |
+| `rearpaint_tora` | Pintura da traseira | Traseira | Traseira: tigre | 22 | 26.000 | 20 | Incomum |
+| `rearpaint_hannya` | Pintura da traseira | Traseira | Traseira: hannya | 21 | 24.000 | 20 | Incomum |
+| `rearpaint_oni` | Pintura da traseira | Traseira | Traseira: oni | 20 | 23.000 | 20 | Incomum |
+| `rearpaint_kitsune` | Pintura da traseira | Traseira | Traseira: raposa | 15 | 17.000 | 20 | Incomum |
+| `rearpaint_tengu` | Pintura da traseira | Traseira | Traseira: tengu | 16 | 18.000 | 20 | Incomum |
+| `rearpaint_noh` | Pintura da traseira | Traseira | Traseira: máscara de Noh | 14 | 16.000 | 20 | Incomum |
+| `rearpaint_kabuki` | Pintura da traseira | Traseira | Traseira: kabuki | 18 | 21.000 | 20 | Incomum |
+| `rearpaint_bijin` | Pintura da traseira | Traseira | Traseira: gueixa | 17 | 19.000 | 20 | Incomum |
+| `rearpaint_shishi` | Pintura da traseira | Traseira | Traseira: leão do kabuki | 19 | 22.000 | 20 | Incomum |
+| `rearpaint_hoo` | Pintura da traseira | Traseira | Traseira: fênix | 18 | 20.000 | 20 | Incomum |
+| `rearpaint_koi` | Pintura da traseira | Traseira | Traseira: carpas | 14 | 15.000 | 20 | Incomum |
+| `roofpaint_01` | Pintura do teto | Teto | Teto: 一番星 (estrela nº 1) | 10 | 12.000 | 0 | Comum |
+| `roofpaint_02` | Pintura do teto | Teto | Teto: 男花道 (caminho de honra) | 11 | 13.000 | 0 | Comum |
+| `roofpaint_03` | Pintura do teto | Teto | Teto: 爆走 (corrida louca) | 12 | 14.000 | 0 | Comum |
+| `roofpaint_04` | Pintura do teto | Teto | Teto: 御意見無用 (dispenso opinião) | 12 | 15.000 | 20 | Incomum |
+| `roofpaint_05` | Pintura do teto | Teto | Teto: 唯我独尊 (único no mundo) | 13 | 16.000 | 20 | Incomum |
+| `roofpaint_06` | Pintura do teto | Teto | Teto: 義理人情 (dever e coração) | 14 | 17.000 | 20 | Incomum |
+| `roofpaint_07` | Pintura do teto | Teto | Teto: 浪漫街道 (estrada romântica) | 14 | 18.000 | 20 | Incomum |
+| `roofpaint_08` | Pintura do teto | Teto | Teto: 天下御免 (licença do mundo) | 15 | 19.000 | 20 | Incomum |
+| `roofpaint_09` | Pintura do teto | Teto | Teto: 夜明けまで (até o amanhecer) | 16 | 20.000 | 20 | Incomum |

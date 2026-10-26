@@ -1276,3 +1276,48 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   121 → 129 → 134 → 136, chamadas 621–636 (pico 642–674), 345–364 mil triângulos, sem picos. **Comparação com o commit
   anterior à T-231 (e989260): NÃO medida.** O worktree dele caiu com falha de segmentação no `--import` (26 s);
   pendente, se o Marco quiser o número exato do custo só das peças novas.
+
+## 2026-10-26 · T-232 · Oficina lote 3: murais, pintura da traseira e pintura do teto (seção 16.2, etapa 4)
+
+- **33 pinturas**: 12 murais (cada um com **desenho diferente em cada lado**), 12 traseiras "focadas no rosto" (arte
+  separada do mural, decisão 8) e 9 tetos com as frases da decisão 7. Lista, preços e destaque em `BALANCEAMENTO.md`
+  (seção T-232, **proposta**); créditos em `docs/CREDITOS_MURAIS.md`.
+- **Arte 100% por código, sem pixel de terceiros** (decisão do Claude, Marco confere): o Marco permitiu obra de domínio
+  público repintada, mas nenhuma imagem foi usada — as obras (Hokusai JP1847, tigres de Ganku etc.) foram só referência de
+  tipo/composição. Motivo: o estilo vetorial de aerógrafo do mural da gueixa (T-218, aprovado) fica coerente no jogo, tudo
+  se regera do repositório (`blender -b --factory-startup -P blender/scripts/build_t232_paint.py`, bytes idênticos a cada
+  rodada) e a licença fica a mais limpa possível. Biblioteca nova: `blender/scripts/lib/paint2d.py` (formas por distância,
+  tubos de raio variável com coordenadas ao longo do corpo, degradês, contorno, neon, PNG sem Pillow) + `lib/t232_*.py`.
+- **Kanji**: fonte de pincel Yuji Syuku (OFL, já registrada) em vetor (o Blender converte cada caractere em triângulos e o
+  numpy desenha). Cada caractere é conferido na tabela `cmap` da fonte (`lib/font_cmap.py`): o Blender desenha um glifo
+  reserva sem avisar quando falta o caractere, então a conferência pela fonte é que impede o tofu. 75 caracteres, todos ok.
+- **Um mural por lado = uma compra traz os 2 lados** (no encaixe `mural` de sempre, junto dos murais Clássicos). Escolha
+  do Claude: misturar murais diferentes em cada lado (ex.: dragão à direita, tigre à esquerda) ficou de fora — mudaria o
+  perfil e a loja; dá para fazer depois se o Marco quiser.
+- **Como a pintura entra no caminhão**: um quadrado com a arte num **retângulo medido por raios** no plano real de cada
+  face (`blender/scripts/lib/paint_measure.py`, gravado em `truck/sockets/*.json` como `rect`), 5 mm para fora, por dentro
+  do contorno de LED. O que sai da lataria (trilhos, montantes, luzinhas, ferragens e travas das portas, escada, contorno,
+  foguete) fica NA FRENTE da pintura. Luzinha rente à face é evitada (a borda do retângulo recua). Os `.glb` não foram
+  regerados. Retângulo com u × v = normal: **a arte nunca sai espelhada** (kanji legível nos dois lados, atrás e no teto).
+- **Proporção**: cada baú tem a sua (lateral de 2,6:1 no Canter a 6,1:1 no longo curta). A arte estica no máximo
+  0,8–1,25× e o resto é cortado nas bordas (que a arte deixa livres). Teto: 2 artes por frase (comprida 1:4 e curta 1:2).
+- **Traseira** = tinta na própria porta: isenta só da zona `rear_doors` (nada mais); a fresta das portas é pintada na arte.
+  Kanji no alto (embaixo, nas quinas, ficam as colunas de lanternas de fábrica). Nos baús médios a escada de fábrica da
+  porta direita passa na frente do kanji da direita (é geometria do baú).
+- **Teto**: frase na vertical ao longo do teto, com o alto das letras para a frente do caminhão (a câmera da corrida, atrás
+  e acima, lê de pé).
+- **Baú rosa (T-218)**: o mural comprado **substitui** o da gueixa (fica por cima); tirando a peça, a gueixa volta. O rival
+  Trovão Rosa continua com a gueixa (ganhou só traseira e teto).
+- **Carroceria aberta** (graneleira, lona, tanque, caçamba): as faces não existem; a pintura comprada fica guardada (não
+  aparece nem conta) e a garagem avisa, como o foguete da T-231.
+- **Noite**: mesma técnica do mural da gueixa (emissão pronta por arte + `MuralGlow`, força pela hora do dia/túnel).
+  Conferido nos dois renderizadores: **Compatibility (celular) acende** igual ao Forward+ (`docs/capturas_t232/*_noite.png`).
+- **Dano**: pintura não amassa, não entorta nem cai (o nó ignora `dent`/`broken`); continua a regra de riscar (perfil).
+- **Custo**: +1 chamada de desenho por face pintada (até +4 por caminhão: medido 100 → 104 no Forward+ e no
+  Compatibility), +8 triângulos; material compartilhado por arte. Memória/APK (ETC2): murais 1536×384 (+ emissão 384×96)
+  **10,0 MB**, traseiras 640×512 **3,3 MB**, tetos 256×1024 e 256×512 **3,0 MB** = **~16 MB a mais no APK**. Em 2048×512
+  os murais custavam 17,8 MB; ficou 1536×384 (a garagem de perto fica um pouco mais suave). Só as pinturas instaladas nos
+  caminhões da corrida ficam na memória de vídeo.
+- **Bots e rivais** com pinturas sorteadas pela semente (mesmo resultado no servidor e nos clientes); **protocolo 17**.
+- **Observação (Clássicas)**: o ornamento lateral Clássico `side_ornament_wave` fica por cima do mural novo (já era um
+  conflito Clássica × peça nova conhecido desde a T-211; não foi mexido).
