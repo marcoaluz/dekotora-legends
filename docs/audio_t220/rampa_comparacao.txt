@@ -1,0 +1,9 @@
+T-220 rampa 700 -> 2400 rpm (6 cil.): fundamental medida x esperada (rpm/20)
+arquivo                        rms dB   segue%  clareza  <300Hz% lenta Hz corte Hz period.ac period.le
+antes_elevenlabs                -23.4       0%     0.68      53%     26.9     48.8      0.08      0.10
+antes_loops_t197                -23.7      89%     1.00      57%     35.1    120.1      0.71      0.36
+depois_mistura                  -25.3      91%     0.97      62%     35.4    120.1      0.61      0.27
+depois_sintetizador             -24.3      90%     0.92      63%     35.2    119.8      0.56      0.31
+depois_sintetizador_leve        -25.1     100%     0.95      59%     35.2    119.9      0.53      0.41
+period.ac/le = periodicidade 200 Hz-4 kHz acelerando / em lenta (1 = toda explosao igual, cara de maquina)
+segue% = janelas da aceleracao com fundamental a +-10% da esperada; lenta esperada 35 Hz, corte 120 Hz.
