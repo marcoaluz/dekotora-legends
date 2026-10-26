@@ -5,7 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-228 | APK de teste com a T-220 (opção Som do motor; protocolo 15) e linha no STATUS | delegado da T-220 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
+| T-228 | APK de teste com a T-220 (opção Som do motor; protocolo 15) e linha no STATUS | delegado da T-220 | fácil | ajudante-rapido | concluída (APK 141 MB protocolo 15, commit 8992237; precisa Marco: instalar e ouvir) | 2026-10-26 | 2026-10-26 |
 | T-227 | Skills: seção "Peso do caminhão (T-219)" na godot-dekotora e vídeo no Blender 5 na blender-pixelart | delegado da T-219 | fácil | ajudante-rapido | concluída (commit fe3f525) | 2026-10-26 | 2026-10-26 |
 | T-226 | APK de teste protocolo 15 (T-219) e linha no STATUS; disco C: com 0,8 GB livre | delegado da T-219 | fácil | ajudante-rapido | concluída (APK 141 MB protocolo 15, commit 8eb8373; precisa Marco: instalar e testar) | 2026-10-26 | 2026-10-26 |
 | T-225 | Skills: seção "Caminhões de homenagem (T-218)" na blender-pixelart e flags --rival-body/--body/--only=homage na godot-dekotora | delegado da T-218 | fácil | ajudante-rapido | concluída (commits 72ca820, 28a3b88) | 2026-10-26 | 2026-10-26 |

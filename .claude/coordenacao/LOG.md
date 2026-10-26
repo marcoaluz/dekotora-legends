@@ -568,3 +568,6 @@ Formato em `docs/AGENTES.md`.
 - Validação: 511/511 testes; --cycle-profiles 0 erros nos 4 modos; corrida litoral com --engine-sound=synth (PC 0,14–0,17 ms/quadro, leve 0,08–0,12); servidor e jogo headless sem erro; Movie Maker gravou os 5 modos; cut_loops testado com os loops atuais (CONFERE) e recusa/acusa os do ElevenLabs.
 - Armadilhas: perfil do PC é Canter (voz i4) → usar --decorated --body=base; Freesound dá 429 se pedir rápido; caminho /d/... não vale para o Python do Windows (usar D:/).
 - Decisão pendente: Marco ouvir docs/audio_t220 e a cena de teste e escolher o padrão (loops/sintetizador/mistura); baixar as gravações CC0; passo 5 (preparado, V8, Canter) só depois.
+
+## 2026-10-26 · T-228 (ajudante-rapido, delegada da T-220) · concluída
+- APK de teste com a opção Som do motor (protocolo 15), 141 MB, commit 8992237. C: agora com 16,8 GB livres.
