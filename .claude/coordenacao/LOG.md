@@ -599,3 +599,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: build das artes 2× = bytes idênticos; build_sockets 2× = JSON idênticos, 0 problemas; suíte 528/528; REPORT_ENCAIXE 1654/1654 (pinturas 528/528); tools/net_test.sh PASSOU (protocolo 17); `--quit-after` sem erro; capturas Forward+ e Compatibility conferidas; custo medido +4 chamadas/+8 triângulos por caminhão todo pintado; APK +~16 MB (ETC2: murais 10,0, traseiras 3,3, tetos 3,0).
 - Armadilhas: (1) o Blender desenha glifo reserva para caractere que a fonte não tem (sem erro) — conferir na `cmap` da fonte (`lib/font_cmap.py`); (2) `shot_t231.gd --batch` separa por espaço: a pasta temporária do usuário tem espaço, usar `blender/renders/t232/shots`; (3) o `catalog.json` é gravado com indent=2 (indent diferente reescreve o arquivo inteiro); (4) API do Met `/v1/search` foi aposentada (usar `/v1.1/search`) e o site bloqueia rajadas (Incapsula 403).
 - Decisão pendente: nenhuma de design (escolhas do Claude para o Marco conferir: mural = par fixo dos 2 lados, arte sem pixel PD, mural comprado cobre a gueixa, 1536×384 nos murais).
+
+## 2026-10-26 · T-232 (especialista) · concluída
+- 12 murais (dois lados diferentes), 12 traseiras, 9 tetos com Yuji; arte 100% por código, referências de domínio público só de composição (CREDITOS_MURAIS). PaintFit 5 mm fora da lataria; acende à noite no Compatibility. +4 chamadas/caminhão, ~+16 MB no APK. Protocolo 17, 528 testes, encaixe 1654/1654.
+- Revisão do coordenador: folha "dekotora completo" de noite convincente; tigres e figuras humanas com cara de desenho animado (anotado pelo próprio especialista).
+- Delegado: T-237 (APK), T-238 (skills). Próximo: T-233.
