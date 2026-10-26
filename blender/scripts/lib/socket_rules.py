@@ -11,7 +11,8 @@ Coordenadas do Godot (x direita, y cima, frente = -z). Caixa = [[x0, y0, z0], [x
 from __future__ import annotations
 
 # Altura do centro da placa da frente por cabine (igual a TruckPlateSpots.FRONT_Y no jogo).
-FRONT_PLATE_Y = {"chata": 0.775, "jac": 0.70, "curta": 0.62, "americana": 0.50, "canter": 0.60}
+FRONT_PLATE_Y = {"chata": 0.775, "jac": 0.70, "curta": 0.62, "americana": 0.50, "canter": 0.60,
+                 "flat_wide": 0.66, "flat_quad": 0.66}
 PLATE_HALF = (0.30, 0.13)          # meia largura/altura da área da placa (placa 0,44 x 0,22 + folga)
 SCALE_MIN, SCALE_MAX = 0.85, 1.15  # escala automática "uniform"
 # Encaixes que só existem em baú fechado (a graneleira é aberta).

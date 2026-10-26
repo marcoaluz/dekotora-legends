@@ -28,6 +28,9 @@ TRUCK_DIR = "game/assets/vehicles/dekotora/truck"
 OUT_DIR = TRUCK_DIR + "/sockets"
 # Iguais ao TruckNode do jogo (LENGTH_DELTA e extra_mounts): onde ficam os escapamentos altos.
 LENGTH_DELTA = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0}
+# Caminhões de homenagem (T-218): cabine fixa (igual a TruckNode.FIXED_CAB) e carrocerias abertas (sem baú fechado).
+FIXED = {"alubox": "flat_wide", "tarp": "flat_quad", "pinkbox": "flat_wide", "tanker": "flat_wide", "dump": "flat_quad"}
+OPEN_BODIES = ("graneleira", "tarp", "tanker", "dump")
 
 
 def parse_name(stem: str):
@@ -35,6 +38,8 @@ def parse_name(stem: str):
     rest = stem.replace("dekotora_truck_", "")
     if rest in ("canter", "carreta"):
         return rest, ("canter" if rest == "canter" else "carreta")
+    if rest in FIXED:
+        return rest, FIXED[rest]
     body, cab = rest.split("_", 1)
     return body, cab
 
@@ -57,7 +62,7 @@ def build_one(path: str) -> dict:
     body, cab = parse_name(stem)
     data = TM.import_truck(path)
     m = TM.measure(data, body)
-    m["open_body"] = body == "graneleira"
+    m["open_body"] = body in OPEN_BODIES
     m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
     st = stacks(body, cab)
     sk = R.sockets(m, st)

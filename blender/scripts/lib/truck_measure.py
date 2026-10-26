@@ -67,7 +67,8 @@ def measure(data: dict, body: str) -> dict:
     # --- cabine: parte da casca na frente do fim do vidro lateral (baú clássico, Canter e graneleira têm a chapa do
     # baú no mesmo material da cabine): corta no baú de metal, senão logo atrás do vidro, e onde a chapa sobe de repente
     glass_back = float(side_glass[:, 2].max())
-    box_v = _cat(objs, ["truck_box_metal", "truck_paint_white_box"])
+    box_v = _cat(objs, ["truck_box_metal", "truck_paint_white_box", "truck_box_alu", "truck_box_pink", "truck_tarp",
+                        "truck_tank_shell", "truck_dump_bed"])        # T-218: baús e cargas dos caminhões de homenagem
     box_front = float(box_v[:, 2].min()) if len(box_v) else None
     cab_lim = (box_front - 0.01) if box_front is not None else glass_back + 0.25
     cab = panel[panel[:, 2] <= cab_lim]
