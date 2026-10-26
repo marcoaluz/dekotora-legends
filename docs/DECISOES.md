@@ -1148,3 +1148,12 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   os bots da corrida rápida sorteiam a cada corrida entre todos os modelos (`BodyDef.BOT_POOL`); online, os bots recebem um
   modelo sorteado pela semente da sala. **Protocolo 14.**
 - Números de preço/massa/agilidade em `docs/BALANCEAMENTO.md` (seção T-218) — **proposta para o Marco testar**.
+- **Medição do rival novo (T-224, 2026-10-26, PC, janela 1280x720, Compatibility, `--quality=1 --time=night`, litoral `kanto_1_coast`,
+  3000 quadros, `--fps-log`)**. Rival = Trovão Rosa (`pinkbox`) × rival antigo (`base`). Ruído alto: a janela ficou entre 7 e 75 FPS
+  (aquecimento de shaders, e o monitor limita a ~75). Chamadas de desenho são o número firme:
+  | Rival | Chamadas (mediana de todos os períodos de 5 s) | Chamadas (últimos 5 períodos) | FPS médio, últimos 5 períodos | FPS médio, todos |
+  | --- | --- | --- | --- | --- |
+  | `pinkbox` | 641 (mín. 424, máx. 665) | 640 | 58,7 | 30,6 (mediana 15,3) |
+  | `base` | 673 (mín. 663, máx. 682) | 673 | 55,5 | 20,5 (mediana 12,5) |
+  Leitura: o baú rosa (rival novo) deu ~30 chamadas a menos que o rival antigo; FPS igual dentro do ruído. A medida no
+  celular continua pendente (o APK de teste é do protocolo 14).
