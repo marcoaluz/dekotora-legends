@@ -242,7 +242,7 @@ um problema visual não puder ser entendido pelos renders.
   Um processo por vez (memória). O uso exato está no topo de `tools/build_t218.sh`.
 - Scripts: `blender/scripts/build_t218_trucks.py` (gera os 5 caminhões, LOD0/1/2), `truck3d/t218_cab.py` (cabine plana larga,
   4 faróis), `truck3d/t218_bodies.py` (5 carrocerias), `lib/tex_mural_t218.py` (mural da gueixa com emissão).
-- Saída: `.glb` em `game/assets/models/` e os LODs em `truck/lod/` (o `TruckNode` carrega sozinho o LOD certo).
+- Saída: `game/assets/vehicles/dekotora/truck/` (LOD0, com os pontos MOUNT_*) e os LODs em `truck/lod/` (o `TruckNode` troca sozinho pela distância).
 - Armadilha: casca sem vértices no meio parece não ter teto para `lib/truck_measure.py`. Corte a cada 10 cm com
   `bisect_plane` para achar o teto de verdade.
 - Armadilha: luz no teto da cabine impede o deque de encostar. Mantenha a luz fora da área do deque.
