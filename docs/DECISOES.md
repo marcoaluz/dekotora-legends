@@ -1269,3 +1269,10 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Bots e rivais**: bots sorteiam um para-choque traseiro novo (e, em 1 de 3, um foguete) pela semente — mesmo resultado
   no servidor e nos clientes; rivais com peças novas (tabela em `BALANCEAMENTO.md`). **Protocolo 16.**
 - Preços, pesos e destaque: os do catálogo, como proposta (`BALANCEAMENTO.md`, seção T-231).
+- **Custo medido no PC (T-235, 2026-10-26, noite, `kanto_3_mountain`, rival da rota `boss_kanto` com rb_grand_panel,
+  rocket_frame e os 3 contornos; modo médio, 1280x720, sem vsync, `--fps-log --quality=1 --life=off`, autoplay,
+  semente 7, 3000 quadros):** início km 330: FPS médio por trecho do log 114 → 127 → 125 → 124, chamadas de desenho
+  556–637 (pico no período 588–678), 258–336 mil triângulos; 4 picos de 63 a 147 ms (t=14–23 s). Início km 1060: FPS
+  121 → 129 → 134 → 136, chamadas 621–636 (pico 642–674), 345–364 mil triângulos, sem picos. **Comparação com o commit
+  anterior à T-231 (e989260): NÃO medida.** O worktree dele caiu com falha de segmentação no `--import` (26 s);
+  pendente, se o Marco quiser o número exato do custo só das peças novas.

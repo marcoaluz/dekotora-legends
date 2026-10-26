@@ -1,5 +1,5 @@
 extends SceneTree
-## Relatorio de encaixe (T-211): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
+## Relatorio de encaixe (T-211; lote 2 na T-231): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
 ## usada, os problemas de projeto dos encaixes e as zonas protegidas de cada caminhao.
 ## Uso (raiz do projeto): godot --headless --path game -s res://tools_dev/report_part_fit.gd
 
