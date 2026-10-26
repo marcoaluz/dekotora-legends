@@ -204,8 +204,9 @@ func part(id: String) -> PartDef:
 func all_parts() -> Array[PartDef]:
 	var out: Array[PartDef] = []
 	for f in DirAccess.get_files_at("res://data/parts/"):
-		if f.ends_with(".tres") and not RetiredParts.has(f.get_basename()):   # T-215: pecas antigas de teto sairam
-			var d: PartDef = part(f.get_basename())
+		var name: String = f.trim_suffix(".remap")     # T-229: no APK exportado os .tres viram .tres.remap
+		if name.ends_with(".tres") and not RetiredParts.has(name.get_basename()):   # T-215: pecas antigas de teto sairam
+			var d: PartDef = part(name.get_basename())
 			if d != null:
 				out.append(d)
 	out.sort_custom(func(a: PartDef, b: PartDef) -> bool: return a.price < b.price)
