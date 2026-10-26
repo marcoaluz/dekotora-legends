@@ -572,3 +572,12 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Texturas novas de cenário 3D: `bash tools/import_textures_3d.sh [PASTA_res ...]` (padrão `game/assets/textures/t217`). Põe VRAM (`compress/mode=2`),
   mipmaps e mapa de normais nos arquivos `*_nrm*`/`*_normal*`, e roda `--import`. Sem isso a textura vira grão à distância (T-199).
 - Todos os scripts usam `GODOT=` para apontar o executável (padrão `/d/DEV/Godot/Godot_v4.7.2-stable_win64.exe`).
+
+## Caminhões de homenagem (T-218)
+
+- `--rival-body=ID` (depois de `--`): força o modelo do rival na corrida (`game/scenes/race/race3d.tscn`, `race_scene_3d.gd`,
+  função `_bot_body`). Sem a flag, o rival da rota usa o dele ou sorteia entre `RIVAL_POOL`.
+- `--demo --body=ID`: na garagem (`garage_debug.gd`), compra o modelo no perfil de teste (`user://demo_profile.json`) se não
+  for dono, e monta com a cor de fábrica. Nunca grava no perfil real.
+- Testes da T-218: `godot --headless --path game -s res://tests/run_tests.gd -- --only=homage` roda só
+  `game/tests/test_homage_t218.gd` (o filtro `--only=` casa com o trecho do nome do arquivo).

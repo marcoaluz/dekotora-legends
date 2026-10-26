@@ -234,3 +234,16 @@ um problema visual não puder ser entendido pelos renders.
 - Canhões: objetos `POD<k>_*` são juntados num objeto por canhão (`_join_pods`) para virar o nó `POD<k>` no jogo.
 - Textura de detalhe da estrutura: `t214_textures.py` (`--textures` regera); no `.import`: `compress/mode=2`,
   `mipmaps/generate=true` e `normal_map=1` na normal.
+
+## Caminhões de homenagem (T-218)
+
+- Build completo (raiz do projeto, Git Bash): `source tools/env.sh && bash tools/build_t218.sh [PASTA_ABS]`.
+  Com a pasta, também gera as prévias (frente, lateral, traseira, 3/4, dia e noite) e as folhas de contato.
+  Um processo por vez (memória). O uso exato está no topo de `tools/build_t218.sh`.
+- Scripts: `blender/scripts/build_t218_trucks.py` (gera os 5 caminhões, LOD0/1/2), `truck3d/t218_cab.py` (cabine plana larga,
+  4 faróis), `truck3d/t218_bodies.py` (5 carrocerias), `lib/tex_mural_t218.py` (mural da gueixa com emissão).
+- Saída: `.glb` em `game/assets/models/` e os LODs em `truck/lod/` (o `TruckNode` carrega sozinho o LOD certo).
+- Armadilha: casca sem vértices no meio parece não ter teto para `lib/truck_measure.py`. Corte a cada 10 cm com
+  `bisect_plane` para achar o teto de verdade.
+- Armadilha: luz no teto da cabine impede o deque de encostar. Mantenha a luz fora da área do deque.
+- Armadilha: teto acima de ~3,15 m estoura o limite de 4,55 m do deque de 2 níveis. Confira a altura antes de gerar.
