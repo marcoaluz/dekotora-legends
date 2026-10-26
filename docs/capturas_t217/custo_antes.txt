@@ -1,0 +1,18 @@
+== kanto_1_coast start=550 day media 1280x720 
+FPS medio: 199.1  (desenhos: 530, max 560 no periodo; triangulos: 247033, texturas: 64.2 MB, video: 131.5 MB)
+FPS medio: 214.8  (desenhos: 525, max 533 no periodo; triangulos: 253706, texturas: 64.2 MB, video: 131.5 MB)
+== kanto_1_coast start=2150 day media 1280x720 
+FPS medio: 189.0  (desenhos: 514, max 532 no periodo; triangulos: 256354, texturas: 64.3 MB, video: 131.7 MB)
+FPS medio: 211.1  (desenhos: 485, max 514 no periodo; triangulos: 242358, texturas: 64.3 MB, video: 131.7 MB)
+== kanto_2_viaduct start=700 day media 1280x720 
+FPS medio: 201.0  (desenhos: 486, max 498 no periodo; triangulos: 323566, texturas: 69.8 MB, video: 154.9 MB)
+FPS medio: 164.8  (desenhos: 498, max 503 no periodo; triangulos: 299866, texturas: 69.8 MB, video: 165.0 MB)
+== kanto_2_viaduct start=1000 day media 1280x720 
+FPS medio: 190.9  (desenhos: 566, max 566 no periodo; triangulos: 414808, texturas: 69.8 MB, video: 156.9 MB)
+FPS medio: 181.7  (desenhos: 579, max 586 no periodo; triangulos: 434197, texturas: 69.6 MB, video: 164.8 MB)
+== kanto_3_mountain start=330 day media 1280x720 
+FPS medio: 200.1  (desenhos: 523, max 534 no periodo; triangulos: 215617, texturas: 69.0 MB, video: 134.2 MB)
+FPS medio: 203.1  (desenhos: 506, max 523 no periodo; triangulos: 215421, texturas: 69.0 MB, video: 134.2 MB)
+== kanto_3_mountain start=1060 day media 1280x720 
+FPS medio: 195.3  (desenhos: 526, max 526 no periodo; triangulos: 262452, texturas: 68.9 MB, video: 130.0 MB)
+FPS medio: 205.8  (desenhos: 527, max 534 no periodo; triangulos: 265288, texturas: 68.9 MB, video: 134.0 MB)

@@ -1113,5 +1113,6 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Escolhas do Claude a confirmar**: lugar de cada muro, do farol, do porto, da cachoeira, da obra; 2 faixas na contrária
   (a nossa tem 3); tsutsuji florida; densidade do trânsito contrário; lâmpada de sódio (laranja) nos postes novos.
 - **Custo** (freecam, Compatibility/média, 1280x720, mesma pose): litoral reta +31 chamadas e +36 mil triângulos
-  (173→204, 128→164 mil); montanha +27 chamadas e +23 mil. Medida completa de FPS (`tools/measure_t217.sh`) NÃO rodou:
-  o sistema parou as capturas finais por falta de memória (ver STATUS). Celular não medido.
+  (173→204, 128→164 mil); montanha +27 chamadas e +23 mil. Medida completa (`tools/measure_t217.sh 3000 day`, 6 pontos,
+  média de 2 amostras, 1280x720, PC): FPS 196 → 180, chamadas 522 → 572, triângulos 286 → 340 mil
+  (`docs/capturas_t217/custo_antes.txt` e `custo_depois.txt`). Celular não medido.
