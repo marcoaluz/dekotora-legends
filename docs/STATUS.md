@@ -1,7 +1,7 @@
 # STATUS — contexto para retomar o trabalho (outra sessão/conta)
 
 Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `docs/ROADMAP.md`, `docs/DECISOES.md`.
-Última atualização: **2026-10-24** (T-214/T-215: deque e viseira assentados na lataria real de cada cabine, canhões sem base, cor das luzes separada, peças antigas de teto fora com reembolso, deque de 2 níveis, protocolo 13; antes T-211: oficina lote 1, 17 deques + 14 viseiras novos, encaixes e zonas protegidas medidos em todos os caminhões, cor L/R com preço, protocolo 12; antes T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
+Última atualização: **2026-10-26** (T-217: ambientação na linha do original: pista contrária com canteiro e trânsito, muros de pedra, túnel gêmeo, danchi, floresta/neblina, postes de braço curvo, placas azuis, farol/porto/cachoeira; capturas finais e FPS PENDENTES (sistema sem memória); antes T-214/T-215: deque e viseira assentados na lataria real de cada cabine, canhões sem base, cor das luzes separada, peças antigas de teto fora com reembolso, deque de 2 níveis, protocolo 13; antes T-211: oficina lote 1, 17 deques + 14 viseiras novos, encaixes e zonas protegidas medidos em todos os caminhões, cor L/R com preço, protocolo 12; antes T-207: pedágio com ilha central, duas passagens, física e luzes, protocolo 10 (a T-208 subiu para 11); antes T-208: abertura do duelo abre mais rápido e dura 8,9 s + 3 s de contagem, servidor espera todos montarem a corrida, protocolo 11; antes T-204: abertura do duelo nova, estúdio preto, Raijin/Fujin, 対決, raio, 8 s, protocolo 9; antes T-202: HUD da corrida novo, estilo Art Truck Battle; antes T-199: polimento do cenário, mais detalhe e desgaste, bugs da noite; antes T-198: câmeras da corrida perto/longe/cinema/órbita e retrovisor; antes: T-193: modelos das pastas novas de docs/Modelos no jogo: trens variados, 2 carros no trânsito, 8 prédios texturizados + skyline, neon kanji, carro único; antes: T-192 cenário nas 3 rotas inteiras). Todos os prompts P00–P81 foram executados até onde dá **sem o celular/contas do Marco**.
 
 ## Ambiente do PC do Marco (Windows 10, Git Bash + PowerShell)
 
@@ -36,7 +36,8 @@ Atualize ao fim de CADA tarefa. Leia antes: `CLAUDE.md`, `docs/AGENTES.md`, `doc
 | Câmera livre / explorador (T-181) | `godot --path game res://scenes/race/race3d.tscn -- --route=kanto_3_mountain --freecam` (já abre nela) ou F1 dentro da corrida; comandos na seção "Câmera livre" abaixo; testes `-- --only=freecam` |
 | Pedágio (T-207) | corrida normal (km 0,15 de toda rota): passe pela esquerda ou direita; ficar na faixa do meio = bate na ilha; comparar `-- --no-toll` (pedágio antigo, sem física) e `--old-toll` (só o visual antigo); prints `GODOT=... bash tools/capture_t207.sh PASTA [day night] [-- extras]` (`Q=3` Ultra, `RES=1200x540` celular com toque, `ROUTES=`, `MODES="tour drive"`; em `docs/capturas_t207/`); custo `bash tools/measure_t207.sh [1500] [night]`; bots sem tela `godot --headless --path game -s res://tools_dev/trace_toll.gd -- --sweep=30 [--no-toll]` ou `-- --route=R --seed=N --n=4`; atlas `godot --path game -s res://tools_dev/make_toll_atlas.gd` (janela); testes `-- --only=toll` |
 | Oficina lote 1 (T-211) | garagem: DECORAÇÃO > PEÇAS > Deque frontal / Viseira (botão VER DE NOITE, cores L/R com preço e letreiro no cartão da peça comprada); depuração `godot --path game res://scenes/garage/garage.tscn -- --demo --parts=deck_painted_wings,visor_v_chevron --view=front`; prints `GODOT=... bash tools/capture_t211.sh PASTA_ABS [DEQUE] [VISEIRA]` (em `docs/capturas_t211/`); relatório de encaixe `godot --headless --path game -s res://tools_dev/report_part_fit.gd` (→ `docs/REPORT_ENCAIXE.md`); regerar encaixes `blender -b --factory-startup -P blender/scripts/build_sockets.py`, peças `... build_t211_parts.py`, proposta `... t211_proposals.py -- --out PASTA`, dados `python tools/gen_t211_data.py`; testes `-- --only=part_fit` |
-| Testes automáticos (470) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
+| Ambientação T-217 | corrida normal; desligar `-- --no-opposite` (`--no-opp-traffic`, `--no-opp-road`), `--no-walls`, `--no-danchi`, `--no-landmarks`, `--no-signs-t217`, `--old-forest`, `--old-lamps`, `--no-exposure`; prints `bash tools/capture_t217.sh PASTA [day night]` (antes: `GAME=<worktree do commit 3055964>/game`, em `docs/capturas_t217/antes|depois`); custo `bash tools/measure_t217.sh [3000] [day]`; números `godot --headless --path game -s res://tools_dev/probe_t217.gd`; texturas do Marco `bash tools/import_textures_3d.sh game/assets/textures/cc0/t217`; testes `-- --only=scenery_t217`; log `AMBIENCE_T217 ...` |
+| Testes automáticos (483) | `godot --headless --path game -s res://tests/run_tests.gd` (código de saída 0 = passou) |
 | Garagem: prévia e pneus (T-171) | `-- --demo --noparts --preview=fb_gold_wing` (peça em prévia), `--preview-paint=#f0b83a --fame=0` (cor travada); capturas `bash tools/capture_t171_preview.sh PASTA`, pneus `bash tools/capture_t171.sh PASTA [wheel\|side\|default]` + `bash tools/sheet_t171.sh`; medida dos pneus `godot --headless --path game -s res://tools_dev/measure_wheel_ground.gd` |
 | Jogo (menu) | `godot --path game` |
 | Corrida direto | `godot --path game res://scenes/race/race3d.tscn` (WASD/setas, Espaço = Passing, H = buzina, C = câmera, R = retrovisor, Esc = pausa) |
@@ -103,6 +104,22 @@ viaduto por cima e na abertura do duelo (motoristas com camisa na cor do caminh�
 `docs/capturas_t186/`. Não validado no celular (APK novo). **T-192**: pinheiro, cedro, árvore redonda, arbusto e coqueiros refeitos
 (galhos/tufos em cartões com textura, `build_foliage_t192.py`, atlas `foliage_leaves.png`), tom por árvore. **T-199**: copas das Gleditsias
 engrossadas (`TreeCrown`) e retrato do duelo com rosto/óculos/hachimaki (`ui/duel_bust.gd`).
+
+## Ambientação T-217 (2026-10-26)
+
+Pista contrária à direita nas 3 rotas (canteiro com cerca viva e guard-rail, trânsito vindo de frente com carros, ônibus e
+os caminhões de docs/Modelos), muros de pedra 谷積み nos cortes (montanha e litoral), túnel gêmeo com portal de concreto,
+ventiladores e brilho da saída, adaptação de exposição no PC (Forward+), danchi na cidade, floresta mais densa e neblina nos
+vales, postes de braço curvo, placas azuis, farol/porto/banhistas no litoral, cachoeira/obra/ponte pênsil na montanha.
+Código em `game/scripts/road3d/` (`route_ambience.gd` orquestra; layouts puros `opposite_layout`, `cut_layout`,
+`danchi_layout`). Lista de downloads do Marco e onde colocar: `docs/BIBLIOTECA_CENARIO.md` seção 7.
+**Pendente**: as capturas finais (faltam antes/noite de cidade e montanha e todas as "depois") e a medida de FPS foram
+paradas pelo sistema por falta de memória; rodar de novo com o PC livre: `GAME=/d/DEV/dekotora-legends/t217_antes/game bash
+tools/capture_t217.sh docs/capturas_t217/antes night` (só cidade e montanha: `ROUTES="kanto_2_viaduct kanto_3_mountain"`),
+`bash tools/capture_t217.sh docs/capturas_t217/depois day night`, depois `bash tools/measure_t217.sh` com e sem
+`GAME=...t217_antes/game`. O worktree `D:/DEV/dekotora-legends/t217_antes` (commit 3055964) pode ser apagado depois
+(`git worktree remove ../t217_antes`). **Protocolo de rede não mudou** (só visual), mas é preciso gerar o APK para ver no
+celular. Celular não medido.
 
 ## Pedágio com física (T-207)
 

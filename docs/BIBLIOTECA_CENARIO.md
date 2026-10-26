@@ -180,3 +180,60 @@ prévias de cada modelo em `blender/renders/t193/inspect/`). Nada foi alterado e
 - Beira da pista: `RoadDetails` (juntas da mureta, refletores do guard-rail, marcos de km, telefones de emergência,
   pichações). Placa verde antiga (`sign_green.glb`): texto maior em `build_scenery_3d.py -- --only sign_green`.
 
+
+## 6. T-217 (2026-10-26): ambientação na linha do original (moderna)
+
+### Peças novas no jogo
+
+| Peça | Arquivo / código | Origem | Onde | Desliga |
+| --- | --- | --- | --- | --- |
+| Pista contrária (canteiro com cerca viva, guard-rail, 2 faixas, mureta externa; viaduto gêmeo na cidade, ponte gêmea no litoral) | `road3d/opposite_layout.gd`, `opposite_road_3d.gd` (por código) | — | à DIREITA nas 3 rotas inteiras (no Japão a mão é inglesa) | `--no-opposite` (`--no-opp-road`, `--no-opp-traffic`) |
+| Trânsito da pista contrária (carros, ônibus, caminhões) | `opposite_traffic_3d.gd`; `vehicles/traffic/truck_box/dump/semi/army.glb` | Caminhão novo, Caminhão vasculante, Carreta, Caminhão antigo (Tatra; só na qualidade alta/Ultra, 1%) | vem em direção ao jogador; perto o .glb, longe uma caixa (1 chamada por classe); faróis à noite | `--no-opp-traffic` |
+| Muros de pedra 谷積み com grama no topo, calha, drenos e tela | `cut_layout.gd`, `stone_walls_3d.gd`; textura `textures/t217/stone_wall(_nrm).png` | por código | montanha (4 cortes), litoral (1) | `--no-walls` |
+| Túnel gêmeo, portal de concreto com capuz, muros de ala de pedra, ventiladores, extintores/telefones, brilho da saída | `tunnel_twin.gd` + `tunnel_3d.gd` | por código | todos os túneis | (com a pista contrária) |
+| Postes de braço curvo longo (simples e duplo no canteiro) | `scenery/lamp_arc.glb`, `lamp_arc_twin.glb` (`build_t217_lamps.py`) | por código | chão do litoral e da montanha | `--old-lamps` |
+| Danchi (団地) e prediozinhos com loja | `danchi_layout.gd`, `danchi_3d.gd`; `textures/t217/danchi_atlas.png` | por código | cidade, entre o viaduto e a ferrovia | `--no-danchi` |
+| Placas azuis (国道, 非常駐車帯, ハイウェイラジオ) e costas dos pórticos da contrária | `signs_t217.gd` | por código | 3 rotas | `--no-signs-t217` |
+| Farol, porto (contêineres, armazém, carretas, trabalhadores), banhistas | `route_landmarks.gd`; `scenery/t217/lighthouse.glb`, `worker.glb`, `swimmer.glb` | farol por código; Homem machucado; Homem | litoral | `--no-landmarks` |
+| Cachoeira (paredão de rocha no terreno, água, poço, respingo), obra com basculantes, ponte pênsil vermelha, neblina nos vales | `route_landmarks.gd`, `landmark_fx.gd`, `valley_mist.gd`; `scenery/t217/footbridge.glb` | Outra ponte; Caminhão vasculante | montanha | `--no-landmarks` |
+| Floresta mais densa (3 cartões, tom por árvore, mais escura longe) | `slope_forest.gd` | — | litoral e montanha | `--old-forest` |
+
+Regerar: `blender -b --factory-startup -P blender/scripts/build_t217_textures.py`, `... build_t217_lamps.py`,
+`... build_t217_trucks.py -- --root <pasta principal>`, `... build_t217_props.py -- --root <pasta principal>` (o worker usa
+os arquivos de `docs/Modelos/Homem machucado/*.rar` extraídos com 7-Zip em `blender/renders/t217/src/homem_machucado/`),
+depois `bash tools/import_textures_3d.sh`. Números sem tela: `godot --headless --path game -s res://tools_dev/probe_t217.gd`.
+
+### Modelos de docs/Modelos ainda NÃO usados (e por quê)
+
+| Arquivo | Motivo |
+| --- | --- |
+| `Road_pontes/Tunel/Tunnel.*` | é uma caixa reta de 255 m (sem portal aproveitável); nossos túneis fazem curva. Os túneis seguem por código |
+| `Road_pontes/Outdor/Highway+sign.fbx` | pórtico dos EUA: decisão do Marco (T-159) |
+| `Novos modelos/Caminhão/canter.obj` | extraído de outro jogo: vetado |
+| `train/Rail+Track`, `Vagoes/.../Rails` | a via do jogo é uma malha contínua com textura |
+| `CARS` SUV (`desirefx.me_002`) | rasga ao reduzir (o jogo já tem `car_suv`) |
+| `Letras Japones e neon/Neon Signs.c4d` | formato Cinema 4D: não abre no Blender/Godot |
+| `Cidade/The+City.obj`, `Cidade/CIT.fbx` | repete o city.fbx sem textura / cidade OSM pesada que não casa com a pista |
+| `Caminhão antigo/军卡.blend` | o mesmo caminhão militar do `813/Tatra_813.obj` (este foi o usado) |
+| Animações de `Homem/anim` (andar, correr, pular, cair) | só a pose parada (Idle) entrou: ninguém anda no cenário ainda (custo de esqueleto no celular) |
+
+### 7. Downloads do Marco: onde colocar para encaixar sozinho
+
+Coloque os arquivos com estes nomes em `game/assets/textures/cc0/t217/` (crie a pasta) e rode uma vez
+`bash tools/import_textures_3d.sh game/assets/textures/cc0/t217` (liga mipmaps e compressão). Sem mudar código, o jogo usa os
+seus no lugar dos nossos (`road3d/tex_slots.gd`): `<slot>_diff.jpg` (cor), `<slot>_nor_gl.jpg` (normal OpenGL),
+`<slot>_rough.jpg` (rugosidade). Pacotes 2K do ambientCG/Poly Haven já vêm com esses três mapas: só renomeie.
+
+| Prioridade | Download do Marco | Slot | Onde melhora |
+| --- | --- | --- | --- |
+| 1 | muro de pedra 石積み (ex.: ambientCG "StoneWall0xx", Poly Haven "stone_wall") | `stone_wall` (repete a cada 3 m) | muros de contenção e alas dos portais |
+| 2 | rocha de corte / penhasco | `rock_cut` | (reservado: paredão da cachoeira e cortes de rocha; hoje o shader do terreno) |
+| 3 | concretos (portal, tabuleiro) | `portal_concrete` | (reservado: portais e viadutos; hoje `concrete_streaks.png`) |
+| 4 | arbustos/folhagem densa | `hedge` (2 m) | cerca viva do canteiro central |
+| 5 | fachadas japonesas | `danchi_wall` | (reservado: paredes dos danchi) |
+| 6 | asfalto novo/gasto/remendado/molhado | — | o asfalto aprovado continua; trocar pede aprovação (mudaria o visual aprovado) |
+| 7 | HDRIs (amanhecer, meio-dia, pôr do sol, noite) | — | só para o PC Ultra (céu/reflexos); hoje o céu é por código (`sky_dome.gd`). Guardar em `game/assets/hdri/` para uma tarefa futura |
+| 8 | modelos (konbini, máquinas de venda, casas, torii, passarela, bambu, cedro, bordo, ginkgo, cerejeira, carros japoneses) | — | colocar em `docs/Modelos/<pasta>` como antes; cada um vira peça por script numa tarefa própria |
+
+Os slots "reservados" já são lidos por `TexSlots`, mas o código só liga `stone_wall` e `hedge` hoje; ligar os outros é mudança
+pequena quando os arquivos chegarem.

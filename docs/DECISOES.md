@@ -1068,3 +1068,50 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   Tabela refeita: **1.500 de 1.728** duplas × caminhões cabem (chata, curta, JAC, Canter: 96/96; americana: 39/96 — lá
   a caixa em cima dos canhões passou a caber e os canhões em cima de caixa continuam não cabendo).
 - Canhões **em cima** de caixa não mudaram (ficam no tampo, alinhados pelas costas).
+
+## 2026-10-26 · T-217 · Ambientação das 3 rotas na linha do original, moderna (pedido do Marco, item 10)
+
+- **Pista contrária (decisão do Marco, pendente desde a T-189)**: fica à DIREITA (mão inglesa), nas 3 rotas inteiras, só
+  visual. Corte: nossa mureta (13–13,6 m), canteiro de 2,8 m com cerca viva (tsutsuji florida em ~18% dos trechos) e
+  guard-rail em W virado para a outra pista, 2 faixas de 3,5 m (16,6–27 m), mureta externa (litoral: guard-rail). Cidade:
+  viaduto gêmeo com 1 m de vão entre os tabuleiros, pilares em T próprios e a barreira de som da direita passa para a
+  borda de fora da outra pista. Ponte do litoral: tabuleiro gêmeo. Túneis: boca própria (túnel gêmeo). O chão afunda 0,3 m
+  embaixo da faixa (sem briga com o terreno); a praia do litoral, as árvores, os postes de energia (32,4 m), os outdoors e
+  os pilares do viaduto/ferrovia da direita foram empurrados para fora. As placas verdes da beira passam para a esquerda
+  (onde não há placa do RoadSigns nem muro). **Carro único**: litoral e cidade foram para o lado esquerdo (a direita agora
+  é a outra pista).
+- **Trânsito da contrária**: posição = função do relógio da cena (para na câmera livre; online cada um vê quase o mesmo),
+  uma velocidade por faixa (27 e 21,5 m/s: ninguém atravessa ninguém), ~95 veículos por rota. Até 130 m o modelo .glb; longe
+  uma caixa por classe (carro, ônibus, caminhão, carreta: 1 chamada cada). Faróis e luzes âmbar dos caminhões à noite.
+  Celular (média): só modelos de 2–4 superfícies; os carros por código (6–7 superfícies) e o caminhão militar só na alta/Ultra.
+  **Armadilha medida**: `visible_instance_count = 0` ainda desenha UMA cópia no Compatibility (+84 mil triângulos com os 14
+  modelos vazios): o nó é escondido quando não há cópia.
+- **Muros de pedra 谷積み**: montanha 370–804 e 1.042–1.215 (esquerda, encostam nas bocas do túnel antigo), 1.290–1.760 e
+  2.385–2.560 (direita, além da outra pista); litoral 2.175–2.390 (lado da terra). Nunca do lado da ferrovia, em túnel ou
+  ponte (teste). Altura 6,5–9,5 m, inclinação 0,35, calha, drenos com cano, coroamento de concreto, grama no topo, tela verde
+  nos altos; atrás o chão vira um terraço (o terreno sobe com ele).
+- **Túneis**: boca gêmea, portal de concreto claro só em volta dos arcos com "capuz" de 1,8 m, muros de ala de pedra, morro
+  inclinado com o shader do terreno (antes uma parede reta), ventiladores de jato a cada 110 m, caixas vermelhas (extintor) e
+  verdes (telefone), lâmpadas laranja na boca gêmea, brilho branco na saída visto de dentro. **Adaptação de exposição só no
+  PC (Forward+)**: entrando de dia a imagem escurece e abre em ~1,3 s; saindo estoura e volta em ~0,5 s; de noite o efeito é
+  ao contrário e fraco; "Reduzir clarões" limita o pico. Celular: continua o clarão antigo.
+- **Postes**: o de braço curvo longo (`lamp_arc`) vira o padrão no chão do litoral e da montanha, atrás da mureta; no
+  canteiro, o duplo (um braço para cada pista). Viaduto e pontes seguem com o da Ponte A; o pedágio com o antigo.
+- **Danchi**: 18 blocos de 5 andares (varandas com roupa no varal, ar-condicionado, janelas que acendem à noite, antenas,
+  "N号棟" na empena) e 13 prediozinhos com loja, entre o viaduto e a ferrovia, na cidade.
+- **Floresta e neblina**: floresta das encostas 2–4× mais densa conforme a qualidade, 3 cartões por árvore, tom por árvore,
+  mais escura embaixo e longe; ~44 lençóis de neblina nos vales da montanha (média para cima).
+- **Identidade**: litoral = farol de 30 m numa ilhota (facho girando à noite), porto com contêineres, armazém, carretas e
+  trabalhadores, banhistas de dia; montanha = cachoeira de ~30 m descendo um paredão de rocha ao lado do muro (poço, respingo
+  e um filete que cai pelo muro até a calha), obra com basculantes, ponte pênsil vermelha num vale ao longe; cidade = danchi
+  + neon (já existia).
+- **Placas**: azuis com texto real (国道1号 com as cidades da rota e setas, 非常駐車帯, ハイウェイラジオ 1620kHz) e as costas
+  cinza dos pórticos da outra pista.
+- **Modelos de docs/Modelos usados agora**: Caminhão novo, Caminhão vasculante (logotipo apagado), Carreta, Caminhão antigo
+  (Tatra), Homem (pose parada), Homem machucado (braços abaixados por script), Outra ponte. Não usados: ver
+  `docs/BIBLIOTECA_CENARIO.md` seção 6.
+- **Escolhas do Claude a confirmar**: lugar de cada muro, do farol, do porto, da cachoeira, da obra; 2 faixas na contrária
+  (a nossa tem 3); tsutsuji florida; densidade do trânsito contrário; lâmpada de sódio (laranja) nos postes novos.
+- **Custo** (freecam, Compatibility/média, 1280x720, mesma pose): litoral reta +31 chamadas e +36 mil triângulos
+  (173→204, 128→164 mil); montanha +27 chamadas e +23 mil. Medida completa de FPS (`tools/measure_t217.sh`) NÃO rodou:
+  o sistema parou as capturas finais por falta de memória (ver STATUS). Celular não medido.
