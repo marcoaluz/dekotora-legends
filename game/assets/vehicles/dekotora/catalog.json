@@ -3890,6 +3890,1258 @@
       "captures": "042",
       "pods": 0,
       "stack": null
+    },
+    {
+      "id": "rb_square_row",
+      "name": "Fileira de lanternas quadradas",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_square_row.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.5,
+        "z": 0.324
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.5,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.314
+        ]
+      ],
+      "triangles": 1090,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_square_row_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "064",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_round_twin",
+      "name": "Duas fileiras redondas",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_round_twin.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.58,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.58,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 1916,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_round_twin_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "065-066",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_square_grid",
+      "name": "Grade de quadradas",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_square_grid.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.6,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.6,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 1832,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_square_grid_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "067-068",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_round_grid",
+      "name": "Grade de redondas",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_round_grid.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.6,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.6,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 2552,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_round_grid_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "069-070",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_target",
+      "name": "Lanternas alvo",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_target.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.6,
+        "z": 0.299
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.6,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.289
+        ]
+      ],
+      "triangles": 2308,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_target_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "071-072",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_double_deck",
+      "name": "Dois andares",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_double_deck.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.62,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.62,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 2484,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_double_deck_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "073-074",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_neon_rows",
+      "name": "Fileiras com neon",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_neon_rows.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.6,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.6,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 2174,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_neon_rows_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "075-076",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_neon_plate",
+      "name": "Placa neon",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_neon_plate.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.58,
+        "z": 0.273
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.58,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.263
+        ]
+      ],
+      "triangles": 1514,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_neon_plate_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "077-078",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_bullet",
+      "name": "Lanternas bala",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_bullet.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.62,
+        "z": 0.288
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.62,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.278
+        ]
+      ],
+      "triangles": 1688,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_bullet_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "079-080",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_torpedo",
+      "name": "Bateria torpedo",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_torpedo.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.42,
+        "y": 0.62,
+        "z": 0.287
+      },
+      "bounds_godot": [
+        [
+          -1.21,
+          -0.62,
+          -0.01
+        ],
+        [
+          1.21,
+          0.0,
+          0.277
+        ]
+      ],
+      "triangles": 2432,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_torpedo_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "081-082",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rb_grand_panel",
+      "name": "Painel grande cromado",
+      "category": "rear",
+      "model": "res://assets/vehicles/dekotora/accessories/rear_t231/rb_grand_panel.glb",
+      "mount_point": "SOCKET_rear_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.43,
+        "y": 0.62,
+        "z": 0.318
+      },
+      "bounds_godot": [
+        [
+          -1.215,
+          -0.62,
+          -0.015
+        ],
+        [
+          1.215,
+          0.0,
+          0.303
+        ]
+      ],
+      "triangles": 3896,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rb_grand_panel_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rear_bumper",
+      "fit": "uniform",
+      "nominal_w": 2.4,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "083-084",
+      "pods": 0,
+      "stack": null
+    },
+    {
+      "id": "rocket_round",
+      "name": "Foguete redondo",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_round.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 0.158,
+        "z": 1.34
+      },
+      "bounds_godot": [
+        [
+          -0.16,
+          0.0,
+          -1.34
+        ],
+        [
+          -0.01,
+          0.158,
+          0.0
+        ]
+      ],
+      "triangles": 2456,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_round_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "095",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 152,
+        "MID": 96,
+        "TAIL": 116
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_square",
+      "name": "Foguete quadrado",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_square.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 0.155,
+        "z": 1.34
+      },
+      "bounds_godot": [
+        [
+          -0.16,
+          0.0,
+          -1.34
+        ],
+        [
+          -0.01,
+          0.155,
+          -0.0
+        ]
+      ],
+      "triangles": 3096,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_square_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "096",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 220,
+        "MID": 124,
+        "TAIL": 88
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_twin",
+      "name": "Foguete duplo",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_twin.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.181,
+        "y": 0.131,
+        "z": 1.34
+      },
+      "bounds_godot": [
+        [
+          -0.176,
+          0.0,
+          -1.34
+        ],
+        [
+          0.006,
+          0.131,
+          0.0
+        ]
+      ],
+      "triangles": 2736,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_twin_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "097",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 164,
+        "MID": 108,
+        "TAIL": 124
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_led",
+      "name": "Foguete com LED",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_led.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 0.14,
+        "z": 1.34
+      },
+      "bounds_godot": [
+        [
+          -0.16,
+          0.0,
+          -1.34
+        ],
+        [
+          -0.01,
+          0.14,
+          -0.0
+        ]
+      ],
+      "triangles": 2768,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_led_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "098",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 176,
+        "MID": 112,
+        "TAIL": 88
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_flat_neon",
+      "name": "Calha neon",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_flat_neon.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.16,
+        "y": 0.079,
+        "z": 1.337
+      },
+      "bounds_godot": [
+        [
+          -0.165,
+          0.0,
+          -1.334
+        ],
+        [
+          -0.005,
+          0.079,
+          0.003
+        ]
+      ],
+      "triangles": 2584,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_flat_neon_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "099",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 88,
+        "MID": 116,
+        "TAIL": 44
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_neon_dash",
+      "name": "Foguete neon tracejado",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_neon_dash.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.15,
+        "y": 0.15,
+        "z": 1.34
+      },
+      "bounds_godot": [
+        [
+          -0.16,
+          0.0,
+          -1.34
+        ],
+        [
+          -0.01,
+          0.15,
+          0.0
+        ]
+      ],
+      "triangles": 3176,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_neon_dash_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "100",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 152,
+        "MID": 132,
+        "TAIL": 116
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "rocket_frame",
+      "name": "Moldura de teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/rocket_frame.glb",
+      "mount_point": "SOCKET_rocket_r",
+      "mount_point_left": "SOCKET_rocket_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.18,
+        "y": 0.148,
+        "z": 1.262
+      },
+      "bounds_godot": [
+        [
+          -0.175,
+          -0.005,
+          -1.259
+        ],
+        [
+          0.005,
+          0.143,
+          0.003
+        ]
+      ],
+      "triangles": 2040,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_rocket_frame_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "rocket_r",
+      "fit": "stretch",
+      "nominal_w": 0.17,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "101",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "rocket_l",
+      "stretch": {
+        "head": 0.1,
+        "mid": 1.0,
+        "tail": 0.24
+      },
+      "module_tris": {
+        "HEAD": 220,
+        "MID": 74,
+        "TAIL": 60
+      },
+      "min_scale": 0.7,
+      "broken_tilt": [
+        0.0,
+        5.0
+      ]
+    },
+    {
+      "id": "boxlight_dash_r",
+      "name": "Contorno de luz – direita",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/boxlight_dash.glb",
+      "mount_point": "SOCKET_box_light_r",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.014,
+        "z": 0.3
+      },
+      "bounds_godot": [
+        [
+          -0.011,
+          0.0,
+          -0.3
+        ],
+        [
+          0.011,
+          0.014,
+          -0.0
+        ]
+      ],
+      "triangles": 2106,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_boxlight_dash_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "box_light_r",
+      "fit": "strips",
+      "nominal_w": 0.025,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "102",
+      "pods": 0,
+      "stack": null,
+      "stretch": {
+        "mid": 0.3
+      },
+      "module_tris": {
+        "HEAD": 0,
+        "MID": 26,
+        "TAIL": 0
+      },
+      "broken_tilt": [
+        0.0,
+        0.0
+      ],
+      "fade_end": 90.0
+    },
+    {
+      "id": "boxlight_dash_l",
+      "name": "Contorno de luz – esquerda",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/boxlight_dash.glb",
+      "mount_point": "SOCKET_box_light_l",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.014,
+        "z": 0.3
+      },
+      "bounds_godot": [
+        [
+          -0.011,
+          0.0,
+          -0.3
+        ],
+        [
+          0.011,
+          0.014,
+          -0.0
+        ]
+      ],
+      "triangles": 2106,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_boxlight_dash_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "box_light_l",
+      "fit": "strips",
+      "nominal_w": 0.025,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "103",
+      "pods": 0,
+      "stack": null,
+      "stretch": {
+        "mid": 0.3
+      },
+      "module_tris": {
+        "HEAD": 0,
+        "MID": 26,
+        "TAIL": 0
+      },
+      "broken_tilt": [
+        0.0,
+        0.0
+      ],
+      "fade_end": 90.0
+    },
+    {
+      "id": "boxlight_dash_top",
+      "name": "Contorno de luz – teto",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/rocket_t231/boxlight_dash.glb",
+      "mount_point": "SOCKET_box_light_top",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 0.022,
+        "y": 0.014,
+        "z": 0.3
+      },
+      "bounds_godot": [
+        [
+          -0.011,
+          0.0,
+          -0.3
+        ],
+        [
+          0.011,
+          0.014,
+          -0.0
+        ]
+      ],
+      "triangles": 2314,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t231_boxlight_dash_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "box_light_top",
+      "fit": "strips",
+      "nominal_w": 0.025,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "104",
+      "pods": 0,
+      "stack": null,
+      "stretch": {
+        "mid": 0.3
+      },
+      "module_tris": {
+        "HEAD": 0,
+        "MID": 26,
+        "TAIL": 0
+      },
+      "broken_tilt": [
+        0.0,
+        0.0
+      ],
+      "fade_end": 90.0
     }
   ]
 }
