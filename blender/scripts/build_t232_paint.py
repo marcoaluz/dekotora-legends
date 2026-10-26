@@ -7,7 +7,7 @@ Saídas: game/assets/vehicles/dekotora/paint_t232/{mural,rear,roof}/*.png (cor +
   --sheets: folhas de contato das artes (dia e "noite" = só a emissão) nessa pasta.
   --no-art: só as letras (blender/renders/t232/glyphs.npz) e as folhas, sem regravar as artes.
 Determinístico: mesmas entradas, mesmos bytes (PNG gravado pelo próprio paint2d, sem metadados).
-Depois: `bash tools/import_textures_3d.sh res://assets/vehicles/dekotora/paint_t232/mural ...` (VRAM + mipmaps).
+Depois: `bash tools/import_textures_3d.sh game/assets/vehicles/dekotora/paint_t232/mural ...` (VRAM + mipmaps).
 """
 import importlib
 import os
