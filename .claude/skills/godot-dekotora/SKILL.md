@@ -544,3 +544,31 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   deque, encaixe ou caminhão: `godot --headless --path game -s res://tools_dev/gen_stack_fit.gd` (o teste acusa se esquecer).
 - T-216: canhões embaixo + caixa em cima = `StackArrange` (canhões 0,24 m à frente, caixa recua onde a viseira não deixa,
   pés `SEAT_post_*` atrás). Sonda: `tools_dev/probe_stack_t216.gd -- --model=STEM --lower=ID --upper=ID`.
+
+## Ambientação (T-217)
+
+- Flags da corrida (depois de `--`), código em `game/scripts/road3d/` (usadas para os "antes" das capturas e medições):
+  - `--no-opposite`: sem a pista contrária (`OppositeLayout.enabled()`, `opposite_layout.gd`).
+  - `--no-opp-traffic`: sem os carros da pista contrária; a estrada continua (`route_ambience.gd`).
+  - `--no-opp-road`: sem a estrada da pista contrária; **também tira o tráfego**, porque o tráfego é criado dentro desse ramo (`route_ambience.gd`).
+  - `--no-walls`: sem os muros de pedra dos cortes (`CutLayout.enabled()`, `cut_layout.gd`).
+  - `--no-danchi`: sem os blocos de conjunto habitacional (`DanchiLayout.enabled()`, `danchi_layout.gd`).
+  - `--no-landmarks`: sem os marcos de identidade de cada rota (`RouteLandmarks.enabled()`, `route_landmarks.gd`).
+  - `--no-signs-t217`: sem as placas novas da T-217 (`SignsT217`, `route_ambience.gd`); as placas antigas continuam.
+  - `--old-forest`: volta à floresta antiga; usa 1 tentativa de árvore por trecho (`slope_forest.gd`).
+  - `--old-lamps`: volta ao poste antigo (`lamp_post`) em vez do poste de braço curvo (`roadside_3d.gd`, `lamp_model`).
+  - `--no-exposure`: desliga a adaptação de exposição, só no Ultra (`exposure_adapt.gd`).
+  - `--opp-near=a,b`: medição; define a faixa (em metros, à frente da câmera) em que os carros usam o modelo completo; fora dela entram os proxies. `0,0` deixa só os proxies (`opposite_traffic_3d.gd`).
+- Registros por pista (static, por caminho da pista): `OppositeLayout.of(path)`, `CutLayout.of(path)`, `DanchiLayout.of(path)`.
+  Quem registra é `RouteAmbience.prepare` (antes dos outros construtores); `of(path)` devolve `null` quando não há.
+  Tudo é limpo por `RouteAmbience.release()` (chama os três `clear_all()`), que roda no `_exit_tree` de `race_scene_3d.gd`,
+  para as tabelas não vazarem para outra cena ou teste.
+- **Armadilha (MultiMesh)**: `visible_instance_count = 0` ainda desenha 1 cópia no renderizador Compatibility: esconda o nó (`visible = false`).
+- Capturas (precisa de janela, sem `--headless`; **rode um processo Godot por vez** para não estourar a memória do PC):
+  - `bash tools/capture_t217.sh PASTA [day night] [-- extras]`: prints com as mesmas poses antes/depois, câmera livre sem painel (`--tour-clean`).
+    Lê o topo do script para o uso: `Q=3` = Ultra, `ROUTES=` e `POSES=` filtram rota e pose, `GAME=` aponta para outra pasta (o "antes" usa um worktree).
+  - `bash tools/measure_t217.sh [QUADROS=3000] [day|night] [RES=1280x720]`: FPS médio, chamadas e triângulos em 6 pontos das 3 rotas, corrida de verdade.
+    `MEASURE_EXTRA="--no-opposite ..."` para medir o antes; `MEASURE_Q="media ultra"` mede as duas qualidades (padrão só a média).
+- Texturas novas de cenário 3D: `bash tools/import_textures_3d.sh [PASTA_res ...]` (padrão `game/assets/textures/t217`). Põe VRAM (`compress/mode=2`),
+  mipmaps e mapa de normais nos arquivos `*_nrm*`/`*_normal*`, e roda `--import`. Sem isso a textura vira grão à distância (T-199).
+- Todos os scripts usam `GODOT=` para apontar o executável (padrão `/d/DEV/Godot/Godot_v4.7.2-stable_win64.exe`).
