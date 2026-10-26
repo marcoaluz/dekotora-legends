@@ -423,6 +423,21 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   `tools/render_t197_audio.sh`; análise/espectrograma: `tools/audio_t197_report.py` (Python do sistema).
 - O executor de testes não roda o `_ready` dos autoloads: para barramentos novos chame `AudioBus._setup_buses()` no teste.
 
+## Som do motor procedural e análise (T-220)
+
+- Diesel procedural = `audio/diesel_synth.gd` (`DieselSynth`, puro: `render(frames, rpm, load, health)`, conta `fired`/
+  `misfires` para teste) + `audio/engine_synth_voice.gd` (`EngineSynthVoice`, AudioStreamGenerator; ressonâncias como
+  efeitos do barramento `EngineSynth`, em C++: em GDScript seriam ~1 ms por quadro). Voz = `EngineVoiceDef`
+  (`data/audio/voice_<voz>.tres`; sem arquivo = loops). Modo = `EngineSoundMode` (`loops|synth|mix`).
+- **Armadilha**: o perfil do PC pode ser o Canter (voz `i4`): para testar o 6 cil. na corrida use
+  `--decorated --body=base` (perfil de demonstração). `--synth-log` imprime `ENGINE_SOUND voz=.. modo=..` e `SYNTH_CPU`.
+- Gerador só enche dentro da árvore e com janela; nos testes use `DieselSynth` direto. Custo: `tools_dev/bench_engine_synth.gd`.
+- Ver o espectro de um WAV sem ouvir: `tools/audio_t220_analyze.py` (loops: fundamental × rpm/20), `tools/audio_t220_compare.py`
+  (rampa gravada: fundamental ao longo do tempo e "periodicidade" 200 Hz–4 kHz; 1 = toda explosão igual). Gráficos com
+  `tools/audio_plot.py` (fonte 5×7 e PNG só com numpy). Excitação sem os efeitos: `tools_dev/render_engine_synth.gd -- --out=ABS.wav --set=campo:valor`.
+- Gravação real → loop: `tools/cut_loops.py` (lê mp3/flac pelo Blender). Saída `rec_<voz>_<on|off>_<rpm>.wav`; o jogo só usa
+  quando os 10 existem (`EngineAudio.recordings_complete`).
+
 ## Chegada "infinita", trem do Marco e serrilhado (T-195)
 
 - **Continuação só visual depois da chegada**: `TrackPath.new(track, ArrivalLayout.runout(rota))` estende a linha

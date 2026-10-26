@@ -301,3 +301,21 @@ Se o sintetizado não agradar, gere com **o mesmo nome em `.mp3`** (o jogo usa o
 | `chassis_creak.mp3` | 1 s | Heavy truck cargo box and steel frame creaking and groaning under hard braking, slow metal twisting stress sound, close, no brakes hiss, no engine, no music |
 | `road_joint_thump.mp3` | 0.5 s | Truck tyres hitting a highway bridge expansion joint at speed, two quick low thumps "ta-dum" front and rear axle, dull and heavy, no engine, no music |
 | `body_rumble_loop.mp3` | 10 s | Loopable low rumble and vibration inside a heavy truck body at highway speed, steady sub-bass road drone with slight rattling panels, no engine note, no wind gusts, no music |
+
+## 11. Som do motor de verdade — T-220 (sem ElevenLabs)
+
+**Não gerar motores no ElevenLabs.** A análise da T-220 (`docs/audio_t220/analise.txt`) mediu os 22 loops de motor do
+ElevenLabs: **nenhum** tem a frequência de ignição certa para o giro em que o jogo os toca (a 2300 rpm um 6 cilindros
+explode 116 vezes por segundo; os loops ficam em 50 Hz). O caminho agora é:
+
+1. **Diesel procedural** (já no jogo, opção "Som do motor" em Opções > Áudio): `game/data/audio/voice_i6.tres`.
+2. **Gravações reais CC0** que o Marco baixa (lista em `docs/AUDIO_FONTES.md`), recortadas por
+   `python tools/cut_loops.py --list audio_src/engine/cortes.txt`. Viram `engines/rec_i6_<on|off>_<rpm>.wav`
+   e substituem os `syn_` quando os 10 arquivos (ON e OFF em 700, 1000, 1400, 1900, 2500 rpm) existirem.
+
+| Arquivo | O que é |
+| --- | --- |
+| `game/data/audio/engine_audio.tres` | modo padrão (`loops` / `synth` / `mix`) no PC e no celular, taxa do sintetizador, corte da mistura (300 Hz), volume |
+| `game/data/audio/voice_i6.tres` | voz do 6 cil. padrão: cilindros, irregularidade, estouro, ruído, ressonâncias (grave 105 Hz, médio 520 Hz) |
+| `engines/rec_<voz>_<on\|off>_<rpm>.wav` | (futuro) loops de gravação real, feitos pelo `cut_loops.py` |
+| `docs/audio_t220/*.wav` | gravações do jogo na mesma rampa 700 → 2400 rpm: antes (ElevenLabs, loops T-197) × depois (sintetizador PC, leve, mistura) |

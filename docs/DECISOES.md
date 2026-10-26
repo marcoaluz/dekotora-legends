@@ -4,6 +4,7 @@ Mais recente no topo. Toda decisão que muda o design ou a stack entra aqui.
 
 | Data | Decisão | Motivo |
 | --- | --- | --- |
+| 2026-10-26 | **Som do motor (T-220, pedido do Marco, item 16) — ANÁLISE + SINTETIZADOR NOVO PARA O MARCO OUVIR; padrão do jogo NÃO mudou.** Medido com numpy: os loops do ElevenLabs estão todos errados (a fundamental ouvida fica em 27–77 Hz em qualquer giro; a 2300 rpm deveria ser 116 Hz). Os loops sintetizados da T-197 (som atual) têm a fundamental certa, mas são "limpos demais" (toda explosão igual: periodicidade 0,71) e 57% da energia fica abaixo de 300 Hz, que o alto-falante do celular não toca. Novo: diesel procedural (`DieselSynth` + `EngineSynthVoice`, AudioStreamGenerator; ressonâncias do escapamento no barramento `EngineSynth`, em C++), tom contínuo, explosões diferentes entre si; modos `loops` / `synth` / `mix` em Opções > Áudio > Som do motor e em `game/data/audio/engine_audio.tres`; só o 6 cil. padrão (`voice_i6.tres`) até o Marco aprovar. Custo: 0,15 ms por quadro no PC, versão leve 0,09 ms (celular não medido). | Pedido do Marco (T-220). Detalhes na seção "T-220" no fim |
 | 2026-10-26 | **Peso do caminhão (T-219, pedido do Marco, item 15) — PROPOSTA, números num arquivo só (`game/data/feel/truck_feel.tres`).** Simulação: arrancada e trocas de marcha mais lentas, troca de faixa com mais inércia e "arrasto" no fim, carga acima de 4 t (×1,25) e peças (×1,5) pesam a mais na inércia; padrão 0–100 km/h 22,6 → 23,7 s, troca de faixa 1,00 → 1,13 s (baú cheio 1,17 → 1,67 s). Visual: baú inclina para fora com mola (atraso e volta), cabeceio, suspensão nas baixadas e emendas do viaduto, câmera com mais atraso e FOV com teto, congelamento de 75 ms nas batidas (online só a câmera), fumaça de pneu/poeira, pancada grave, rangido, vibração da carroceria, vento; opções "Vibração do celular" e "Reduzir tremor da câmera". Bot que ficava preso atrás de um lento corrigido. Protocolo 15. | Pedido do Marco (T-219). Detalhes na seção "T-219" no fim |
 | 2026-10-23 | **Pedágio de verdade, com física (T-207, pedido do Marco) — visual A CONFIRMAR PELO MARCO.** No km 0,15 de toda rota a pista se divide em **duas passagens** em volta de uma **ilha central** (a faixa do meio inteira, ±1,8 m, de 132 a 164 m) com a cabine; o acostamento acaba num **funil** de barreiras (60 m) e cada passagem tem 3,8 m (faixas 1 e 3 sempre cabem). **Bater no nariz da ilha = batida de frente como num veículo parado** (mesma regra/massa dos obstáculos da T-139: dano, carga, para a 6 m/s e sai para a passagem do lado, x = 0 vai para a esquerda); de lado = empurrado para fora (batida lateral ou raspada); encostar = raspada; acostamento = raspa e entra na passagem. Bots, rival e trânsito saem da faixa do meio antes (mesmas consultas de faixa fechada), o bot preso ao lado de alguém cai para trás dele para entrar ("zíper"), troca de faixa para a ilha é recusada perto dela. **Sem limite de velocidade nem parada** (é corrida: o ETC real pede 20 km/h). Passagem da esquerda **ETC/一般** (verde), da direita **ETC専用** (roxa); saiu o 止まれ/pare do acostamento. Duelo (largada nas faixas 1 e 3): custo 0 s; corrida rápida (jogador larga no meio, entre 2 bots): o último a passar perde ~4 s. Protocolo 10. | Pedido do Marco (T-207). Detalhes na seção "T-207" no fim |
 | 2026-10-23 | **Abertura do duelo mais lenta e abrindo na hora (T-208, relato do Marco: "demorou para abrir e foi rápido demais").** Cena de **8,9 s + 3 s de contagem = 11,9 s** (antes 5 + 3): entrada 2,6 s (param em 2,1 s e respiram), guardiões 1,3 s, 対決 sozinho 1,2 s, **fase nova "faixas" 1,9 s** (faixas dos pilotos paradas ~2,5 s para ler), raio 0,9 s, arrancada 1,0 s. O relógio da cena começa no **1º quadro liso**: antes dele um preparo com tela preta + neblina roxa aquece os shaders (pista uma vez, estúdio com tudo aceso uma vez). O menu lê a corrida em segundo plano e a troca de tela mostra preto + neblina desde o clique. **Online: o servidor só começa a contar quando todos montaram a corrida** (`c_race_loaded`, no máximo 30 s) e avisa todos no mesmo instante (`s_state(COUNTDOWN)`); protocolo 11. | Relato do Marco no celular (T-208). Medidas em `docs/capturas_t208/medidas.txt`; detalhes na seção "T-208" no fim |
@@ -1190,3 +1191,42 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Opções novas**: Controles > "Vibração do celular" (liga/desliga) e Gráficos > "Reduzir tremor da câmera" (tremores ×0,25 e
   sem congelamento). `--reduce-shake` força sem gravar.
 - **Protocolo 15** (a simulação mudou). Vídeos e tiras antes/depois em `docs/capturas_t219/`.
+
+## 2026-10-26 · T-220 · Som do motor "de verdade" (pedido do Marco, item 16)
+
+- **O que o jogo usava**: desde a T-197 o padrão já NÃO são os loops do ElevenLabs, e sim loops sintetizados
+  (`syn_<voz>_<on|off>_<rpm>.wav`, `tools/synth_truck_audio.py`). Os do ElevenLabs só tocam com `--engine-sound=old`.
+- **Análise objetiva** (`tools/audio_t220_analyze.py`, numpy; tabela em `docs/audio_t220/analise.txt`, gráficos
+  `docs/audio_t220/espectro_*.png`). Diesel 6 cil. 4 tempos: ignição = rpm/20 Hz (lenta 35 Hz, 2400 rpm 120 Hz).
+  - ElevenLabs (22 loops): **todos ERRADOS**. A fundamental que o jogador ouve fica entre 27 e 77 Hz em qualquer giro
+    (6 cil. padrão: 27 → 37 → 43 → 50 Hz da lenta ao alto, deveria ser 35 → 61 → 88 → 116 Hz); vários mudam de tom
+    dentro do arquivo (até 13 semitons) ou nem têm ritmo de ignição claro. Na rampa gravada, o som "segue o motor" em 0%.
+  - T-197 (som atual): 6 cil. padrão **10 de 10 CERTOS** (fundamental exata). Preparado: 8 de 10 (as 2 lentas medem
+    outra frequência). V8: o período mais forte é o do giro (metade/terço da ignição), por causa do ronco irregular
+    das bancadas — de propósito, rever no passo 5. 4 cil.: 8 de 10 (lentas sem ritmo claro).
+  - Por que o atual ainda soa sintético (hipótese medida, não ouvida): **toda explosão é igual** (periodicidade
+    0,71 na faixa do celular; o sintetizador novo fica em 0,56), o arquivo repete a cada 1,6 s, o tom vem de esticar o
+    loop (±20%, as ressonâncias andam junto) e 57% da energia está abaixo de 300 Hz (o celular quase não toca).
+- **Sintetizador procedural** (reserva e para comparar): `game/scripts/audio/diesel_synth.gd` (excitação em GDScript:
+  pulso de cada explosão no tempo real do cilindro, estalo da válvula, rajada de gás, batida do injetor, ruído do
+  fluxo, diferença fixa entre cilindros + variação a cada explosão + atraso aleatório, oscilação lenta do governador,
+  falhas com o motor danificado) e `engine_synth_voice.gd` (AudioStreamGenerator + barramento `EngineSynth`: passa-alta,
+  EQ do escapamento (21 bandas no PC, 10 no leve), abafador que abre com o giro, aspereza, eco do cano (só PC)).
+  Números da voz em `game/data/audio/voice_i6.tres` (`EngineVoiceDef`: cilindros, tempos, ordem de ignição,
+  irregularidade, ressonâncias). **Só o 6 cil. padrão**; preparado/V8/Canter continuam nos loops até o Marco aprovar
+  (é só criar `voice_i6t.tres`, `voice_v8.tres`, `voice_i4.tres`).
+- **Modos** (`EngineSoundMode`): `loops` (T-197; gravações reais `rec_*` entram sozinhas quando os 10 arquivos de uma
+  voz existirem), `synth` (sintetizador no lugar dos loops ON/OFF; turbo, freio-motor, estalos e chacoalho continuam
+  loops) e `mix` (sintetizador abaixo de 300 Hz + loops só nos médios/agudos, barramento `EngineLoopsHP`). Prioridade:
+  `-- --engine-sound=loops|synth|mix` > Opções > Áudio > Som do motor > `game/data/audio/engine_audio.tres`
+  (`mode` no PC, `mode_mobile` no celular). Rivais e outros caminhões ficam sempre nos loops (custo).
+  **Padrão continua `loops`** (nada muda para quem não mexer na opção) até o Marco ouvir e escolher.
+- **Custo medido** (RX 580/PC, corrida no litoral, `--synth-log`): 0,14–0,17 ms por quadro a 22 kHz; versão leve
+  (11 kHz, 10 bandas, sem eco; automática no celular) 0,08–0,12 ms; picos até 1,8 ms quando o jogo trava e o buffer
+  esvazia. Banco de ensaio sem tela: 11,4 ms por segundo de áudio (PC) e 5,1 ms (leve). **Celular não medido**
+  (estimativa 4–6× o PC = 0,4–0,6 ms por quadro na versão leve); `--synth-log` imprime `SYNTH_CPU` no logcat.
+- **Gravações reais** (passo 4): lista em `docs/AUDIO_FONTES.md` (só CC0 conferida na página). Ferramenta
+  `tools/cut_loops.py` (mede o RPM pela fundamental, escolhe o trecho estável, ajusta ao ponto de RPM do jogo,
+  emenda sem clique por correlação + cruzamento + passagem por zero, confere o resultado). Testada com os loops atuais.
+- Nada mudou na simulação nem na rede (o áudio só lê o estado). O servidor sem tela não cria som.
+
