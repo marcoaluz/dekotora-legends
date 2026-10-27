@@ -1331,3 +1331,36 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - Botão para olhar para trás, esquerda e direita (T-241).
 - Murais podem usar **imagens prontas sem direito autoral** (domínio público/CC0), baixadas pelo Marco ou pelo Claude (T-242).
 - Ordem: terminar a T-233, depois T-239 → T-242, depois seguir com a T-234.
+
+## 2026-10-26 · T-233 · Oficina lote 4: para-choque da frente, retrovisor, escada e saias (seção 16.2, etapa 6)
+
+- **28 peças**: 11 para-choques da frente, 6 hastes de retrovisor, 3 escadas e 8 saias (catálogo da T-210, seções 3, 5,
+  8 e 9). **Viseira: nada a fazer** — a T-211 já entregou as 14 viseiras do catálogo (as "4 bases" são só a forma; os
+  desenhos de neon por cima são as 14 peças). Números = proposta do catálogo (`BALANCEAMENTO.md`, seção T-233).
+- **Encaixe medido nos .glb** (`truck_measure.front_side`, `socket_rules`), sem regerar os caminhões:
+  - **Para-choque da frente**: encosta na FRENTE do nariz de fábrica (raios de frente) e o cobre, entre 0,16 m do chão e
+    3 cm abaixo do farol/lanterna mais baixo, até 0,62 m à frente e 0,15 m além da cabine de cada lado. A peça tem 3
+    faixas; só a do meio (chapa e faixas) estica/encolhe (`FrameFit`, fit "bumper"): onde o farol é baixo (Canter,
+    cabines HAYATE: 0,34–0,37 m livres) a peça encolhe sem deformar lâmpadas nem a caixa da placa; onde é alto (chata,
+    0,89 m) ela cresce até 0,55 m para cobrir o para-choque de fábrica. **A seta da frente vai junto** (pontos
+    SIGNAL_L/R da peça: a seta do caminhão pisca ali) e **a placa vai para a caixa da placa** da peça (como atrás, T-231).
+  - **Retrovisor** (decisão do Claude, Marco confere): **no máximo 0,50 m para fora da lateral da cabine** (a largura
+    total fica na ordem da dos espelhos de fábrica, até ~3,3 m; nada "de ônibus") e 0,60 m à frente da cabine, entre a
+    borda de baixo do vidro − 0,25 m e a de cima + 0,20 m, sempre na frente da porta. A altura da haste segue o vidro de
+    cada cabine. **O espelho de fábrica some** quando a haste está montada (o jogo esconde só os triângulos dentro da
+    caixa medida do espelho, `hide`; tirando a peça ele volta); cada haste traz o espelho dela. Não atrapalha a câmera
+    do retrovisor do jogo (T-198: fica atrás do baú) e não existe câmera de cabine (decisão de 2026-10-17).
+  - **Escada**: na lateral do baú logo atrás da quina da frente e dos escapamentos altos, encostada por fora do
+    contorno de LED (até 0,16 m), do fundo ao topo do baú; o degrau se repete pela altura. Só baú fechado.
+  - **Saias**: embaixo do baú, entre a roda da frente e a primeira de trás, **só nos trechos livres** medidos por raios:
+    o tanque de combustível e a bateria de fábrica saem 0,1 m para fora do baú, então a saia para antes deles e volta
+    depois (2 pedaços na maioria; 1 no baú leve e no Canter). Assim saia, tanque, escapamento, rodas e contorno convivem.
+    Passa no máximo 3 cm da lateral do baú. Servem em todos os caminhões (inclusive os abertos).
+- **Dano sem buraco**: quebrada fica no lugar, torta (2–9° conforme a peça), luzes apagadas, cromo vira aço.
+- **Luzes à noite**: lâmpadas âmbar (`lamp_amber`), LED e neon da cor L/R pela mesma técnica dos lotes anteriores
+  (material de luz animado; funciona no Compatibility).
+- **Bots e rivais**: bots sorteiam para-choque da frente (1 em 5 fica com o básico), saia em 1 de 2 e retrovisor em 1
+  de 3, pela semente; rivais com peças novas. **Protocolo 18.**
+- **Conflitos com Clássicas** (conhecidos, não mexidos): `fb_*` Clássicos, `front_lip`, `aux_lights`, `skirt_*` Clássicas
+  e `side_box` ocupam lugares parecidos; o teste só garante o catálogo novo.
+- Complemento do Marco para a T-242: as imagens prontas mantêm o **efeito de luz noturno** dos murais da T-232, mas só em **pontos escolhidos** (olho do animal, lua, sol, chamas…), não na imagem inteira. Fazemos à mão uma máscara de emissão para cada imagem.
