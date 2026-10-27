@@ -1321,3 +1321,13 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Bots e rivais** com pinturas sorteadas pela semente (mesmo resultado no servidor e nos clientes); **protocolo 17**.
 - **Observação (Clássicas)**: o ornamento lateral Clássico `side_ornament_wave` fica por cima do mural novo (já era um
   conflito Clássica × peça nova conhecido desde a T-211; não foi mexido).
+
+## 2026-10-26 · Pedidos novos do Marco (T-239 a T-242)
+
+- Muda a decisão 4 da T-218: as cabines dos 5 caminhões de homenagem **passam a ser trocáveis** pelo jogador (T-240).
+- Muda a decisão 1 da T-231: as luzes da porta traseira do baú **saem**; ficam só as do para-choque (T-239).
+- Ao frear, **todas** as luzes do caminhão ficam vermelhas; as setas acendem em cima da lanterna certa (T-239).
+- Foguetes um pouco maiores em altura e largura (T-240).
+- Botão para olhar para trás, esquerda e direita (T-241).
+- Murais podem usar **imagens prontas sem direito autoral** (domínio público/CC0), baixadas pelo Marco ou pelo Claude (T-242).
+- Ordem: terminar a T-233, depois T-239 → T-242, depois seguir com a T-234.

@@ -5,6 +5,10 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-242 | Pinturas com imagens prontas de domínio público/CC0 (ukiyo-e de museus com acesso aberto): especificação de tamanho/formato para o Marco, baixar e trocar os murais/traseiras mais fracos (tigres, figuras humanas) por versões mais detalhadas, créditos | pedido do Marco | difícil | especialista | fila (depois da T-241) | 2026-10-26 | |
+| T-241 | Botão para olhar para trás, para a esquerda e para a direita na corrida (PC e celular) | pedido do Marco | difícil | especialista | fila (depois da T-240) | 2026-10-26 | |
+| T-240 | Caminhões de homenagem (T-218) com cabine trocável pelo jogador + foguetes (T-231) maiores em altura e largura | pedido do Marco (muda a decisão 4 da T-218) | difícil | especialista | fila (depois da T-239) | 2026-10-26 | |
+| T-239 | Luzes: ao frear TODAS as luzes do caminhão ficam vermelhas; setas esquerda/direita acesas em cima da lanterna certa (hoje acende fora do lugar); remover as luzes da porta traseira do baú (ficam só as do para-choque) | pedido do Marco | difícil | especialista | fila (depois da T-233) | 2026-10-26 | |
 | T-238 | Skills: seção "Pinturas (T-232)" na blender-pixelart e na godot-dekotora | delegado da T-232 | fácil | ajudante-rapido | concluída (commit 48b3bd9) | 2026-10-26 | 2026-10-26 |
 | T-237 | APK protocolo 17 (T-232 murais/pinturas) e linha no STATUS | delegado da T-232 | fácil | ajudante-rapido | concluída (APK 157 MB protocolo 17, commit 25227d4; precisa Marco: instalar e testar) | 2026-10-26 | 2026-10-26 |
 | T-236 | Skills: "Oficina lote 2 (T-231)" na godot-dekotora e na blender-pixelart | delegado da T-231 | fácil | ajudante-rapido | concluída (commit 5a908f4) | 2026-10-26 | 2026-10-26 |
