@@ -620,3 +620,10 @@ Formato em `docs/AGENTES.md`.
 - 11 para-choques dianteiros (setas e placa vão com a peça), 6 retrovisores (espelho de fábrica escondido), 3 escadas, 8 saias em trechos (tanque sai 0,1 m do baú). Viseiras já estavam completas desde a T-211. Protocolo 18, 546 testes, encaixe 2249/2249, net_test ok.
 - Revisão do coordenador: folha completo_base_chata_noite convincente.
 - Delegado: T-243 (skills), T-244 (APK + FPS, depois da T-241). T-239 (luzes) começa agora.
+
+## 2026-10-26 · T-241 · especialista · CONCLUÍDA
+- Feito: olhar para trás/esquerda/direita segurando (soltar = volta, 0,24–0,34 s suave, arco por cima da cabine). `RaceLook` por cima de todas as câmeras da T-198 (a câmera da corrida segue por baixo; pose restaurada a cada quadro); trás = 11 m na frente da cabine olhando para trás; lados = grua 8 m do lado oposto, olhando por cima do teto. Retrovisor some enquanto olha + aviso "OLHANDO ...". PC Q/E/X (Q+E = trás); controle analógico direito (lados/baixo), RB/R3 = trás; celular botão do olho (segurar = trás, deslizar = lados). Atraso/tremor do RaceFeel respeitados ("Reduzir tremor" vale). Simulação/rede intactas.
+- Arquivos: game/scripts/road3d/{race_look (novo), race_cam_view, race_scene_3d}.gd, ui/race_look_badge.gd (novo), input/{local_input, touch_controls}.gd, project.godot (look_back/left/right), pt-BR.json, tests/test_race_look{,_scene}_t241.gd, tools/capture_t241.sh, docs/capturas_t241/ (16), .gitignore.
+- Validação: suíte 546/546 (12 novos); capturas PC 1920x1080 e celular 2400x1080, dia/noite, frente/trás/esq/dir conferidas. Celular de verdade não testado.
+- Armadilhas: (1) a câmera de perseguição usa a própria posição do quadro anterior (lerp) — sem `restore_base` ela partiria da pose do olhar; (2) `clamp_point` empurra para o lado quem está sobre o baú mesmo lá no alto — passar `me` com comprimento 0 quando a altura > BODY_TOP_H; (3) o commit de docs da T-233 (4984c1e) levou junto meu texto de DECISOES/STATUS/ROADMAP (conteúdo certo).
+- Decisão pendente: Marco confirmar as 3 vistas, as teclas (X/Q/E) e o lugar do botão do olho.
