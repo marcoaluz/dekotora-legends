@@ -673,3 +673,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   os triângulos do espelho de fábrica que caem nessa caixa somem (cache em `_hidden_cache`).
 - Protocolo de rede 18 (`game/scripts/net/protocol.gd`): para-choque/saia/retrovisor no descritor e bots com essas peças sorteadas
   pela semente (descritor e massa mudaram). Cliente antigo não entra.
+
+## Olhar para trás e para os lados (T-241)
+
+- `RaceLook` (`game/scripts/road3d/race_look.gd`, `class_name RaceLook`): olhar segurando (soltar = volta suave, 0,24–0,34 s).
+  Só visual: não toca na simulação nem na rede. Por cima de qualquer câmera da corrida.
+- `RaceCamView.restore_base` e `RaceCamView.apply_look` (`game/scripts/road3d/race_cam_view.gd`), chamados em `_update_camera`
+  de `race_scene_3d.gd`: `restore_base` antes da câmera da corrida, `apply_look` depois.
+- Flag para captura: `--look=back|left|right` força o olhar (no celular, mostra o botão do olho apertado).
+- Captura: `bash tools/capture_t241.sh docs/capturas_t241` (16 casos: pc/cel × dia/noite × frente/tras/esq/dir).
+- Ações `look_back`, `look_left`, `look_right` no `game/project.godot`; `LocalInput.look_dir()` (`game/scripts/input/local_input.gd`) junta teclado, controle e toque.
+- Celular: botão "look" em `TouchControls.button_layout` (`game/scripts/input/touch_controls.gd`). Segurar o botão = trás;
+  deslizar com o mesmo dedo (ele fica preso ao olho) = esquerda/direita.
+- Teclas: Q esquerda, E direita, X trás (Q+E também = trás). Controle: analógico direito (esquerda, direita, baixo = trás) e R3/RB = trás.
+- Armadilha 1: a câmera de perseguição faz lerp a partir da PRÓPRIA posição do quadro anterior. Qualquer pose que a sobrescreva
+  (o olhar) precisa ser restaurada no quadro seguinte (`restore_base`), senão a câmera parte da pose do olhar.
+- Armadilha 2: `RaceCamRig.clamp_point` empurra para o lado um ponto que está sobre o baú, mesmo lá no alto. Quando a altura
+  do ponto for maior que `BODY_TOP_H`, passe `me` com comprimento 0 (`Vector3(me.x, me.y, 0.0)`), como faz `RaceLook.world_target`.
