@@ -149,7 +149,7 @@ static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalo
 			pn.get_parent().remove_child(pn)
 			pn.free()
 		return po
-	if StripFit.handles(e):                          # T-231: pecas por modulo (foguete, contorno), os 2 lados
+	if StripFit.handles(e) or FrameFit.handles(e):   # T-231/T-233: pecas por modulo/grupo, os 2 lados
 		var out: Array[String] = []
 		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):
 			var sn: Node3D = catalog.attach(model, id, side)

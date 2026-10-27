@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"fb_deck_neon"
+display_key = "part.fb_deck_neon"
+slot = &"front_bumper"
+zones = PackedStringArray("front")
+weight_kg = 470.0
+durability = 260.0
+fame = 34
+price = 64000
+accessory_id = "fb_deck_neon"
+rarity = &"lendaria"
+fame_min = 120

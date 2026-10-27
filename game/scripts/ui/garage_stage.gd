@@ -24,7 +24,7 @@ const SLOT_FOCUS: Dictionary = {
 	"body_ornament": "roof", "andon": "roof", "side_skirts": "side", "fenders": "side", "steps": "side", "side_trim": "side",
 	"side_box": "side", "side_ornament": "side", "mural": "side", "hubcaps": "wheel", "rear_bumper": "rear",
 	"rear_lamps": "rear", "plate": "rear", "mudflaps": "rear", "rear_ornament": "rear",
-	"rocket": "box_roof", "box_light_top": "box_roof", "box_light_r": "side", "box_light_l": "side_l",
+	"mirror_stay": "front", "ladder": "side", "rocket": "box_roof", "box_light_top": "box_roof", "box_light_r": "side", "box_light_l": "side_l",
 	"roof_paint": "box_roof", "rear_paint": "rear",                                      # T-232
 }
 ## Velocidade de mentira das rodas em "Ver em movimento" (m/s; ~1 volta a cada 3 s).

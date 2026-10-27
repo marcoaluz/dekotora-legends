@@ -410,6 +410,8 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 	for id in _acc_nodes:
 		for n in _acc_nodes[id]:
 			if is_instance_valid(n):
+				if (n as Node).get_parent() != null and String((n as Node).get_parent().name).begins_with("SOCKET_"):
+					(n as Node).get_parent().remove_child(n)      # T-233: a seta/placa nao pode achar a peca velha
 				n.queue_free()
 	_acc_nodes.clear()
 	_acc_state.clear()
@@ -442,6 +444,7 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 					lower_entry = entry
 		_acc_nodes[String(d.id)] = list
 		_acc_state[String(d.id)] = "ok"
+	_after_frame_parts(catalog, defs)
 	for d in tops:
 		var top: Node3D = _mount_top(catalog, d, lower, lower_entry)
 		if top != null:
@@ -449,6 +452,31 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 			_acc_nodes[String(d.id)] = [top]
 			_acc_state[String(d.id)] = "ok"
 	_queue_plates()
+
+
+## T-233: espelho de fabrica some onde ha haste de retrovisor da oficina; seta da frente vai para o para-choque novo.
+func _after_frame_parts(catalog: AccessoryCatalog, defs: Array[PartDef]) -> void:
+	var sides: Array = []
+	for d in defs:
+		if String(catalog.entry(d.accessory_id).get("fit", "")) == "stay":
+			sides = ["r", "l"]
+	var data: Dictionary = TruckSockets.for_model(model_path(body_kind, cab_kind))
+	FrameFit.hide_stock(model, FrameFit.stock_boxes(data, sides))
+	_place_front_blinkers()
+
+
+## Setas da frente: nos pontos SIGNAL_L/R do para-choque da oficina, se houver; senao no lugar de sempre.
+func _place_front_blinkers() -> void:
+	if _blinkers.size() < 2:
+		return
+	var spots: Array = FrameFit.signal_spots(self, model)
+	var front_z: float = -11.5 - front_delta()
+	for i in 2:
+		var b: MeshInstance3D = _blinkers[i]
+		if spots.size() == 2:
+			b.transform = (spots[i] as Transform3D) * Transform3D(Basis.from_scale(Vector3(1.0 / 0.34, 1.0 / 0.2, 1.0 / 0.14)), Vector3.ZERO)
+		else:
+			b.transform = Transform3D(Basis.IDENTITY, Vector3((-1.0 if i == 0 else 1.0) * 1.22, 0.95, front_z))
 
 
 ## Variante, cor/letreiro/luzes da oficina, brilho, cromo e luzinhas de uma peca recem-montada.

@@ -73,6 +73,8 @@ static func apply(node: Node3D, entry: Dictionary, color_id: String = "", sign: 
 				m.set_surface_override_material(s, sign_material(cell, default_sign(entry)))
 			elif n == "acrylic_art":
 				m.set_surface_override_material(s, art_material())
+			elif n == "deco_checker":                   # T-233: chapa xadrez do deque do para-choque
+				m.set_surface_override_material(s, AccessoryMaterials.make_checker())
 
 
 ## Material de um papel: estrutura/painel com detalhe, LED com lente, neon liso.

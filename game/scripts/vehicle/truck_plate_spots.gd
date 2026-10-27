@@ -61,6 +61,13 @@ static func _rear_holder(truck: Node3D, model: Node3D) -> Dictionary:
 
 ## Retangulo branco ("paint_white") de uma peca montada no para-choque dianteiro, se houver.
 static func _bumper_plate(truck: Node3D, model: Node3D) -> Dictionary:
+	var ofb: Node = model.find_child("SOCKET_front_bumper", true, false)   # T-233: para-choque da oficina (caixa da placa)
+	if ofb != null:
+		for mi in ofb.find_children("*deco_plate*", "MeshInstance3D", true, false):
+			var om: MeshInstance3D = mi as MeshInstance3D
+			if om.mesh == null or not om.visible or PlateSpot.dying(om, model):
+				continue
+			return {"box": PlateSpot.rel_transform(om, truck) * om.mesh.get_aabb()}
 	var fb: Node = model.find_child("MOUNT_FRONT_BUMPER", true, false)
 	if fb == null:
 		return {}

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"skirt_neon_green"
+display_key = "part.skirt_neon_green"
+slot = &"side_skirts"
+zones = PackedStringArray("left", "right")
+weight_kg = 130.0
+durability = 80.0
+fame = 18
+price = 25000
+accessory_id = "skirt_neon_green"
+rarity = &"incomum"
+fame_min = 20

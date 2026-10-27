@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"ladder_green"
+display_key = "part.ladder_green"
+slot = &"ladder"
+zones = PackedStringArray("left", "right")
+weight_kg = 30.0
+durability = 30.0
+fame = 12
+price = 14000
+accessory_id = "ladder_green"
+rarity = &"comum"
+fame_min = 0

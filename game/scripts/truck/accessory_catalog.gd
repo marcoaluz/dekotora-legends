@@ -90,7 +90,9 @@ func attach(truck_model: Node3D, id: String, side: String = "R") -> Node3D:
 	mount.add_child(node)
 	if mirror and side == "L":
 		node.scale = Vector3(-1, 1, 1)
-	if mount.has_meta("sockets") and StripFit.handles(e):   # T-231: foguete/contorno no tamanho do bau (modulos)
+	if mount.has_meta("sockets") and FrameFit.handles(e):   # T-233: para-choque, retrovisor, escada, saia
+		FrameFit.apply(node, mount.get_meta("sockets"), e, side)
+	elif mount.has_meta("sockets") and StripFit.handles(e):   # T-231: foguete/contorno no tamanho do bau (modulos)
 		StripFit.apply(node, mount.get_meta("sockets"), e, side)
 	elif mount.has_meta("sockets"):                   # T-211: encaixe por caminhao, escala pela largura (TruckSockets)
 		node.scale = Vector3.ONE * TruckSockets.fit_scale(mount.get_meta("sockets"), e)

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"skirt_neon_gems"
+display_key = "part.skirt_neon_gems"
+slot = &"side_skirts"
+zones = PackedStringArray("left", "right")
+weight_kg = 150.0
+durability = 85.0
+fame = 22
+price = 32000
+accessory_id = "skirt_neon_gems"
+rarity = &"rara"
+fame_min = 60

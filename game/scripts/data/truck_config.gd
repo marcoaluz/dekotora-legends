@@ -71,12 +71,20 @@ const BOT_ROCKET: Array[String] = ["rocket_round", "rocket_neon_dash", "rocket_l
 const BOT_MURAL: Array[String] = ["mural_nami_fuji", "mural_koi", "mural_tora_take", "mural_hoo", "mural_kabuki", "mural_men"]
 const BOT_REAR_PAINT: Array[String] = ["rearpaint_koi", "rearpaint_noh", "rearpaint_kitsune", "rearpaint_tengu", "rearpaint_oni"]
 const BOT_ROOF_PAINT: Array[String] = ["roofpaint_01", "roofpaint_03", "roofpaint_06", "roofpaint_09"]
+## T-233: para-choque da frente (sempre; 1 em 5 fica com o basico), saia em 1 de 2, retrovisor em 1 de 3.
+const BOT_FRONT: Array[String] = ["fb_fan_plate", "fb_fan_amber", "fb_fan_red", "fb_fan_stripe", "fb_box_amber", "fb_smooth_chrome"]
+const BOT_SKIRT: Array[String] = ["skirt_neon_twin", "skirt_neon_dash", "skirt_chrome_rails", "skirt_neon_green"]
+const BOT_MIRROR: Array[String] = ["mirror_stay_l", "mirror_stay_frame", "mirror_stay_truss"]
 
 
 ## Pecas de um bot pela semente (mesma semente = mesmas pecas no servidor e em todos os clientes).
 static func bot_part_ids(seed_: int) -> Array[String]:
 	var k: int = absi(seed_)
-	var out: Array[String] = ["fb_basic", BOT_REAR[k % BOT_REAR.size()]]
+	var out: Array[String] = ["fb_basic" if k % 5 == 4 else BOT_FRONT[(k / 5) % BOT_FRONT.size()], BOT_REAR[k % BOT_REAR.size()]]
+	if (k / 3) % 2 == 0:
+		out.append(BOT_SKIRT[(k / 6) % BOT_SKIRT.size()])
+	if k % 3 == 1:
+		out.append(BOT_MIRROR[(k / 3) % BOT_MIRROR.size()])
 	if k % 3 == 0:
 		out.append(BOT_ROCKET[(k / 3) % BOT_ROCKET.size()])
 	if k % 2 == 0:

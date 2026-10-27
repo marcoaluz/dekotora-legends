@@ -129,6 +129,68 @@ func _lot3(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("")
 
 
+var _lot4_ok: int = 0
+var _lot4_n: int = 0
+const LOT4: Array = ["front_bumper", "mirror_stay_r", "ladder_r", "side_skirts_r"]   # T-233
+
+
+## T-233: matriz caminhao x lote 4 (11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias).
+func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
+	var ids: Array[String] = PartFit.socket_parts(c, LOT4)
+	lines.append("## Matriz caminhão × lote 4 (T-233: 11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias)")
+	lines.append("")
+	lines.append("| Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |")
+	lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
+	files.sort()
+	for f in files:
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
+			continue
+		var stem: String = String(f).get_basename()
+		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
+		var body: String = String(data.get("body", ""))
+		var model: Node3D = PartFit.load_model(TruckNode.MODEL_DIR + stem + ".glb", body, String(data.get("cab", "")))
+		var ok: Dictionary = {"front_bumper": 0, "mirror_stay": 0, "ladder": 0, "side_skirts": 0}
+		var n: Dictionary = {"front_bumper": 0, "mirror_stay": 0, "ladder": 0, "side_skirts": 0}
+		var here: int = 0
+		for id in ids:
+			var e: Dictionary = c.entry(id)
+			var k: String = String(e["socket"]).trim_suffix("_r")
+			if TruckSockets.socket(data, String(e["socket"])).is_empty():
+				continue
+			n[k] += 1
+			var probs: Array[String] = PartFit.check_part(model, data, c, id)
+			if probs.is_empty():
+				ok[k] += 1
+			else:
+				here += 1
+				fails.append("- `%s` em `%s`: %s" % [id, stem, "; ".join(probs)])
+		model.free()
+		var fb: Dictionary = TruckSockets.socket(data, "front_bumper")
+		var sk: Dictionary = TruckSockets.socket(data, "side_skirts_r")
+		var runs: PackedStringArray = []
+		for r in sk.get("runs", []):
+			runs.append("%.2f" % (float(r[1]) - float(r[0])))
+		var sc: float = TruckSockets.fit_scale(data, {"socket": "front_bumper", "nominal_w": 2.3})
+		var name: String = stem.replace("dekotora_truck_", "") + (" (guardada)" if body == "carreta" else "")
+		var cell := func(k: String) -> String: return ("%d/%d" % [ok[k], n[k]]) if n[k] > 0 else "—"
+		lines.append("| %s | %s | %.2f m / ×%.2f | %s | %s | %s | %s | %s |" % [name, cell.call("front_bumper"), float(fb.get("height", 0.0)),
+				FrameFit.bumper_k(float(fb.get("height", 0.4)), sc, 0.13, 0.2, 0.09), cell.call("mirror_stay"),
+				cell.call("ladder") if n["ladder"] > 0 else "só baú fechado", cell.call("side_skirts"), " + ".join(runs) if runs.size() > 0 else "—",
+				"nenhuma" if here == 0 else str(here)])
+		if body != "carreta":
+			for k in ok:
+				_lot4_ok += int(ok[k])
+				_lot4_n += int(n[k])
+	lines.append("")
+	lines.append("Lote 4: **%d de %d** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do" % [_lot4_ok, _lot4_n])
+	lines.append("nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a faixa do meio estica/encolhe (coluna")
+	lines.append("\"faixa do meio\", para o leque de 0,42 m). Retrovisor: até 0,50 m para fora da cabine e 0,60 m à frente; o")
+	lines.append("espelho de fábrica some. Escada: por fora do contorno de LED, até 0,16 m. Saia: só nos trechos livres (tanque e")
+	lines.append("bateria de fábrica ficam de fora). Conferido vértice a vértice (`FrameFit.problems`).")
+	lines.append("")
+
+
 func _initialize() -> void:
 	var c := AccessoryCatalog.new()
 	c.reload()
@@ -197,7 +259,10 @@ func _initialize() -> void:
 	_lot3(c, lines, fails)
 	total_ok += _lot3_ok
 	total += _lot3_n
-	lines.append("**Total geral (lotes 1 e 2 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
+	_lot4(c, lines, fails)
+	total_ok += _lot4_ok
+	total += _lot4_n
+	lines.append("**Total geral (lotes 1, 2, 4 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
 	lines.append("")
 	lines.append("## Falhas")
 	lines.append("")
@@ -215,6 +280,8 @@ func _initialize() -> void:
 	lines.append("Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo")
 	lines.append("leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da")
 	lines.append("placa próprias) para `rear_bumper`; rodas para `hubcaps`; `rear_doors` para `rear_paint` (T-232: tinta na porta).")
+	lines.append("T-233: o para-choque da frente leva a seta (pontos SIGNAL_L/R) e a caixa da placa; o espelho de fábrica (caixa")
+	lines.append("`hide` do encaixe `mirror_stay_*`) some enquanto a haste está montada.")
 	lines.append("")
 	var fa := FileAccess.open(ProjectSettings.globalize_path(OUT), FileAccess.WRITE)
 	fa.store_string("\n".join(lines) + "\n")

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"mirror_stay_l"
+display_key = "part.mirror_stay_l"
+slot = &"mirror_stay"
+zones = PackedStringArray("front")
+weight_kg = 25.0
+durability = 40.0
+fame = 6
+price = 7000
+accessory_id = "mirror_stay_l"
+rarity = &"comum"
+fame_min = 0

@@ -47,7 +47,28 @@ const DEFS: Dictionary = {
 	# T-231: lanterna das pecas da traseira (acende a noite, nao pisca) e fundo da caixa da placa
 	"lamp_tail": {"c": "#ff2a2a", "emit": 2.5},
 	"deco_plate": {"c": "#e9eef5", "metal": 0.0, "rough": 0.5},
+	# T-233: lente da seta da frente (a seta acesa e a do TruckNode), vidro do espelho e chapa xadrez
+	"deco_signal": {"c": "#8a4a10", "metal": 0.0, "rough": 0.3},
+	"deco_mirror": {"c": "#2a3442", "metal": 0.9, "rough": 0.05},
+	"deco_checker": {"c": "#c3cad6", "metal": 0.85, "rough": 0.35},
 }
+## Chapa xadrez (T-233): a mesma textura da chapa dos caminhoes (tex_diamond_plate), UV de 0,30 m do Blender.
+const CHECKER_ALB := "res://assets/vehicles/dekotora/textures/tex_diamond_plate.png"
+const CHECKER_NRM := "res://assets/vehicles/dekotora/textures/tex_diamond_nrm.png"
+
+
+static func make_checker() -> StandardMaterial3D:
+	if _cache.has("deco_checker@tex"):
+		return _cache["deco_checker@tex"]
+	var m: StandardMaterial3D = make("deco_checker").duplicate() as StandardMaterial3D
+	if ResourceLoader.exists(CHECKER_ALB):
+		m.albedo_texture = load(CHECKER_ALB) as Texture2D
+	if ResourceLoader.exists(CHECKER_NRM):
+		m.normal_enabled = true
+		m.normal_texture = load(CHECKER_NRM) as Texture2D
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	_cache["deco_checker@tex"] = m
+	return m
 
 ## Textura de detalhe da estrutura das pecas da oficina (T-214, blender/scripts/t214_textures.py): metal escovado,
 ## emendas, rebites e desgaste, em UV de metros (1 repeticao = 0,5 m). So nos papeis estrutura e painel.
