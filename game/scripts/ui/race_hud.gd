@@ -157,7 +157,7 @@ func _feed(t: TruckSim) -> void:
 		gauge.curve_safe_kmh = _curve_ahead_safe_kmh(t)
 	var lim: float = sim.track.events.limit_at(t.z, t.z + t.length + 200.0) if sim.track != null else INF
 	gauge.limit_kmh = -1.0 if is_inf(lim) else lim * 3.6
-	strip.signal_dir = t.signal_dir
+	strip.signal_dir = t.shown_signal()            # T-239: seta acesa tambem durante a troca de faixa
 	strip.headlights = headlights
 	strip.hazard = HudStatus.hazard(t, sim.time, racing)
 	strip.horn = t.horn

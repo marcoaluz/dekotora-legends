@@ -5,7 +5,7 @@ extends RefCounted
 ##   u32 tick · u8 n_trucks · por caminhao: u8 idx, f32 z, f32 x, f32 speed, f32 lateral_vel, u16 rpm,
 ##   u8 gear, u8 boost, u8 flags, u8 passing_charge, u8 draft, u8 lane, u8 signal(0..2 = -1/0/+1 +1),
 ##   u8 signal_time (centesimos de s), u8 tap_prev(0..2), u8 lane_change_time (centesimos),
-##   u8 jolt (ticks de tranco que faltam, T-152), u32 ack (ultimo comando aplicado)
+##   u8 jolt (ticks de tranco que faltam, T-152), u8 flags2 (bit0 luz de freio, T-239), u32 ack (ultimo comando aplicado)
 ##   · u8 n_cars · por carro: f32 z, f32 x, s16 giro (milirradianos), u8 altura (2 cm; carro arremessado, T-141),
 ##   u8 acidentado (T-183: 0 = anda normal; 1..255 = acidentado ha (n - 1) decimos de s, satura em 25,4 s).
 ##   flags: bit0 passing, bit1 offroad, bit2 chegou, bit3 buzina, bit4 freada forte (T-144), bit5 empurrado (fumaca, T-141),
@@ -37,6 +37,7 @@ static func pack(sim: RaceSim, acks: Array) -> PackedByteArray:
 		b.put_u8(t.tap_prev + 1)
 		b.put_u8(clampi(roundi(t.lane_change_time * 100.0), 0, 255))
 		b.put_u8(clampi(roundi(t.jolt_t / RaceSim.FIXED_DT), 0, 255))     # em ticks: a predicao bloqueia o mesmo numero de ticks
+		b.put_u8(1 if t.brake_lamp else 0)                                # T-239: flags2 (bit0 luz de freio)
 		b.put_u32(int(acks[i]) if i < acks.size() else 0)
 	var cars: Array = sim.traffic.cars if sim.traffic != null else []
 	b.put_u8(mini(cars.size(), 255))
@@ -97,6 +98,7 @@ static func unpack(data: PackedByteArray) -> Dictionary:
 		t["tap_prev"] = int(b.get_u8()) - 1
 		t["lane_change_time"] = float(b.get_u8()) / 100.0
 		t["jolt_t"] = float(b.get_u8()) * RaceSim.FIXED_DT
+		t["brake_lamp"] = (b.get_u8() & 1) != 0
 		t["ack"] = b.get_u32()
 		(out["trucks"] as Array).append(t)
 	var nc: int = b.get_u8()
@@ -137,6 +139,7 @@ static func apply_to(sim: RaceSim, snap: Dictionary, skip_idx: int = -1) -> void
 		ts.offroad = bool(t["offroad"])
 		ts.horn = bool(t["horn"])
 		ts.hard_braking = bool(t["hard_braking"])
+		ts.brake_lamp = bool(t.get("brake_lamp", false))
 		ts.shove_t = Collision.SHOVE_SMOKE_S if bool(t["shoved"]) else 0.0
 		ts.passing_charge = float(t["passing_charge"])
 		ts.draft = float(t["draft"])

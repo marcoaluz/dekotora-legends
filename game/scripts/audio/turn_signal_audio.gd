@@ -55,7 +55,7 @@ func _make(s: AudioStream) -> AudioStreamPlayer:
 
 ## Chame todo quadro com o caminhao do jogador.
 func update(t: TruckSim) -> void:
-	step(t.signal_dir, t.tap_prev, SignalBlink.now())
+	step(t.shown_signal(), t.tap_prev, SignalBlink.now())    # T-239: tambem durante a troca de faixa
 
 
 ## Logica pura (testavel com relogio proprio). `tap_dir` = direcao segurada no ultimo passo (-1/0/+1).

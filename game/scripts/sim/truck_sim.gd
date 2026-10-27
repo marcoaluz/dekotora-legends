@@ -91,6 +91,7 @@ var brake_intensity: float = 0.0        # 0..1: som e fumaca
 var brake_speed0: float = 0.0           # m/s quando apertou o freio
 var brake_lost: float = 0.0             # m/s perdidos nesta freada (o "pssh" do freio a ar ao soltar)
 var brake_held: bool = false
+var brake_lamp: bool = false            # T-239: luz de freio acesa (HardBrake.LAMP_ON/OFF; vai no snapshot)
 var hard_brake_started: bool = false    # bordas deste tick (RaceSim vira evento)
 var hard_brake_ended: bool = false
 ## Empurrao lateral (T-141): s de fumaca nos pneus de quem foi empurrado para a faixa vizinha (ou quicou).
@@ -206,6 +207,18 @@ func lane_closed_ahead(l: int, track: Track) -> bool:
 	if track.events.is_empty():
 		return false
 	return track.events.lane_blocked_between(l, z, z + length + maxf(REFUSE_AHEAD_M, speed * REFUSE_AHEAD_S))
+
+
+## T-239: seta mostrada no caminhao: a seta ligada ou, durante a troca de faixa, o lado para onde ele vai (o 2o toque
+## apaga signal_dir, mas a seta continua piscando ate o caminhao chegar na faixa). So leitura (apresentacao).
+func shown_signal() -> int:
+	if signal_dir != 0:
+		return signal_dir
+	if lane_change_time > 0.0:
+		var dx: float = Lanes.X[clampi(lane, 0, Lanes.X.size() - 1)] - x
+		if absf(dx) > 0.02:
+			return 1 if dx > 0.0 else -1
+	return 0
 
 
 ## Inclinacao visual da cabine (-1..+1) durante a troca de faixa.

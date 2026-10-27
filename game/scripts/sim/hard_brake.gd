@@ -13,6 +13,10 @@ const MIN_SPEED: float = 60.0 / 3.6     # m/s no instante em que aperta
 const MIN_DECEL: float = 2.5            # m/s^2 (9 km/h por segundo)
 const END_SPEED: float = 2.5            # m/s: abaixo disto acabou (parado)
 const FULL_SPEED: float = 120.0 / 3.6   # m/s: freada a partir daqui = intensidade cheia
+## T-239: luz de freio (todas as luzes do caminhao ficam vermelhas). Acende com o freio a partir de LAMP_ON e so apaga
+## abaixo de LAMP_OFF (histerese: o freio proporcional dos bots nao faz a luz piscar).
+const LAMP_ON: float = 0.15
+const LAMP_OFF: float = 0.05
 
 
 ## Chame no fim de TruckSim.step com o freio do comando e a velocidade de ANTES do tick.
@@ -25,6 +29,7 @@ static func update(t: TruckSim, brake: float, speed_before: float, dt: float) ->
 		t.brake_speed0 = speed_before
 		t.brake_lost = 0.0
 	t.brake_held = held
+	t.brake_lamp = brake >= LAMP_ON or (t.brake_lamp and brake > LAMP_OFF)
 	var was: bool = t.hard_braking
 	t.hard_braking = held and t.brake_speed0 >= MIN_SPEED and t.speed > END_SPEED and decel >= MIN_DECEL
 	if t.hard_braking:

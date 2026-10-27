@@ -173,6 +173,7 @@ func interpolate(now_ms: int, dt: float) -> void:
 		ts.horn = bool(tb["horn"])                    # T-144: buzina e freada forte dos outros (som e fumaca)
 		ts.hard_braking = bool(tb["hard_braking"])
 		ts.brake_intensity = 0.7 if ts.hard_braking else 0.0
+		ts.brake_lamp = bool(tb.get("brake_lamp", false))   # T-239: luz de freio dos outros
 		ts.shove_t = Collision.SHOVE_SMOKE_S if bool(tb["shoved"]) else 0.0     # T-141: fumaca de quem foi empurrado
 		ts.draft = float(tb["draft"])
 		ts.passing_charge = float(tb["passing_charge"])

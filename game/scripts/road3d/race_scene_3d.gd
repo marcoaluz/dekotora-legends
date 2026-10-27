@@ -854,7 +854,8 @@ func _update_visuals(alpha: float, dt: float) -> void:
 		node.animate(t.speed, dt, t.lean())
 		_feel.update_truck(k, node, t, z, dt)          # T-219: balanco do bau (roll/pitch/suspensao; antes: lean x 0,11)
 		var hz: bool = t.signal_dir == 0 and HudStatus.hazard(t, sim.time, _countdown <= 0.0)
-		node.set_signal(2 if hz else t.signal_dir)       # T-202: 2 = hazard (both sides)
+		node.set_signal(2 if hz else t.shown_signal())   # T-202: 2 = hazard; T-239: seta acesa tambem durante a troca
+		node.set_brake(t.brake_lamp, dt)                 # T-239: freio = todas as luzes vermelhas
 		if _cam != null:
 			_brake_fx.update_truck(k, node, t, _cam.global_position, dt, tod.headlights, _feel.tire_smoke(k), _feel.offroad_dust(t))
 	_traffic3d.refresh()
