@@ -658,3 +658,9 @@ Formato em `docs/AGENTES.md`.
 - T-247/T-249 (ajudante): skills e ROADMAP (bbcba8b, 0971335).
 - T-248 (ajudante): APK 166 MB protocolo 19 exportado de git archive do commit 0971335 (7c3ac6d).
 - Em andamento: T-240 (cabine trocável nos caminhões de homenagem + foguetes maiores).
+
+## 2026-10-27 · T-240 · especialista · CONCLUÍDA
+- Feito: cabine trocável por kit (cabine e carroceria em .glb separados, juntados no jogo pelo `TruckKit`, uma malha por material): 6 cabines × 5 homenagens + HAYATE nos baús leve/médio/longo/graneleira; compra vem com a cabine de fábrica; rivais/bots de homenagem ficam com a de fábrica; protocolo 20. Foguetes até 1,35× (faixa larga que para antes dos andons).
+- Arquivos: blender/scripts/build_t240_kits.py, build_sockets.py, lib/truck_measure.py; game/scripts/truck/truck_kit.gd, truck_node.gd, strip_fit.gd; truck/kit/*, sockets/*, stack_fit.json; tests/test_cab_swap_t240.gd; tools/capture_t240.sh; docs/capturas_t240/.
+- Validação: suíte 564/564; REPORT_ENCAIXE 5196/5196; build_sockets 56 caminhões sem problemas; gen_stack_fit OK; --quit-after sem erro; capturas conferidas. APK: +7,3 MB (.scn) +1,4 MB JSON.
+- Decisão pendente: nenhuma bloqueante (Marco confere: vão cabine-carroceria com JAC/curta; HAYATE nos baús antigos; tamanho do foguete).

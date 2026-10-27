@@ -708,3 +708,14 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   - Sondagem da porta e das setas: `godot --headless --path game -s res://tools_dev/probe_t239.gd -- --truck=corpo:cabine`.
   - Só os testes de luz: `godot --headless --path game -s res://tests/run_tests.gd -- --only=lights_t239`.
   - Foto com freio ou seta: `shot_t231.gd` aceita `--brake` e `--signal=-1|1|2`.
+
+## Cabine trocável (T-240)
+
+- `TruckKit` (`game/scripts/truck/truck_kit.gd`): homenagem × qualquer cabine e baú antigo × `flat_wide`/`flat_quad` são
+  montados de `truck/kit/` (malhas de mesmo material juntadas, cache por combinação). `TruckNode.model_path` devolve um
+  caminho VIRTUAL para essas combinações: abra com `TruckNode.instantiate_model(body, cab)` e confira com
+  `TruckNode.model_exists` (nunca `load(model_path)` / `ResourceLoader.exists`).
+- Ao mover nós de uma cena instanciada para outra: zere o `owner` (e dos filhos) antes do `add_child`, senão aviso de dono.
+- `BodyDef.factory_cab` (cabine de fábrica, vem na compra) e `BodyDef.default_cab` (rivais/bots). Protocolo 20.
+- Testes: `-- --only=cab_swap` (`test_cab_swap_t240.gd`); sonda `tools_dev/probe_t240.gd`; capturas `tools/capture_t240.sh`.
+- Foguete: `max_scale` no catálogo (1,35) em `StripFit`; a faixa vem de `truck_measure.ROCKET_RUN` (0,85).

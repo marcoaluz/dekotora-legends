@@ -298,3 +298,14 @@ um problema visual não puder ser entendido pelos renders.
 - Armadilha 3 (tanque): o tanque de combustível de fábrica sai ~0,1 m para fora do baú. Por isso as saias
   (`skirt_t233.py`) só entram nos trechos livres entre as rodas, medidos por raios, e deixam o tanque e a bateria de fora.
   (Medido pela T-233: tanque e bateria de fábrica saem 0,1 m para fora do baú; ver docs/DECISOES.md, entrada T-233.)
+
+## Cabine trocável: kits de cabine e carroceria (T-240)
+
+- Script: `blender -b --factory-startup -P blender/scripts/build_t240_kits.py -- [--cabs chata,jac,...] [--bodies alubox,...,base]`
+  Saída `game/assets/vehicles/dekotora/truck/kit/{cab,body}_<id>.glb` + `kit/lod/` (baús antigos sem LOD).
+- `build_sockets.py` mede as combinações do kit sozinho (`KIT_COMBOS`; importa carroceria + cabine com
+  `truck_measure.import_truck([body, (cab, dy)])`, a cabine deslocada pelo comprimento do baú).
+- Armadilha: a função `add` passada aos construtores precisa DEVOLVER o objeto (`jac_cab._badge` usa o retorno).
+- Armadilha: no baú antigo a chapa do baú usa o material da cabine (`paint_white_panel`); na medição do kit ela é
+  renomeada para `truck_paint_white_box` (senão a cabine HAYATE, que é mais curta, "come" a frente do baú).
+- Os .glb não saem byte a byte iguais entre rodadas (ordem de alguns índices muda); a geometria é a mesma.

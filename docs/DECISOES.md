@@ -1457,3 +1457,44 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   Em velocidade a fumaça fica quase escondida pela cabine (como já era no baú médio); parado, sai pela grade.
 - Teste: `test_smoke_t246.gd` (fumaça abaixo do vidro e na frente da cabine nos 23+ caminhões; nada solto na frente do
   vidro; baforada redonda). Capturas antes/depois em `docs/capturas_t246/`. Protocolo não mudou (só visual).
+
+## 2026-10-27 · T-240 · Cabine trocável e foguetes maiores (pedido do Marco)
+
+- **Montagem em tempo de jogo, sem .glb por combinação** (decisão do Claude). Cada cabine e cada carroceria virou um
+  .glb separado em `game/assets/vehicles/dekotora/truck/kit/` (`blender/scripts/build_t240_kits.py`): a cabine leva o eixo
+  e as rodas da frente, a "sobrancelha" de luzes e os pontos de montagem da frente; a carroceria leva o chassi, o baú/carga,
+  a decoração, as rodas de trás e os pontos dela. O jogo junta as duas (`TruckKit`) e as malhas de mesmo material viram
+  uma só (em cache por combinação): **mesmas chamadas de desenho** de um .glb único. A cabine anda junto com o comprimento
+  do baú (leve −2,8 m, longo +1,6 m).
+- **Onde vale**: os 5 caminhões de homenagem aceitam as **6 cabines** (chata, JAC, curta, americana, plana larga, plana de
+  4 faróis = 30 combinações). **As 2 cabines HAYATE também passam a valer nos baús leve, médio, longo e na graneleira**
+  (8 combinações). As 16 combinações antigas (baú antigo × cabine antiga), o Canter e a carreta **continuam nos .glb de
+  sempre** (nada mudou neles). Os 5 .glb únicos das homenagens (e LODs) saíram do jogo: o kit os substitui (o
+  `build_t218_trucks.py` continua gerando-os só para as prévias, em `builds/`).
+- **Vão entre cabine e carroceria**: as carrocerias de homenagem têm 8,2 m e foram feitas para cabine com costas em 8,45 m.
+  Com as cabines JAC e curta (costas em ~9,5 m) fica um vão de ~1,3 m com o chassi e os escapamentos à mostra (o baú
+  antigo crescia até a cabine; as carrocerias de homenagem — tanque, caçamba, lona — não esticam). Ficou assim de
+  propósito (é como um caminhão de cabine curta com carroceria padrão); Marco confere nas folhas.
+- **Comprar continua vindo de fábrica**: comprar um caminhão de homenagem pinta na cor de fábrica E monta a cabine de
+  fábrica (`BodyDef.factory_cab`); depois o jogador troca na garagem (aba MODELO > CABINE). A cabine continua UMA por
+  perfil (`profile.cab`): trocar de carroceria mantém a cabine escolhida (como a pintura).
+- **Rivais e bots**: os de homenagem ficam com a cabine de fábrica (Trovão Rosa = rosa com a plana larga, etc.;
+  `BodyDef.default_cab`), offline e online. **Protocolo 20** (o `cab` do descritor passa a valer nesses modelos e o
+  cliente antigo não conhece as combinações novas).
+- **Encaixes**: as 38 combinações novas foram medidas (`build_sockets.py` importa carroceria + cabine juntas):
+  0 problemas de projeto; relatório de encaixe **5196/5196**; deque de 2 níveis: homenagem com chata/JAC/curta 96 de 96
+  duplas, com americana 39, com as HAYATE 62 (como antes).
+- **Foguetes maiores** (decisão do Claude sobre o "um pouco"): a seção cresce até **1,35×** (antes nunca passava de 1,0×)
+  onde a faixa do teto deixa: 0,15 × 0,16 m → **0,20 × 0,21 m**. Nos baús com andon de fábrica nas pontas do teto (médio
+  premium e baú rosa) o foguete era fino (0,13–0,16 m de faixa, escala 0,77–0,94) espremido ao lado dos andons; agora a
+  medição escolhe a faixa larga (0,34 m) mesmo um pouco mais curta (≥ 85% do trecho mais longo), e o foguete **para
+  antes dos andons** em vez de passar ao lado deles (base: 8,19 → 7,74 m). Não sobe acima do limite de 0,38 m do encaixe,
+  não encosta no contorno de LED (mesma folga) e fica por cima da pintura do teto (como antes). Ganho: +35% nos baús de
+  faixa larga, +43% no médio, +75% no rosa. Preço/peso não mudaram.
+- **Custo no APK** (medido nos arquivos importados `.scn`): kits = 16,4 MB contra 9,1 MB dos 5 .glb únicos de antes:
+  **+7,3 MB** (+2,6 MB pelas 25 combinações novas das homenagens; +4,7 MB pelos 4 baús antigos para as cabines HAYATE,
+  sem LOD) + ~1,4 MB de JSON de encaixes. Montar uma combinação nova pela 1ª vez custa ~0,2–0,45 s no PC (juntar as
+  malhas; depois fica em cache). Celular não medido.
+- **Conhecidos, não mexidos** (já existiam nos .glb antigos): a cabine americana tem 3–4 luzinhas da sobrancelha soltas
+  no ar na frente do capô; no baú leve e no longo o andon da frente do teto fica muito alto (só os pés aparecem, sobem
+  para fora da tela). Os kits copiam o mesmo código, então aparecem igual.
