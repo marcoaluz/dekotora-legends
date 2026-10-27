@@ -187,8 +187,7 @@ func apply_look(dt: float, cam: Camera3D, want: int, allowed: bool, me: Vector3,
 	var target: Array = []
 	var w: int = look.forced if look.forced != RaceLook.Dir.NONE else want
 	if allowed and w != RaceLook.Dir.NONE:
-		var lp: Array[Vector3] = RaceLook.local_pose(w, me)
-		target = [rig.to_world(rig.clamp_point(lp[0], me)), rig.to_world(lp[1])]
+		target = RaceLook.world_target(rig, w, me)
 	var out: Array = look.update(dt, want, allowed, base, target, anchor, rig.path.forward_at(mid), follow_rate)
 	if look_badge != null:
 		look_badge.show_dir(look.current, look.weight)

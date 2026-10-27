@@ -97,6 +97,15 @@ func _input(event: InputEvent) -> void:
 		_apply()
 
 
+## T-241: the pause menu swallows the finger release; forget the eye finger so the view is not stuck looking.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PAUSED and _look_finger >= 0:
+		_fingers.erase(_look_finger)
+		_look_finger = -1
+		_look_dir = RaceLook.Dir.NONE
+		_apply()
+
+
 ## Button under `p` (the eye button only when a finger lands on it: sliding into it does nothing).
 func _hit(p: Vector2, allow_look: bool) -> String:
 	var best: String = ""

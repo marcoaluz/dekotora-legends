@@ -1374,9 +1374,11 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **As 3 vistas** (escolha do Claude, Marco confere nas capturas):
   - **Trás**: câmera 11 m na frente da cabine, a 6 m de altura (a mesma "câmera de perseguição" virada ao contrário),
     olhando 40 m atrás do baú. Mostra a frente decorada do caminhão e quem vem atrás por cima do baú.
-  - **Esquerda / Direita**: câmera 6 m acima, 3 m para o lado, ao lado da cabine (acima de um caminhão na faixa
-    vizinha, então não entra dentro dele), olhando para o lado e um pouco para trás (≈120° da frente): vê a faixa ao
-    lado, a lateral do próprio baú e quem vem ultrapassando por aquele lado.
+  - **Esquerda / Direita**: "grua" 8 m acima, 3,5 m para o lado OPOSTO, sobre a frente do baú, olhando por cima do
+    teto do próprio caminhão para o lado escolhido e um pouco para trás (≈110° da frente): o teto do caminhão fica
+    embaixo na tela (o jogador sabe onde está) e aparecem a faixa vizinha e quem vem ultrapassando. Alta o bastante
+    para nunca entrar num caminhão da faixa ao lado. (A 1ª versão, ao lado da cabine, mostrava só o ônibus vizinho de
+    perto, sem o próprio caminhão: descartada.)
   - Todas passam pelo mesmo limite das câmeras da T-198 (entre as muretas, embaixo do arco do túnel e da praça do
     pedágio, fora do baú).
 - **Transição**: 0,24 s para entrar e 0,28 s para voltar, com início e fim suaves; quando a câmera passa de trás para a

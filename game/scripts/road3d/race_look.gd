@@ -5,8 +5,8 @@ extends RefCounted
 ## underneath and this only overrides the final pose. Hold = look, release = back to the camera, with a short eased
 ## move that arcs over the truck when it crosses from behind to the front (never through the cab).
 ##  BACK : in front of the cab, chase-camera height, looking back over the truck (the decorated front + who chases).
-##  LEFT/RIGHT: high beside the cab (above the cars of the next lane), looking out to that side and a bit back along
-##         the truck's flank (where an overtaker comes from).
+##  LEFT/RIGHT: a crane shot from high on the OTHER side, looking across the truck's own roof (it stays at the bottom
+##         of the picture, so the player knows where he is) to that side and a bit back (where an overtaker comes from).
 ## Inputs (see docs/DECISOES.md T-241): Q / E / X, right stick (left, right, down) + R3/RB on a controller, and the
 ## touch "eye" button (hold = back, slide left/right = sides).
 
@@ -25,11 +25,11 @@ const TOUCH_BACK: float = 0.55             # ... and come back under radius x th
 const BACK_AHEAD_M: float = 11.0
 const BACK_H: float = 6.0
 const BACK_LOOK_BEHIND_M: float = 40.0     # look point behind the truck's rear
-const SIDE_FROM_FRONT_M: float = 1.0       # camera this much behind the front (beside the cab)
-const SIDE_OUT_M: float = 3.0              # lateral offset from the truck's centre line
-const SIDE_H: float = 6.0                  # over a truck in the next lane (box ~4 m)
-const SIDE_LOOK_BACK_M: float = 8.0        # look point: this much behind the camera ...
-const SIDE_LOOK_OUT_M: float = 14.0        # ... and this much to the side (≈120° from straight ahead)
+const SIDE_FROM_FRONT_M: float = 3.0       # camera this much behind the front (over the front of the box)
+const SIDE_OUT_M: float = -3.5             # lateral offset from the truck's centre line (< 0 = the side NOT looked at)
+const SIDE_H: float = 8.0                  # well over the box (~4 m) and any truck in the next lane
+const SIDE_LOOK_BACK_M: float = 7.0        # look point: this much behind the camera ...
+const SIDE_LOOK_OUT_M: float = 14.0        # ... and this much to the side of the truck (≈110° from straight ahead)
 const BACK_FOV: float = 58.0
 const SIDE_FOV: float = 60.0
 
@@ -91,6 +91,15 @@ static func local_pose(dir: int, me: Vector3) -> Array[Vector3]:
 			return [Vector3(cz, me.y + s * SIDE_OUT_M, SIDE_H),
 					Vector3(cz - SIDE_LOOK_BACK_M, me.y + s * SIDE_LOOK_OUT_M, 0.5)]
 	return [Vector3(me.x - 14.0, me.y, 5.6), Vector3(front + 14.0, me.y, 1.8)]
+
+
+## World target [pos, look] of a direction: the camera point goes through the T-198 limits (barriers, tunnel arch,
+## toll canopy); the "keep out of the player's box" push is skipped when the point is already above the box.
+static func world_target(rig: RaceCamRig, dir: int, me: Vector3) -> Array:
+	var lp: Array[Vector3] = local_pose(dir, me)
+	var body: Vector3 = me if lp[0].z < RaceCamRig.BODY_TOP_H else Vector3(me.x, me.y, 0.0)
+	var p: Vector3 = rig.clamp_point(lp[0], body)
+	return [rig.to_world(p), rig.to_world(lp[1])]
 
 
 static func fov_of(dir: int) -> float:

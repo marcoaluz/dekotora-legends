@@ -52,3 +52,5 @@ docs/capturas_t202/raw/
 # T-211: prévias por peça da oficina (folhas t211_sheet_*.png ficam no Git)
 game/assets/vehicles/dekotora/previews/t211_*_day.png
 game/assets/vehicles/dekotora/previews/t211_*_night.png
+# Quadros brutos das capturas da T-241 (so as finais vao para o Git)
+docs/capturas_t241/raw/

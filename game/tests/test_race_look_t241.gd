@@ -12,8 +12,7 @@ func _rig() -> RaceCamRig:
 func _target(rig: RaceCamRig, dir: int, me: Vector3) -> Array:
 	if dir == RaceLook.Dir.NONE:
 		return []
-	var lp: Array[Vector3] = RaceLook.local_pose(dir, me)
-	return [rig.to_world(rig.clamp_point(lp[0], me)), rig.to_world(lp[1])]
+	return RaceLook.world_target(rig, dir, me)
 
 
 func test_keys_and_sticks_pick_the_direction() -> void:
@@ -46,11 +45,11 @@ func test_poses_look_the_right_way() -> void:
 	check(back[1].x < me.x - 20.0, "tras: olha para longe atras do bau")
 	var left: Array[Vector3] = RaceLook.local_pose(RaceLook.Dir.LEFT, me)
 	var right: Array[Vector3] = RaceLook.local_pose(RaceLook.Dir.RIGHT, me)
-	check(left[0].y < 0.0 and left[1].y < left[0].y - 8.0, "esquerda: do lado esquerdo, olhando para a esquerda")
-	check(right[0].y > 0.0 and right[1].y > right[0].y + 8.0, "direita: espelhado")
+	check(left[1].y < -8.0 and left[1].y < left[0].y - 8.0, "esquerda: olha por cima do teto para a esquerda")
+	check(right[1].y > 8.0 and right[1].y > right[0].y + 8.0, "direita: espelhado")
 	check(left[0].z >= 5.0, "lado: acima de um caminhao na faixa vizinha")
 	var yaw: float = rad_to_deg(atan2(absf(left[1].y - left[0].y), left[1].x - left[0].x))
-	check(yaw > 95.0 and yaw < 140.0, "lado: para o lado e um pouco para tras (%.0f graus)" % yaw)
+	check(yaw > 95.0 and yaw < 130.0, "lado: para o lado e um pouco para tras (%.0f graus)" % yaw)
 
 
 func test_poses_stay_inside_the_road_in_any_lane() -> void:
@@ -60,7 +59,7 @@ func test_poses_stay_inside_the_road_in_any_lane() -> void:
 		var me := Vector3(500.0, lane_x * Track.ROAD_HALF_WIDTH_M, 12.0)
 		for dir in [RaceLook.Dir.BACK, RaceLook.Dir.LEFT, RaceLook.Dir.RIGHT]:
 			var lp: Array[Vector3] = RaceLook.local_pose(dir, me)
-			var p: Vector3 = rig.clamp_point(lp[0], me)
+			var p: Vector3 = rig.clamp_point(lp[0], me if lp[0].z < RaceCamRig.BODY_TOP_H else Vector3(me.x, me.y, 0.0))
 			var prof: Vector3 = LaneSections.profile(rig.events, p.x)
 			if p.y < -prof.x or p.y > prof.y or p.z < RaceCamRig.MIN_H:
 				bad += 1
