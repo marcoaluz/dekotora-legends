@@ -1498,3 +1498,10 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Conhecidos, não mexidos** (já existiam nos .glb antigos): a cabine americana tem 3–4 luzinhas da sobrancelha soltas
   no ar na frente do capô; no baú leve e no longo o andon da frente do teto fica muito alto (só os pés aparecem, sobem
   para fora da tela). Os kits copiam o mesmo código, então aparecem igual.
+
+## 2026-10-27 · Respostas do Marco à T-240
+
+- Foguetes: "um pouco maior e mais largo um pouco" que o tamanho da T-240 (T-252).
+- Corrigir as luzinhas soltas na frente da cabine americana e o andon da frente do teto alto demais nos baús leve e longo (T-252).
+- Vão entre cabine e carroceria nas combinações novas: fechar (T-251).
+- Pasta `t240_antes` pode ser apagada (já não existia em 2026-10-27).
