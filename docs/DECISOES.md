@@ -1505,3 +1505,34 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - Corrigir as luzinhas soltas na frente da cabine americana e o andon da frente do teto alto demais nos baús leve e longo (T-252).
 - Vão entre cabine e carroceria nas combinações novas: fechar (T-251).
 - Pasta `t240_antes` pode ser apagada (já não existia em 2026-10-27).
+
+## 2026-10-27 · T-251 · Cabine encostada na carroceria em todas as combinações (pedido do Marco)
+
+- **A carga estica para a frente até a cabine** (decisão do Claude sobre o "fechar o vão"): o baú/tanque/caçamba/lona do
+  kit cresce no comprimento, do ponto 0,5 m da traseira até a frente da carga, até ficar a uma folga fixa das costas da
+  cabine: **0,25 m** quando a carroceria tem escapamentos de fábrica (eles ficam nesse vão, como na cabine chata) e
+  **0,06 m** sem eles (baú de alumínio). Feito no jogo ao montar o kit (`TruckKit._fit_body`, em cache por combinação,
+  também nos LODs) e igual na medição do Blender (`truck_measure.kit_stretch`), com as medidas em `truck/kit/*.json`
+  (`front`/`gap`/`y0` da carroceria, `back` = costas da cabine). Quanto estica: JAC/curta ~0,9 a 1,5 m (+12% a +21% de
+  comprimento da carga: caçamba mais, lona/rosa menos); chata/HAYATE/americana 0 a 0,43 m (tanque e caçamba tinham folga).
+- **O que NÃO estica**: chassi, longarinas, tanques, rodas e eixos (malhas `frame_*` do .glb, juntadas de volta depois de
+  esticar), o neon de baixo do chassi. Os escapamentos de fábrica e os comprados (`MOUNT_STACK_*`) andam junto com as
+  costas da cabine (`TruckKit.front_shift`), ficam sempre no vão.
+- **Simulação não muda**: o comprimento do caminhão na pista (`BodyDef.length_m`), colisão e peso são os mesmos; é só
+  visual. Protocolo continua 20. Os 16 caminhões antigos (.glb próprio), o Canter e a carreta não mudaram (já encostavam);
+  os baús antigos com cabine HAYATE também não esticam (já encostavam).
+- **Efeito colateral aceito**: o mural da gueixa do baú rosa e as faixas/luzes da lateral esticam junto (até 13% com a
+  JAC/curta). Peças da oficina (foguete, contorno, murais T-232, saias) já seguem o comprimento medido de cada combinação
+  (encaixes refeitos: relatório 5196/5196).
+
+## 2026-10-27 · T-252 · Foguete maior, andon do leve/longo e luzinhas da americana (respostas do Marco à T-240)
+
+- **Foguete**: a seção agora cresce até **1,65×** (T-240: 1,35×) e fica **10% mais larga que alta** (`wide_k` 1,1 no
+  catálogo, sem passar de 90% da faixa medida do teto): nos baús de faixa larga (0,34 m) o foguete redondo vai de
+  0,20 × 0,21 m para **0,27 × 0,26 m** (largura × altura). Continua abaixo do limite de 0,38 m de altura do encaixe.
+- **Andon da frente do teto no baú leve e no longo**: estava a ~7 m (só os pés apareciam). Causa: depois de esticar o
+  baú, o script lia posições velhas da cena (faltava `view_layer.update()`) e somava a altura duas vezes. Corrigido em
+  `build_truck_3d.py`; .glb do leve/longo (chata e americana) refeitos; o kit (HAYATE) já usa o mesmo código.
+- **Luzinhas soltas na frente da cabine americana**: 3–4 luzes da "sobrancelha" caíam fora da casca (o raio não
+  encontrava a lataria e a luz ficava no ar na frente do capô). Agora a luz sem lataria atrás é pulada
+  (`kw_cab.surf` devolve normal vazia, `deco.cab_brow` pula). .glb da americana e o kit `cab_americana` refeitos.

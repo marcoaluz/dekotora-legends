@@ -670,3 +670,16 @@ Formato em `docs/AGENTES.md`.
 - Foguetes até 1,35× (0,15×0,16 → 0,20×0,21 m).
 - Revisão do coordenador: com JAC/curta aparece a parede da frente do baú e um vão de chassi; a diferença dos foguetes é pequena nas folhas (max_scale ajustável). Pasta D:\DEV\dekotora-legends\t240_antes só pode ser apagada com aprovação do Marco.
 - Delegado: T-250 (APK). T-242 começa agora.
+
+## 2026-10-27 20:55 · T-251 · especialista · CONCLUÍDA
+- Feito: a carga do kit (baú, lona, rosa, tanque, caçamba) estica para a frente até a cabine em todas as 30 combinações homenagem × cabine (folga 0,25 m com escapamentos no vão, 0,06 m no baú de alumínio); chassi/rodas/tanques não esticam (malhas `frame_*`), escapamentos de fábrica e comprados acompanham as costas da cabine; LODs também. Só visual (sim e protocolo 20 iguais). Retomado do trabalho não commitado da sessão que expirou: conferido, testado, capturas "depois" refeitas (iguais byte a byte às de 12:00).
+- Arquivos: game/scripts/truck/{truck_kit,truck_node}.gd; blender/scripts/{build_t240_kits,build_sockets}.py, lib/truck_measure.py; truck/kit/*.json (novos), kits/sockets refeitos; tests/test_cab_gap_t251.gd; tools/capture_t251.sh (SKIP_ANTES); docs/capturas_t251/.
+- Validação: suíte 570/570; --quit-after 30 sem erro; REPORT_ENCAIXE 5196/5196; sonda de altura dos andons em 36 caminhões (3,78–4,29 m); folhas antes/depois conferidas (rodas no lugar, carga encostada).
+- Armadilha: a T-242 (murais) estava sendo feita ao mesmo tempo na mesma pasta, sem commit (catalog.json com as duas mudanças): commitei só os trechos do foguete do catalog.json (`git update-index --cacheinfo`); os arquivos da T-242 continuam não commitados.
+- Decisão pendente: nenhuma bloqueante (Marco confere: mural da gueixa do baú rosa estica até 13% com JAC/curta).
+
+## 2026-10-27 20:55 · T-252 · especialista · CONCLUÍDA
+- Feito: foguete até 1,65× e 10% mais largo que alto (redondo no baú de faixa larga 0,20×0,21 → 0,27×0,26 m); andon da frente do teto do leve/longo a ~3,8 m (era ~7 m: `matrix_world` velha depois de esticar o baú, faltava `view_layer.update()`); luzinhas da sobrancelha da americana fora da lataria agora são puladas.
+- Arquivos: blender/scripts/{build_truck_3d,build_t231_parts}.py, truck3d/{deco,kw_cab}.py; game/scripts/truck/strip_fit.gd; catalog.json (max_scale/wide_k); .glb leve/longo/americana e kit cab_americana refeitos.
+- Validação: testes do test_cab_gap_t251 (foguete, andon < 4,3 m, 0 luzes soltas na americana); folhas foguetes_t252_antes_depois_noite.png e americana_e_andon_antes_depois.png conferidas.
+- Decisão pendente: nenhuma (Marco confere se o foguete ficou "um pouco maior e mais largo" na medida que queria; o número é `max_scale`/`wide_k` no catálogo).
