@@ -652,3 +652,9 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 556/556 (3 novos); sonda mostrou o CPUParticles3D em (0; 2,4; -11) e escondê-lo tirou o retângulo; capturas da T-241 de trás refeitas (4) sem o retângulo.
 - Armadilhas: (1) a sonda achou o culpado escondendo nós e tirando print, não pelo nome (era partícula, não MeshInstance3D); (2) `GradientTexture2D.get_image()` é null sem tela: testar o gradiente; (3) as capturas usam o perfil real do PC (motor 0% salvo de corridas anteriores), por isso a fumaça aparecia.
 - Decisão pendente: nenhuma de design (opcional para o Marco: fumaça do motor quase não aparece em velocidade, pela câmera de trás; se quiser vê-la, é efeito novo).
+
+## 2026-10-26 · T-246 a T-249 (resumo do coordenador)
+- T-246 (especialista): retângulo cinza = fumaça do motor quebrado saindo de ponto fixo no ar; agora sai da grade, baforada redonda; 556 testes (576e2fc).
+- T-247/T-249 (ajudante): skills e ROADMAP (bbcba8b, 0971335).
+- T-248 (ajudante): APK 166 MB protocolo 19 exportado de git archive do commit 0971335 (7c3ac6d).
+- Em andamento: T-240 (cabine trocável nos caminhões de homenagem + foguetes maiores).

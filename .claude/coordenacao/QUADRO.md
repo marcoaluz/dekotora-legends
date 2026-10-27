@@ -5,8 +5,8 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-249 | ROADMAP com a T-246 e linha da sonda probe_t246 na skill godot-dekotora | delegado da T-246 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
-| T-248 | APK de teste protocolo 19 (T-239 luzes + correção da T-246) + SHA-256 no STATUS | delegado da T-239 | fácil | ajudante-rapido | em andamento | 2026-10-26 | |
+| T-249 | ROADMAP com a T-246 e linha da sonda probe_t246 na skill godot-dekotora | delegado da T-246 | fácil | ajudante-rapido | concluída (commit 0971335) | 2026-10-26 | 2026-10-26 |
+| T-248 | APK de teste protocolo 19 (T-239 luzes + correção da T-246) + SHA-256 no STATUS | delegado da T-239 | fácil | ajudante-rapido | concluída (APK 166 MB protocolo 19 do commit 0971335, commit 7c3ac6d; precisa Marco: instalar e testar) | 2026-10-26 | 2026-10-26 |
 | T-247 | Skill godot-dekotora "Luzes de freio e setas (T-239)" + contagem de testes 553 no STATUS | delegado da T-239 | fácil | ajudante-rapido | concluída (commit bbcba8b) | 2026-10-26 | 2026-10-26 |
 | T-246 | Retângulo cinza tapando o para-brisa quando a câmera olha a frente do caminhão (captura docs/capturas_t241/pc_dia_tras.png) — achar a causa e corrigir | achado do coordenador na revisão da T-241 | difícil | especialista | concluída (era a fumaça do motor quebrado; commit 576e2fc; 556 testes) | 2026-10-26 | 2026-10-26 |
 | T-245 | Skill godot-dekotora com a T-241 (RaceLook, apply_look, flag --look, ações, botão do olho, 2 armadilhas) + folha 4x4 das capturas | delegado da T-241 | fácil | ajudante-rapido | concluída (commit f064eb7) | 2026-10-26 | 2026-10-26 |
