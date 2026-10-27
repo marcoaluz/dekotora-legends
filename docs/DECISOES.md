@@ -1364,6 +1364,18 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Conflitos com Clássicas** (conhecidos, não mexidos): `fb_*` Clássicos, `front_lip`, `aux_lights`, `skirt_*` Clássicas
   e `side_box` ocupam lugares parecidos; o teste só garante o catálogo novo.
 - Complemento do Marco para a T-242: as imagens prontas mantêm o **efeito de luz noturno** dos murais da T-232, mas só em **pontos escolhidos** (olho do animal, lua, sol, chamas…), não na imagem inteira. Fazemos à mão uma máscara de emissão para cada imagem.
+- **Custo medido no PC (T-244, 2026-10-26, noite, `kanto_3_mountain`, rival chefe da rota `boss_kanto`; modo médio,
+  1280x720, sem vsync, `--fps-log --quality=1 --life=off`, autoplay, semente 7, 3000 quadros: as mesmas flags da T-235;
+  cópia limpa do commit 1276aa1, protocolo 18 = T-232 + T-233 + T-241; o APK de teste é desse commit):**
+  início km 330: FPS médio por trecho do log 127 → 144 → 144 → 143 (primeira leitura 127); chamadas 622–675 (pico
+  638–748), 297–341 mil triângulos; 5 picos de 67 a 137 ms (t=4–21 s). Início km 1060: FPS 140 → 150 → 137 → 152;
+  chamadas 662–718 (pico 714–731), 361–429 mil triângulos, sem picos.
+- **Comparação com a T-235 (estado da T-231, protocolo 16, mesmos parâmetros):** chamadas de desenho +40 a +80 por
+  quadro (≈ +6 a +12%) e triângulos +16 a +65 mil no km 1060 (≈ +5 a +18%): é o que o T-232 (pinturas) e o T-233 (peças)
+  somaram. Porém o FPS agora está **mais alto** que o da T-235 (114–136 lá; 127–152 aqui), o que não vem de mais peças:
+  é ruído da medida (não sei se outro programa, como um Godot aberto por outro agente, rodava junto; um Godot de 131 MB
+  estava aberto no começo). Conclusão: **não dá para afirmar queda de FPS**; o custo visível é pequeno e o PC segue
+  acima de 120 FPS nesse trecho. Comparação A/B exata (mesmo PC, dois commits lado a lado) continua **não medida**.
 
 ## 2026-10-26 · T-241 · Olhar para trás, esquerda e direita na corrida (pedido do Marco)
 
