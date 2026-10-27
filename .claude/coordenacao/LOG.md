@@ -683,3 +683,13 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/{build_truck_3d,build_t231_parts}.py, truck3d/{deco,kw_cab}.py; game/scripts/truck/strip_fit.gd; catalog.json (max_scale/wide_k); .glb leve/longo/americana e kit cab_americana refeitos.
 - Validação: testes do test_cab_gap_t251 (foguete, andon < 4,3 m, 0 luzes soltas na americana); folhas foguetes_t252_antes_depois_noite.png e americana_e_andon_antes_depois.png conferidas.
 - Decisão pendente: nenhuma (Marco confere se o foguete ficou "um pouco maior e mais largo" na medida que queria; o número é `max_scale`/`wide_k` no catálogo).
+
+## 2026-10-27 20:57 · T-253 · ajudante-rapido · CANCELADA
+- Feito: cópia limpa do 77d055f montada e removida; nenhum APK gerado (Marco: APK só sob pedido).
+- Arquivos: nenhum no repositório (pasta temporária criada e apagada).
+- Observação: STATUS.md não foi alterado; sem tamanho nem SHA-256 novo.
+
+## 2026-10-27 20:57 · T-254 · ajudante-rapido · CONCLUÍDA
+- Feito: skill godot-dekotora (linha T-251 e foguete 1,65/wide_k 1,1) e blender-pixelart (kit JSON, frame_*, import_truck com vão, view_layer.update).
+- Arquivos: .claude/skills/godot-dekotora/SKILL.md, .claude/skills/blender-pixelart/SKILL.md (commit 97546c9).
+- Observação: nada.
