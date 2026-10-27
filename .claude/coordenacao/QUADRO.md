@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-251 | T-240: cabines trocadas não encostam no baú/caçamba (vão de chassi atrás da cabine) — fechar o vão em todas as combinações | pedido do Marco | difícil | especialista (o mesmo da T-240) | em andamento | 2026-10-27 | |
 | T-250 | APK de teste protocolo 20 (T-240) de git archive do commit 5bbc3a8; tamanho no STATUS e no LOG | delegado da T-240 | fácil | ajudante-rapido | concluída (APK 173 MB protocolo 20, commit a4c3f00; precisa Marco: instalar e testar) | 2026-10-27 | 2026-10-27 |
 | T-249 | ROADMAP com a T-246 e linha da sonda probe_t246 na skill godot-dekotora | delegado da T-246 | fácil | ajudante-rapido | concluída (commit 0971335) | 2026-10-26 | 2026-10-26 |
 | T-248 | APK de teste protocolo 19 (T-239 luzes + correção da T-246) + SHA-256 no STATUS | delegado da T-239 | fácil | ajudante-rapido | concluída (APK 166 MB protocolo 19 do commit 0971335, commit 7c3ac6d; precisa Marco: instalar e testar) | 2026-10-26 | 2026-10-26 |
