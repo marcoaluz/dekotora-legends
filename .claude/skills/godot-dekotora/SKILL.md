@@ -690,6 +690,7 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   (o olhar) precisa ser restaurada no quadro seguinte (`restore_base`), senão a câmera parte da pose do olhar.
 - Armadilha 2: `RaceCamRig.clamp_point` empurra para o lado um ponto que está sobre o baú, mesmo lá no alto. Quando a altura
   do ponto for maior que `BODY_TOP_H`, passe `me` com comprimento 0 (`Vector3(me.x, me.y, 0.0)`), como faz `RaceLook.world_target`.
+- Sonda `-s res://tools_dev/probe_t246.gd -- <args da corrida> [--frames=240] [--hide=nome,...] [--probe-shot=arq.png]`: lista o que cruza a frente da cabine do jogador; para achar o culpado, esconda e tire print. As capturas usam o perfil real do PC (motor 0% = fumaça).
 
 ## Luzes de freio e setas (T-239)
 

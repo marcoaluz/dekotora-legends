@@ -115,6 +115,7 @@ O número entre colchetes é o prompt em `PROMPTS.md`. Claude marca `[x]` ao con
 - [x] [T-233] Oficina, lote 4: 11 para-choques da frente (altura se ajusta ao farol de cada cabine, seta e placa na peça), 6 hastes de retrovisor (espelho de fábrica some), 3 escadas e 8 saias (só nos trechos livres, tanque fica de fora); encaixe 595/595; bots/rivais; protocolo 18 (2026-10-26)
 - [x] [T-239] Luzes: freio deixa todas as luzes vermelhas (jogador, bots, rivais, online; protocolo 19), setas em cima da lâmpada certa (frente/trás, com e sem para-choque da oficina, halo) e acesas durante a troca de faixa, porta traseira do baú sem luzes, lanterna de fábrica no para-choque dos baús base/leve/longo (2026-10-26)
 - [x] [T-241] Olhar para trás/esquerda/direita segurando um botão (Q/E/X; analógico direito, RB/R3; botão do olho com deslize no celular), por cima de todas as câmeras, retrovisor some enquanto olha, só visual (2026-10-26, `tests/test_race_look*_t241.gd`, `docs/capturas_t241/`; celular de verdade não testado)
+- [x] [T-246] Quadrado cinza no para-brisa olhando para trás = fumaça do motor quebrado; agora sai da grade e é redonda; test_smoke_t246 (2026-10-26)
 - [ ] [T-211+] Próximos lotes da oficina (ordem da seção 16.2 do catálogo), um por vez com folha aprovada
 - [ ] [T-192b] Pendências do Marco (não agora): copas ralas das Gleditsias adultas (d/e/f) e boneco com cara de manequim no retrato do duelo
 - [ ] [V8] Medir no celular — PRECISA MARCO (Android SDK + JDK 17 para gerar o APK)
