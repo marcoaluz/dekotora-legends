@@ -664,3 +664,9 @@ Formato em `docs/AGENTES.md`.
 - Arquivos: blender/scripts/build_t240_kits.py, build_sockets.py, lib/truck_measure.py; game/scripts/truck/truck_kit.gd, truck_node.gd, strip_fit.gd; truck/kit/*, sockets/*, stack_fit.json; tests/test_cab_swap_t240.gd; tools/capture_t240.sh; docs/capturas_t240/.
 - Validação: suíte 564/564; REPORT_ENCAIXE 5196/5196; build_sockets 56 caminhões sem problemas; gen_stack_fit OK; --quit-after sem erro; capturas conferidas. APK: +7,3 MB (.scn) +1,4 MB JSON.
 - Decisão pendente: nenhuma bloqueante (Marco confere: vão cabine-carroceria com JAC/curta; HAYATE nos baús antigos; tamanho do foguete).
+
+## 2026-10-27 · T-240 (especialista) · concluída
+- Cabine trocável: kits de cabine e carroceria montados em jogo (TruckKit), 6 cabines nos 5 caminhões de homenagem + cabines HAYATE nos baús leve/médio/longo/graneleira; compra monta a cabine de fábrica; rivais com cabine de fábrica. +7,3 MB. Protocolo 20, 564 testes, encaixe 5196/5196.
+- Foguetes até 1,35× (0,15×0,16 → 0,20×0,21 m).
+- Revisão do coordenador: com JAC/curta aparece a parede da frente do baú e um vão de chassi; a diferença dos foguetes é pequena nas folhas (max_scale ajustável). Pasta D:\DEV\dekotora-legends\t240_antes só pode ser apagada com aprovação do Marco.
+- Delegado: T-250 (APK). T-242 começa agora.
