@@ -71,12 +71,12 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 
 | Caminhão | Para-choques OK | Escala | Foguetes OK | Faixa / comprimento do foguete | Contornos OK | Contorno (m: dir/esq/teto) | Falhas |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| alubox_americana | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| alubox_chata | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| alubox_curta | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| alubox_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| alubox_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| alubox_jac | 11/11 | 1.03 | 7/7 | 0.34 / 8.09 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
+| alubox_americana | 11/11 | 1.03 | 7/7 | 0.34 / 8.19 m | 3/3 | 20.8/20.8/21.3 | nenhuma |
+| alubox_chata | 11/11 | 1.03 | 7/7 | 0.34 / 8.24 m | 3/3 | 20.9/20.9/21.4 | nenhuma |
+| alubox_curta | 11/11 | 1.03 | 7/7 | 0.34 / 9.29 m | 3/3 | 23.0/23.0/23.6 | nenhuma |
+| alubox_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 8.24 m | 3/3 | 20.9/20.9/21.4 | nenhuma |
+| alubox_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 8.24 m | 3/3 | 20.9/20.9/21.4 | nenhuma |
+| alubox_jac | 11/11 | 1.03 | 7/7 | 0.34 / 9.19 m | 3/3 | 22.9/22.9/23.4 | nenhuma |
 | base_americana | 11/11 | 1.08 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.5 | nenhuma |
 | base_chata | 11/11 | 1.08 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.5 | nenhuma |
 | base_curta | 11/11 | 1.08 | 7/7 | 0.34 / 8.94 m | 3/3 | 23.0/23.0/23.9 | nenhuma |
@@ -97,24 +97,24 @@ Regras: `game/scripts/truck/part_fit.gd`; encaixes e zonas: `game/assets/vehicle
 | graneleira_flat_quad | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
 | graneleira_flat_wide | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
 | graneleira_jac | 11/11 | 1.00 | só baú fechado | — | só baú fechado | — | nenhuma |
-| leve_americana | 11/11 | 1.03 | 7/7 | 0.34 / 5.09 m | 3/3 | 13.4/13.4/15.4 | nenhuma |
-| leve_chata | 11/11 | 1.03 | 7/7 | 0.34 / 5.19 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
+| leve_americana | 11/11 | 1.03 | 7/7 | 0.34 / 4.89 m | 3/3 | 13.4/13.4/15.4 | nenhuma |
+| leve_chata | 11/11 | 1.03 | 7/7 | 0.34 / 4.94 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
 | leve_curta | 11/11 | 1.03 | 7/7 | 0.34 / 6.09 m | 3/3 | 15.6/15.6/17.9 | nenhuma |
-| leve_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 5.19 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
-| leve_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 5.19 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
+| leve_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 4.94 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
+| leve_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 4.94 m | 3/3 | 13.9/13.9/15.5 | nenhuma |
 | leve_jac | 11/11 | 1.03 | 7/7 | 0.34 / 5.59 m | 3/3 | 15.3/15.3/16.8 | nenhuma |
-| longo_americana | 11/11 | 1.03 | 7/7 | 0.34 / 9.49 m | 3/3 | 22.0/22.0/24.2 | nenhuma |
-| longo_chata | 11/11 | 1.03 | 7/7 | 0.34 / 9.59 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
+| longo_americana | 11/11 | 1.03 | 7/7 | 0.34 / 9.29 m | 3/3 | 22.0/22.0/24.2 | nenhuma |
+| longo_chata | 11/11 | 1.03 | 7/7 | 0.34 / 9.34 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
 | longo_curta | 11/11 | 1.03 | 7/7 | 0.34 / 10.49 m | 3/3 | 24.3/24.3/26.7 | nenhuma |
-| longo_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 9.59 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
-| longo_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 9.59 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
+| longo_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 9.34 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
+| longo_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 9.34 m | 3/3 | 22.0/22.0/24.3 | nenhuma |
 | longo_jac | 11/11 | 1.03 | 7/7 | 0.34 / 9.99 m | 3/3 | 23.3/23.3/25.6 | nenhuma |
 | pinkbox_americana | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
 | pinkbox_chata | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| pinkbox_curta | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
+| pinkbox_curta | 11/11 | 1.03 | 7/7 | 0.34 / 8.69 m | 3/3 | 22.7/22.7/23.2 | nenhuma |
 | pinkbox_flat_quad | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
 | pinkbox_flat_wide | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
-| pinkbox_jac | 11/11 | 1.03 | 7/7 | 0.34 / 7.74 m | 3/3 | 20.6/20.6/21.1 | nenhuma |
+| pinkbox_jac | 11/11 | 1.03 | 7/7 | 0.34 / 8.59 m | 3/3 | 22.5/22.5/23.0 | nenhuma |
 | tanker_americana | 11/11 | 0.97 | só baú fechado | — | só baú fechado | — | nenhuma |
 | tanker_chata | 11/11 | 0.97 | só baú fechado | — | só baú fechado | — | nenhuma |
 | tanker_curta | 11/11 | 0.97 | só baú fechado | — | só baú fechado | — | nenhuma |
@@ -137,12 +137,12 @@ placa), topo a 0,93 m (abaixo das setas). Foguete e contorno: faixas medidas por
 
 | Caminhão | Murais OK | Lateral (m) | Traseiras OK | Traseira (m) | Tetos OK | Teto (m) | Falhas |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| alubox_americana | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
-| alubox_chata | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
-| alubox_curta | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
-| alubox_flat_quad | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
-| alubox_flat_wide | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
-| alubox_jac | 12/12 | 8.07 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.07 | nenhuma |
+| alubox_americana | 12/12 | 8.15 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.18 | nenhuma |
+| alubox_chata | 12/12 | 8.20 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.20 | nenhuma |
+| alubox_curta | 12/12 | 9.28 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 9.28 | nenhuma |
+| alubox_flat_quad | 12/12 | 8.20 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.20 | nenhuma |
+| alubox_flat_wide | 12/12 | 8.20 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.20 | nenhuma |
+| alubox_jac | 12/12 | 9.18 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 9.20 | nenhuma |
 | base_americana | 12/12 | 8.13 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 8.15 | nenhuma |
 | base_chata | 12/12 | 8.13 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 8.15 | nenhuma |
 | base_curta | 12/12 | 9.40 × 1.98 | 12/12 | 2.40 × 1.90 | 9/9 | 2.42 × 9.38 | nenhuma |
@@ -177,10 +177,10 @@ placa), topo a 0,93 m (abaixo das setas). Foguete e contorno: faixas medidas por
 | longo_jac | 12/12 | 9.85 × 1.70 | 12/12 | 2.27 × 1.88 | 9/9 | 2.38 × 10.25 | nenhuma |
 | pinkbox_americana | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
 | pinkbox_chata | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
-| pinkbox_curta | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
+| pinkbox_curta | 12/12 | 9.00 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 9.03 | nenhuma |
 | pinkbox_flat_quad | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
 | pinkbox_flat_wide | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
-| pinkbox_jac | 12/12 | 7.90 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.00 | nenhuma |
+| pinkbox_jac | 12/12 | 8.82 × 2.23 | 12/12 | 2.27 × 2.13 | 9/9 | 2.38 × 8.93 | nenhuma |
 | tanker_americana | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
 | tanker_chata | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
 | tanker_curta | só baú fechado | — | só baú fechado | — | só baú fechado | — | nenhuma |
@@ -203,12 +203,12 @@ de `rear_doors`). Conferido por `PaintFit.problems`.
 
 | Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| alubox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.52 + 1.48 | nenhuma |
-| alubox_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
-| alubox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
-| alubox_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
-| alubox_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
-| alubox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
+| alubox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.62 + 1.48 | nenhuma |
+| alubox_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
+| alubox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.71 + 1.48 | nenhuma |
+| alubox_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
+| alubox_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
+| alubox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.62 + 1.48 | nenhuma |
 | base_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.75 + 1.48 | nenhuma |
@@ -217,12 +217,12 @@ de `rear_doors`). Conferido por `PaintFit.problems`.
 | base_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.48 | nenhuma |
 | canter | 11/11 | 0.37 m / ×0.92 | 6/6 | 3/3 | 8/8 | 2.74 | nenhuma |
 | carreta (guardada) | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | — | — | nenhuma |
-| dump_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.71 + 0.78 + 1.78 | nenhuma |
+| dump_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.68 + 0.78 + 1.78 | nenhuma |
 | dump_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
-| dump_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| dump_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 0.78 + 1.78 + 0.83 + 1.83 | nenhuma |
 | dump_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
 | dump_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
-| dump_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| dump_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 0.69 + 1.78 + 0.83 + 1.83 | nenhuma |
 | graneleira_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.46 + 1.48 | nenhuma |
 | graneleira_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.44 + 1.48 | nenhuma |
 | graneleira_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.61 + 1.48 | nenhuma |
@@ -243,22 +243,22 @@ de `rear_doors`). Conferido por `PaintFit.problems`.
 | longo_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.58 | nenhuma |
 | pinkbox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
-| pinkbox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| pinkbox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.48 + 1.48 | nenhuma |
 | pinkbox_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
-| pinkbox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
-| tanker_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.51 + 1.58 | nenhuma |
-| tanker_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
-| tanker_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
-| tanker_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
-| tanker_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
-| tanker_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
+| pinkbox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.38 + 1.48 | nenhuma |
+| tanker_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
+| tanker_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.59 + 1.58 | nenhuma |
+| tanker_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.50 + 1.58 | nenhuma |
 | tarp_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.53 | nenhuma |
 | tarp_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
-| tarp_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
+| tarp_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.53 + 1.48 | nenhuma |
 | tarp_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
 | tarp_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
-| tarp_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
+| tarp_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.43 + 1.48 | nenhuma |
 
 Lote 4: **1468 de 1468** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do
 nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a faixa do meio estica/encolhe (coluna

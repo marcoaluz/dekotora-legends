@@ -19,8 +19,8 @@ const OLD_BODIES: Array[String] = ["base", "leve", "longo", "graneleira"]
 ## Cabines que so existem em kit (T-218, HAYATE).
 const NEW_CABS: Array[String] = ["flat_wide", "flat_quad"]
 
-static var _merged: Dictionary = {}
-static var _meta: Dictionary = {}            # "body_x"/"cab_x" -> medidas do kit (kit/<nome>.json)          # "<modelo>_<cabine>[_lodN]/<no>" -> ArrayMesh (ou null = nao junta)
+static var _merged: Dictionary = {}          # "<modelo>_<cabine>[_lodN]/<no>" -> ArrayMesh (ou null = nao junta)
+static var _meta: Dictionary = {}            # "body_x"/"cab_x" -> medidas do kit (kit/<nome>.json)
 
 
 ## Esta combinacao e montada pelo kit?
