@@ -640,3 +640,8 @@ Formato em `docs/AGENTES.md`.
 - Armadilhas: (1) os .glb juntam todas as lâmpadas de um material numa malha só: separar em peças ligadas (`LampMesh.pieces`, por índice e posição); (2) os LODs entram depois no `_ready`: tirar as luzes da porta DEPOIS de `_attach_lods`; (3) vários nós com o mesmo nome no mesmo pai são renomeados: marcar com meta, não por nome; (4) `[x]` literal não é `Array[Tipo]`: montar o array tipado antes de passar.
 - Decisão pendente: nenhuma de design (para o Marco conferir: o que conta como "luz" no freio, luzes de dia acendendo ao frear, a lanterna de fábrica nova dos baús base/leve/longo, a seta do para-choque traseiro novo piscando na lanterna vermelha mais de fora em vez de uma lente âmbar própria).
 
+
+## 2026-10-26 · T-239 (especialista) · concluída
+- Freio: todas as luzes decorativas vermelhas e fixas (liga 15% do pedal, desliga < 5%); setas = cópia acesa da lâmpada + halo âmbar, no lugar certo com e sem para-choque novo; luzes da porta traseira removidas em jogo (inclusive LODs); baús sem lanterna ganharam lanterna de fábrica que some com o para-choque novo. Protocolo 19 (bit de freio no snapshot). 553 testes, net_test ok.
+- Revisão do coordenador: folha depois_base_chata_noite mostra freio vermelho claro; seta pequena nas miniaturas.
+- Delegado: T-247 (skill + STATUS), T-248 (APK). T-246 começa agora.
