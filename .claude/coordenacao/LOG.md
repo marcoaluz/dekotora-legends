@@ -627,3 +627,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 546/546 (12 novos); capturas PC 1920x1080 e celular 2400x1080, dia/noite, frente/trás/esq/dir conferidas. Celular de verdade não testado.
 - Armadilhas: (1) a câmera de perseguição usa a própria posição do quadro anterior (lerp) — sem `restore_base` ela partiria da pose do olhar; (2) `clamp_point` empurra para o lado quem está sobre o baú mesmo lá no alto — passar `me` com comprimento 0 quando a altura > BODY_TOP_H; (3) o commit de docs da T-233 (4984c1e) levou junto meu texto de DECISOES/STATUS/ROADMAP (conteúdo certo).
 - Decisão pendente: Marco confirmar as 3 vistas, as teclas (X/Q/E) e o lugar do botão do olho.
+
+## 2026-10-26 · T-241, T-243 a T-245 (resumo do coordenador)
+- T-241 (especialista): olhar trás/esq/dir (X/Q/E, analógico direito, RB/R3, botão do olho no celular), só câmera; 546 testes. Revisão: retângulo cinza no para-brisa visto de frente → T-246.
+- T-243/T-245 (ajudante): skills dos lotes T-233 e T-241; folha 4x4 da T-241.
+- T-244 (ajudante): APK 165 MB protocolo 18 exportado de `git archive` do commit 1276aa1 para não levar a T-239 pela metade; FPS PC noite 127–152 com o chefe (ruído; sem A/B exato).
