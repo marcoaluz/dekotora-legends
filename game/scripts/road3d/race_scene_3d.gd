@@ -887,7 +887,19 @@ func _snap_camera() -> void:
 	_cam.look_at(c[1], Vector3.UP)
 
 
+## T-241: the race camera, then "look back / left / right" over it while the button is held (local only).
 func _update_camera(dt: float) -> void:
+	_camv.restore_base(_cam)
+	_update_camera_base(dt)
+	var t: TruckSim = sim.trucks[player]
+	var allowed: bool = _countdown <= 0.0 and not _result_shown and _demo.cam_mode == "" and not _cinema.active()
+	var me: Vector2 = _drawn[player] if _drawn.size() > player else Vector2(_player_z(), _player_x())
+	_camv.apply_look(dt, _cam, input.look_dir() if input != null else RaceLook.Dir.NONE, allowed,
+			Vector3(me.x, me.y * Track.ROAD_HALF_WIDTH_M, t.length),
+			_shake * _feel.feel.impact_shake_m * _feel.shake_scale(), _feel.feel.cam_follow_rate)
+
+
+func _update_camera_base(dt: float) -> void:
 	var t: TruckSim = sim.trucks[player]
 	var racing: bool = _countdown <= 0.0 and not _result_shown
 	var ext: bool = _demo.cam_mode != "" or _cinema.active()

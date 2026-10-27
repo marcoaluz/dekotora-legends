@@ -11,6 +11,7 @@ var touch_throttle: float = 0.0
 var touch_brake: float = 0.0
 var touch_passing: bool = false
 var touch_horn: bool = false
+var touch_look: int = 0                 # T-241: RaceLook.Dir from the touch eye button (camera only, not a command)
 const MIN_HOLD_MS: int = 70             # um toque curto dura ao menos 2 passos da simulacao (30/s)
 var _latch_dir: int = 0
 var _latch_until: int = 0
@@ -35,3 +36,14 @@ func poll() -> Commands:
 	var passing: bool = Input.is_action_pressed("passing") or touch_passing
 	var horn: bool = touch_horn or (InputMap.has_action("horn") and Input.is_action_pressed("horn"))
 	return Commands.make(steer, throttle, brake, passing, horn)
+
+
+## T-241: where the player wants to look (RaceLook.Dir). Not part of Commands: only the local camera uses it.
+## Keyboard Q / E / X, controller right stick (left / right / down) + R3 / RB, touch eye button.
+func look_dir() -> int:
+	if touch_look != 0:
+		return touch_look
+	if not InputMap.has_action("look_back"):
+		return 0
+	return RaceLook.resolve(Input.get_action_strength("look_back"), Input.get_action_strength("look_left"),
+			Input.get_action_strength("look_right"))
