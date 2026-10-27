@@ -264,9 +264,9 @@ def previews(built, co, lights):
             set_night(lights, night)
             path = os.path.abspath(os.path.join(OUT, "previews", f"t233_{pid}_{tag}.png"))
             if kind == "front":
-                shoot(co, ctr, 210, 14, 4.6, path)              # de frente, 3/4 pela esquerda, baixa
+                shoot(co, ctr, 330, 14, 4.6, path)              # de frente, 3/4 pela esquerda, baixa
             elif kind == "mirror":
-                shoot(co, ctr, 150, 18, 2.4, path)
+                shoot(co, ctr, 40, 18, 2.4, path)
             elif kind == "ladder":
                 shoot(co, ctr, 60, 10, 3.6, path)
             else:

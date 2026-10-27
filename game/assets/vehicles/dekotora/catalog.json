@@ -6588,6 +6588,1968 @@
           }
         ]
       }
+    },
+    {
+      "id": "fb_fan_plate",
+      "name": "Leque baixo com placa",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_plate.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.42,
+        "z": 0.463
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.42,
+          -0.463
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 720,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_plate_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "044-045",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 512,
+        "MID": 60,
+        "BOT": 32,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.2,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_fan_amber",
+      "name": "Leque com caixas âmbar",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_amber.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.44,
+        "z": 0.463
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.44,
+          -0.463
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 1200,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_amber_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "046-047",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 80,
+        "MID": 60,
+        "BOT": 32,
+        "CEN": 1028,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.22,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_fan_red",
+      "name": "Leque de luz vermelha",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_red.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.388,
+        "y": 0.42,
+        "z": 0.403
+      },
+      "bounds_godot": [
+        [
+          -1.194,
+          -0.42,
+          -0.403
+        ],
+        [
+          1.194,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 1164,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_tail"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_red_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "048",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 980,
+        "MID": 36,
+        "BOT": 32,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.2,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_fan_gold",
+      "name": "Leque de caixas douradas",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_gold.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.44,
+        "z": 0.463
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.44,
+          -0.463
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 960,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_gold_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "049-050",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 80,
+        "MID": 60,
+        "BOT": 32,
+        "CEN": 788,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.22,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_fan_stripe",
+      "name": "Leque de faixas rosa",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_stripe.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.42,
+        "z": 0.463
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.42,
+          -0.463
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 672,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "paint_pink"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_stripe_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "051, 053",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 368,
+        "MID": 156,
+        "BOT": 32,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.2,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_fan_chrome",
+      "name": "Leque cromado",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_fan_chrome.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.44,
+        "z": 0.513
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.44,
+          -0.513
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 804,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_fan_chrome_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "052",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 512,
+        "MID": 60,
+        "BOT": 44,
+        "CEN": 188,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.13,
+        "mid": 0.22,
+        "bot": 0.09
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_box_amber",
+      "name": "Caixa alta âmbar",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_box_amber.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.58,
+        "z": 0.483
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.58,
+          -0.483
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 552,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_box_amber_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "054-055",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 344,
+        "MID": 48,
+        "BOT": 32,
+        "CEN": 128,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.16,
+        "mid": 0.3,
+        "bot": 0.12
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_box_steps",
+      "name": "Caixa alta com degraus",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_box_steps.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.58,
+        "z": 0.555
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.58,
+          -0.555
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 992,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim",
+        "lamp_amber"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_box_steps_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "056-057",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 608,
+        "MID": 60,
+        "BOT": 208,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.14,
+        "mid": 0.3,
+        "bot": 0.14
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_smooth_chrome",
+      "name": "Cromado liso",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_smooth_chrome.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.52,
+        "z": 0.383
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.52,
+          -0.383
+        ],
+        [
+          1.264,
+          0.0,
+          -0.0
+        ]
+      ],
+      "triangles": 276,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_smooth_chrome_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "058",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 80,
+        "MID": 48,
+        "BOT": 32,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.14,
+        "mid": 0.26,
+        "bot": 0.12
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_deck_checker",
+      "name": "Deque de chapa xadrez",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_deck_checker.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.492,
+        "z": 0.503
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.48,
+          -0.503
+        ],
+        [
+          1.264,
+          0.012,
+          -0.0
+        ]
+      ],
+      "triangles": 452,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_checker",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_deck_checker_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "prata_marinho",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "059-060",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 100,
+        "MID": 84,
+        "BOT": 32,
+        "CEN": 236,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.14,
+        "mid": 0.24,
+        "bot": 0.1
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "fb_deck_neon",
+      "name": "Deque xadrez com neon largo",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/front_t233/fb_deck_neon.glb",
+      "mount_point": "SOCKET_front_bumper",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": {
+        "x": 2.528,
+        "y": 0.512,
+        "z": 0.503
+      },
+      "bounds_godot": [
+        [
+          -1.264,
+          -0.5,
+          -0.503
+        ],
+        [
+          1.264,
+          0.012,
+          -0.0
+        ]
+      ],
+      "triangles": 368,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_checker",
+        "deco_neon",
+        "deco_plate",
+        "deco_signal",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_fb_deck_neon_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "front_bumper",
+      "fit": "bumper",
+      "nominal_w": 2.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "061-062",
+      "pods": 0,
+      "stack": null,
+      "module_tris": {
+        "TOP": 100,
+        "MID": 108,
+        "BOT": 44,
+        "CEN": 116,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "top": 0.14,
+        "mid": 0.26,
+        "bot": 0.1
+      },
+      "broken_tilt": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "mirror_stay_l",
+      "name": "Haste em L",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_l.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.46,
+        "y": 0.677,
+        "z": 0.385
+      },
+      "bounds_godot": [
+        [
+          0.001,
+          0.06,
+          -0.335
+        ],
+        [
+          0.461,
+          0.737,
+          0.05
+        ]
+      ],
+      "triangles": 512,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_l_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "105",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_truss",
+      "name": "Haste treliçada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_truss.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.46,
+        "y": 0.696,
+        "z": 0.385
+      },
+      "bounds_godot": [
+        [
+          0.001,
+          0.046,
+          -0.335
+        ],
+        [
+          0.461,
+          0.741,
+          0.05
+        ]
+      ],
+      "triangles": 1104,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_truss_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "106",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_frame",
+      "name": "Moldura retangular",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_frame.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.48,
+        "y": 0.751,
+        "z": 0.492
+      },
+      "bounds_godot": [
+        [
+          0.001,
+          0.02,
+          -0.442
+        ],
+        [
+          0.481,
+          0.771,
+          0.05
+        ]
+      ],
+      "triangles": 544,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_frame_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "107",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_box",
+      "name": "Moldura grossa",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_box.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.491,
+        "y": 0.751,
+        "z": 0.485
+      },
+      "bounds_godot": [
+        [
+          -0.005,
+          0.02,
+          -0.435
+        ],
+        [
+          0.485,
+          0.771,
+          0.05
+        ]
+      ],
+      "triangles": 464,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_box_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "108",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_chain",
+      "name": "Treliça vazada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_chain.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.447,
+        "y": 0.751,
+        "z": 0.499
+      },
+      "bounds_godot": [
+        [
+          0.001,
+          0.02,
+          -0.449
+        ],
+        [
+          0.448,
+          0.771,
+          0.05
+        ]
+      ],
+      "triangles": 1680,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_chain_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "109",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_grand",
+      "name": "Moldura gigante",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_grand.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.484,
+        "y": 0.843,
+        "z": 0.625
+      },
+      "bounds_godot": [
+        [
+          0.001,
+          0.006,
+          -0.575
+        ],
+        [
+          0.485,
+          0.85,
+          0.05
+        ]
+      ],
+      "triangles": 1984,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_grand_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "110",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "vfit": {
+        "nominal_h": 0.85
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "ladder_neon",
+      "name": "Escada de neon",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_neon.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.131,
+        "y": 0.63,
+        "z": 0.32
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          0.0,
+          -0.16
+        ],
+        [
+          0.131,
+          0.63,
+          0.16
+        ]
+      ],
+      "triangles": 1336,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_neon_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "111",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 180,
+        "MID": 44,
+        "BOT": 180,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "stretch": {
+        "head": 0.15,
+        "mid": 0.3,
+        "tail": 0.18
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "ladder_green",
+      "name": "Escada de luzes verdes",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_green.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.134,
+        "y": 0.63,
+        "z": 0.305
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          0.0,
+          -0.153
+        ],
+        [
+          0.134,
+          0.63,
+          0.153
+        ]
+      ],
+      "triangles": 2188,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_green_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.3,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "112",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 184,
+        "MID": 114,
+        "BOT": 112,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "stretch": {
+        "head": 0.15,
+        "mid": 0.3,
+        "tail": 0.18
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "ladder_chrome",
+      "name": "Escada cromada",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_chrome.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.148,
+        "y": 0.649,
+        "z": 0.29
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.01,
+          -0.145
+        ],
+        [
+          0.148,
+          0.639,
+          0.145
+        ]
+      ],
+      "triangles": 2592,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_chrome_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "113",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 204,
+        "MID": 132,
+        "BOT": 168,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0
+      },
+      "stretch": {
+        "head": 0.15,
+        "mid": 0.3,
+        "tail": 0.18
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "skirt_chrome_rails",
+      "name": "Trilhos cromados",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_chrome_rails.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.06,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.06,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.0,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 2616,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_chrome_rails_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "086-087",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 108,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 56,
+        "TAIL": 56
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_twin",
+      "name": "Neon de 2 linhas",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_twin.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.0,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 1392,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_twin_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "088",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 32,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_diamond",
+      "name": "Corrente de losangos",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_diamond.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.057,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.002,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 1608,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_diamond_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "089",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 44,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_dash",
+      "name": "Neon tracejado duplo",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_dash.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.0,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 2364,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_dash_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "090",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 86,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_arch",
+      "name": "Neon com arco da roda",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_arch.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.061,
+        "y": 0.38,
+        "z": 0.9
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.9
+        ],
+        [
+          0.006,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 2400,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_arch_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "091",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 32,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 152,
+        "TAIL": 152
+      },
+      "stretch": {
+        "head": 0.2,
+        "mid": 0.5,
+        "tail": 0.2
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_green",
+      "name": "Traços verdes e ciano",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_green.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.055,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.0,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 2112,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_green_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "092",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 72,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_gems",
+      "name": "Pedras de luz",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_gems.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.061,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.006,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 3192,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_gems_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "093",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 132,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "skirt_neon_arrows",
+      "name": "Setas duplas",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_arrows.glb",
+      "mount_point": "SOCKET_side_skirts_r",
+      "mount_point_left": "SOCKET_side_skirts_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.057,
+        "y": 0.38,
+        "z": 0.6
+      },
+      "bounds_godot": [
+        [
+          -0.055,
+          -0.379,
+          -0.6
+        ],
+        [
+          0.002,
+          0.001,
+          -0.0
+        ]
+      ],
+      "triangles": 3696,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_arrows_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "side_skirts_r",
+      "fit": "runs",
+      "nominal_w": 0.055,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "094",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "side_skirts_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 160,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 68,
+        "TAIL": 68
+      },
+      "stretch": {
+        "head": 0.05,
+        "mid": 0.5,
+        "tail": 0.05
+      },
+      "broken_tilt": [
+        0.0,
+        3.0
+      ]
     }
   ]
 }

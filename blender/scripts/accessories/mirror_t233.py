@@ -72,9 +72,9 @@ def mirror_stay_box(m):
 
 def mirror_stay_chain(m):
     top, low = HN * 0.86, 0.06
-    xo, yf = HX + 0.10, 0.42
-    segs = Q.chain((0.03, 0.0, top), (xo, yf, top), 0.06, 7, (0.0, 0.0, 1.0))
-    segs += Q.chain((xo, yf, top), (xo, yf, low), 0.06, 6, (0.7, -0.7, 0.0))
+    xo, yf = HX + 0.06, 0.42
+    segs = Q.chain((0.03, 0.0, top), (xo, yf, top), 0.05, 7, (0.0, 0.0, 1.0))
+    segs += Q.chain((xo, yf, top), (xo, yf, low), 0.05, 6, (0.7, -0.7, 0.0))
     segs += Q.path([(0.03, 0.0, low), (xo, yf, low)])
     segs += [((xo, yf, HZ), (HX + 0.02, HY - 0.02, HZ))]
     return [Q.tubes("chain", segs, R * 0.6, m["chrome"], seg=6)] + _mounts(m, (0.06, HN * 0.86)) + \
