@@ -650,3 +650,26 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - `catalog.json` (`game/assets/vehicles/dekotora/catalog.json`) é gravado pelo `tools/gen_t232_data.py` com `indent=2`.
 - Protocolo de rede 17 (`game/scripts/net/protocol.gd`): pinturas no descritor (`mural`, `rear_paint`, `roof_paint`) e
   bots/rivais com pinturas sorteadas pela semente. Cliente antigo não entra.
+
+## Oficina lote 4 (T-233)
+
+- Comandos (raiz do projeto):
+  - Build das peças: `blender -b --factory-startup -P blender/scripts/build_t233_parts.py -- [--only id1,id2] [--no-preview]` (ver a parte do Blender).
+  - Captura: `bash tools/capture_t233.sh [PASTA_ABS]` (padrão: `docs/capturas_t233`).
+  - Sonda de uma peça: `godot --headless --path game -s res://tools_dev/probe_t233.gd -- --part=ID` (ex.: `--part=fb_fan_plate`).
+  - Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=t233` (roda `game/tests/test_parts_t233.gd`).
+- Armadilha 1 (nomes): o Blender renomeia empties repetidos (`SIGNAL_L.006` vira o nó `SIGNAL_L_006` no Godot).
+  Procure com curinga: `find_child("SIGNAL_L*", true, false)` (é o que `FrameFit` faz em `frame_fit.gd`).
+- Armadilha 2 (fila do `queue_free`): `find_child` ainda acha uma peça que já está na fila do `queue_free` no mesmo quadro.
+  Tire o nó do pai (`remove_child`) antes de chamar `queue_free`. Exemplo: `apply_decals`/peças em `truck_node.gd`,
+  bloco marcado `T-233`.
+- Encaixes por `fit` (`game/scripts/truck/frame_fit.gd`, `class_name FrameFit`, `FITS = ["bumper", "stay", "ladder", "runs"]`):
+  - `bumper` (para-choque da frente): escala uniforme pela largura da cabine; `TOP_` fica no topo (embaixo do farol), `BOT_` acompanha o fundo, `CEN_` no meio.
+    A seta vai para os pontos `SIGNAL_L/R` (lista vazia = sem seta).
+  - `stay` (haste do retrovisor): largura pela cabine, altura pelo vidro de cada cabine.
+  - `ladder` (escada): o degrau `MID_` se repete até o topo do baú; `TOP_` vai para o fim.
+  - `runs` (saia): um pedaço (`HEAD_` + `MID_` repetido + `TAIL_`) em cada trecho livre medido embaixo do baú.
+- Espelho de fábrica: `FrameFit.stock_boxes` lê o `hide` do encaixe `mirror_stay_L/R`; quando há haste de retrovisor da oficina,
+  os triângulos do espelho de fábrica que caem nessa caixa somem (cache em `_hidden_cache`).
+- Protocolo de rede 18 (`game/scripts/net/protocol.gd`): para-choque/saia/retrovisor no descritor e bots com essas peças sorteadas
+  pela semente (descritor e massa mudaram). Cliente antigo não entra.

@@ -286,3 +286,15 @@ um problema visual não puder ser entendido pelos renders.
   (VRAM + mipmaps).
 - `--batch` do Godot separa os argumentos por espaço: por isso os prints crus ficam em `blender/renders/t232/shots`
   (caminho sem espaço). Não use pasta com espaço nesse caminho.
+
+## Oficina lote 4 (T-233)
+
+- Script: `blender/scripts/build_t233_parts.py` (para-choques da frente, retrovisores, escadas e saias). Kit: `accessories/front_t233.py`,
+  `accessories/mirror_t233.py`, `accessories/ladder_t233.py`, `accessories/skirt_t233.py`. Rodar na raiz do projeto:
+  `blender -b --factory-startup -P blender/scripts/build_t233_parts.py -- [--only id1,id2] [--no-preview]`
+- Saída: `accessories/front_t233/<id>.glb` (grupos `TOP_`/`MID_`/`BOT_`/`CEN_` + pontos `SIGNAL_L`/`SIGNAL_R`; o jogo ajusta a altura).
+- Armadilha 1 (nomes): o Blender renomeia empties repetidos (`SIGNAL_L.006` vira o nó `SIGNAL_L_006` no Godot).
+  Quem procura esses pontos no jogo tem que usar curinga (`SIGNAL_L*`). Ver a parte do Godot.
+- Armadilha 3 (tanque): o tanque de combustível de fábrica sai ~0,1 m para fora do baú. Por isso as saias
+  (`skirt_t233.py`) só entram nos trechos livres entre as rodas, medidos por raios, e deixam o tanque e a bateria de fora.
+  (Esse número de 0,1 m não está escrito nos docs; confirmar com o Marco ou medir antes de mexer nas saias.)
