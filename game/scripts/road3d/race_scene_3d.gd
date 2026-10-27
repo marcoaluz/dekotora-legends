@@ -509,7 +509,10 @@ func _spawn_field() -> void:
 		t.is_bot = i != 0
 		var node := TruckNode.new()
 		node.body_kind = String(gs.profile.get("body", "base")) if i == 0 else _bot_body(i, rival)
-		node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", "")) if i == 0 else RIVAL_CABS[i % RIVAL_CABS.size()]
+		if i == 0:
+			node.cab_kind = CabCatalog.normalize(gs.profile.get("cab", ""))
+		else:                                           # T-240: homenagem = cabine de fabrica (Trovao Rosa etc.)
+			node.cab_kind = BodyDef.default_cab(node.body_kind, RIVAL_CABS[i % RIVAL_CABS.size()])
 		node.chrome_mode = "day" if tod.day_amount > 0.5 else "night"
 		node.set_mural_glow(tod.mural_glow)                                   # T-155: mural aceso a noite
 		node.plates = _plates

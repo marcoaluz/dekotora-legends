@@ -4543,6 +4543,7 @@
         "TAIL": 116
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4611,6 +4612,7 @@
         "TAIL": 88
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4679,6 +4681,7 @@
         "TAIL": 124
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4747,6 +4750,7 @@
         "TAIL": 88
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4814,6 +4818,7 @@
         "TAIL": 44
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4882,6 +4887,7 @@
         "TAIL": 116
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0
@@ -4949,6 +4955,7 @@
         "TAIL": 60
       },
       "min_scale": 0.7,
+      "max_scale": 1.35,
       "broken_tilt": [
         0.0,
         5.0

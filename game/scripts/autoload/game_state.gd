@@ -308,6 +308,8 @@ func buy_body(id: String) -> bool:
 	profile["owned_bodies"][id] = true
 	if bd.default_paint != "":
 		profile["paint"] = bd.default_paint
+	if bd.factory_cab != "":                        # T-240: vem com a cabine de fabrica; depois troca na garagem
+		profile["cab"] = bd.factory_cab
 	profile["body"] = id
 	save_profile()
 	_act("buy_body", id)

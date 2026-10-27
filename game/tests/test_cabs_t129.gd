@@ -17,8 +17,7 @@ const TRIS_LIMIT: Dictionary = {"leve": 66000, "base": 78000, "longo": 92000}
 
 
 func _load(body: String, cab: String) -> Node3D:
-	var scene: PackedScene = load(TruckNode.model_path(body, cab)) as PackedScene
-	return scene.instantiate() as Node3D if scene != null else null
+	return TruckNode.instantiate_model(body, cab)          # T-240: .glb unico ou kit (cabines HAYATE)
 
 
 func _mount(m: Node3D, n: String) -> Node3D:
@@ -44,7 +43,7 @@ func _tris_and_materials(m: Node3D, tag: String) -> int:
 
 
 func test_catalog_ids_and_normalize() -> void:
-	check_eq(CabCatalog.IDS.size(), 4, "4 cabines de arquivo")
+	check_eq(CabCatalog.IDS.size(), 6, "4 cabines de arquivo + 2 HAYATE (T-240)")
 	check_eq(TruckNode.CABS, CabCatalog.IDS, "a garagem lista as cabines do catalogo")
 	check(CabCatalog.is_valid(CabCatalog.DEFAULT), "cabine padrao existe")
 	check_eq(CabCatalog.DEFAULT, "chata", "perfil novo comeca com a cara chata")
@@ -115,7 +114,7 @@ func test_removed_code_cabs_are_gone() -> void:
 		for cab in REMOVED:
 			check(not ResourceLoader.exists("res://assets/vehicles/dekotora/truck/dekotora_truck_%s_%s.glb" % [body, cab]), "sem %s_%s" % [body, cab])
 			check(not TruckNode.CABS.has(cab), "garagem nao lista %s" % cab)
-			check(ResourceLoader.exists(TruckNode.model_path(body, cab)), "id antigo %s ainda abre um modelo (%s)" % [cab, TruckNode.model_path(body, cab)])
+			check(TruckNode.model_exists(body, cab), "id antigo %s ainda abre um modelo (%s)" % [cab, TruckNode.model_path(body, cab)])
 	check(ResourceLoader.exists(TruckNode.MODEL_PATH), "modelo padrao (acessorios) existe")
 	check(ResourceLoader.exists(TruckNode.MODEL_PATHS["carreta"]), "carreta guardada ainda existe")
 
@@ -134,7 +133,7 @@ func test_old_profile_migrates() -> void:
 		check_eq(String(gs.profile["cab"]), CabCatalog.normalize(old), "perfil antigo com %s carrega com %s" % [old, CabCatalog.normalize(old)])
 		check_eq(int(gs.profile["rev"]), rev, "migrar nao muda rev (sincronizacao)")
 		check_eq(int(gs.profile["money"]), 50000, "resto do perfil intacto")
-		check(ResourceLoader.exists(TruckNode.model_path(String(gs.profile["body"]), String(gs.profile["cab"]))), "modelo do perfil migrado existe")
+		check(TruckNode.model_exists(String(gs.profile["body"]), String(gs.profile["cab"])), "modelo do perfil migrado existe")
 	gs.profile.erase("cab")                          # perfil de antes da escolha de cabine
 	gs.save_profile()
 	gs.profile = {}

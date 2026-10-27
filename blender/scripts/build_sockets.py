@@ -28,9 +28,26 @@ TRUCK_DIR = "game/assets/vehicles/dekotora/truck"
 OUT_DIR = TRUCK_DIR + "/sockets"
 # Iguais ao TruckNode do jogo (LENGTH_DELTA e extra_mounts): onde ficam os escapamentos altos.
 LENGTH_DELTA = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0}
-# Caminhões de homenagem (T-218): cabine fixa (igual a TruckNode.FIXED_CAB) e carrocerias abertas (sem baú fechado).
-FIXED = {"alubox": "flat_wide", "tarp": "flat_quad", "pinkbox": "flat_wide", "tanker": "flat_wide", "dump": "flat_quad"}
+# Carrocerias abertas (sem baú fechado; T-218: lona, tanque e caçamba).
 OPEN_BODIES = ("graneleira", "tarp", "tanker", "dump")
+# T-240: combinações montadas pelo jogo a partir de truck/kit/ (TruckKit): homenagens x todas as cabines e as cabines
+# HAYATE nos baús antigos. O nome é o "virtual" do jogo (dekotora_truck_<bau>_<cabine>); o arquivo não existe.
+KIT_DIR = TRUCK_DIR + "/kit"
+CABS = ("chata", "jac", "curta", "americana", "flat_wide", "flat_quad")
+KIT_COMBOS = [(b, c) for b in ("alubox", "tarp", "pinkbox", "tanker", "dump") for c in CABS] +     [(b, c) for b in ("base", "leve", "longo", "graneleira") for c in ("flat_wide", "flat_quad")]
+
+
+def kit_files(body: str, cab: str) -> list:
+    """Carroceria e cabine; a cabine anda junto com o comprimento do baú (leve/longo), como no TruckKit do jogo."""
+    return [os.path.join(KIT_DIR, f"body_{body}.glb"), (os.path.join(KIT_DIR, f"cab_{cab}.glb"), LENGTH_DELTA.get(body, 0.0))]
+
+
+def source_of(path: str):
+    """Caminho do .glb, ou [carroceria, cabine] do kit quando o nome é de uma combinação montada (T-240)."""
+    if os.path.exists(path):
+        return path
+    body, cab = parse_name(os.path.splitext(os.path.basename(path))[0])
+    return kit_files(body, cab)
 
 
 def parse_name(stem: str):
@@ -38,8 +55,6 @@ def parse_name(stem: str):
     rest = stem.replace("dekotora_truck_", "")
     if rest in ("canter", "carreta"):
         return rest, ("canter" if rest == "canter" else "carreta")
-    if rest in FIXED:
-        return rest, FIXED[rest]
     body, cab = rest.split("_", 1)
     return body, cab
 
@@ -49,6 +64,8 @@ def stacks(body: str, cab: str) -> list:
     p = (1.3, 8.3 + d, 0.9)
     if body == "canter":
         p = (1.25, 5.09, 0.75)
+    elif (body, cab) in KIT_COMBOS:
+        pass                                                     # T-240: kit = escapamentos no layout de sempre
     elif cab == "curta":
         p = (1.4, 9.47 + d, 0.9)
     elif cab == "jac":
@@ -60,7 +77,7 @@ def stacks(body: str, cab: str) -> list:
 def build_one(path: str) -> dict:
     stem = os.path.splitext(os.path.basename(path))[0]
     body, cab = parse_name(stem)
-    data = TM.import_truck(path)
+    data = TM.import_truck(source_of(path))
     m = TM.measure(data, body)
     m["open_body"] = body in OPEN_BODIES
     m["surf"] = TM.surfaces(m)                                  # T-214: teto e testa medidos por raios
@@ -151,7 +168,7 @@ def _mat(name, rgba):
 def preview(path: str, data: dict, out_dir: str) -> list:
     """Caminhão + caixas: frente 3/4 e lado. Azul = encaixe; vermelho = zona protegida."""
     from lib import preview as P
-    TM.import_truck(path)
+    TM.import_truck(source_of(path))
     blue, red = _mat("sock", (0.1, 0.5, 1.0, 0.35)), _mat("zone", (1.0, 0.1, 0.1, 0.30))
     objs = [o for o in bpy.data.objects if o.type == "MESH"]
     for k, v in data["sockets"].items():
@@ -175,7 +192,8 @@ def main():
     ap.add_argument("--only", default="", help="lista de modelos sem o prefixo, ex.: base_chata,canter")
     ap.add_argument("--preview", default="", help="pasta ABSOLUTA para as imagens de conferência")
     args = ap.parse_args(argv)
-    files = sorted(glob.glob(os.path.join(TRUCK_DIR, "dekotora_truck_*.glb")))
+    files = sorted(glob.glob(os.path.join(TRUCK_DIR, "dekotora_truck_*.glb")) +
+                   [os.path.join(TRUCK_DIR, f"dekotora_truck_{b}_{c}.glb") for b, c in KIT_COMBOS])
     if args.only:
         want = {"dekotora_truck_" + s for s in args.only.split(",")}
         files = [f for f in files if os.path.splitext(os.path.basename(f))[0] in want]

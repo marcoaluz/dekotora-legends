@@ -214,6 +214,8 @@
  "body.desc.dump": "Homenagem · basculante de inox · 15 t · granel",
  "cab.flat_wide": "Plana larga",
  "cab.flat_quad": "Plana de 4 faróis",
+ "cab.desc.flat_wide": "HAYATE dos anos 80: grade preta larga e faróis retangulares",
+ "cab.desc.flat_quad": "HAYATE dos anos 80: grade cromada e 4 faróis redondos",
  "garage.carries.tank": "Combustível e carga comum",
  "garage.body_price": "%s · Fama %d",
  "garage.body_need_fame": "Precisa de %d de Fama para comprar este modelo",

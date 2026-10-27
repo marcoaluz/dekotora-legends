@@ -4,8 +4,9 @@ extends RefCounted
 ## Os ids aparecem no perfil (`profile.cab`), no descritor de rede (`"cab"`) e no nome do .glb
 ## (`dekotora_truck_<bau>_<cabine>.glb`). Codigo puro: o servidor tambem usa (sem render).
 
-## Ordem da lista da garagem. A primeira e a padrao dos perfis novos.
-const IDS: Array[String] = ["chata", "jac", "curta", "americana"]
+## Ordem da lista da garagem. A primeira e a padrao dos perfis novos. T-240: + as 2 cabines HAYATE da T-218 (feitas por
+## codigo), que agora servem em todos os caminhoes grandes (montadas pelo TruckKit).
+const IDS: Array[String] = ["chata", "jac", "curta", "americana", "flat_wide", "flat_quad"]
 ## Cabine dos perfis novos e de qualquer id desconhecido: a "cara chata" (cab-over japonesa grande com
 ## dormitorio, a mais proxima do Dekotora classico).
 const DEFAULT: String = "chata"

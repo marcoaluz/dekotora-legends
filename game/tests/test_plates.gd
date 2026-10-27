@@ -87,7 +87,7 @@ func test_traffic_plates_vary_per_car_one_draw() -> void:
 func test_truck_plates_front_and_rear() -> void:
 	for cab in CabCatalog.IDS:
 		var node := Node3D.new()                           # como o TruckNode: o .glb e filho direto
-		var model: Node3D = (load(TruckNode.model_path("base", cab)) as PackedScene).instantiate() as Node3D
+		var model: Node3D = TruckNode.instantiate_model("base", cab)
 		node.add_child(model)
 		var s: Array = TruckPlateSpots.spots(node, model, cab)
 		var f: Vector3 = (s[0] as Transform3D).origin

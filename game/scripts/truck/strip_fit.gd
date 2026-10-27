@@ -3,7 +3,8 @@ extends RefCounted
 ## Pecas da oficina que seguem o tamanho do bau (T-231), montadas a partir de modulos do .glb:
 ##  - fit "stretch" (foguete): grupos HEAD_ (ponta de tras), MID_ (modulo do meio) e TAIL_ (ponta da frente); o modulo
 ##    do meio e repetido ate o comprimento medido do encaixe (`length`), sem deformar as pontas; a secao encolhe na
-##    largura da faixa livre do teto (`band`, minimo `min_scale`), nunca cresce;
+##    largura da faixa livre do teto (`band`, minimo `min_scale`) e cresce ate `max_scale` (T-240: 1,35, foguete maior)
+##    onde a faixa e larga;
 ##  - fit "strips" (contorno de LED): o modulo MID_ e repetido ao longo de cada trecho medido (`strips` do encaixe:
 ##    a, b, normal n, eixo da largura w), em coordenadas do modelo.
 ## Tudo vira UMA malha por material (poucas chamadas de desenho), feita uma vez na montagem.
@@ -39,7 +40,7 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 		var n: int = maxi(1, roundi(body / mid_len))
 		var sz: float = body / (n * mid_len)
 		var sc: float = clampf(float(s.get("band", entry.get("nominal_w", 1.0))) / float(entry.get("nominal_w", 1.0)),
-				float(entry.get("min_scale", 0.7)), 1.0)
+				float(entry.get("min_scale", 0.7)), float(entry.get("max_scale", 1.0)))
 		node.scale = Vector3(-sc if side == "L" else sc, sc, 1.0)
 		var mids: Array[Transform3D] = []
 		for k in n:

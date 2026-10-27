@@ -201,6 +201,7 @@ func _build_race(seed_: int) -> void:
 		t.is_bot = true
 		var desc: Dictionary = TruckConfig.bot_descriptor(seed_ + 13 * b)     # T-231: pecas da oficina sorteadas
 		desc["body"] = BodyDef.BOT_POOL[absi(seed_ + 7 * b) % BodyDef.BOT_POOL.size()]   # T-218: sorteio pela semente
+		desc["cab"] = BodyDef.default_cab(String(desc["body"]), String(desc.get("cab", CabCatalog.DEFAULT)))   # T-240
 		bot_loadouts[idx2] = desc
 		TruckConfig.apply(t, desc)
 		drivers[idx2] = BotDriver.new(clampi(b, 0, 2), seed_ + 10 + b, g2.y)

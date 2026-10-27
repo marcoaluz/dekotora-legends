@@ -1,6 +1,6 @@
 extends TestCase
-## Caminhoes de homenagem (T-218): os 5 .glb abrem com rodas, pontos de montagem e materiais nossos, tem 3 LODs, encaixes
-## medidos sem problema, cabine fixa; nenhum texto de marca real nos nomes; o mural do baú rosa e o proprio (com emissao);
+## Caminhoes de homenagem (T-218): os 5 abrem com rodas, pontos de montagem e materiais nossos, tem 3 LODs, encaixes
+## medidos sem problema; T-240: com QUALQUER cabine (kit cabine + carroceria); nenhum texto de marca real nos nomes; o mural do baú rosa e o proprio (com emissao);
 ## o tanque leva combustivel e so ele; compra na garagem (preco/Fama); rivais e bots podem receber os modelos novos.
 
 const IDS: Array[String] = ["alubox", "tarp", "pinkbox", "tanker", "dump"]
@@ -36,47 +36,54 @@ func test_models_lods_and_mounts() -> void:
 	for id in IDS:
 		var bd: BodyDef = BodyDef.find(id)
 		check(bd != null, "BodyDef %s existe" % id)
-		check(TruckNode.FIXED_CAB.has(id), "%s tem cabine fixa" % id)
-		var path: String = TruckNode.model_path(id, "chata")
-		check(path.ends_with("dekotora_truck_%s.glb" % id), "caminho do %s: %s" % [id, path])
-		var m: Node3D = (load(path) as PackedScene).instantiate() as Node3D
-		check(m.find_children("wheel_f_*", "Node3D", true, false).size() == 2, "%s: 2 rodas dianteiras" % id)
-		check(m.find_children("wheel_r_*", "Node3D", true, false).size() == 8, "%s: rodado duplo em 2 eixos" % id)
-		for n in MOUNTS:
-			check(m.find_child(n, true, false) != null, "%s: ponto de montagem %s" % [id, n])
-		var t0: int = _tris(m)
-		check(t0 > 20000 and t0 < 80000, "%s LOD0 com %d triangulos (limite 80 mil, como o baú medio)" % [id, t0])
-		for mi in m.find_children("*", "MeshInstance3D", true, false):
-			for s in (mi as MeshInstance3D).mesh.get_surface_count():
-				var mat: Material = (mi as MeshInstance3D).mesh.surface_get_material(s)
-				var mn: String = mat.resource_name if mat != null else ""
-				var ok: bool = false
-				for p in KNOWN_PREFIX:
-					ok = ok or mn.begins_with(p)
-				check(ok, "%s: material nosso (%s)" % [id, mn])
-		var prev: int = t0
-		for k in [1, 2]:
-			var lp: String = TruckNode.LOD_DIR + "dekotora_truck_%s_lod%d.glb" % [id, k]
-			check(ResourceLoader.exists(lp), "%s tem LOD%d" % [id, k])
-			if not ResourceLoader.exists(lp):
+		check(not TruckNode.FIXED_CAB.has(id), "%s: cabine trocavel (T-240)" % id)
+		check(bd.factory_cab in CabCatalog.IDS, "%s: cabine de fabrica %s existe" % [id, bd.factory_cab])
+		for cab in CabCatalog.IDS:
+			var tag: String = "%s_%s" % [id, cab]
+			var path: String = TruckNode.model_path(id, cab)
+			check(path.ends_with("dekotora_truck_%s.glb" % tag), "caminho do %s: %s" % [tag, path])
+			check(TruckKit.uses_kit(id, cab) and TruckNode.model_exists(id, cab), "%s: montado pelo kit" % tag)
+			var m: Node3D = TruckNode.instantiate_model(id, cab)
+			check(m != null, "abre %s" % tag)
+			if m == null:
 				continue
-			var lod: Node3D = (load(lp) as PackedScene).instantiate() as Node3D
-			var tk: int = _tris(lod)
-			check(tk < prev * 0.5, "%s LOD%d mais leve (%d < metade de %d)" % [id, k, tk, prev])
-			check(lod.find_children("wheel_*", "Node3D", true, false).is_empty(), "%s LOD%d sem nos wheel_* (nao gira)" % [id, k])
-			check(lod.find_children("MOUNT_*", "Node3D", true, false).is_empty(), "%s LOD%d sem pontos de montagem" % [id, k])
-			prev = tk
-			lod.free()
-		m.free()
+			check(m.find_children("wheel_f_*", "Node3D", true, false).size() == 2, "%s: 2 rodas dianteiras" % tag)
+			check(m.find_children("wheel_r_*", "Node3D", true, false).size() == 8, "%s: rodado duplo em 2 eixos" % tag)
+			for n in MOUNTS:
+				check(m.find_children(n, "Node3D", true, false).size() == 1, "%s: um ponto de montagem %s" % [tag, n])
+			var t0: int = _tris(m)
+			check(t0 > 20000 and t0 < 80000, "%s LOD0 com %d triangulos (limite 80 mil, como o baú medio)" % [tag, t0])
+			for mi in m.find_children("*", "MeshInstance3D", true, false):
+				for s in (mi as MeshInstance3D).mesh.get_surface_count():
+					var mat: Material = (mi as MeshInstance3D).mesh.surface_get_material(s)
+					var mn: String = mat.resource_name if mat != null else ""
+					var ok: bool = false
+					for p in KNOWN_PREFIX:
+						ok = ok or mn.begins_with(p)
+					check(ok, "%s: material nosso (%s)" % [tag, mn])
+			var prev: int = t0
+			for k in [1, 2]:
+				var lod: Node3D = TruckKit.lod(id, cab, k)
+				check(lod != null, "%s tem LOD%d" % [tag, k])
+				if lod == null:
+					continue
+				var tk: int = _tris(lod)
+				check(tk < prev * 0.5, "%s LOD%d mais leve (%d < metade de %d)" % [tag, k, tk, prev])
+				check(lod.find_children("wheel_*", "Node3D", true, false).is_empty(), "%s LOD%d sem nos wheel_* (nao gira)" % [tag, k])
+				check(lod.find_children("MOUNT_*", "Node3D", true, false).is_empty(), "%s LOD%d sem pontos de montagem" % [tag, k])
+				prev = tk
+				lod.free()
+			m.free()
 
 
 func test_no_real_brand_names() -> void:
 	for id in IDS:
-		var names: Array[String] = [id, String(BodyDef.find(id).fixed_cab), Tr.t("body." + id), Tr.t("body.desc." + id)]
-		var m: Node3D = (load(TruckNode.model_path(id, "")) as PackedScene).instantiate() as Node3D
-		for n in m.find_children("*", "Node", true, false):
-			names.append(String(n.name))
-		m.free()
+		var names: Array[String] = [id, String(BodyDef.find(id).factory_cab), Tr.t("body." + id), Tr.t("body.desc." + id)]
+		for cab in CabCatalog.IDS:
+			var m: Node3D = TruckNode.instantiate_model(id, cab)
+			for n in m.find_children("*", "Node", true, false):
+				names.append(String(n.name))
+			m.free()
 		for s in names:
 			for b in BANNED:
 				check(not s.to_lower().contains(b), "%s: nome sem marca real (%s contem %s)" % [id, s, b])
@@ -84,21 +91,24 @@ func test_no_real_brand_names() -> void:
 
 func test_sockets_measured_without_problems() -> void:
 	for id in IDS:
-		var data: Dictionary = TruckSockets.for_model(TruckNode.model_path(id, ""))
-		check(not data.is_empty(), "%s: encaixes medidos" % id)
-		check((data.get("design_problems", ["?"]) as Array).is_empty(), "%s: sem problemas de projeto" % id)
-		check(TruckSockets.socket(data, "andon").has("anchor"), "%s: deque tem lugar no teto" % id)
-		check(TruckSockets.socket(data, "visor").has("anchor"), "%s: viseira tem lugar na testa" % id)
-		check(String(data.get("cab", "")) == String(TruckNode.FIXED_CAB[id]), "%s: cabine do JSON = FIXED_CAB" % id)
+		for cab in CabCatalog.IDS:
+			var tag: String = "%s_%s" % [id, cab]
+			var data: Dictionary = TruckSockets.for_model(TruckNode.model_path(id, cab))
+			check(not data.is_empty(), "%s: encaixes medidos" % tag)
+			check((data.get("design_problems", ["?"]) as Array).is_empty(), "%s: sem problemas de projeto" % tag)
+			check(TruckSockets.socket(data, "andon").has("anchor"), "%s: deque tem lugar no teto" % tag)
+			check(TruckSockets.socket(data, "visor").has("anchor"), "%s: viseira tem lugar na testa" % tag)
+			check(String(data.get("cab", "")) == cab, "%s: cabine do JSON" % tag)
 
 
 func test_truck_node_lods_and_own_mural() -> void:
 	var t := TruckNode.new()
 	t.body_kind = "pinkbox"
+	t.cab_kind = "flat_wide"
 	t._ready()                                       # fora da arvore: monta o modelo na hora
 	check(t.model != null, "TruckNode abre o baú rosa")
 	check(t.lod_count() == 2, "TruckNode poe os 2 LODs leves (%d)" % t.lod_count())
-	check(t.shown_cab() == "flat_wide", "cabine mostrada = a fixa")
+	check(t.shown_cab() == "flat_wide", "cabine mostrada = a escolhida")
 	var mural_ok: bool = false
 	for mi in t.model.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D

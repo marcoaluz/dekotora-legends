@@ -173,7 +173,7 @@ static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalo
 
 ## Modelo do .glb pronto para encaixar (pontos extras + encaixes da oficina). Caminho de TruckNode.model_path.
 static func load_model(path: String, body: String, cab: String) -> Node3D:
-	var model: Node3D = (load(path) as PackedScene).instantiate() as Node3D
+	var model: Node3D = TruckNode.instantiate_model(body, cab)      # T-240: .glb unico ou kit (cabine + carroceria)
 	TruckNode.add_extra_mounts(model, body, cab)
 	TruckSockets.add_nodes(model, path)
 	return model

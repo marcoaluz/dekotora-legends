@@ -13,21 +13,21 @@ const MODEL_PATHS: Dictionary = {
 	"carreta": "res://assets/vehicles/dekotora/truck/dekotora_truck_carreta.glb",
 	"canter": "res://assets/vehicles/dekotora/truck/dekotora_truck_canter.glb",   # T-125: so com a cabine do JAC
 	"graneleira": "res://assets/vehicles/dekotora/truck/dekotora_truck_graneleira_chata.glb",   # T-145: aberta com lona
-	# T-218: caminhoes de homenagem (feitos do zero, marca ficticia), cada um com a cabine dele
-	"alubox": "res://assets/vehicles/dekotora/truck/dekotora_truck_alubox.glb",
-	"tarp": "res://assets/vehicles/dekotora/truck/dekotora_truck_tarp.glb",
-	"pinkbox": "res://assets/vehicles/dekotora/truck/dekotora_truck_pinkbox.glb",
-	"tanker": "res://assets/vehicles/dekotora/truck/dekotora_truck_tanker.glb",
-	"dump": "res://assets/vehicles/dekotora/truck/dekotora_truck_dump.glb",
+	# T-218: caminhoes de homenagem (feitos do zero, marca ficticia). T-240: montados pelo TruckKit (cabine trocavel);
+	# estes caminhos sao "virtuais" (a combinacao com a cabine de fabrica): so o nome conta (encaixes em sockets/).
+	"alubox": "res://assets/vehicles/dekotora/truck/dekotora_truck_alubox_flat_wide.glb",
+	"tarp": "res://assets/vehicles/dekotora/truck/dekotora_truck_tarp_flat_quad.glb",
+	"pinkbox": "res://assets/vehicles/dekotora/truck/dekotora_truck_pinkbox_flat_wide.glb",
+	"tanker": "res://assets/vehicles/dekotora/truck/dekotora_truck_tanker_flat_wide.glb",
+	"dump": "res://assets/vehicles/dekotora/truck/dekotora_truck_dump_flat_quad.glb",
 }
 const MODEL_DIR := "res://assets/vehicles/dekotora/truck/"
 ## Cabines que existem em .glb (T-129: so de modelos de arquivo; ids antigos caem em CabCatalog.normalize).
 const CABS: Array[String] = CabCatalog.IDS
 ## Quanto a frente de cada cabine passa da frente padrao (CAB_Y1 = 11,5 m): JAC grande e bico longo americano.
 const CAB_FRONT_DELTA: Dictionary = {"jac": 0.17, "americana": 0.09}
-## Modelos com cabine fixa (nao combinam com as outras cabines).
-const FIXED_CAB: Dictionary = {"canter": "canter", "alubox": "flat_wide", "tarp": "flat_quad", "pinkbox": "flat_wide",
-		"tanker": "flat_wide", "dump": "flat_quad"}
+## Modelos com cabine fixa (nao combinam com as outras cabines). T-240: os 5 de homenagem sairam daqui (cabine trocavel).
+const FIXED_CAB: Dictionary = {"canter": "canter"}
 ## LODs (T-218): <modelo>_lod1.glb e _lod2.glb nesta pasta (so os caminhoes de homenagem tem). O LOD0 (o .glb de sempre,
 ## com pecas, rodas que giram e pontos de montagem) aparece ate LOD_RANGES[0] m da camera; o LOD1 ate LOD_RANGES[1]; o
 ## LOD2 dali em diante. As pecas compradas ficam sempre (sao filhas dos pontos de montagem do LOD0).
@@ -94,11 +94,10 @@ var glow: AccessoryGlow = AccessoryGlow.new()
 func _ready() -> void:
 	cab_kind = CabCatalog.normalize(cab_kind)
 	var path: String = model_path(body_kind, cab_kind)
-	var scene: PackedScene = load(path) as PackedScene
-	if scene == null:
+	model = instantiate_model(body_kind, cab_kind)
+	if model == null:
 		push_warning("TruckNode: modelo nao encontrado: " + path)
 		return
-	model = scene.instantiate() as Node3D
 	add_child(model)
 	add_extra_mounts(model, body_kind, cab_kind)
 	TruckSockets.add_nodes(model, path)              # T-211: encaixes das pecas da oficina (deque, viseira...)
@@ -370,12 +369,24 @@ func _own_mural() -> String:
 func _attach_lods(path: String) -> void:
 	var stem: String = path.get_file().get_basename()
 	var paths: Array[String] = [LOD_DIR + stem + "_lod1.glb", LOD_DIR + stem + "_lod2.glb"]
-	if not ResourceLoader.exists(paths[0]) or not ResourceLoader.exists(paths[1]):
+	var kit: bool = TruckKit.uses_kit(body_kind, CabCatalog.normalize(cab_kind))
+	var lods: Array[Node3D] = []
+	for k in 2:
+		if kit:
+			lods.append(TruckKit.lod(body_kind, CabCatalog.normalize(cab_kind), k + 1))
+		elif ResourceLoader.exists(paths[k]):
+			lods.append((load(paths[k]) as PackedScene).instantiate() as Node3D)
+		else:
+			lods.append(null)
+	if lods[0] == null or lods[1] == null:
+		for n in lods:
+			if n != null:
+				n.free()
 		return
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		(mi as MeshInstance3D).visibility_range_end = LOD_RANGES[0]
 	for k in 2:
-		var lod: Node3D = (load(paths[k]) as PackedScene).instantiate() as Node3D
+		var lod: Node3D = lods[k]
 		lod.name = "LOD%d" % (k + 1)
 		for mi in lod.find_children("*", "MeshInstance3D", true, false):
 			var m: MeshInstance3D = mi as MeshInstance3D
@@ -402,6 +413,8 @@ static func extra_mounts(body: String, cab: String) -> Dictionary:
 	if body == "canter":
 		stack = Vector3(1.25, 5.09, 0.75)                    # entre a cabine curta e o bau do Canter
 		sc = 0.88
+	elif TruckKit.uses_kit(body, CabCatalog.normalize(cab)):
+		pass                                                 # T-240: kit = carroceria no layout de sempre (escapamento em 8,3)
 	elif cab == "curta":
 		stack = Vector3(1.4, 9.47 + d, 0.9)                  # canto de tras da cabine curta (o bau cresceu ate ali)
 	elif cab == "jac":
@@ -452,13 +465,35 @@ func front_delta() -> float:
 
 ## Caminho do .glb para a combinacao carroceria + cabine (`dekotora_truck_<bau>_<cabine>.glb`; o Canter e a
 ## carreta tem cabine fixa). Cabine antiga ou desconhecida vira a nova mais parecida (CabCatalog.normalize).
+## T-240: combinacao montada pelo TruckKit (homenagens com qualquer cabine, cabines HAYATE nos baus antigos) = caminho
+## "virtual" (o arquivo nao existe; abra com instantiate_model).
 static func model_path(body: String, cab: String) -> String:
 	if FIXED_CAB.has(body) or body == "carreta":
 		return String(MODEL_PATHS[body])
-	var path: String = MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, CabCatalog.normalize(cab)]
+	var c: String = CabCatalog.normalize(cab)
+	var path: String = MODEL_DIR + "dekotora_truck_%s_%s.glb" % [body, c]
+	if TruckKit.uses_kit(body, c):
+		return path
 	if not ResourceLoader.exists(path):
 		return String(MODEL_PATHS.get(body, MODEL_PATH))
 	return path
+
+
+## T-240: o modelo 3D da combinacao (sem pecas): o .glb unico ou o kit montado (cabine + carroceria). null se faltar.
+static func instantiate_model(body: String, cab: String) -> Node3D:
+	var c: String = CabCatalog.normalize(cab)
+	if not FIXED_CAB.has(body) and body != "carreta" and TruckKit.uses_kit(body, c):
+		return TruckKit.instantiate(body, c)
+	var ps: PackedScene = load(model_path(body, c)) as PackedScene if ResourceLoader.exists(model_path(body, c)) else null
+	return ps.instantiate() as Node3D if ps != null else null
+
+
+## T-240: a combinacao tem modelo (arquivo unico ou kit)?
+static func model_exists(body: String, cab: String) -> bool:
+	var c: String = CabCatalog.normalize(cab)
+	if not FIXED_CAB.has(body) and body != "carreta" and TruckKit.uses_kit(body, c):
+		return ResourceLoader.exists(TruckKit.DIR + "body_%s.glb" % body) and ResourceLoader.exists(TruckKit.DIR + "cab_%s.glb" % c)
+	return ResourceLoader.exists(model_path(body, c))
 
 
 ## Monta os acessorios 3D das pecas instaladas (PartDef) nos pontos de encaixe do caminhao. `styles` (T-211):

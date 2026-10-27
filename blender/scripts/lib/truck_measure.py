@@ -14,11 +14,25 @@ import numpy as np
 SLICE = 0.05                      # m: fatia ao longo de z para o perfil do teto
 
 
-def import_truck(path: str) -> dict:
+def import_truck(path) -> dict:
     """Importa o .glb numa cena vazia. Devolve {nome do objeto sem sufixo: matriz Nx3 de vértices (Godot)} e os
-    pontos MOUNT_* (Godot)."""
+    pontos MOUNT_* (Godot). T-240: `path` pode ser uma lista (carroceria + cabine do kit): as malhas de mesmo nome
+    viram uma só, como o jogo faz (TruckKit)."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=os.path.abspath(path))
+    for k, p in enumerate([path] if isinstance(path, str) else list(path)):
+        dy = 0.0
+        if isinstance(p, (tuple, list)):                       # (.glb, deslocamento para a frente em m): cabine do kit
+            p, dy = p
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.gltf(filepath=os.path.abspath(p))
+        if dy:
+            for o in bpy.data.objects:
+                if o not in before and o.parent is None:
+                    o.location.y += dy
+        if k == 0 and not isinstance(path, str):               # carroceria do kit: a chapa do baú antigo usa o material
+            for o in [o for o in bpy.data.objects if o not in before]:     # da cabine; aqui ela conta como baú
+                if o.type == "MESH" and o.name.split(".")[0] == "truck_paint_white_panel":
+                    o.name = "truck_paint_white_box"
     bpy.context.view_layer.update()
     objs: dict = {}
     mounts: dict = {}
@@ -250,6 +264,10 @@ LAMP_GAP = 0.012                  # m: distância mínima entre a faixa e uma la
 RB_TOP_MAX = 0.93                 # m: topo do para-choque traseiro (as setas de trás começam em 0,95)
 ROCKET_MIN_W = 0.12               # m: faixa do foguete mais estreita que isto não serve
 ROCKET_GAP = 0.012                # m: folga entre o foguete e o contorno de LED do teto
+# T-240 (foguete maior): a faixa mais LARGA cujo trecho livre tem pelo menos esta fração do maior trecho. Antes 0,97: nos
+# baús com andon de fábrica nas pontas do teto (médio premium, baú rosa) o foguete ficava fino (0,13–0,16 m) espremido ao
+# lado dos andons; agora ele fica largo e para antes deles (um pouco mais curto).
+ROCKET_RUN = 0.85
 
 
 def _protrusion(tree, p, n, reach=0.6):
@@ -433,7 +451,7 @@ def box_edges(data: dict, m: dict) -> dict:
         longest = max(c[0] for c in cands)
         if longest < 2.0:
             continue
-        ln, i, j0, j1 = max((c for c in cands if c[0] >= longest * 0.97), key=lambda c: c[1])
+        ln, i, j0, j1 = max((c for c in cands if c[0] >= longest * ROCKET_RUN), key=lambda c: c[1])
         out["rocket_" + side] = {"inner": round(float(xs[i]), 3), "outer": round(float(outer), 3),
                                  "z0": round(float(zs[j0]) - EDGE_STEP / 2 + 0.005, 3),
                                  "z1": round(float(zs[j1 - 1]) + EDGE_STEP / 2 - 0.005, 3),

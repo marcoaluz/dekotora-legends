@@ -198,7 +198,7 @@ def build_all(todo_ids):
         worst = 2 * (tg["HEAD"] + tg["TAIL"] + n_long * tg["MID"])           # 2 lados, baú mais comprido
         warn = [f"orçamento de triângulos excedido no baú mais comprido: {worst}"] if worst > MAX_TRIS else []
         e = entry_for(p, rel, size, mn, mx, worst, mats, "rocket",
-                      {"fit_warnings": warn, "stretch": dict(st), "module_tris": tg, "min_scale": 0.7, "broken_tilt": [0.0, 5.0]})
+                      {"fit_warnings": warn, "stretch": dict(st), "module_tris": tg, "min_scale": 0.7, "max_scale": 1.35, "broken_tilt": [0.0, 5.0]})
         built[p["id"]] = (root, merged, e)
         entries.append(e)
         log(f"{p['id']:18s} cabeça/meio/ponta={tg['HEAD']}/{tg['MID']}/{tg['TAIL']} tris (2 lados, {LONGEST_BOX} m)={worst} mats={len(mats)} {'; '.join(warn)}")

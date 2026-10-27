@@ -37,11 +37,10 @@ func test_models_load_for_every_cab() -> void:
 	for cab in CabCatalog.IDS:
 		var path: String = TruckNode.model_path("graneleira", cab)
 		check(path.ends_with("dekotora_truck_graneleira_%s.glb" % cab), "caminho da graneleira com cabine %s" % cab)
-		var scene: PackedScene = load(path) as PackedScene
-		check(scene != null, "abre %s" % path)
-		if scene == null:
+		var m: Node3D = TruckNode.instantiate_model("graneleira", cab)      # T-240: kit nas cabines HAYATE
+		check(m != null, "abre %s" % path)
+		if m == null:
 			continue
-		var m: Node3D = scene.instantiate() as Node3D
 		check_eq(m.find_children("wheel_f_*", "Node3D", true, false).size(), 2, "%s: 2 rodas dianteiras" % cab)
 		check_eq(m.find_children("wheel_r_*", "Node3D", true, false).size(), 8, "%s: 2 eixos traseiros com rodado duplo" % cab)
 		for n in MOUNTS:
