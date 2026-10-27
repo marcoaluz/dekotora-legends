@@ -615,3 +615,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: build_sockets 23/23 sem problema de projeto (só os 7 encaixes do lote mudaram nos JSON); build_t233_parts OK (28 peças, todas no orçamento de triângulos); suíte 546/546; REPORT_ENCAIXE 2249/2249 (lote 4: 595/595); tools/net_test.sh PASSOU (protocolo 18); `--quit-after 30` sem erro; folhas conferidas.
 - Armadilhas: (1) o Blender renomeia empties repetidos (SIGNAL_L.006 → nó "SIGNAL_L_006" no Godot): procurar com curinga "SIGNAL_L*"; (2) tanque de combustível de fábrica sai ~0,1 m para fora do baú: saia contínua não cabe, por isso trechos; (3) peça velha na fila do queue_free ainda é achada por find_child no mesmo quadro: tirar do pai antes; (4) outro agente estava mexendo em race_look/race_scene_3d em paralelo: rodar `--import` antes da suíte.
 - Decisão pendente: nenhuma de design (limites do retrovisor, espelho de fábrica sumir, saias em trechos e altura de 0,55 m do para-choque são escolhas do Claude para o Marco conferir).
+
+## 2026-10-26 · T-233 (especialista) · concluída
+- 11 para-choques dianteiros (setas e placa vão com a peça), 6 retrovisores (espelho de fábrica escondido), 3 escadas, 8 saias em trechos (tanque sai 0,1 m do baú). Viseiras já estavam completas desde a T-211. Protocolo 18, 546 testes, encaixe 2249/2249, net_test ok.
+- Revisão do coordenador: folha completo_base_chata_noite convincente.
+- Delegado: T-243 (skills), T-244 (APK + FPS, depois da T-241). T-239 (luzes) começa agora.
