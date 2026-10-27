@@ -1417,3 +1417,33 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   faixa) e um dedo que entra deslizando no olho não começa a olhar. O velocímetro/radar/retrovisor continuam livres do
   botão (o `HudLayout` já desvia de todos os botões; testado em 16:9 e 20:9, tamanhos 0,7–1,5).
 - **Capturas**: `--look=back|left|right` força o olhar (e mostra o botão apertado no celular); `tools/capture_t241.sh`.
+
+## 2026-10-26 · T-239 · Luzes: freio vermelho, setas em cima da lâmpada, porta do baú sem luzes
+
+- **Freio = todas as luzes vermelhas** (pedido do Marco). Entram: luzinhas de marcação (fileiras, sobrancelha, teto),
+  fundo luminoso do andon, LEDs e neons das peças da oficina e Clássicas, lanternas `lamp_tail` dos para-choques novos
+  (brilham 1,5×), lanternas vermelhas de fábrica (brilham 2×) e a mancha de neon no chão. **Ficam como estão** (decisão
+  do Claude, Marco confere): os **faróis brancos** e a luz de ré branca (mesmo material do farol), o **texto** do andon e
+  o acrílico com arte (são letreiro, não lâmpada) e a **seta**, que continua âmbar piscando por cima do vermelho (como
+  num caminhão de verdade). O padrão de pisca (sequencial etc.) para enquanto freia (tudo fixo). **De dia** as luzinhas
+  estão apagadas: freando elas **acendem** em vermelho (75% do brilho da noite), para o freio aparecer. Transição de
+  0,08 s para acender e 0,15 s para apagar (sem piscar). Só muda uniformes do material de luz de cada caminhão (nada
+  recompila).
+- **Quando acende**: freio a partir de 15% do pedal, apaga abaixo de 5% (histerese: o freio proporcional dos bots não faz a
+  luz piscar). Vale para jogador, rivais, bots e online. **Protocolo 19**: 1 byte por caminhão no snapshot (`flags2`, bit 0).
+- **Seta em cima da lâmpada**: a seta agora é uma **cópia acesa da própria lâmpada** (mesmos triângulos, 4 mm na frente,
+  âmbar) + um **halo** redondo de 0,5 m no centro dela (sem o halo, uma lâmpada de 6–15 cm some na tela a 10 m). Onde:
+  - frente com para-choque da oficina: pontos `SIGNAL_L/R` da peça (como na T-233);
+  - frente sem: a lanterna âmbar da quina da cabine, a que fica na altura do farol (até 12 cm acima);
+  - trás com para-choque da oficina: a **lanterna mais de fora** de cada lado da peça (empate: a de cima). As peças só
+    têm lanternas vermelhas (`lamp_tail`); a de fora pisca âmbar por cima — **não** viraram lente âmbar no Blender;
+  - trás sem: a lanterna âmbar do para-choque de fábrica (homenagens, Canter, graneleiras);
+  - os **baús base/leve/longo/carreta** só tinham a faixa vermelha fina embaixo: ganharam uma **lanterna de fábrica do jogo**
+    (`StockRearLamps`): chapa preta em cada lado com 4 lanternas redondas (de fora para dentro: âmbar = seta, vermelha,
+    vermelha, branca), logo acima da faixa vermelha, atrás do encaixe do para-choque da oficina (some quando ele é montado).
+  - A seta **continua piscando durante a troca de faixa** (antes apagava no 2º toque); o HUD e o tique-taque também.
+- **Porta traseira do baú sem luzes** (muda a decisão 1 da T-231): saem as colunas de lanternas (branca/vermelha/âmbar com a
+  chapa e os aros), as luzinhas dos lados da porta e a fileira de cima da porta, em todos os baús fechados (17 + homenagens
+  de baú + Canter + carreta), inclusive nos LODs. Feito no jogo (`RearDoorLamps`, triângulos dentro da zona `rear_doors`),
+  **sem regerar os .glb**. Ficam: andon traseiro, fileira do teto, luzinhas das laterais, refletores pintados da borda de
+  baixo, escada e trilhos. Baús abertos (graneleira, lona, tanque, caçamba) não têm porta: nada muda.
