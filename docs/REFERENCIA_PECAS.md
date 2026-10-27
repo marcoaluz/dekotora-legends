@@ -127,6 +127,8 @@ Cores (L/R): estrutura preta / cromada / prata com azul-marinho; LED verde ou ci
 
 ## 2. Viseira – frontal (029–042)
 
+> **FEITO na T-211/T-214** (as 14 viseiras). A T-233 conferiu: nada faltando.
+
 **O que as imagens mostram.** Câmera de frente, um pouco acima, enquadrando o para-brisa inteiro. A viseira é uma **aba
 fina sobre o para-brisa**, da largura da cabine (~2,3 m), 0,15–0,25 m de altura, saindo ~0,3 m para a frente.
 Quase todas são a **mesma aba preta** com um desenho diferente de **neon ciano**: pontilhado (030), tracejado (031), 2 linhas
@@ -163,6 +165,9 @@ O resto é desenho de neon por cima (barato: mesma malha, faixas emissivas difer
 ---
 
 ## 3. Para-choque frontal (043–062)
+
+> **FEITO na T-233**: as 11 peças no jogo (`accessories/front_t233.py`), na frente do nariz de fábrica de cada cabine, com a
+> faixa do meio que estica/encolhe até o farol mais baixo, seta da frente e caixa da placa na peça.
 
 **O que as imagens mostram.** Câmera em 3/4 pela frente-esquerda, baixa, enquadrando a frente da cabine e a roda
 dianteira. 043 é o **de fábrica** (cromado com placa). As outras são para-choques **largos e baixos** que avançam
@@ -238,6 +243,9 @@ de um lado. Lanternas vermelhas, aros cromados.
 ---
 
 ## 5. Para-choque lateral (085–094)
+
+> **FEITO na T-233**: as 8 saias no jogo (`accessories/skirt_t233.py`), só nos trechos livres entre as rodas (o tanque e a
+> bateria de fábrica ficam de fora), em todos os caminhões.
 
 **O que as imagens mostram.** Câmera **de lado, reta**, enquadrando o baú inteiro e o chassi. A peça vai **embaixo do baú,
 entre as rodas** e depois da roda de trás (em 2 pedaços), ~0,3–0,5 m de altura, colada à longarina. 085 é **sem peça**
@@ -323,6 +331,9 @@ Cores (L/R): verde, ciano, rosa, âmbar.
 
 ## 8. Retrovisor (105–110)
 
+> **FEITO na T-233**: as 6 hastes no jogo (`accessories/mirror_t233.py`), até 0,50 m para fora e 0,60 m à frente da cabine;
+> o espelho de fábrica some quando a haste está montada.
+
 **O que as imagens mostram.** Câmera em 3/4 pela frente-esquerda, enquadrando a cabine. São **hastes grandes de retrovisor**
 (ミラーステー) que saem da quina da cabine e avançam ~0,4–0,9 m para a frente e para o lado: haste em L simples (105),
 **treliçada** (106), moldura retangular (107), moldura grossa (108), treliça vazada tipo corrente (109) e uma moldura
@@ -347,6 +358,9 @@ não dá para trocar o espelho sem regerar os `.glb` (seção 13).
 ---
 
 ## 9. Escada (111–113)
+
+> **FEITO na T-233**: as 3 escadas no jogo (`accessories/ladder_t233.py`), na lateral do baú atrás da quina da frente, por
+> fora do contorno de LED. Só baú fechado.
 
 **O que as imagens mostram.** Câmera em 3/4 pela frente, alta. **Escadas verticais** presas na quina da frente do baú,
 logo atrás da cabine, do chassi até o topo do baú (~2,5 m), 0,2–0,3 m de largura: com **trilhos de neon ciano** (111),
@@ -601,7 +615,7 @@ Ordem pensada no que a câmera da corrida mais mostra (atrás e acima do baú).
 | 3 | Traseira + foguete + contorno do baú — **FEITO (T-231)** | 11 + 7 + 3 = 21 | 2 sessões |
 | 4 | Murais + pintura da traseira + pintura do teto (com `CREDITOS_MURAIS.md`) — **FEITO (T-232)** | 12 + 12 + 9 = 33 | 2–3 sessões |
 | 5 | Deque frontal (shader de LED, atlas de letreiros) | 17 | 2 sessões |
-| 6 | Frente: viseira (4 bases), para-choque, retrovisor, escada, saias | 14 + 11 + 6 + 3 + 8 = 42 | 3 sessões |
+| 6 | Frente: viseira (4 bases), para-choque, retrovisor, escada, saias — **FEITO (T-211 viseiras; T-233 o resto)** | 14 + 11 + 6 + 3 + 8 = 42 | 3 sessões |
 | 7 | Cor L/R por peça, raridade, filtros da loja, rede (descritor + protocolo novo), APK, medida no celular | — | 1–2 sessões |
 | **Total** | | **113 peças** | **12–14 sessões** |
 

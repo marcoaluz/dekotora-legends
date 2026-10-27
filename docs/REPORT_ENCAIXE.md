@@ -100,7 +100,41 @@ medido por raios no plano real da lataria (`blender/scripts/lib/paint_measure.py
 a arte nunca sai espelhada (u × v = normal) e fica fora das zonas protegidas (a traseira é tinta na porta: isenta só
 de `rear_doors`). Conferido por `PaintFit.problems`.
 
-**Total geral (lotes 1 e 2 e pinturas): 1654 de 1654 combinações cabem.**
+## Matriz caminhão × lote 4 (T-233: 11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias)
+
+| Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| alubox | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.50 + 1.48 | nenhuma |
+| base_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| base_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| base_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.75 + 1.48 | nenhuma |
+| base_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.48 | nenhuma |
+| canter | 11/11 | 0.37 m / ×0.92 | 6/6 | 3/3 | 8/8 | 2.74 | nenhuma |
+| carreta (guardada) | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | — | — | nenhuma |
+| dump | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| graneleira_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.46 + 1.48 | nenhuma |
+| graneleira_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.44 + 1.48 | nenhuma |
+| graneleira_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.61 + 1.48 | nenhuma |
+| graneleira_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.29 + 1.48 | nenhuma |
+| leve_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.46 | nenhuma |
+| leve_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 | nenhuma |
+| leve_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.68 | nenhuma |
+| leve_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 | nenhuma |
+| longo_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.46 + 1.58 | nenhuma |
+| longo_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.58 | nenhuma |
+| longo_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.68 + 1.58 | nenhuma |
+| longo_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.58 | nenhuma |
+| pinkbox | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| tanker | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
+| tarp | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
+
+Lote 4: **595 de 595** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do
+nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a faixa do meio estica/encolhe (coluna
+"faixa do meio", para o leque de 0,42 m). Retrovisor: até 0,50 m para fora da cabine e 0,60 m à frente; o
+espelho de fábrica some. Escada: por fora do contorno de LED, até 0,16 m. Saia: só nos trechos livres (tanque e
+bateria de fábrica ficam de fora). Conferido vértice a vértice (`FrameFit.problems`).
+
+**Total geral (lotes 1, 2, 4 e pinturas): 2249 de 2249 combinações cabem.**
 
 ## Falhas
 
@@ -111,11 +145,13 @@ largura do teto. Imagem das caixas e zonas: `docs/capturas_t211/encaixes_zonas.p
 ## Zonas protegidas e encaixes (exemplos)
 
 **base_chata**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_L_3, wheel_r_R_1, wheel_r_R_3, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
 **canter**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_R_1, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (uniform), mirror_stay_l (uniform), front_bumper (uniform), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (stretch_y), ladder_l (stretch_y), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (stretch9), side_skirts_l (stretch9), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
 
 Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo
 leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da
 placa próprias) para `rear_bumper`; rodas para `hubcaps`; `rear_doors` para `rear_paint` (T-232: tinta na porta).
+T-233: o para-choque da frente leva a seta (pontos SIGNAL_L/R) e a caixa da placa; o espelho de fábrica (caixa
+`hide` do encaixe `mirror_stay_*`) some enquanto a haste está montada.
 

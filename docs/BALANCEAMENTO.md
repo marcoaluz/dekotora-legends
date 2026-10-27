@@ -630,3 +630,20 @@ cada batida lateral **risca**: −10% do destaque até repintar, repintar = 30% 
 | `roofpaint_07` | Pintura do teto | Teto | Teto: 浪漫街道 (estrada romântica) | 14 | 18.000 | 20 | Incomum |
 | `roofpaint_08` | Pintura do teto | Teto | Teto: 天下御免 (licença do mundo) | 15 | 19.000 | 20 | Incomum |
 | `roofpaint_09` | Pintura do teto | Teto | Teto: 夜明けまで (até o amanhecer) | 16 | 20.000 | 20 | Incomum |
+
+## Peças da oficina, lote 4: para-choque da frente, retrovisor, escada e saias (T-233) — PROPOSTA
+
+Números do catálogo (`docs/REFERENCIA_PECAS.md`, seções 3, 5, 8 e 9), sem mudança; dados em `game/data/parts/*.tres`
+(gerados por `python tools/gen_t233_data.py`). Raridade/fama mínima só informativas (não travam).
+
+| Peça | Peso kg | Durab. | Destaque | Preço ¥ | Raridade |
+| --- | --- | --- | --- | --- | --- |
+| 11 para-choques da frente (`fb_fan_*`, `fb_box_*`, `fb_smooth_chrome`, `fb_deck_*`) | 280–470 | 180–260 | 16–34 | 26.000–64.000 | incomum a lendária |
+| 6 retrovisores (`mirror_stay_*`, os 2 lados numa compra) | 25–60 | 40–55 | 6–18 | 7.000–26.000 | comum/incomum |
+| 3 escadas (`ladder_*`, os 2 lados) | 30–45 | 30–50 | 10–12 | 14.000–16.000 | comum/incomum |
+| 8 saias (`skirt_*`, os 2 lados) | 120–240 | 80–190 | 14–24 | 20.000–34.000 | incomum/rara |
+
+- **Bots** (T-233): para-choque da frente novo sorteado pela semente (1 em 5 fica com o `fb_basic`), saia em 1 de 2 e
+  retrovisor em 1 de 3 (`TruckConfig.BOT_FRONT/BOT_SKIRT/BOT_MIRROR`). Rivais: chefe `fb_deck_neon` + `skirt_neon_arrows`
+  + `mirror_stay_grand` + `ladder_neon`; Trovão Rosa `fb_fan_stripe` + `skirt_neon_twin`; Lua Cromada `fb_smooth_chrome` +
+  `skirt_chrome_rails` + `mirror_stay_frame`; Dragão de Aço `fb_box_amber` + `mirror_stay_box`.

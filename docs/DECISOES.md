@@ -1364,3 +1364,42 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Conflitos com Clássicas** (conhecidos, não mexidos): `fb_*` Clássicos, `front_lip`, `aux_lights`, `skirt_*` Clássicas
   e `side_box` ocupam lugares parecidos; o teste só garante o catálogo novo.
 - Complemento do Marco para a T-242: as imagens prontas mantêm o **efeito de luz noturno** dos murais da T-232, mas só em **pontos escolhidos** (olho do animal, lua, sol, chamas…), não na imagem inteira. Fazemos à mão uma máscara de emissão para cada imagem.
+
+## 2026-10-26 · T-241 · Olhar para trás, esquerda e direita na corrida (pedido do Marco)
+
+- **Segurar = olhar, soltar = volta.** Só a câmera do aparelho: nada em `scripts/sim/`, nada na rede (protocolo não muda;
+  o olhar nem entra no `Commands`). Funciona por cima de **todas** as câmeras da T-198 (perto, padrão, longe, cinema,
+  órbita): a câmera da corrida continua rodando por baixo e o olhar só troca a pose final (`RaceLook`,
+  `road3d/race_look.gd`; ligação em `RaceCamView.apply_look`). Online e offline iguais.
+- **As 3 vistas** (escolha do Claude, Marco confere nas capturas):
+  - **Trás**: câmera 11 m na frente da cabine, a 6 m de altura (a mesma "câmera de perseguição" virada ao contrário),
+    olhando 40 m atrás do baú. Mostra a frente decorada do caminhão e quem vem atrás por cima do baú.
+  - **Esquerda / Direita**: câmera 6 m acima, 3 m para o lado, ao lado da cabine (acima de um caminhão na faixa
+    vizinha, então não entra dentro dele), olhando para o lado e um pouco para trás (≈120° da frente): vê a faixa ao
+    lado, a lateral do próprio baú e quem vem ultrapassando por aquele lado.
+  - Todas passam pelo mesmo limite das câmeras da T-198 (entre as muretas, embaixo do arco do túnel e da praça do
+    pedágio, fora do baú).
+- **Transição**: 0,24 s para entrar e 0,28 s para voltar, com início e fim suaves; quando a câmera passa de trás para a
+  frente do caminhão (olhar para trás) leva 0,34 s e faz um arco **por cima** da cabine (+3,2 m), nunca atravessa o
+  caminhão. Trocar de lado direto (esquerda → direita) vai de uma vista para a outra sem voltar.
+- **RaceFeel (T-219)**: a vista do olhar segue o caminhão com o mesmo atraso da câmera (`cam_follow_rate`), recebe o tremor
+  das batidas já multiplicado por "Reduzir tremor da câmera" e para junto no congelamento das batidas. FOV fixo (58° trás,
+  60° lados): o "zoom" de velocidade só faz sentido olhando para a frente.
+- **Retrovisor some enquanto olha** (qualquer direção): a tela já é a vista de trás/lado, e no lugar dele aparece o aviso
+  "OLHANDO PARA TRÁS / À ESQUERDA / À DIREITA" com o ícone de olho (Lucide `eye`). Isso também economiza a segunda
+  renderização enquanto olha. Soltou, ele volta como estava.
+- **Cortes** (abertura, contagem, cortes de largada/chegada, demo, resultado): o olhar é largado na hora.
+- **PC (teclado)**: segure **Q** = esquerda, **E** = direita, **X** = trás (Q+E juntos também = trás). Q/E/X não eram
+  usados na corrida (a câmera livre F1 usa Q/E só com a corrida congelada).
+- **Controle**: **analógico direito** para a esquerda/direita = olhar para o lado, **para baixo** = trás; **RB** ou
+  **apertar o analógico direito (R3)** = trás. Botões já usados (A Passing, X buzina, Y câmera, Back retrovisor, Start
+  pausa, gatilhos, analógico esquerdo) não mudaram. Ações `look_back`, `look_left`, `look_right` no `project.godot`.
+- **Celular: UM botão de olho com deslize** (escolhido em vez de 3 botões pequenos). Fica acima e à direita da seta
+  direita (no lugar espelhado da BUZINA), raio 20 (× tamanho dos botões). **Segurar = trás**; com o mesmo dedo,
+  **deslizar para a esquerda/direita** = olhar para aquele lado (aparecem as 3 opções ESQ · TRÁS · DIR em volta do botão,
+  a escolhida acesa); voltar ao centro = trás; soltar = volta. Por quê: o polegar esquerdo só toca nas setas de vez em
+  quando (o direito fica no acelerador), então é ele que olha, e um botão ocupa menos tela que três; três alvos
+  pequenos juntos geram toque errado. O dedo que começou no olho nunca vira seta (deslizar por cima da seta não troca de
+  faixa) e um dedo que entra deslizando no olho não começa a olhar. O velocímetro/radar/retrovisor continuam livres do
+  botão (o `HudLayout` já desvia de todos os botões; testado em 16:9 e 20:9, tamanhos 0,7–1,5).
+- **Capturas**: `--look=back|left|right` força o olhar (e mostra o botão apertado no celular); `tools/capture_t241.sh`.
