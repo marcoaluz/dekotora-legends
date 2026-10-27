@@ -16,6 +16,7 @@ Uso (na raiz do projeto):
 Determinístico (mesma entrada, mesmos arquivos).
 """
 import argparse
+import json
 import os
 import sys
 
@@ -37,6 +38,26 @@ BODIES = ("alubox", "tarp", "pinkbox", "tanker", "dump")
 OLD_BODIES = ("base", "leve", "longo", "graneleira")
 CAB_MOUNTS = ("MOUNT_FRONT_BUMPER", "MOUNT_FRONT_GRILLE", "MOUNT_FRONT_ORNAMENT", "MOUNT_VISOR", "MOUNT_ROOF",
               "MOUNT_ROOF_LIGHTS", "MOUNT_STEP_", "MOUNT_CAB_SIDE_", "MOUNT_WHEEL_FRONT_")
+
+
+# T-251: a carga estica para a frente até encostar na cabine (o jogo faz: TruckKit). Do ponto STRETCH_Y0 (m da traseira)
+# até a frente da carga, o comprimento cresce na proporção; o que está na frente da carga (escapamentos) anda inteiro.
+# Folga que fica entre a carga e as costas da cabine: com escapamentos altos (eles ficam no vão) e sem.
+STRETCH_Y0 = 0.5
+GAP_STACKS = 0.25
+GAP_PLAIN = 0.06
+FRONT_EXTRA = ("stack_", "cab_back_gap")            # do chassi, mas andam com a frente da carga
+
+
+def _world_y(o):
+    mw = o.matrix_world
+    return [(mw @ v.co) for v in o.data.vertices]
+
+
+def write_meta(out_dir, name, meta):
+    path = os.path.join(out_dir, "truck", "kit", name + ".json")
+    with open(path, "w", encoding="utf-8", newline=chr(10)) as f:
+        json.dump(meta, f, indent=1, sort_keys=True)
 
 
 def is_cab_mount(name: str) -> bool:
@@ -81,9 +102,12 @@ def build_cab_kit(cab, m, src=None):
     mounts.update({n: p for n, p in info.mounts.items() if is_cab_mount(n)})
     BT._front_wheel_mounts(mounts, info)
     empties = [M.empty(n, p) for n, p in sorted(mounts.items())]
-    print(f"[t240] cabine {cab}: {info.tris} triangulos; costas y={info.y_back if hasattr(info, 'y_back') else '?'}"
-          f" eixo y={info.front_axle:.2f} r={info.front_r}")
-    return parts, wheels, empties
+    bpy.context.view_layer.update()
+    shell = [p for o in parts if not o.name.startswith(BT.FRONT_AXLE_PARTS + ("mk_cab_",)) and o.type == "MESH"
+             for p in _world_y(o) if p.z > 1.2]
+    back = round(min(p.y for p in shell), 3)                 # T-251: costas da cabine (acima das rodas)
+    print(f"[t240] cabine {cab}: {info.tris} triangulos; costas y={back} eixo y={info.front_axle:.2f} r={info.front_r}")
+    return parts, wheels, empties, set(), {"back": back}
 
 
 def build_body_kit(body, m, out_dir):
@@ -97,6 +121,7 @@ def build_body_kit(body, m, out_dir):
     for o in [o for o in parts if o.name.startswith(BT.FRONT_AXLE_PARTS)]:
         parts.remove(o)
         bpy.data.objects.remove(o, do_unlink=True)
+    chassis = {o.name for o in parts if not o.name.startswith(FRONT_EXTRA)}
     info = B.build_pinkbox(m, add, T.mural_material(body, out_dir)) if body == "pinkbox" else B.BUILDERS[body](m, add)
     if info.get("drop_stacks"):
         for o in [o for o in parts if o.name.startswith("stack_")]:
@@ -115,8 +140,17 @@ def build_body_kit(body, m, out_dir):
     mounts = {n: p for n, p in MOUNTS.items() if not is_cab_mount(n)}
     mounts.update({n: p for n, p in info["mounts"].items() if not is_cab_mount(n)})
     empties = [M.empty(n, p) for n, p in sorted(mounts.items())]
-    print(f"[t240] carroceria {body}: carga ate {info['top']:.2f} m")
-    return parts, wheels, empties
+    bpy.context.view_layer.update()
+    cargo = [o for o in parts if o.name not in chassis and not o.name.startswith(FRONT_EXTRA + ("stack_guard", "stack_tip"))]
+    front = max(max(p.y for p in _world_y(o)) for o in cargo if o.type == "MESH" and max(p.y for p in _world_y(o)) < 9.0)
+    frame = set(chassis)
+    for o in parts:                                          # neon de baixo do chassi etc.: comprido até debaixo da cabine
+        if o.type == "MESH" and max(p.y for p in _world_y(o)) > front + 0.6:
+            frame.add(o.name)
+    has_stacks = any(o.name.startswith("stack_") for o in parts)
+    meta = {"front": round(front, 3), "y0": STRETCH_Y0, "gap": GAP_STACKS if has_stacks else GAP_PLAIN}
+    print(f"[t240] carroceria {body}: carga ate {info['top']:.2f} m; frente da carga y={front:.3f}; chassi {len(frame)} objetos")
+    return parts, wheels, empties, frame, meta
 
 
 def build_old_body_kit(body, m, body_src=None):
@@ -155,28 +189,33 @@ def build_old_body_kit(body, m, body_src=None):
         else:
             keep_e.append(e)
     print(f"[t240] carroceria antiga {body}: {len(drop)} objetos da cabine retirados")
-    return parts, keep_w, keep_e
+    return parts, keep_w, keep_e, set(), {"front": round(8.2 + BT.LENGTH_DELTA.get(body, 0.0), 3), "stretch": False}
 
 
-def export_kit(name, parts, wheels, empties, out_dir, root_name, lod=True):
-    """`lod=False`: sem LOD1/LOD2 (baús antigos: só o caminhão do jogador usa, sempre perto da câmera)."""
+def export_kit(name, parts, wheels, empties, frame, meta, out_dir, root_name, lod=True):
+    """`lod=False`: sem LOD1/LOD2 (baús antigos: só o caminhão do jogador usa, sempre perto da câmera).
+    T-251: `frame` = nomes dos objetos do chassi que NÃO esticam (malhas `frame_*`; o jogo junta de volta nas `truck_*`
+    depois de esticar a carga); `meta` vai para <nome>.json ao lado do .glb."""
     T._uv(parts)
-    lods = {level: T._clone(T._lod_pick(parts, wheels, level)) for level in (1, 2)} if lod else {}
+    box = [o for o in parts if o.name not in frame]
+    chs = [o for o in parts if o.name in frame]
+    lods = {level: (T._clone(T._lod_pick(box, wheels, level)), T._clone(T._lod_pick(chs, [], level))) for level in (1, 2)} if lod else {}
     all_meshes = parts + [w for ws in wheels for w in ws]
     M.smooth(all_meshes, 35.0)
     tris0 = M.count_tris(all_meshes)
-    merged = M.join_by_material(parts, prefix="truck_")
+    merged = M.join_by_material(box, prefix="truck_") + M.join_by_material(chs, prefix="frame_")
     wheel_objs = T._join_wheels(wheels) if wheels else []
     kit = os.path.join(out_dir, "truck", "kit")
     os.makedirs(os.path.join(kit, "lod"), exist_ok=True)
     path = os.path.join(kit, name + ".glb")
     T._export(path, merged + wheel_objs + empties, root_name, out_dir)
+    write_meta(out_dir, name, meta)
     rep = [tris0]
     if not lod:
         print(f"[t240] {name}: triangulos {rep} bytes {[os.path.getsize(path)]} (sem LOD)")
         return
     for level in (1, 2):
-        joined = M.join_by_material(lods[level], prefix=f"lod{level}_")
+        joined = M.join_by_material(lods[level][0], prefix=f"lod{level}_") +             M.join_by_material(lods[level][1], prefix=f"lod{level}frame_")
         ratio = (T.LOD1_RATIO if level == 1 else T.LOD2_RATIO) * tris0 / max(1, M.count_tris(joined))
         if ratio < 1.0:
             for o in joined:

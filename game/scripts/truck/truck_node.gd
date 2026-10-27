@@ -413,8 +413,8 @@ static func extra_mounts(body: String, cab: String) -> Dictionary:
 	if body == "canter":
 		stack = Vector3(1.25, 5.09, 0.75)                    # entre a cabine curta e o bau do Canter
 		sc = 0.88
-	elif TruckKit.uses_kit(body, CabCatalog.normalize(cab)):
-		pass                                                 # T-240: kit = carroceria no layout de sempre (escapamento em 8,3)
+	elif TruckKit.uses_kit(body, CabCatalog.normalize(cab)):   # T-240: kit = escapamento em 8,3; T-251: anda com a carga
+		stack.y += TruckKit.front_shift(body, CabCatalog.normalize(cab))
 	elif cab == "curta":
 		stack = Vector3(1.4, 9.47 + d, 0.9)                  # canto de tras da cabine curta (o bau cresceu ate ali)
 	elif cab == "jac":

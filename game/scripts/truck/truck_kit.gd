@@ -19,7 +19,8 @@ const OLD_BODIES: Array[String] = ["base", "leve", "longo", "graneleira"]
 ## Cabines que so existem em kit (T-218, HAYATE).
 const NEW_CABS: Array[String] = ["flat_wide", "flat_quad"]
 
-static var _merged: Dictionary = {}          # "<modelo>_<cabine>[_lodN]/<no>" -> ArrayMesh (ou null = nao junta)
+static var _merged: Dictionary = {}
+static var _meta: Dictionary = {}            # "body_x"/"cab_x" -> medidas do kit (kit/<nome>.json)          # "<modelo>_<cabine>[_lodN]/<no>" -> ArrayMesh (ou null = nao junta)
 
 
 ## Esta combinacao e montada pelo kit?
@@ -45,6 +46,7 @@ static func instantiate(body: String, cab: String) -> Node3D:
 			cab_root.free()
 		return null
 	root.name = "dekotora_truck_%s_%s" % [body, cab]
+	_fit_body(_host(root), body, cab, "truck_", "frame_", "%s_%s" % [body, cab])
 	_shift(cab_root, body)
 	_graft(_host(root), _host(cab_root), "%s_%s" % [body, cab])
 	cab_root.free()
@@ -63,10 +65,121 @@ static func lod(body: String, cab: String, level: int) -> Node3D:
 		if b != null:
 			b.free()
 		return null
+	_fit_body(_host(a), body, cab, "lod%d_" % level, "lod%dframe_" % level, "%s_%s_lod%d" % [body, cab, level])
 	_shift(b, body)
 	_graft(_host(a), _host(b), "%s_%s_lod%d" % [body, cab, level])
 	b.free()
 	return a
+
+
+## T-251: quanto (m) a carga estica para a frente para encostar na cabine: costas da cabine - folga - frente da carga
+## (kit/*.json, medidos no Blender). 0 nos baus antigos (as cabines HAYATE ja encostam como a chata).
+static func stretch(body: String, cab: String) -> float:
+	var b: Dictionary = meta("body_" + body)
+	var c: Dictionary = meta("cab_" + cab)
+	if b.is_empty() or c.is_empty() or not bool(b.get("stretch", true)):
+		return 0.0
+	var ext: float = float(c["back"]) - float(b["gap"]) - float(b["front"])
+	return ext if ext > 0.01 else 0.0
+
+
+## Costas da cabine de referencia (chata/HAYATE, m): as carrocerias foram desenhadas para ela.
+const CAB_REF_BACK: float = 8.425
+
+
+## T-251: quanto o que fica NA FRENTE da carga (escapamentos de fabrica, protetores) anda para acompanhar as costas da
+## cabine: fica sempre a mesma distancia da cabine (no vao), em vez de andar com a carga.
+static func front_shift(body: String, cab: String) -> float:
+	var b: Dictionary = meta("body_" + body)
+	var c: Dictionary = meta("cab_" + cab)
+	if b.is_empty() or c.is_empty() or not bool(b.get("stretch", true)):
+		return 0.0
+	return float(c["back"]) - CAB_REF_BACK
+
+
+## Folga (m) entre a frente da carga (ja esticada) e as costas da cabine: testes.
+static func gap(body: String, cab: String) -> float:
+	var back: float = float(meta("cab_" + cab).get("back", 0.0)) + float(TruckNode.LENGTH_DELTA.get(body, 0.0))
+	return back - float(meta("body_" + body).get("front", 0.0)) - stretch(body, cab)
+
+
+## Medidas de um kit (front/gap/y0 da carroceria, back da cabine; em metros da traseira do bau para a frente).
+static func meta(name: String) -> Dictionary:
+	if not _meta.has(name):
+		var path: String = DIR + name + ".json"
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null
+		_meta[name] = parsed if parsed is Dictionary else {}
+	return _meta[name]
+
+
+## Posicao na frente (m, para a frente) depois de esticar: ate y0 fica; de y0 ate a frente da carga cresce na proporcao;
+## na frente da carga (escapamentos) anda `shift` (acompanha a cabine, front_shift). Igual ao `truck_measure.kit_stretch` do Blender.
+static func stretch_y(y: float, y0: float, front: float, ext: float, shift: float = 0.0) -> float:
+	if y <= y0:
+		return y
+	if y >= front:
+		return y + shift
+	return y0 + (y - y0) * (front - y0 + ext) / (front - y0)
+
+
+## Estica a carga (`box` = prefixo das malhas que esticam) e junta o chassi (`frame`) nas malhas de mesmo material.
+static func _fit_body(host: Node3D, body: String, cab: String, box: String, frame: String, key: String) -> void:
+	var ext: float = stretch(body, cab)
+	var sh: float = front_shift(body, cab)
+	var b: Dictionary = meta("body_" + body)
+	if ext > 0.0 or absf(sh) > 0.001:
+		var y0: float = float(b["y0"])
+		var front: float = float(b["front"])
+		for c in host.get_children():
+			if c is MeshInstance3D and String(c.name).begins_with(box):
+				var mi: MeshInstance3D = c as MeshInstance3D
+				var ck: String = key + "/stretch/" + String(c.name)
+				if not _merged.has(ck):
+					_merged[ck] = _stretched(mi.mesh, mi.transform, y0, front, ext, sh)
+				mi.mesh = _merged[ck]
+			elif c is Node3D and String(c.name).begins_with("MOUNT_"):
+				var n3: Node3D = c as Node3D
+				n3.position.z = -stretch_y(-n3.position.z, y0, front, ext, sh)
+	for c in host.get_children():
+		var nm: String = String(c.name)
+		if not (c is MeshInstance3D and nm.begins_with(frame)):
+			continue
+		var target: String = box + nm.substr(frame.length())
+		var other: Node = host.get_node_or_null(NodePath(target))
+		if other is MeshInstance3D:
+			var mesh: Mesh = _merge(key + "/frame/" + nm, other as MeshInstance3D, c as MeshInstance3D, Transform3D.IDENTITY)
+			if mesh != null:
+				(other as MeshInstance3D).mesh = mesh
+				host.remove_child(c)
+				c.free()
+				continue
+		c.name = target
+
+
+static func _stretched(src: Mesh, xf: Transform3D, y0: float, front: float, ext: float, sh: float) -> Mesh:
+	var k: float = (front - y0 + ext) / (front - y0)
+	var out := ArrayMesh.new()
+	var inv: Transform3D = xf.affine_inverse()
+	for si in src.get_surface_count():
+		var arr: Array = src.surface_get_arrays(si)
+		var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var has_n: bool = arr[Mesh.ARRAY_NORMAL] != null
+		var nn: PackedVector3Array = arr[Mesh.ARRAY_NORMAL] if has_n else PackedVector3Array()
+		for i in v.size():
+			var w: Vector3 = xf * v[i]
+			var y: float = -w.z
+			if has_n and y > y0 and y < front:
+				var n: Vector3 = nn[i]
+				nn[i] = Vector3(n.x, n.y, n.z / k).normalized()
+			w.z = -stretch_y(y, y0, front, ext, sh)
+			v[i] = inv * w
+		arr[Mesh.ARRAY_VERTEX] = v
+		if has_n:
+			arr[Mesh.ARRAY_NORMAL] = nn
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+		out.surface_set_material(si, src.surface_get_material(si))
+	out.resource_name = src.resource_name
+	return out
 
 
 ## Nos da parte da cabine que ficaram com nome proprio (sem malha da carroceria para juntar): testes.

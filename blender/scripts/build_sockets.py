@@ -37,9 +37,39 @@ CABS = ("chata", "jac", "curta", "americana", "flat_wide", "flat_quad")
 KIT_COMBOS = [(b, c) for b in ("alubox", "tarp", "pinkbox", "tanker", "dump") for c in CABS] +     [(b, c) for b in ("base", "leve", "longo", "graneleira") for c in ("flat_wide", "flat_quad")]
 
 
+def kit_meta(name: str) -> dict:
+    p = os.path.join(KIT_DIR, name + ".json")
+    return json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+
+
+def kit_ext(body: str, cab: str) -> float:
+    """T-251: quanto a carga estica para encostar na cabine (igual a TruckKit.stretch)."""
+    b, c = kit_meta("body_" + body), kit_meta("cab_" + cab)
+    if not b or not c or not b.get("stretch", True):
+        return 0.0
+    e = c["back"] - b["gap"] - b["front"]
+    return e if e > 0.01 else 0.0
+
+
+CAB_REF_BACK = 8.425                                   # igual a TruckKit.CAB_REF_BACK
+
+
+def kit_shift(body: str, cab: str) -> float:
+    """T-251: o que fica na frente da carga (escapamentos) acompanha as costas da cabine (TruckKit.front_shift)."""
+    b, c = kit_meta("body_" + body), kit_meta("cab_" + cab)
+    if not b or not c or not b.get("stretch", True):
+        return 0.0
+    return c["back"] - CAB_REF_BACK
+
+
 def kit_files(body: str, cab: str) -> list:
-    """Carroceria e cabine; a cabine anda junto com o comprimento do baú (leve/longo), como no TruckKit do jogo."""
-    return [os.path.join(KIT_DIR, f"body_{body}.glb"), (os.path.join(KIT_DIR, f"cab_{cab}.glb"), LENGTH_DELTA.get(body, 0.0))]
+    """Carroceria (esticada até a cabine, T-251) e cabine (anda com o comprimento do baú: leve/longo), como no jogo."""
+    ext = kit_ext(body, cab)
+    b = kit_meta("body_" + body)
+    sh = kit_shift(body, cab)
+    st = (b["y0"], b["front"], ext, sh) if ext > 0.0 or abs(sh) > 0.001 else None
+    return [(os.path.join(KIT_DIR, f"body_{body}.glb"), 0.0, st),
+            (os.path.join(KIT_DIR, f"cab_{cab}.glb"), LENGTH_DELTA.get(body, 0.0))]
 
 
 def source_of(path: str):
@@ -65,7 +95,7 @@ def stacks(body: str, cab: str) -> list:
     if body == "canter":
         p = (1.25, 5.09, 0.75)
     elif (body, cab) in KIT_COMBOS:
-        pass                                                     # T-240: kit = escapamentos no layout de sempre
+        p = (p[0], p[1] + kit_shift(body, cab), p[2])            # T-240/T-251: acompanham as costas da cabine
     elif cab == "curta":
         p = (1.4, 9.47 + d, 0.9)
     elif cab == "jac":

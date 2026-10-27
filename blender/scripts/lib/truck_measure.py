@@ -14,6 +14,15 @@ import numpy as np
 SLICE = 0.05                      # m: fatia ao longo de z para o perfil do teto
 
 
+def kit_stretch(y: float, y0: float, front: float, ext: float, shift: float = 0.0) -> float:
+    """T-251: posição (m, para a frente) depois de esticar a carga do kit; igual a TruckKit.stretch_y do jogo."""
+    if y <= y0:
+        return y
+    if y >= front:
+        return y + shift
+    return y0 + (y - y0) * (front - y0 + ext) / (front - y0)
+
+
 def import_truck(path) -> dict:
     """Importa o .glb numa cena vazia. Devolve {nome do objeto sem sufixo: matriz Nx3 de vértices (Godot)} e os
     pontos MOUNT_* (Godot). T-240: `path` pode ser uma lista (carroceria + cabine do kit): as malhas de mesmo nome
@@ -21,14 +30,32 @@ def import_truck(path) -> dict:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     for k, p in enumerate([path] if isinstance(path, str) else list(path)):
         dy = 0.0
-        if isinstance(p, (tuple, list)):                       # (.glb, deslocamento para a frente em m): cabine do kit
-            p, dy = p
+        st = None
+        if isinstance(p, (tuple, list)):                       # (.glb, deslocamento para a frente em m[, esticar]): kit
+            p, dy, st = (tuple(p) + (None,))[:3]
         before = set(bpy.data.objects)
         bpy.ops.import_scene.gltf(filepath=os.path.abspath(p))
         if dy:
             for o in bpy.data.objects:
                 if o not in before and o.parent is None:
                     o.location.y += dy
+        new = [o for o in bpy.data.objects if o not in before]
+        if st:                                                 # T-251: a carga estica até a cabine (igual ao TruckKit)
+            bpy.context.view_layer.update()
+            for o in new:
+                if o.type == "MESH" and o.name.startswith("truck_"):
+                    mw = o.matrix_world
+                    inv = mw.inverted()
+                    for v in o.data.vertices:
+                        w = mw @ v.co
+                        w.y = kit_stretch(w.y, *st)
+                        v.co = inv @ w
+                    o.data.update()
+                elif o.name.startswith("MOUNT_"):
+                    o.location.y = kit_stretch(o.matrix_world.translation.y, *st) - (o.matrix_world.translation.y - o.location.y)
+            for o in new:
+                if o.type == "MESH" and o.name.startswith("frame_"):
+                    o.name = "truck_" + o.name[len("frame_"):]
         if k == 0 and not isinstance(path, str):               # carroceria do kit: a chapa do baú antigo usa o material
             for o in [o for o in bpy.data.objects if o not in before]:     # da cabine; aqui ela conta como baú
                 if o.type == "MESH" and o.name.split(".")[0] == "truck_paint_white_panel":
