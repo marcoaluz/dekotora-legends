@@ -309,3 +309,8 @@ um problema visual não puder ser entendido pelos renders.
 - Armadilha: no baú antigo a chapa do baú usa o material da cabine (`paint_white_panel`); na medição do kit ela é
   renomeada para `truck_paint_white_box` (senão a cabine HAYATE, que é mais curta, "come" a frente do baú).
 - Os .glb não saem byte a byte iguais entre rodadas (ordem de alguns índices muda); a geometria é a mesma.
+- (T-251/T-252) O `build_t240_kits.py` grava `kit/<nome>.json` ao lado de cada .glb: `front`/`gap`/`y0` da carroceria (onde a
+  frente e o vão começam, altura do chão) e `back` da cabine. Também separa o chassi em malhas `frame_*` (não estica
+  com a carga). `truck_measure.import_truck` aceita `(glb, dy, (y0, front, ext, shift))` para esticar a carga como o jogo.
+- **Armadilha (matriz velha)**: depois de esticar ou mover objetos, chame `bpy.context.view_layer.update()` antes de ler
+  `matrix_world`. Sem isso o andon do leve/longo foi parar a ~7 m (T-252).

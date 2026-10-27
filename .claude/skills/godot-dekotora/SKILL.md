@@ -718,4 +718,8 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Ao mover nós de uma cena instanciada para outra: zere o `owner` (e dos filhos) antes do `add_child`, senão aviso de dono.
 - `BodyDef.factory_cab` (cabine de fábrica, vem na compra) e `BodyDef.default_cab` (rivais/bots). Protocolo 20.
 - Testes: `-- --only=cab_swap` (`test_cab_swap_t240.gd`); sonda `tools_dev/probe_t240.gd`; capturas `tools/capture_t240.sh`.
-- Foguete: `max_scale` no catálogo (1,35) em `StripFit`; a faixa vem de `truck_measure.ROCKET_RUN` (0,85).
+- Foguete: `max_scale` no catálogo (1,65; `wide_k` 1,1, T-252) em `StripFit`; a faixa vem de `truck_measure.ROCKET_RUN` (0,85).
+- **T-251**: a carga do kit estica até a cabine (`TruckKit._fit_body`/`stretch`/`front_shift`/`gap`; medidas em `truck/kit/*.json`
+  gravadas pelo `build_t240_kits.py`; malhas `frame_*` = chassi que não estica). Testes `-- --only=cab_gap`. Capturas
+  antes/depois (T-251 e T-252): `bash tools/capture_t251.sh [cabines|t252|tudo]` → `docs/capturas_t251/` (o "antes" usa
+  `../t251_antes/game`, cópia do commit 2a868b6; `SKIP_ANTES=1` refaz só os "depois", reaproveitando os "antes").
