@@ -661,7 +661,7 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Armadilha 1 (nomes): o Blender renomeia empties repetidos (`SIGNAL_L.006` vira o nó `SIGNAL_L_006` no Godot).
   Procure com curinga: `find_child("SIGNAL_L*", true, false)` (é o que `FrameFit` faz em `frame_fit.gd`).
 - Armadilha 2 (fila do `queue_free`): `find_child` ainda acha uma peça que já está na fila do `queue_free` no mesmo quadro.
-  Tire o nó do pai (`remove_child`) antes de chamar `queue_free`. Exemplo: `apply_decals`/peças em `truck_node.gd`,
+  Tire o nó do pai (`remove_child`) antes de chamar `queue_free`. Exemplo: `apply_loadout` em `truck_node.gd`,
   bloco marcado `T-233`.
 - Encaixes por `fit` (`game/scripts/truck/frame_fit.gd`, `class_name FrameFit`, `FITS = ["bumper", "stay", "ladder", "runs"]`):
   - `bumper` (para-choque da frente): escala uniforme pela largura da cabine; `TOP_` fica no topo (embaixo do farol), `BOT_` acompanha o fundo, `CEN_` no meio.
