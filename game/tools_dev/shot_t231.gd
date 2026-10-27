@@ -5,6 +5,7 @@ extends SceneTree
 ##   godot --path game --resolution 960x600 -s res://tools_dev/shot_t231.gd -- --body=base --cab=chata
 ##       --parts=rb_torpedo,rocket_led,boxlight_dash_r --view=back34|back|side|front|q34|roof|roof_back|rear_low
 ##       [--night] [--color=id:cor] [--led=id:luz] [--neon=id:luz] [--state=id:dent|broken] --out=ABS.png
+##       T-239: [--signal=-1|1|2] (seta acesa no print) [--brake] (freio apertado)
 ##   ou --batch=ABS.txt (uma linha por print, mesmos argumentos separados por espaco).
 
 var _jobs: Array = []
@@ -27,7 +28,7 @@ func _initialize() -> void:
 
 static func _parse(args: PackedStringArray) -> Dictionary:
 	var j: Dictionary = {"body": "base", "cab": "chata", "parts": PackedStringArray(), "view": "back34", "night": false,
-		"out": "", "styles": {}, "states": {}, "fov": 38.0}
+		"out": "", "styles": {}, "states": {}, "fov": 38.0, "signal": 0, "brake": false}
 	for a in args:
 		var v: String = a.get_slice("=", 1)
 		if a.begins_with("--body="):
@@ -42,6 +43,10 @@ static func _parse(args: PackedStringArray) -> Dictionary:
 			j["fov"] = float(v)
 		elif a == "--night":
 			j["night"] = true
+		elif a.begins_with("--signal="):
+			j["signal"] = int(v)
+		elif a == "--brake":
+			j["brake"] = true
 		elif a.begins_with("--out="):
 			j["out"] = v
 		elif a.begins_with("--state="):
@@ -151,6 +156,12 @@ func _process(_dt: float) -> bool:
 	_frames += 1
 	if _frames == 2:
 		_mount(_job)
+	if _frames == 14:                         # T-239: seta (reacende agora: comeca acesa) e freio
+		var tn: TruckNode = _job["truck"]
+		tn.set_signal(0)
+		tn.set_signal(int(_job["signal"]))
+		if bool(_job["brake"]) and tn.has_method("set_brake"):
+			tn.call("set_brake", true, 1.0)
 	if _frames == 16:
 		var img: Image = root.get_viewport().get_texture().get_image()
 		if String(_job["out"]) != "":

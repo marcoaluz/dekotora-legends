@@ -73,9 +73,17 @@ const LIGHTS_OFF_LEVEL: float = 0.12
 var _lamp_mats: Dictionary = {}              # nome do material de luz -> ShaderMaterial animado (um por caminhao)
 var _lights_level: float = 1.0
 var _pattern: String = "steady"
-var _blinkers: Array[MeshInstance3D] = []   # 0 frente-esq., 1 frente-dir., 2 traseira-esq., 3 traseira-dir.
+var signals: TruckSignals = TruckSignals.new()   # T-239: setas em cima das lampadas (0 FE, 1 FD, 2 TE, 3 TD)
 var _blink := SignalBlink.new()             # T-170: ritmo do pisca (1,5 Hz)
 var _blink_shown: int = 0
+var _sockets: Dictionary = {}               # encaixes/medidas do .glb (TruckSockets)
+var _stock_rear: Node3D                     # T-239: lanterna de fabrica do jogo (so baus sem lanterna ambar atras)
+var _brake: float = 0.0                     # T-239: 0..1 luz de freio (todas as luzes vermelhas)
+var _red_mats: Array[StandardMaterial3D] = []   # lanternas vermelhas de fabrica deste caminhao (brilham mais no freio)
+var _red_base: Array[float] = []
+const BRAKE_ON_S: float = 0.08              # s para acender todas as luzes de vermelho (rapido, sem piscar feio)
+const BRAKE_OFF_S: float = 0.15
+const BRAKE_RED_GAIN: float = 1.0           # lanterna vermelha de fabrica: + 100% de brilho freando
 ## Brilho no chao (neon de chao, estribo) e acrilico do andon das pecas deluxe (T-172), pela mesma forca das luzinhas.
 var glow: AccessoryGlow = AccessoryGlow.new()
 
@@ -91,13 +99,17 @@ func _ready() -> void:
 	add_child(model)
 	add_extra_mounts(model, body_kind, cab_kind)
 	TruckSockets.add_nodes(model, path)              # T-211: encaixes das pecas da oficina (deque, viseira...)
+	_sockets = TruckSockets.for_model(path)
 	_attach_lods(path)                               # T-218: antes do cromo/mural/texturas (valem para os LODs tambem)
+	RearDoorLamps.strip(model, _sockets)             # T-239: porta de tras do bau sem luzes (so as do para-choque; LODs tambem)
+	if StockRearLamps.needed(model, _sockets):
+		_stock_rear = StockRearLamps.build(model, _sockets)
 	if chrome_mode != "":
 		ChromeMatcap.apply(model, chrome_mode)
 	_apply_mural()
 	TruckTextures.apply(model)               # texturas grandes compartilhadas (o .glb so traz miniaturas)
 	_apply_light_materials(model)
-	_build_blinkers()
+	_place_blinkers()
 	wheels.setup(model, float(WHEEL_RADII.get(body_kind, WHEEL_RADIUS)))
 	_headlight = SpotLight3D.new()
 	_headlight.position = Vector3(0, 1.2, -11.6 - front_delta())
@@ -171,7 +183,8 @@ func set_light_pattern(pattern: String) -> void:
 
 
 ## Troca os materiais das luzinhas (lamp_amber/yellow/pink/cyan) de `root` pelo material animado do padrao.
-## Vermelho (lanterna) e branco (farol) ficam fixos. Chame de novo depois de montar pecas novas.
+## Branco (farol) fica fixo; vermelho (lanterna de fabrica) ganha uma copia por caminhao que brilha mais no freio (T-239).
+## Chame de novo depois de montar pecas novas.
 func _apply_light_materials(root: Node) -> void:
 	for mi in root.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
@@ -179,6 +192,9 @@ func _apply_light_materials(root: Node) -> void:
 			continue
 		for s in m.mesh.get_surface_count():
 			var cur: Material = m.get_active_material(s)
+			if cur is StandardMaterial3D and cur.resource_name == "lamp_red":
+				m.set_surface_override_material(s, _red_copy(cur as StandardMaterial3D))
+				continue
 			if cur == null or not cur.resource_name.begins_with("lamp_") or not (LightPatterns.is_animated(cur.resource_name) 					or LightPatterns.is_steady_lit(cur.resource_name)):
 				continue
 			var key: String = cur.resource_name
@@ -186,8 +202,51 @@ func _apply_light_materials(root: Node) -> void:
 				var sm: ShaderMaterial = LightPatterns.make_material(cur)
 				sm.set_shader_parameter("level", _lights_level)
 				sm.set_shader_parameter("pattern", 0 if LightPatterns.is_steady_lit(key) else LightPatterns.IDS.find(_pattern))
+				sm.set_shader_parameter("brake", _brake)
 				_lamp_mats[key] = sm
 			m.set_surface_override_material(s, _lamp_mats[key])
+
+
+## Copia por caminhao da lanterna vermelha de fabrica (o .glb divide o material entre todos os caminhoes).
+func _red_copy(src: StandardMaterial3D) -> StandardMaterial3D:
+	if src in _red_mats:
+		return src
+	var i: int = _red_base.size()
+	for k in _red_mats.size():
+		if _red_mats[k].get_meta("src", null) == src:
+			return _red_mats[k]
+	var dup: StandardMaterial3D = src.duplicate() as StandardMaterial3D
+	dup.set_meta("src", src)
+	_red_mats.append(dup)
+	_red_base.append(dup.emission_energy_multiplier if dup.emission_enabled else 0.0)
+	_apply_red(i)
+	return dup
+
+
+func _apply_red(i: int) -> void:
+	if _red_mats[i].emission_enabled:
+		_red_mats[i].emission_energy_multiplier = _red_base[i] * (1.0 + BRAKE_RED_GAIN * _brake)
+
+
+## T-239: luz de freio. `on` = freio apertado (TruckSim.brake_lamp); `dt` em s (transicao de BRAKE_ON_S / BRAKE_OFF_S;
+## dt grande = na hora). Todas as luzinhas, LEDs, neons e lanternas ficam vermelhos e fixos; o farol branco e a seta
+## nao mudam. So mexe em uniformes quando o valor muda (nada de material novo).
+func set_brake(on: bool, dt: float) -> void:
+	var target: float = 1.0 if on else 0.0
+	var b: float = move_toward(_brake, target, dt / (BRAKE_ON_S if on else BRAKE_OFF_S))
+	if b == _brake:
+		return
+	_brake = b
+	for m in _lamp_mats.values():
+		(m as ShaderMaterial).set_shader_parameter("brake", _brake)
+	for i in _red_mats.size():
+		_apply_red(i)
+	glow.set_brake(_brake)
+
+
+## Luz de freio agora (0..1; testes).
+func brake_level() -> float:
+	return _brake
 
 
 ## Adesivos (DecalPlacer): lista de {id, slot, x, y, size, color}. Troca tudo de uma vez.
@@ -201,38 +260,19 @@ func apply_decals(decals: Array) -> void:
 	_decal_nodes = DecalPlacer.build(self, model, decals, -11.5 - front_delta(), shown_cab())
 
 
-## Setas de faixa: 4 lamparinas ambar (frente e traseira, esquerda e direita), sem luz real (barato no celular).
-func _build_blinkers() -> void:
-	var front_z: float = -11.5 - front_delta()
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(1.0, 0.62, 0.05)
-	mat.emission_enabled = true
-	mat.emission = Color(1.0, 0.55, 0.0)
-	mat.emission_energy_multiplier = 5.0
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	var box := BoxMesh.new()
-	box.size = Vector3(0.34, 0.2, 0.14)
-	box.material = mat
-	for i in 4:
-		var m := MeshInstance3D.new()
-		m.mesh = box
-		var side: float = -1.0 if i % 2 == 0 else 1.0
-		m.position = Vector3(side * 1.22, 0.95 if i < 2 else 1.05, front_z if i < 2 else 0.12)
-		m.visible = false
-		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(m)
-		_blinkers.append(m)
-
-
 ## Pisca a seta do lado `dir` (-1 esquerda, +1 direita, 0 apagada, 2 = pisca-alerta dos dois lados, T-202), ~1,5 vez por segundo (T-170: SignalBlink,
 ## comeca aceso no toque). So mexe na visibilidade quando muda (nenhum no ou material novo).
 func set_signal(dir: int) -> void:
 	if _blink.update(dir, SignalBlink.now()) == SignalBlink.Edge.NONE and dir == _blink_shown:
 		return
 	_blink_shown = dir
-	for i in _blinkers.size():
-		var side: int = -1 if i % 2 == 0 else 1
-		_blinkers[i].visible = _blink.lit and (side == dir or dir == 2)     # T-202: 2 = hazard (both sides)
+	for i in 4:
+		signals.set_visible(i, _blink_lit(i))
+
+
+func _blink_lit(i: int) -> bool:
+	var side: int = -1 if i % 2 == 0 else 1
+	return _blink.lit and (side == _blink_shown or _blink_shown == 2)     # T-202: 2 = hazard (both sides)
 
 
 ## A seta esta acesa agora (testes)?
@@ -462,21 +502,30 @@ func _after_frame_parts(catalog: AccessoryCatalog, defs: Array[PartDef]) -> void
 			sides = ["r", "l"]
 	var data: Dictionary = TruckSockets.for_model(model_path(body_kind, cab_kind))
 	FrameFit.hide_stock(model, FrameFit.stock_boxes(data, sides))
-	_place_front_blinkers()
+	_place_blinkers()
 
 
-## Setas da frente: nos pontos SIGNAL_L/R do para-choque da oficina, se houver; senao no lugar de sempre.
-func _place_front_blinkers() -> void:
-	if _blinkers.size() < 2:
+## T-239: setas em cima das lampadas (TruckSignals). A lanterna de fabrica do jogo some quando ha para-choque traseiro
+## da oficina (a peca traz as lanternas dela).
+func _place_blinkers() -> void:
+	if model == null:
 		return
-	var spots: Array = FrameFit.signal_spots(self, model)
-	var front_z: float = -11.5 - front_delta()
-	for i in 2:
-		var b: MeshInstance3D = _blinkers[i]
-		if spots.size() == 2:
-			b.transform = (spots[i] as Transform3D) * Transform3D(Basis.from_scale(Vector3(1.0 / 0.34, 1.0 / 0.2, 1.0 / 0.14)), Vector3.ZERO)
-		else:
-			b.transform = Transform3D(Basis.IDENTITY, Vector3((-1.0 if i == 0 else 1.0) * 1.22, 0.95, front_z))
+	if _stock_rear != null:
+		_stock_rear.visible = not _has_rear_part()
+	var lit: Array[bool] = []
+	for i in 4:
+		lit.append(_blink_lit(i))
+	signals.rebuild(self, model, _sockets, -11.5 - front_delta(), lit)
+
+
+func _has_rear_part() -> bool:
+	var rb: Node = model.find_child("SOCKET_rear_bumper", true, false)
+	if rb == null:
+		return false
+	for c in rb.get_children():
+		if not c.is_queued_for_deletion() and c is Node3D and (c as Node3D).visible:
+			return true
+	return false
 
 
 ## Variante, cor/letreiro/luzes da oficina, brilho, cromo e luzinhas de uma peca recem-montada.

@@ -86,8 +86,10 @@ func test_bumper_fits_height_and_carries_plate_and_signal() -> void:
 		var spots: Array = FrameFit.signal_spots(t, t.model)
 		check(spots.size() == 2, "%s: setas no para-choque" % body)
 		if spots.size() == 2:
-			check((t._blinkers[0].transform.origin - (spots[0] as Transform3D).origin).length() < 0.01, "%s: seta esquerda foi junto" % body)
-			check(t._blinkers[0].transform.origin.x < 0.0 and t._blinkers[1].transform.origin.x > 0.0, "%s: esquerda/direita" % body)
+			check(t.signals.spots[0] == "bumper" and t.signals.spots[1] == "bumper", "%s: seta no ponto do para-choque" % body)
+			var bl: AABB = t.signals.box_of(0, t)       # T-239: a seta e filha do ponto SIGNAL (antes: caixa no TruckNode)
+			check(bl.get_center().distance_to((spots[0] as Transform3D).origin) < 0.01, "%s: seta esquerda foi junto" % body)
+			check(bl.get_center().x < 0.0 and t.signals.box_of(1, t).get_center().x > 0.0, "%s: esquerda/direita" % body)
 		t.free()
 
 

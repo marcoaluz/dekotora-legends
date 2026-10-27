@@ -78,6 +78,13 @@ func set_level(l: float) -> void:
 		_acrylic[i].emission_energy_multiplier = _acrylic_base[i] * lerpf(ACRYLIC_MIN, 1.0, clampf(l, 0.0, 1.0))
 
 
+## T-239: freio = a mancha de luz no chao fica vermelha junto com as lampadas (0..1).
+func set_brake(b: float) -> void:
+	for key in _floor_mats:
+		var base := Color.html(String(key))
+		(_floor_mats[key] as ShaderMaterial).set_shader_parameter("color", base.lerp(LightPatterns.BRAKE_COLOR, b))
+
+
 func floor_level() -> float:
 	if _floor_mats.is_empty():
 		return -1.0

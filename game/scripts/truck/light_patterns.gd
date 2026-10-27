@@ -13,6 +13,11 @@ const STEADY_LIT: Array[String] = ["lamp_tail"]
 const STEADY_FLOOR: float = 0.3
 ## T-214: sufixo do material de LED com lente (DecoStyle): o shader desenha a lente pela UV 0..1 de cada LED.
 const LENS_SUFFIX := "@lens"
+## T-239: freio = todas as luzes ficam vermelhas e fixas (sem padrao). BRAKE_LEVEL = brilho minimo com o freio (de dia as
+## luzes estao apagadas em 0,12: freando elas acendem de verdade); a lanterna (STEADY_LIT) ainda ganha BRAKE_GAIN.
+const BRAKE_COLOR := Color(1.0, 0.07, 0.04)
+const BRAKE_LEVEL: float = 0.75
+const BRAKE_GAIN_TAIL: float = 1.5
 
 const SHADER := """
 shader_type spatial;
@@ -24,6 +29,10 @@ uniform float level = 1.0;        // brilho geral: 1 noite/tunel, ~0.4 previa de
 uniform float speed = 1.0;
 uniform float lens = 0.0;         // T-214: LED com lente (UV 0..1 por LED): centro forte, borda mais escura
 uniform float floor_level = 0.0;  // T-231: brilho minimo (lanterna: lente vermelha de dia)
+uniform float brake = 0.0;        // T-239: 0..1 freio (cor vai para brake_color, padrao para fixo, brilho sobe)
+uniform vec4 brake_color : source_color = vec4(1.0, 0.07, 0.04, 1.0);
+uniform float brake_level = 0.75;
+uniform float brake_gain = 1.0;
 varying vec3 lp;
 
 void vertex() {
@@ -50,7 +59,10 @@ void fragment() {
 		float d = length(UV - vec2(0.5));
 		k *= mix(1.3, 0.42, smoothstep(0.10, 0.52, d));
 	}
-	ALBEDO = base_color.rgb * energy * max(level, floor_level) * k;
+	float lv = max(level, floor_level);
+	lv = mix(lv, max(lv, brake_level) * brake_gain, brake);
+	k = mix(k, max(k, 1.0), brake);
+	ALBEDO = mix(base_color.rgb, brake_color.rgb, brake) * energy * lv * k;
 }
 """
 
@@ -74,6 +86,9 @@ static func make_material(src: Material) -> ShaderMaterial:
 	if src != null and is_steady_lit(src.resource_name):
 		m.set_shader_parameter("lens", 1.0)
 		m.set_shader_parameter("floor_level", STEADY_FLOOR)
+		m.set_shader_parameter("brake_gain", BRAKE_GAIN_TAIL)
+	m.set_shader_parameter("brake_color", BRAKE_COLOR)
+	m.set_shader_parameter("brake_level", BRAKE_LEVEL)
 	return m
 
 
