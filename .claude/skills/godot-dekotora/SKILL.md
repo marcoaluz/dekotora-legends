@@ -690,3 +690,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   (o olhar) precisa ser restaurada no quadro seguinte (`restore_base`), senão a câmera parte da pose do olhar.
 - Armadilha 2: `RaceCamRig.clamp_point` empurra para o lado um ponto que está sobre o baú, mesmo lá no alto. Quando a altura
   do ponto for maior que `BODY_TOP_H`, passe `me` com comprimento 0 (`Vector3(me.x, me.y, 0.0)`), como faz `RaceLook.world_target`.
+
+## Luzes de freio e setas (T-239)
+
+- Freio: `TruckNode.set_brake(on, dt)` (`game/scripts/truck/truck_node.gd`) recebe `TruckSim.brake_lamp`. Todas as luzinhas, LEDs, neons e lanternas ficam vermelhos e fixos; farol e seta não mudam.
+- `TruckSim.brake_lamp` (`game/scripts/sim/truck_sim.gd`) vai no snapshot como bit de freio (protocolo 19). Liga com 15% do pedal e desliga abaixo de 5% (`HardBrake.LAMP_ON` / `LAMP_OFF`, histerese).
+- Seta mostrada: `TruckSim.shown_signal()` (só leitura). Vale a seta ligada ou, durante a troca de faixa, o lado para onde o caminhão vai.
+- `TruckSignals` (`game/scripts/truck/truck_signals.gd`): seta = cópia acesa da lâmpada + halo âmbar (nó marcado com `meta` "halo", não por nome). Para testes: `spots` (de onde veio cada lado) e `box_of(i, root)`.
+- Porta de trás: `RearDoorLamps.strip` e `RearDoorLamps.lamps_left` (`game/scripts/truck/rear_door_lamps.gd`). Caixa de luzes de fábrica: `StockRearLamps` (`stock_rear_lamps.gd`). Peças de luz: `LampMesh.pieces` (`game/scripts/truck/lamp_mesh.gd`).
+- Armadilhas:
+  - Tirar as luzes da porta DEPOIS de `_attach_lods` (senão os LODs ficam com luz).
+  - Marcar nós com `meta` e não por nome.
+  - Array literal não é `Array[Tipo]`: converta antes de atribuir a um array tipado.
+- Comandos:
+  - Antes/depois da captura: `bash tools/capture_t239.sh antes` ou `bash tools/capture_t239.sh depois`.
+  - Sondagem da porta e das setas: `godot --headless --path game -s res://tools_dev/probe_t239.gd -- --truck=corpo:cabine`.
+  - Só os testes de luz: `godot --headless --path game -s res://tests/run_tests.gd -- --only=lights_t239`.
+  - Foto com freio ou seta: `shot_t231.gd` aceita `--brake` e `--signal=-1|1|2`.
