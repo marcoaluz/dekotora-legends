@@ -297,4 +297,4 @@ um problema visual não puder ser entendido pelos renders.
   Quem procura esses pontos no jogo tem que usar curinga (`SIGNAL_L*`). Ver a parte do Godot.
 - Armadilha 3 (tanque): o tanque de combustível de fábrica sai ~0,1 m para fora do baú. Por isso as saias
   (`skirt_t233.py`) só entram nos trechos livres entre as rodas, medidos por raios, e deixam o tanque e a bateria de fora.
-  (Esse número de 0,1 m não está escrito nos docs; confirmar com o Marco ou medir antes de mexer nas saias.)
+  (Medido pela T-233: tanque e bateria de fábrica saem 0,1 m para fora do baú; ver docs/DECISOES.md, entrada T-233.)
