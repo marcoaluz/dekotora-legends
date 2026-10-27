@@ -105,8 +105,8 @@ def build_kw(m, add, src=None) -> KwInfo:
 
     def surf(x, z):
         hit = tree.ray_cast(Vector((x, y_front + 3.0, z)), Vector((0, -1, 0)))
-        if hit[0] is None:
-            return Vector((x, y_front, z)), Vector((0, 1, 0))
+        if hit[0] is None:                          # T-252: fora da casca -> sem normal (a sobrancelha pula o ponto)
+            return Vector((x, y_front, z)), None
         nrm = hit[1] if hit[1].y >= 0 else -hit[1]
         return hit[0].copy(), nrm.normalized()
     extra = _back_wall(m, add, shell, y_back)

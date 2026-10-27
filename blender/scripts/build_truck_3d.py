@@ -192,7 +192,8 @@ def build_truck(m: dict, paint_name: str = "paint_white", variant: str = "base",
         build_box_premium(m, add, BoxDims(l=round(BODY_L + dy + ext, 3)))
     if variant != "carreta":                        # decoracao Dekotora (V7): luzes, andons, murais
         body_l = BODY_L + dy + ext
-        cab_z = info.top                            # altura real da cabine (com defletor de teto, se houver)
+        bpy.context.view_layer.update()            # T-252: matrix_world velha depois do stretch (leve/longo) dobrava a
+        cab_z = info.top                            # altura -> andon da frente a ~7 m; altura real da cabine (com defletor)
         for o in parts:
             mw = o.matrix_world
             for v in o.data.vertices:

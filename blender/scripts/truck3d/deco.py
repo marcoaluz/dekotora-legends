@@ -101,6 +101,8 @@ def cab_brow(m, add, cab_front):
             add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), (x, yf + 0.03, z), lamps[k % 2], bevel=0.0, seg=1))
             continue
         p, n = surf(x, z)
+        if n is None:                                         # T-252: o raio nao achou a casca (americana: luz solta no ar)
+            continue
         p = p + n * 0.012
         add(M.box(f"mk_cab_{k}", (LAMP, 0.03, LAMP), tuple(p), lamps[k % 2], bevel=0.0, seg=1,
                   rot=(0, 0, -math.degrees(math.atan2(n.x, n.y)))))
