@@ -37,6 +37,9 @@ const LOD_RANGES: Array[float] = [45.0, 120.0]
 const LENGTH_DELTA: Dictionary = {"base": 0.0, "leve": -2.8, "longo": 1.6, "carreta": 5.5, "canter": -4.6, "graneleira": 0.0,
 		"alubox": 0.0, "tarp": 0.0, "pinkbox": 0.0, "tanker": 0.0, "dump": 0.0}
 const WHEEL_RADIUS: float = 0.52
+## Fumaca do motor (T-246): quanto abaixo da borda de baixo do para-brisa e quanto para dentro da frente da cabine (m).
+const SMOKE_BELOW_GLASS: float = 0.45
+const SMOKE_INSET: float = 0.15
 const WHEEL_RADII: Dictionary = {"canter": 0.44}
 ## Mural das laterais do bau: troque este PNG (proporcao ~4:1) pela arte que quiser; um
 ## user://mural_side.png (pasta de dados do jogo) tem prioridade, para testar sem reimportar.
@@ -423,6 +426,20 @@ static func add_extra_mounts(root: Node3D, body: String, cab: String) -> void:
 ## Cabine que aparece de verdade (o Canter so tem a dele, qualquer que seja a escolha do perfil).
 func shown_cab() -> String:
 	return String(FIXED_CAB.get(body_kind, CabCatalog.normalize(cab_kind)))
+
+
+## T-246: de onde sai a fumaca do motor ferido (metros do caminhao): na grade, ABAIXO do para-brisa, um pouco para
+## dentro do bico (a fumaca brota da frente da cabine). Antes era fixo em (0; 2,4; -11), que no bau curto ficava
+## solto no ar 2,3 m na frente do para-brisa e, olhando de frente, virava um quadrado cinza em cima do vidro.
+func smoke_origin() -> Vector3:
+	var front: float = -11.5 - front_delta()
+	var top: float = 1.7
+	var cab: Dictionary = (_sockets.get("measure", {}) as Dictionary).get("cab", {})
+	if cab.has("front_z"):
+		front = float(cab["front_z"])
+	if cab.has("windshield"):
+		top = TruckSockets.aabb_of(cab["windshield"]).position.y
+	return Vector3(0.0, top - SMOKE_BELOW_GLASS, front + SMOKE_INSET)
 
 
 ## Quanto a frente deste caminhao passa da do caminhao padrao (m): comprimento do bau + bico da cabine.

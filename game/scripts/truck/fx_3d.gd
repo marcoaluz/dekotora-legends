@@ -50,11 +50,32 @@ func _ready() -> void:
 	_flash_mat.no_depth_test = true
 	_flash_mesh = QuadMesh.new()
 	_flash_mesh.size = Vector2(1.0, 1.0)
-	_smoke_mat = StandardMaterial3D.new()
-	_smoke_mat.albedo_color = Color(0.25, 0.25, 0.28, 0.55)
-	_smoke_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_smoke_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_smoke_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	_smoke_mat = make_smoke_material()
+
+
+## Fumaca do motor (T-246): baforada redonda e macia (gradiente radial que some na borda) que aparece e some aos
+## poucos (cor por particula). Antes era um quadrado cinza chapado sem textura: varios juntos viravam um retangulo.
+static func make_smoke_material() -> StandardMaterial3D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1.0, 1.0, 1.0, 0.7))
+	g.set_color(1, Color(1.0, 1.0, 1.0, 0.0))
+	g.add_point(0.55, Color(1.0, 1.0, 1.0, 0.35))
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.5, 0.5)
+	gt.fill_to = Vector2(1.0, 0.5)
+	gt.width = 64
+	gt.height = 64
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = gt
+	m.albedo_color = Color(0.3, 0.3, 0.33, 0.8)
+	m.vertex_color_use_as_albedo = true             # color_ramp da particula: entra e some aos poucos
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.billboard_keep_scale = true
+	return m
 
 
 func zone_point(truck: Node3D, zone: String) -> Vector3:
@@ -133,11 +154,29 @@ func set_smoke(index: int, truck: Node3D, level: float) -> void:
 		p.scale_amount_min = 0.8
 		p.scale_amount_max = 2.2
 		p.local_coords = false
+		var ramp := Gradient.new()                  # entra e some (sem borda dura no fim da vida)
+		ramp.set_color(0, Color(1, 1, 1, 0.0))
+		ramp.set_color(1, Color(1, 1, 1, 0.0))
+		ramp.add_point(0.15, Color(1, 1, 1, 1.0))
+		ramp.add_point(0.6, Color(1, 1, 1, 0.6))
+		p.color_ramp = ramp
+		var grow := Curve.new()                     # cresce ao subir
+		grow.add_point(Vector2(0.0, 0.45))
+		grow.add_point(Vector2(1.0, 1.0))
+		p.scale_amount_curve = grow
+		p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(p)
 		_smoke[index] = p
 	p.amount = int(6 + level * 26.0)
 	p.emitting = true
-	p.global_position = truck.global_transform * Vector3(0, 2.4, -11.0)
+	p.global_position = truck.global_transform * smoke_origin(truck)
+
+
+## Ponto da fumaca do motor no caminhao (metros do caminhao; TruckNode sabe onde fica a grade dele).
+static func smoke_origin(truck: Node3D) -> Vector3:
+	if truck is TruckNode:
+		return (truck as TruckNode).smoke_origin()
+	return Vector3(0.0, 1.25, -11.2)
 
 
 ## Clarao rapido no ponto da batida (aparece por cima do bau: sem teste de profundidade). `size` em metros.

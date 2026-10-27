@@ -645,3 +645,10 @@ Formato em `docs/AGENTES.md`.
 - Freio: todas as luzes decorativas vermelhas e fixas (liga 15% do pedal, desliga < 5%); setas = cópia acesa da lâmpada + halo âmbar, no lugar certo com e sem para-choque novo; luzes da porta traseira removidas em jogo (inclusive LODs); baús sem lanterna ganharam lanterna de fábrica que some com o para-choque novo. Protocolo 19 (bit de freio no snapshot). 553 testes, net_test ok.
 - Revisão do coordenador: folha depois_base_chata_noite mostra freio vermelho claro; seta pequena nas miniaturas.
 - Delegado: T-247 (skill + STATUS), T-248 (APK). T-246 começa agora.
+
+## 2026-10-26 · T-246 · especialista · CONCLUÍDA
+- Feito: o retângulo cinza no para-brisa (câmera olhando para trás) era a fumaça do motor ferido (perfil do PC com motor 0%) saindo de um ponto fixo (0; 2,4; -11) que, no baú curto, fica no ar na frente do vidro, com baforadas quadradas sem textura. Agora sai da grade de cada caminhão (`TruckNode.smoke_origin`, pelas medidas do .glb) e a baforada é redonda/macia (`Fx3D.make_smoke_material`).
+- Arquivos: game/scripts/truck/{fx_3d, truck_node}.gd; game/tests/test_smoke_t246.gd (novo); game/tools_dev/probe_t246.gd (novo: abre a corrida e lista o que cruza a frente da cabine, `--hide=` e `--probe-shot=`); docs/capturas_t246/ (antes_/depois_ pc/cel dia/noite trás); DECISOES.
+- Validação: suíte 556/556 (3 novos); sonda mostrou o CPUParticles3D em (0; 2,4; -11) e escondê-lo tirou o retângulo; capturas da T-241 de trás refeitas (4) sem o retângulo.
+- Armadilhas: (1) a sonda achou o culpado escondendo nós e tirando print, não pelo nome (era partícula, não MeshInstance3D); (2) `GradientTexture2D.get_image()` é null sem tela: testar o gradiente; (3) as capturas usam o perfil real do PC (motor 0% salvo de corridas anteriores), por isso a fumaça aparecia.
+- Decisão pendente: nenhuma de design (opcional para o Marco: fumaça do motor quase não aparece em velocidade, pela câmera de trás; se quiser vê-la, é efeito novo).

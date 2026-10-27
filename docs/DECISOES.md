@@ -1447,3 +1447,13 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   de baú + Canter + carreta), inclusive nos LODs. Feito no jogo (`RearDoorLamps`, triângulos dentro da zona `rear_doors`),
   **sem regerar os .glb**. Ficam: andon traseiro, fileira do teto, luzinhas das laterais, refletores pintados da borda de
   baixo, escada e trilhos. Baús abertos (graneleira, lona, tanque, caçamba) não têm porta: nada muda.
+
+## 2026-10-26 · T-246 · Quadrado cinza no para-brisa (olhando para trás) era a fumaça do motor
+- Causa: a fumaça do motor ferido (`Fx3D.set_smoke`, aparece com motor < 60%) saía de um ponto fixo (0; 2,4; -11) e
+  cada baforada era um quadrado cinza sem textura. No baú curto (frente da cabine em -8,7) esse ponto fica solto no ar
+  2,3 m na frente do vidro; de frente, as baforadas empilhadas viravam um retângulo cinza. Na garagem não aparece (sem fumaça).
+- Correção na origem: `TruckNode.smoke_origin()` põe a fumaça na grade de cada caminhão (0,45 m abaixo do para-brisa,
+  0,15 m para dentro do bico, pelas medidas do .glb) e a baforada virou redonda e macia (gradiente radial, entra e some).
+  Em velocidade a fumaça fica quase escondida pela cabine (como já era no baú médio); parado, sai pela grade.
+- Teste: `test_smoke_t246.gd` (fumaça abaixo do vidro e na frente da cabine nos 23+ caminhões; nada solto na frente do
+  vidro; baforada redonda). Capturas antes/depois em `docs/capturas_t246/`. Protocolo não mudou (só visual).
