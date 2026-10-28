@@ -674,7 +674,10 @@ Referência de preço: a peça mais barata do lote custa 8.000 ¥ e um frete de 
 a cor comum é ~1/4 da peça barata, a metálica ~1/2, a neon ~2/3. Letreiro do deque (lista de 12 nomes prontos:
 銀河丸, 一番星, 爆走丸, 龍神丸, 桜吹雪, 天翔丸, 浪花節, 男一匹, 夜桜, 鳳凰丸, 雷神丸, 唐獅子): **de graça** (proposta).
 
-## 19. Proposta para as lacunas (rodas, escapamento, grade, buzina, interior, adesivos) — T-211, NÃO modelado
+## 19. Proposta para as lacunas (rodas, escapamento, grade, buzina, interior, adesivos) — **FEITO (T-234)**
+
+T-234: as 3 propostas de cada categoria viraram peças (grade refeita pela referência do Marco, buzina em cima da
+viseira); ver `docs/DECISOES.md` (T-234) e `docs/capturas_t234/`.
 
 Decisão 2 do Marco: propor um design novo no estilo das capturas, mostrar em folha ANTES de modelar. Esboços de forma
 e cor (blocos simples, de noite para ver o neon): **`docs/capturas_t211/proposta_lacunas.png`** (uma imagem por

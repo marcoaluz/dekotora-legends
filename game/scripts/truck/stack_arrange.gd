@@ -67,9 +67,16 @@ static func _ahead(lower: Node3D, pods: Array[Node3D], data: Dictionary, anchor:
 		var b: AABB = lower.transform * PartFit.rel_xform(pod, lower) * SocketSeat._local_aabb(pod)
 		front = minf(front, anchor.z + b.position.z)
 		bottom = minf(bottom, anchor.y + b.position.y)
-	if bottom > vb.end.y + 0.005:
+	var room: float = INF
+	if bottom <= vb.end.y + 0.005:
+		room = front - (vb.end.z + VISOR_GAP)                # quanto da para avancar sem entrar no lugar da viseira
+	var hs: Dictionary = TruckSockets.socket(data, "horn")  # T-234: nem no lugar da buzina (em cima da viseira)
+	if hs.has("box"):
+		var hb: AABB = TruckSockets.aabb_of(hs["box"])
+		if bottom <= hb.end.y - 0.002:
+			room = minf(room, front - (hb.end.z + VISOR_GAP))
+	if room == INF:
 		return AHEAD
-	var room: float = front - (vb.end.z + VISOR_GAP)        # quanto da para avancar sem entrar no lugar da viseira
 	return clampf(room / sc, 0.0, AHEAD)
 
 

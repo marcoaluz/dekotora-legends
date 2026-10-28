@@ -9,7 +9,7 @@ import bpy
 import numpy as np
 
 RAW, OUT = sys.argv[sys.argv.index("--") + 1:][:2]
-VIEWS = ["front34", "front_close", "wheel_close", "stack34", "horn_back", "side"]
+VIEWS = ["front34", "front_close", "wheel_close", "stack34", "visor_close", "side"]
 
 
 def load(path):

@@ -60,6 +60,9 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 		"horn":
 			var lift: float = float(s.get("lift", 0.0))
 			node.position = Vector3(0.0, lift, 0.0)
+			var h: float = float((entry.get("dimensions_m", {}) as Dictionary).get("y", 0.0))
+			if h > 0.0 and box.end.y - anchor.y - lift < h:      # T-234: caixa mais baixa (americana) = peca menor
+				node.scale = Vector3.ONE * maxf((box.end.y - anchor.y - lift) / h, 0.5)
 			if lift > 0.0:
 				_pedestal(node, lift)
 

@@ -21,7 +21,7 @@ LOTS=(
   "alubox x hub_led_ring,stack_neon_twin,grille_honey_sun,horn_ship,interior_chandelier,$OLD"
   "tanker x hub_star_gold,stack_j_amber,grille_bars_led,horn_triple,interior_curtain,deck_led_box,visor_v_chevron"
 )
-VIEWS="front34 front_close wheel_close stack34 horn_back side"
+VIEWS="front34 front_close wheel_close stack34 visor_close side"
 for lot in "${LOTS[@]}"; do
   read -r body cab parts <<< "$lot"
   tag="${body}_${cab}"
@@ -37,7 +37,7 @@ one() {  # tipo peca vista [cabine]
 for p in hub_led_ring hub_star_gold hub_neon_spinner; do one roda $p wheel_close; done
 for p in stack_neon_twin stack_j_amber stack_side_triple; do one escape $p stack34; done
 for p in grille_bars_led grille_honey_sun grille_slats_neon; do one grade $p front_close; done
-for p in horn_triple horn_twin_long horn_ship; do one buzina $p horn_back; done
+for p in horn_triple horn_twin_long horn_ship; do one buzina $p visor_close; done
 for p in interior_curtain interior_chandelier interior_tufted; do one interior $p front_close; done
 # a mesma grade em todas as cabines (estica na largura/altura de cada uma; o sol continua redondo)
 for m in "base chata" "base jac" "base curta" "base americana" "base flat_wide" "canter canter"; do

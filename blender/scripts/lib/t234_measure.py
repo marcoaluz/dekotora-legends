@@ -1,7 +1,7 @@
 """Medidas da oficina, lote 5 (T-234), por RAIOS na malha real do caminhão importado (coordenadas do Godot):
 
 - grade: z da frente da cabine dentro da caixa do encaixe `grille` (a peça encosta no ponto mais à frente);
-- buzina: lugar plano no TOPO da carga, logo atrás da frente (baú, lona, tanque); caçamba aberta não tem;
+- buzina: em cima da viseira, encostada na testa (`socket_rules.lot5`); `horn_spot` (topo da carga) ficou só como medida;
 - interior: retângulo no plano do para-brisa (maior retângulo só de vidro, ajustado a um plano), onde o jogo põe a arte
   do interior "vista pelo vidro" (`game/scripts/truck/paint_fit.gd`, mesmo formato das pinturas da T-232).
 Determinístico (grades fixas de raios).
@@ -15,8 +15,8 @@ from . import truck_measure as TM
 
 GRILLE_STEP = 0.04        # m: grade de raios na frente da grade
 HORN_W = 0.32             # m: meia largura da caixa da buzina
-HORN_L = 0.62             # m: comprimento da caixa da buzina (ao longo do caminhão)
-HORN_H = 0.42             # m: altura da caixa da buzina acima do topo da carga
+HORN_L = 0.64             # m: comprimento da caixa da buzina (para a frente da testa)
+HORN_H = 0.28             # m: altura da caixa da buzina acima da viseira
 HORN_FLAT = 0.06          # m: o topo pode variar isso dentro da caixa (tanque redondo)
 HORN_TOP = 0.15           # m: o lugar tem de estar a no máximo isto abaixo do topo da carga (caçamba aberta: não)
 HORN_SEARCH = 2.6         # m: procura atrás da frente da carga até isto

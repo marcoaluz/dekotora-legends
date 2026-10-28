@@ -647,3 +647,18 @@ Números do catálogo (`docs/REFERENCIA_PECAS.md`, seções 3, 5, 8 e 9), sem mu
   retrovisor em 1 de 3 (`TruckConfig.BOT_FRONT/BOT_SKIRT/BOT_MIRROR`). Rivais: chefe `fb_deck_neon` + `skirt_neon_arrows`
   + `mirror_stay_grand` + `ladder_neon`; Trovão Rosa `fb_fan_stripe` + `skirt_neon_twin`; Lua Cromada `fb_smooth_chrome` +
   `skirt_chrome_rails` + `mirror_stay_frame`; Dragão de Aço `fb_box_amber` + `mirror_stay_box`.
+
+## Peças da oficina, lote 5: calotas, escapamentos, grades, buzinas, interior e adesivos (T-234) — PROPOSTA
+
+Dados em `game/data/parts/*.tres` (gerados por `python tools/gen_t234_data.py`). Raridade/fama mínima só informativas.
+
+| Peça | Peso kg | Durab. | Destaque | Preço ¥ | Raridade |
+| --- | --- | --- | --- | --- | --- |
+| 3 calotas (`hub_*`, uma em cada roda de fora) | 46–52 | 65–75 | 16–22 | 24.000–32.000 | incomum/rara |
+| 3 escapamentos (`stack_*`, os 2 lados) | 60–95 | 50–60 | 14–20 | 20.000–30.000 | comum/incomum |
+| 3 grades com painel aceso (`grille_*`) | 55–60 | 50 | 12–16 | 16.000–22.000 | comum/incomum |
+| 3 buzinas em cima da viseira (`horn_*`, trazem o som: melodia, 2 tons, navio) | 20–30 | 40–45 | 10–14 | 12.000–18.000 | comum/incomum |
+| 3 interiores pelo para-brisa (`interior_*`, arte: peso 0, não quebra) | 0 | 0 | 8–16 | 9.000–24.000 | comum/incomum |
+| 11 adesivos novos (9 frases, labaredas, sol) | — | — | +6 cada (regra antiga) | grátis (regra antiga) | — |
+
+- **Bots** (T-234): calota nova em 1 de 3 e grade nova em 1 de 4 (`TruckConfig.BOT_HUB/BOT_GRILLE`). Protocolo 21.

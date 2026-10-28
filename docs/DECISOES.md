@@ -1536,3 +1536,31 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Luzinhas soltas na frente da cabine americana**: 3–4 luzes da "sobrancelha" caíam fora da casca (o raio não
   encontrava a lataria e a luz ficava no ar na frente do capô). Agora a luz sem lataria atrás é pulada
   (`kw_cab.surf` devolve normal vazia, `deco.cab_brow` pula). .glb da americana e o kit `cab_americana` refeitos.
+
+## 2026-10-28 · T-234 · Oficina lote 5: as lacunas da seção 19 (rodas, escapamento, grade, buzina, interior, adesivos)
+
+- **As 3 propostas de cada lacuna viraram peças** (a folha `docs/capturas_t211/proposta_lacunas.png` tinha 3 por
+  categoria; o Marco pediu "modelar pelas propostas" sem escolher uma): 15 peças 3D/arte + 11 adesivos. Números em
+  `BALANCEAMENTO.md` (seção T-234, proposta). Código: `blender/scripts/build_t234_parts.py`, `game/scripts/truck/lot5_fit.gd`.
+- **Calotas**: uma em cada roda de fora (gira com o pneu), escalada pelo raio de cada roda (`wheel_r`, Canter 0,44 m).
+- **Escapamentos**: no meio do vão cabine–carga; a seção encolhe onde o vão é estreito (baú de alumínio, 11 cm).
+- **Grade (refeita com a referência do Marco, `docs/Murais/referencia grider.docx`; imagens em
+  `docs/Referencias/grade_t234/`, fora do Git: telas "pintura geral" do original)**: painel de acrílico ACESO com arte
+  (atlas da T-211: ondas, sakura, raios), barras/lâminas por cima, fileiras de LED com a cor de luz separada da cor da
+  peça (T-214) e emblema de asas com miolo aceso no meio. Encosta no ponto mais à frente da cabine entre os faróis
+  (medido por raios) e estica até a caixa de cada cabine; o emblema não deforma. Nas cabines planas (farol baixo) a
+  caixa da grade sobe para cima da placa. Observação: a célula "raios" do atlas lembra a bandeira de raios; se o Marco
+  preferir, trocamos por outra arte.
+- **Buzina (pedido do Marco: mais para a frente, perto do quebra-sol)**: em cima da viseira, encostada na testa, cornetas
+  deitadas apontando para a frente, na frente do deque (não cruza a caixa dele). O deque de 2 níveis (T-215/T-216)
+  passou a respeitar o lugar da buzina (`StackArrange`/`StackFit`): a tabela continua 4.251 de 5.376 duplas.
+  **Cabine americana: sem buzina** (teto curto: os canhões do deque de 2 níveis descem pela testa até a viseira e
+  bateriam nela; com a buzina ali, a americana perderia todas as 39 duplas). A peça fica guardada e a garagem avisa.
+  A 1ª versão (no topo da carga, atrás do andon de fábrica) foi descartada.
+- **Interior**: o vidro do jogo é opaco; o interior é uma ARTE (render 3D nosso: cabine com painel, volante à direita,
+  bancos + cortina franzida / lustre de cristal / estofado capitonê) colocada 4 mm na frente do para-brisa, seguindo a
+  curvatura do vidro (grade 12 x 6 medida por raios), com bordas que somem e brilho de vidro. À noite só o que acende
+  brilha (lustre, neon, mostradores). Não quebra (como as pinturas).
+- **Adesivos**: as 9 frases da decisão 7 (Yuji Syuku), labaredas e sol nascente sobre ondas (não a bandeira de 16
+  raios), brancos com contorno: o jogo tinge pela cor escolhida. Na pasta `game/assets/decals/`.
+- **Bots**: calota nova em 1 de 3, grade nova em 1 de 4. **Protocolo 21**.

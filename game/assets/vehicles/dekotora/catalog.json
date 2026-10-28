@@ -8922,360 +8922,6 @@
       ]
     },
     {
-      "id": "grille_bars_led",
-      "name": "Barras cromadas com friso de LED",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_bars_led.glb",
-      "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
-        "z": 0.072
-      },
-      "bounds_godot": [
-        [
-          -0.65,
-          -0.4,
-          -0.072
-        ],
-        [
-          0.65,
-          0.4,
-          -0.0
-        ]
-      ],
-      "triangles": 2248,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_led",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_bars_led_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
-      "id": "grille_honey_sun",
-      "name": "Colmeia dourada com sol aceso",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_honey_sun.glb",
-      "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
-        "z": 0.083
-      },
-      "bounds_godot": [
-        [
-          -0.65,
-          -0.4,
-          -0.083
-        ],
-        [
-          0.65,
-          0.4,
-          -0.0
-        ]
-      ],
-      "triangles": 1036,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "deco_honey",
-        "deco_trim",
-        "lamp_amber",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_honey_sun_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "preto_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
-      "id": "grille_slats_neon",
-      "name": "Lâminas douradas com neon",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_slats_neon.glb",
-      "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
-        "z": 0.064
-      },
-      "bounds_godot": [
-        [
-          -0.65,
-          -0.4,
-          -0.064
-        ],
-        [
-          0.65,
-          0.4,
-          -0.0
-        ]
-      ],
-      "triangles": 736,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "deco_body",
-        "deco_neon",
-        "deco_trim",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_slats_neon_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "preto_rosa",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
-      "id": "horn_triple",
-      "name": "Corneta tripla cromada",
-      "category": "lighting",
-      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_triple.glb",
-      "dimensions_m": {
-        "x": 0.46,
-        "y": 0.303,
-        "z": 0.594
-      },
-      "bounds_godot": [
-        [
-          -0.23,
-          -0.06,
-          -0.304
-        ],
-        [
-          0.23,
-          0.243,
-          0.29
-        ]
-      ],
-      "triangles": 972,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_triple_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "horn",
-      "nominal_w": 1.0,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "horn": "horn_musical_dekotora"
-    },
-    {
-      "id": "horn_twin_long",
-      "name": "Par de cornetas douradas",
-      "category": "lighting",
-      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_twin_long.glb",
-      "dimensions_m": {
-        "x": 0.44,
-        "y": 0.3,
-        "z": 0.584
-      },
-      "bounds_godot": [
-        [
-          -0.22,
-          -0.06,
-          -0.294
-        ],
-        [
-          0.22,
-          0.24,
-          0.29
-        ]
-      ],
-      "triangles": 848,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_trim",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_twin_long_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "horn",
-      "nominal_w": 1.0,
-      "default_color": "preto_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "horn": "horn_dual_tone"
-    },
-    {
-      "id": "horn_ship",
-      "name": "Buzina de navio com aro âmbar",
-      "category": "lighting",
-      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_ship.glb",
-      "dimensions_m": {
-        "x": 0.4,
-        "y": 0.464,
-        "z": 0.515
-      },
-      "bounds_godot": [
-        [
-          -0.2,
-          -0.06,
-          -0.25
-        ],
-        [
-          0.2,
-          0.404,
-          0.265
-        ]
-      ],
-      "triangles": 764,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_trim",
-        "lamp_amber",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_ship_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "horn",
-      "nominal_w": 1.0,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "horn": "horn_ship_deep"
-    },
-    {
       "id": "interior_curtain",
       "name": "Cortina franzida vermelha",
       "category": "front",
@@ -9388,6 +9034,366 @@
           }
         ]
       }
+    },
+    {
+      "id": "grille_bars_led",
+      "name": "Barras cromadas sobre painel aceso",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_bars_led.glb",
+      "dimensions_m": {
+        "x": 1.3,
+        "y": 0.8,
+        "z": 0.107
+      },
+      "bounds_godot": [
+        [
+          -0.65,
+          -0.4,
+          -0.107
+        ],
+        [
+          0.65,
+          0.4,
+          -0.0
+        ]
+      ],
+      "triangles": 1534,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_art",
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_bars_led_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
+    },
+    {
+      "id": "grille_honey_sun",
+      "name": "Painel de sakura com moldura de LED",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_honey_sun.glb",
+      "dimensions_m": {
+        "x": 1.3,
+        "y": 0.8,
+        "z": 0.112
+      },
+      "bounds_godot": [
+        [
+          -0.65,
+          -0.4,
+          -0.112
+        ],
+        [
+          0.65,
+          0.4,
+          -0.0
+        ]
+      ],
+      "triangles": 1670,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_art",
+        "chrome",
+        "deco_led",
+        "deco_neon",
+        "deco_trim",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_honey_sun_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
+    },
+    {
+      "id": "grille_slats_neon",
+      "name": "Lâminas douradas sobre painel de raios",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_slats_neon.glb",
+      "dimensions_m": {
+        "x": 1.3,
+        "y": 0.8,
+        "z": 0.066
+      },
+      "bounds_godot": [
+        [
+          -0.65,
+          -0.4,
+          -0.066
+        ],
+        [
+          0.65,
+          0.4,
+          -0.0
+        ]
+      ],
+      "triangles": 1054,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "acrylic_art",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_slats_neon_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "preto_rosa",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
+    },
+    {
+      "id": "horn_triple",
+      "name": "Corneta tripla cromada",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_triple.glb",
+      "dimensions_m": {
+        "x": 0.44,
+        "y": 0.158,
+        "z": 0.603
+      },
+      "bounds_godot": [
+        [
+          -0.22,
+          0.0,
+          -0.604
+        ],
+        [
+          0.22,
+          0.158,
+          -0.0
+        ]
+      ],
+      "triangles": 972,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_triple_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "horn",
+      "nominal_w": 1.0,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_horn",
+      "socket": "horn",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "horn": "horn_musical_dekotora"
+    },
+    {
+      "id": "horn_twin_long",
+      "name": "Par de cornetas douradas",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_twin_long.glb",
+      "dimensions_m": {
+        "x": 0.4,
+        "y": 0.175,
+        "z": 0.603
+      },
+      "bounds_godot": [
+        [
+          -0.2,
+          0.0,
+          -0.604
+        ],
+        [
+          0.2,
+          0.175,
+          -0.0
+        ]
+      ],
+      "triangles": 804,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_trim",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_twin_long_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "horn",
+      "nominal_w": 1.0,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_horn",
+      "socket": "horn",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "horn": "horn_dual_tone"
+    },
+    {
+      "id": "horn_ship",
+      "name": "Buzina de navio com aro âmbar",
+      "category": "lighting",
+      "model": "res://assets/vehicles/dekotora/accessories/horn_t234/horn_ship.glb",
+      "dimensions_m": {
+        "x": 0.36,
+        "y": 0.272,
+        "z": 0.567
+      },
+      "bounds_godot": [
+        [
+          -0.18,
+          -0.001,
+          -0.567
+        ],
+        [
+          0.18,
+          0.271,
+          -0.0
+        ]
+      ],
+      "triangles": 652,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_trim",
+        "lamp_amber",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_horn_ship_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "horn",
+      "nominal_w": 1.0,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_horn",
+      "socket": "horn",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "horn": "horn_ship_deep"
     }
   ]
 }

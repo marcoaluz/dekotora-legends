@@ -443,13 +443,18 @@ def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
             b[1][2] = round(max(b[1][2], seat["face_z"] + 0.01), 3)
             g["anchor"] = [g["anchor"][0], round((b[0][1] + b[1][1]) / 2, 3), seat["face_z"]]
         g.update({"fit": "grille", "height": round(b[1][1] - b[0][1], 3)})
-    hs = l5.get("horn") or {}
-    if hs:
-        y = hs["y"]
-        lift = hs.get("lift", 0.0)
-        sk["horn"] = {"box": _box(-T.HORN_W, min(hs["low"], y - 0.07) - 0.005, hs["z0"], T.HORN_W, y + lift + T.HORN_H, hs["z1"]),
-                      "anchor": [0.0, y, round((hs["z0"] + hs["z1"]) / 2, 3)], "fit": "horn", "lift": lift,
-                      "drop": round(y - hs["low"], 3), "length": round(hs["z1"] - hs["z0"], 3)}
+    # buzina (pedido do Marco depois da 1a versão no topo da carga): EM CIMA da viseira, encostada na testa da cabine,
+    # cornetas deitadas apontando para a frente. Fica na frente do deque (não cruza a caixa dele) e acima da viseira.
+    # Teto curto (americana, `max_depth`): o deque começa no fim do capô e os canhões do deque de 2 níveis descem pela
+    # testa até a viseira; a buzina bateria neles. Ali não há buzina (fica guardada, como o foguete na carga aberta).
+    vi, an = sk.get("visor", {}).get("box"), sk.get("andon", {}).get("box")
+    if vi and not (an and "max_depth" in sk["andon"]):
+        zb = min(vi[1][2], an[0][2]) if an else vi[1][2]
+        y0 = vi[1][1]
+        y1 = y0 + T.HORN_H
+        sk["horn"] = {"box": _box(-T.HORN_W, y0, zb - T.HORN_L, T.HORN_W, y1, zb),
+                      "anchor": [0.0, round(y0, 3), round(zb - 0.004, 3)], "fit": "horn", "lift": 0.0,
+                      "length": T.HORN_L}
     it = l5.get("interior") or {}
     if it:
         sk["interior"] = {"fit": "face", "rect": it}

@@ -1,16 +1,17 @@
-"""Grades e buzinas da oficina, lote 5 (T-234): 3 + 3 peças, pelas propostas da seção 19 de docs/REFERENCIA_PECAS.md.
+"""Grades e buzinas da oficina, lote 5 (T-234): 3 + 3 peças (seção 19 de docs/REFERENCIA_PECAS.md).
 
-Grade: origem = centro do encaixe `grille`, nas costas da peça (encosta no ponto mais à frente da cabine entre os
-faróis). Tamanho nominal GW x GH; o jogo estica a largura e a altura até a caixa de cada cabine (1,0–1,5 m x
-0,5–1,4 m; fit "grille", `game/scripts/truck/lot5_fit.gd`). O que tem prefixo CEN_ (o sol do meio) não deforma:
-fica com a menor das duas escalas. A colmeia é textura (`deco_honey`), repetida pelo tamanho real (favo não estica).
-Buzina: origem = topo da carga logo atrás da frente (encaixe `horn`), cornetas apontando para a frente (+Y). Cabe em
-x +-0,30, y +-0,30, até 0,40 m de altura; a base desce 6 cm (topo de tanque redondo).
+Grade (refeita com a referência do Marco, docs/Referencias/grade_t234/: a "pintura geral" do original, com painel
+pintado/aceso e emblema de asas no meio da grade): painel de acrílico ACESO com arte (atlas da T-211), barras ou
+lâminas por cima, fileiras de LED (cor de luz separada da cor da peça, T-214) e emblema de asas com miolo aceso.
+Origem = centro do encaixe `grille`, nas costas da peça (encosta no ponto mais à frente da cabine entre os faróis).
+Tamanho nominal GW x GH; o jogo estica a largura e a altura até a caixa de cada cabine (fit "grille",
+`game/scripts/truck/lot5_fit.gd`). O que tem prefixo CEN_ (o emblema) não deforma: fica com a menor das duas escalas.
+Buzina (pedido do Marco: mais para a frente, perto do quebra-sol): origem = costas na testa da cabine, EM CIMA da
+viseira (encaixe `horn`); cornetas deitadas apontando para a frente (+Y). Cabe em x +-0,30, até 0,62 m para a frente
+e 0,26 m de altura.
 Desenho nosso.
 """
 from __future__ import annotations
-
-import math
 
 from lib import mesh3d as M
 
@@ -33,108 +34,111 @@ def _back(m, mat=None):
     return M.box("back", (GW - 0.02, 0.012, GH - 0.02), (0, 0.006, 0), mat or m["trim"], bevel=0.004, seg=1)
 
 
+def _emblem(m, name, scale=1.0, y=0.075, z=0.0, fill="neon", frame="chrome"):
+    """Emblema de asas (asas cromadas/douradas com miolo aceso na cor de luz escolhida). Grupo CEN_: não deforma."""
+    k = scale
+    wing = [(0.0, 0.085), (0.09, 0.035), (0.30, 0.075), (0.36, 0.055), (0.21, -0.02), (0.07, -0.05), (0.0, -0.095),
+            (-0.07, -0.05), (-0.21, -0.02), (-0.36, 0.055), (-0.30, 0.075), (-0.09, 0.035)]
+    inner = [(0.0, 0.05), (0.07, 0.02), (0.24, 0.045), (0.15, -0.005), (0.05, -0.03), (0.0, -0.06), (-0.05, -0.03),
+             (-0.15, -0.005), (-0.24, 0.045), (-0.07, 0.02)]
+    o = [M.plane_extrude(name + "_frame", [(x * k, zz * k + z) for x, zz in wing], 0.03, (0, y, 0), m[frame], bevel=0.006),
+         M.plane_extrude(name + "_fill", [(x * k, zz * k + z) for x, zz in inner], 0.03, (0, y + 0.012, 0), m[fill], bevel=0.0)]
+    return Z.tag(o, "CEN")
+
+
+def _led_row(m, name, face_y, zc, cols=26, h=0.034, x_in=0.05):
+    face = K.Face((GW / 2 - x_in, face_y, zc - h / 2), (-(GW - 2 * x_in), 0, 0), (0, 0, h))
+    return K.led_grid(name, face, 0.0, 0.0, 1.0, 1.0, cols, 1, m["led"], fill=0.72, off=0.004, depth=0.010)
+
+
+def _art(m, cell, inset=0.07, y=0.014):
+    """Painel de acrílico aceso por dentro com arte (atlas da T-211: 12 ondas, 13 sakura, 14 raios, 15 nuvens)."""
+    face = K.Face((GW / 2 - inset, y, -GH / 2 + inset), (-(GW - 2 * inset), 0, 0), (0, 0, GH - 2 * inset))
+    return K.art_panel("art", face, 0.0, 0.0, 1.0, 1.0, m, cell)
+
+
 def grille_bars_led(m):
-    """Barras verticais cromadas com friso de LED em cima."""
-    o = [_back(m)] + _frame(m, m["body"], bar=0.06, depth=0.055)
-    n = 15
+    """Barras cromadas sobre painel aceso de ondas, fileiras de LED em cima e embaixo e emblema de asas."""
+    o = [_back(m), _art(m, 12)] + _frame(m, m["body"], bar=0.07, depth=0.065)
+    n = 7
     for k in range(n):
-        x = -GW / 2 + 0.10 + k * (GW - 0.20) / (n - 1)
-        o.append(M.box(f"bar_{k}", (0.032, 0.05, GH - 0.20), (x, 0.03, -0.02), m["chrome"], bevel=0.012, seg=2))
-    face = K.Face((GW / 2 - 0.06, 0.056, GH / 2 - 0.055), (-(GW - 0.12), 0, 0), (0, 0, 0.05))
-    o.append(K.quad_panel("led_back", face, 0.0, 0.0, 1.0, 1.0, m["trim"], off=0.002, depth=0.004))
-    o.append(K.led_grid("led", face, 0.01, 0.12, 0.99, 0.88, 22, 1, m["led"], fill=0.7, off=0.016, depth=0.012))
+        z = -GH / 2 + 0.12 + k * (GH - 0.24) / (n - 1)
+        o.append(Z.Q.tubes(f"bar_{k}", [((-GW / 2 + 0.07, 0.045, z), (GW / 2 - 0.07, 0.045, z))], 0.014, m["chrome"], seg=8))
+    for sx in (-1, 1):
+        o.append(M.box(f"post_{sx}", (0.03, 0.035, GH - 0.14), (sx * GW / 4, 0.045, 0), m["chrome"], bevel=0.008, seg=1))
+    o.append(_led_row(m, "led_top", 0.066, GH / 2 - 0.035))
+    o.append(_led_row(m, "led_bot", 0.066, -GH / 2 + 0.035))
+    o += _emblem(m, "emb", 1.0, y=0.08)
     return o
 
 
 def grille_honey_sun(m):
-    """Colmeia dourada com sol aceso no meio."""
-    o = [_back(m, m["trim"])] + _frame(m, m["gold"], bar=0.055, depth=0.06)
-    # colmeia: placa com a textura de favos (UV em repetições de HONEY_CELL; o jogo ajusta à escala real)
-    hw, hh = GW / 2 - 0.055, GH / 2 - 0.055
-    honey = M.box("honey", (2 * hw, 0.008, 2 * hh), (0, 0.03, 0), m["honey"], bevel=0.0, seg=1)
-    _uv_box_front(honey, 2 * hw / Z.HONEY_CELL, 2 * hh / Z.HONEY_CELL)
-    o.append(honey)
-    # sol (não estica: CEN_)
-    sun = [M.cylinder("sun_disc", 0.13, 0.03, (0, 0.065, 0), m["amber"], axis="Y", seg=20),
-           M.torus("sun_rim", 0.14, 0.014, (0, 0.07, 0), m["gold"], axis="Y", seg=20, tube_seg=5)]
-    for k in range(12):
-        a = 2 * math.pi * k / 12
-        ln = 0.10 if k % 2 == 0 else 0.07
-        r0 = 0.16 + ln / 2
-        sun.append(M.box(f"ray_{k}", (0.025, 0.02, ln), (math.sin(a) * r0, 0.065, math.cos(a) * r0), m["gold"],
-                         bevel=0.006, seg=1, rot=(0, math.degrees(a), 0)))
-    o += Z.tag(sun, "CEN")
+    """Painel aceso de sakura numa moldura dourada cravejada de LED (4 lados), com emblema de asas grande."""
+    o = [_back(m, m["trim"]), _art(m, 13, inset=0.075)] + _frame(m, m["gold"], bar=0.075, depth=0.07)
+    o.append(_led_row(m, "led_top", 0.071, GH / 2 - 0.0375, cols=22))
+    o.append(_led_row(m, "led_bot", 0.071, -GH / 2 + 0.0375, cols=22))
+    for sx in (-1, 1):
+        x0 = sx * (GW / 2 - 0.0375) + 0.017
+        face = K.Face((x0, 0.071, -GH / 2 + 0.08), (-0.034, 0, 0), (0, 0, GH - 0.16))
+        o.append(K.led_grid(f"led_col_{sx}", face, 0.0, 0.0, 1.0, 1.0, 1, 12, m["led"], fill=0.72, off=0.004, depth=0.010))
+    face = K.Face((GW / 2 - 0.075, 0.03, -GH / 2 + 0.075), (-(GW - 0.15), 0, 0), (0, 0, GH - 0.15))
+    o += K.frame_on("inner", face, 0.0, 0.0, 1.0, 1.0, 0.012 / (GW - 0.15), 0.012 / (GH - 0.15), m["chrome"], off=0.0, depth=0.02)
+    o += _emblem(m, "emb", 1.25, y=0.085, fill="neon", frame="gold")
     return o
-
-
-def _uv_box_front(o, su, sv):
-    """UV da caixa: (x, z) -> (0..su, 0..sv) (a textura se repete su x sv vezes no tamanho nominal)."""
-    me = o.data
-    if not me.uv_layers:
-        me.uv_layers.new()
-    uv = me.uv_layers.active.data
-    xs = [v.co.x for v in me.vertices]
-    zs = [v.co.z for v in me.vertices]
-    x0, x1, z0, z1 = min(xs), max(xs), min(zs), max(zs)
-    for poly in me.polygons:
-        for li in poly.loop_indices:
-            v = me.vertices[me.loops[li].vertex_index].co
-            uv[li].uv = ((v.x - x0) / (x1 - x0) * su, (v.z - z0) / (z1 - z0) * sv)
 
 
 def grille_slats_neon(m):
-    """Lâminas douradas inclinadas com colunas de neon nos lados."""
-    o = [_back(m)] + _frame(m, m["body"], bar=0.05, depth=0.05)
-    n = 9
+    """Lâminas douradas inclinadas sobre painel aceso de raios, colunas de neon e fileira de LED embaixo."""
+    o = [_back(m), _art(m, 14, inset=0.06)] + _frame(m, m["body"], bar=0.05, depth=0.05)
+    n = 8
     inner = GH - 0.14
     for k in range(n):
-        z = -inner / 2 + 0.03 + k * (inner - 0.06) / (n - 1)
-        o.append(M.box(f"slat_{k}", (GW - 0.26, 0.05, 0.035), (0, 0.035, z), m["gold"], bevel=0.008, seg=1, rot=(28, 0, 0)))
+        z = -inner / 2 + 0.04 + k * (inner - 0.08) / (n - 1)
+        o.append(M.box(f"slat_{k}", (GW - 0.30, 0.045, 0.022), (0, 0.04, z), m["gold"], bevel=0.006, seg=1, rot=(32, 0, 0)))
     for sx in (-1, 1):
-        x = sx * (GW / 2 - 0.085)
-        o.append(M.box(f"col_{sx}", (0.05, 0.03, GH - 0.12), (x, 0.03, 0), m["trim"], bevel=0.006, seg=1))
-        o.append(Z.Q.tubes(f"neon_{sx}", [((x, 0.05, -GH / 2 + 0.08), (x, 0.05, GH / 2 - 0.08))], 0.014, m["neon"], seg=8))
+        x = sx * (GW / 2 - 0.09)
+        o.append(M.box(f"col_{sx}", (0.06, 0.03, GH - 0.12), (x, 0.03, 0), m["trim"], bevel=0.006, seg=1))
+        o.append(Z.Q.tubes(f"neon_{sx}", [((x, 0.05, -GH / 2 + 0.08), (x, 0.05, GH / 2 - 0.08))], 0.016, m["neon"], seg=8))
+    o.append(_led_row(m, "led_bot", 0.052, -GH / 2 + 0.025, cols=20, x_in=0.16))
     return o
 
 
-# ----------------------------------------------------------------------------- buzinas
+# ----------------------------------------------------------------------------- buzinas (em cima da viseira)
 
-def _base(m, w=0.46, d=0.56):
-    """Chapa da base (na cor da peça) com saia que desce 6 cm (encosta no topo curvo do tanque)."""
-    return [M.box("base", (w, d, 0.04), (0, 0, 0.02), m["body"], bevel=0.01, seg=1),
-            M.box("skirt", (w - 0.04, d - 0.04, 0.06), (0, 0, -0.03), m["trim"], bevel=0.006, seg=1)]
+def _bracket(m, w=0.44):
+    """Suporte na testa da cabine (costas da peça) e trilho embaixo das cornetas."""
+    return [M.box("bracket", (w, 0.035, 0.12), (0, 0.018, 0.06), m["body"], bevel=0.008, seg=1),
+            M.box("rail", (w - 0.06, 0.40, 0.025), (0, 0.22, 0.0125), m["trim"], bevel=0.005, seg=1)]
 
 
 def horn_triple(m):
-    """Corneta tripla cromada (3 notas): 3 cornetas de tamanhos diferentes lado a lado."""
-    o = _base(m)
-    for k, (x, ln, rb) in enumerate(((-0.13, 0.40, 0.055), (0.0, 0.50, 0.065), (0.13, 0.58, 0.075))):
-        o.append(Z.trumpet(f"horn_{k}", ln, 0.022, rb, m["chrome"], loc=(x, -0.28, 0.17), seg=14))
-        o.append(M.box(f"post_{k}", (0.04, 0.05, 0.11), (x, -0.16, 0.095), m["body"], bevel=0.008, seg=1))
-    o.append(M.box("valve", (0.36, 0.08, 0.07), (0, -0.25, 0.10), m["chrome"], bevel=0.015, seg=1))
+    """Corneta tripla cromada (3 notas), deitada em cima da viseira apontando para a frente."""
+    o = _bracket(m)
+    for k, (x, ln, rb) in enumerate(((-0.13, 0.42, 0.05), (0.0, 0.52, 0.06), (0.13, 0.60, 0.07))):
+        o.append(Z.trumpet(f"horn_{k}", ln - 0.03, 0.02, rb, m["chrome"], loc=(x, 0.03, 0.09), seg=14))
+        o.append(M.box(f"clip_{k}", (0.05, 0.04, 0.07), (x, 0.16, 0.045), m["chrome"], bevel=0.006, seg=1))
+    o.append(M.box("valve", (0.34, 0.06, 0.05), (0, 0.06, 0.09), m["chrome"], bevel=0.012, seg=1))
     return o
 
 
 def horn_twin_long(m):
     """Par de cornetas longas douradas."""
-    o = _base(m, w=0.44)
+    o = _bracket(m, w=0.40)
     for k, x in enumerate((-0.11, 0.11)):
-        o.append(Z.trumpet(f"horn_{k}", 0.58, 0.024, 0.08, m["gold"], loc=(x, -0.29, 0.16), seg=16))
-        for y in (-0.16, 0.08):
-            o.append(M.box(f"post_{k}_{y}", (0.035, 0.04, 0.10), (x, y, 0.085), m["chrome"], bevel=0.008, seg=1))
-    o.append(M.box("valve", (0.30, 0.07, 0.06), (0, -0.25, 0.10), m["chrome"], bevel=0.012, seg=1))
+        o.append(Z.trumpet(f"horn_{k}", 0.57, 0.022, 0.075, m["gold"], loc=(x, 0.03, 0.10), seg=16))
+        for y in (0.14, 0.34):
+            o.append(M.box(f"clip_{k}_{y}", (0.045, 0.035, 0.08), (x, y, 0.045), m["chrome"], bevel=0.006, seg=1))
     return o
 
 
 def horn_ship(m):
     """Buzina de navio: um sino grande apontando para a frente com aro âmbar aceso."""
-    o = _base(m, w=0.40, d=0.50)
-    prof = [(0.05, -0.26), (0.05, -0.12), (0.06, -0.05), (0.09, 0.05), (0.13, 0.13), (0.17, 0.19), (0.165, 0.205),
-            (0.11, 0.17)]
-    o.append(Z.lathe("bell", prof, m["chrome"], axis="Y", seg=18, loc=(0, 0.03, 0.22), cap0=True))
-    o.append(M.torus("amber_ring", 0.168, 0.016, (0, 0.235, 0.22), m["amber"], axis="Y", seg=20, tube_seg=5))
-    o.append(M.box("post", (0.06, 0.16, 0.16), (0, -0.10, 0.10), m["body"], bevel=0.01, seg=1))
-    o.append(M.cylinder("cap", 0.07, 0.05, (0, -0.24, 0.22), m["gold"], axis="Y", seg=14, bevel=0.01, bevel_seg=1))
+    o = _bracket(m, w=0.36)
+    prof = [(0.04, 0.0), (0.04, 0.14), (0.05, 0.24), (0.075, 0.34), (0.10, 0.42), (0.125, 0.50), (0.12, 0.515), (0.08, 0.48)]
+    o.append(Z.lathe("bell", prof, m["chrome"], axis="Y", seg=18, loc=(0, 0.04, 0.135), cap0=True))
+    o.append(M.torus("amber_ring", 0.123, 0.013, (0, 0.555, 0.135), m["amber"], axis="Y", seg=20, tube_seg=5))
+    o.append(M.box("post", (0.06, 0.20, 0.07), (0, 0.22, 0.04), m["body"], bevel=0.01, seg=1))
+    o.append(M.cylinder("cap", 0.055, 0.04, (0, 0.05, 0.135), m["gold"], axis="Y", seg=14))
     return o
 
 
@@ -149,9 +153,9 @@ def _h(pid, name, build, horn, color="cromo_ciano"):
 
 
 PARTS = [
-    _g("grille_bars_led", "Barras cromadas com friso de LED", grille_bars_led),
-    _g("grille_honey_sun", "Colmeia dourada com sol aceso", grille_honey_sun, "preto_ciano"),
-    _g("grille_slats_neon", "Lâminas douradas com neon", grille_slats_neon, "preto_rosa"),
+    _g("grille_bars_led", "Barras cromadas sobre painel aceso", grille_bars_led),
+    _g("grille_honey_sun", "Painel de sakura com moldura de LED", grille_honey_sun, "preto_ciano"),
+    _g("grille_slats_neon", "Lâminas douradas sobre painel de raios", grille_slats_neon, "preto_rosa"),
     _h("horn_triple", "Corneta tripla cromada", horn_triple, "horn_musical_dekotora"),
     _h("horn_twin_long", "Par de cornetas douradas", horn_twin_long, "horn_dual_tone", "preto_ciano"),
     _h("horn_ship", "Buzina de navio com aro âmbar", horn_ship, "horn_ship_deep"),

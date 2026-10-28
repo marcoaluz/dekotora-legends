@@ -65,8 +65,8 @@ func test_every_truck_fits() -> void:
 			check(probs.is_empty(), "%s em %s: %s" % [id, m["stem"], "; ".join(probs)])
 			checked += 1
 		model.free()
-	for s in no_horn:          # so a cacamba aberta (dump) e a graneleira da cabine JAC ficam sem topo plano
-		check(s.contains("dump") or s.contains("graneleira"), "%s: sem lugar para a buzina" % s)
+	for s in no_horn:          # so a cabine americana (teto curto: o deque de 2 niveis desce ate a viseira) fica sem buzina
+		check(s.contains("americana"), "%s: sem lugar para a buzina" % s)
 	check(checked >= 50 * 14, "%d combinacoes conferidas" % checked)
 
 
@@ -84,10 +84,12 @@ func test_grille_stretches_to_each_cab() -> void:
 		check(box.size.x > sb.size.x * 0.85 and box.size.y > sb.size.y * 0.80, "%s: grade ocupa a caixa (%.2f x %.2f de %.2f x %.2f)" %
 				[cab, box.size.x, box.size.y, sb.size.x, sb.size.y])
 		var sun: Array = node.find_children("*_CEN_*", "MeshInstance3D", true, false)
-		check(not sun.is_empty(), "%s: sol do meio separado" % cab)
-		if not sun.is_empty():
-			var sbox: AABB = PartFit.aabb_in(sun[0] as Node3D, t.model)
-			check(absf(sbox.size.x - sbox.size.y) < 0.03, "%s: sol redondo (%.2f x %.2f)" % [cab, sbox.size.x, sbox.size.y])
+		check(not sun.is_empty(), "%s: emblema do meio separado" % cab)
+		if not sun.is_empty():                       # emblema de asas: 0,90 x 0,225 m na grade (proporcao 4:1, sem deformar)
+			var smi: MeshInstance3D = sun[0] as MeshInstance3D
+			var sbox: AABB = PartFit.rel_xform(smi, t.model) * smi.mesh.get_aabb()
+			var ratio: float = sbox.size.x / maxf(sbox.size.y, 0.001)
+			check(sbox.size.x > 0.3 and absf(ratio - 4.0) < 0.5, "%s: emblema sem deformar (%.2f x %.2f)" % [cab, sbox.size.x, sbox.size.y])
 		t.free()
 
 
