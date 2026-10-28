@@ -1615,3 +1615,37 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   _traseira/_teto`, máscara opcional `_brilho`, brilho automático só em luz forte e colorida) e `tools/gen_t258_data.py`
   (catálogo com `group: "wallpapers"`, .tres, texto). Guia em `docs/CREDITOS_MURAIS.md`. Ainda não há wallpaper no jogo.
 - Sugestão: os 5 murais anime pendentes (T-242) entram como **Wallpapers** quando aprovados.
+
+## 2026-10-28 · T-260 · Som do motor das gravações reais (Iveco Daily, CC0)
+
+- Os 4 mp3 do Marco (`docs/som caminhão/`, SFX Jar) são gravações de **Joseph Sardin / BigSoundBank, CC0** (licença lida
+  nas páginas originais). Usamos os WAV originais (48 kHz, sem perda), baixados por `tools/fetch_t260_sources.sh` para
+  `audio_src/engine/` (fora do Git). Os mp3 do Marco ficam onde estão (não usados, não apagados).
+- O motor é um 4 cilindros (marcha lenta ~850 rpm, acelerações em vazio até ~3.300 rpm). Não há giro alto constante,
+  então os loops saem por **reamostragem que segue o giro** (o ritmo das explosões fica exato no ponto) + grãos emendados
+  (`tools/rec_engine_t260.py`). Mapa: lenta "truck engine" = `off_700`, lenta "truck engine #1" = `on_700`, aceleração
+  leve = pontos 1000/1400, aceleração pesada = 1900/2500 (subindo = ON, caindo = OFF).
+- Vozes: `i4` (leve/Canter) = o Iveco de verdade; `i6` (6 cil. pesado) e `i6t` (preparado) recriadas a partir dele
+  (trechos a 1,5× o giro, ressonâncias ×0,80 / ×0,88, mais grave / mais brilho). **V8 continua sintetizado**.
+- **Novo modo "rec" (Gravação real) é o padrão** no PC e no celular; Opções > Áudio > Som do motor tem também "Loops
+  sintetizados" (os da T-197), "Sintetizador novo" e "Mistura" (mistura usa as gravações nos médios/agudos).
+  `--engine-sound=rec|loops|synth|mix`. Só áudio: simulação e protocolo iguais.
+
+## 2026-10-28 · T-259 · Grade refeita: adesivo na lataria da frente (pela referência do Marco), grade só grade
+
+- O Marco não gostou das imagens DENTRO da grade (T-234/T-256). Relida a referência (`docs/Referencias/grade_t234/`,
+  telas "pintura geral" do original): a arte é uma **faixa larga logo abaixo do para-brisa, de lado a lado**, e a grade
+  embaixo tem só o emblema. Agora:
+  - **Grade = só grade**: barras cromadas / colmeia dourada (textura de favos) / lâminas douradas + moldura com o
+    contorno de LED (T-256) e o emblema de asas. Nenhum painel de arte dentro. Nomes: "Barras cromadas com LED",
+    "Colmeia dourada com moldura de LED", "Lâminas douradas com neon".
+  - **Adesivo na lataria da frente** (opção de graca da grade, a mesma escolha `art` da T-256: ondas, sakura, raios,
+    nuvens): faixa de lado a lado da cabine logo abaixo do para-brisa (38% da altura entre a grade e o vidro, 14–40 cm),
+    colada na curva da chapa (grade de raios `band` no encaixe), **recortada em volta de farol, lanterna, seta e placa**,
+    com uma fileira de LEDs em cima e embaixo (a cor de LED da grade, mesmo pisca/freio) e brilho fraco à noite. A grade
+    desce para baixo da faixa (`Lot5Band`).
+  - Mantidos: contorno de LED da grade, encaixe inclinado + colar, cornetas esquerda/direita/dois lados.
+- **Saves**: a escolha `art` (12–15) continua com o mesmo nome e valores: quem escolheu na T-256 passa a ver a faixa
+  nova; nada a migrar (protocolo 22 igual).
+- Observação: na referência a faixa parece ficar na parte de baixo do VIDRO; o Marco pediu na LATARIA, então ela fica
+  na chapa logo abaixo do para-brisa. Na cabine chata a faixa é baixa (21 cm) porque o vidro desce muito.

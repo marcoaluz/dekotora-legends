@@ -85,3 +85,18 @@ mais estável, ajusta o tom para o ponto mais perto e faz a emenda sem clique.
 **Limite honesto**: gravações livres quase sempre têm lenta e acelerações rápidas, raramente o motor parado num giro
 alto. A lenta sai fácil (M1); os loops acelerando em giro fixo podem não ter trecho estável longo. Nesse caso o
 caminho é o modo **Mistura** (o sintetizador dá o ritmo e os graves; a gravação, a textura dos médios e agudos).
+
+## 5. Gravações já usadas no jogo (T-260)
+
+Os 4 mp3 de `docs/som caminhão/` (SFX Jar) são do **BigSoundBank (Joseph Sardin), CC0**: um Iveco Daily 3.0 HPI
+(4 cilindros) parado, em marcha lenta e acelerando em vazio. O jogo usa os WAV originais:
+
+1. `bash tools/fetch_t260_sources.sh` baixa os 4 WAV para `audio_src/engine/` (fora do Git).
+2. `python -P tools/rec_engine_t260.py` gera os 30 loops `rec_i4_*`, `rec_i6_*`, `rec_i6t_*` em
+   `game/assets/audio/engines/` e o relatório `docs/audio_t260/gerar_log.txt` (uma linha por loop, CONFERE / NAO CONFERE)
+   com as folhas `docs/audio_t260/loops/*_check.png`. Depois: `godot --headless --path game --import`.
+3. `python -P tools/demo_engine_t260.py` grava as prévias `docs/audio_t260/demo_<voz>_<rec|syn>.wav` (mesmo roteiro de
+   20 s: lenta, acelera trocando marcha, segura, solta, acelera de leve, lenta; `rec` = gravação, `syn` = sintetizado).
+4. Análise das gravações: `python -P tools/audio_t260_analyze.py audio_src/engine` → `docs/audio_t260/analise.txt` + PNG.
+
+(`-P` em vez de `-I`: o `-I` esconde o numpy instalado no usuário.)
