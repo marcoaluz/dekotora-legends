@@ -128,8 +128,15 @@ func build_slot_detail(box: VBoxContainer, slot: String) -> void:
 		box.add_child(wl(Tr.t("garage.no_horn_spot" if slot == "horn" else "garage.box_only"), 14, UiTheme.BAD))   # T-234
 	if slot == "mural":                                  # T-232: cada mural tem um desenho em cada lado
 		box.add_child(wl(Tr.t("garage.paint_both_sides"), 14, UiTheme.TEXT_DIM))
-	for d in plist:
-		box.add_child(part_card(d, d.id == StringName(inst), base))
+	if slot in PaintFit.GROUP_SLOTS:                     # T-258: Todos / Pinturas / Wallpapers
+		var list := VBoxContainer.new()
+		list.name = "PaintList"
+		box.add_child(_group_bar(slot, plist, list, inst, base))
+		box.add_child(list)
+		_fill_paints(list, plist, inst, base)
+	else:
+		for d in plist:
+			box.add_child(part_card(d, d.id == StringName(inst), base))
 	if inst != "":
 		var rm: Button = small_button(Tr.t("garage.remove"))
 		rm.pressed.connect(func() -> void: gs.uninstall(slot))
@@ -340,3 +347,53 @@ func build_repair(box: VBoxContainer) -> void:
 		box.add_child(cv2[0])
 	if not any:
 		box.add_child(wl(Tr.t("garage.nothing_to_repair"), 18, UiTheme.GOOD))
+
+
+# ---------------------------------------------------------------- grupos das pinturas (T-258)
+
+## Filtro atual do seletor de pintura ("all" | "pinturas" | "wallpapers"); vale para mural, traseira e teto.
+static var paint_filter: String = "all"
+
+
+## Pecas do grupo `filter` ("all" = todas), na ordem da lista.
+static func filter_paints(plist: Array[PartDef], filter: String) -> Array[PartDef]:
+	if filter == "all":
+		return plist
+	var c: AccessoryCatalog = AccessoryCatalog.get_instance()
+	var out: Array[PartDef] = []
+	for d in plist:
+		if PaintFit.group_of(c.entry(d.accessory_id)) == filter:
+			out.append(d)
+	return out
+
+
+func _group_bar(slot: String, plist: Array[PartDef], list: VBoxContainer, inst: String, base: Dictionary) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "PaintGroups_" + slot
+	row.add_theme_constant_override("separation", 4)
+	for g in ["all"] + Array(PaintFit.GROUPS):
+		var key: String = String(g)
+		var n: int = filter_paints(plist, key).size()
+		var b: Button = small_button("%s (%d)" % [Tr.t("garage.paint_group." + key), n], 96)
+		b.name = "Group_" + key
+		b.toggle_mode = true
+		b.button_pressed = key == paint_filter
+		b.pressed.connect(func() -> void:
+			paint_filter = key
+			for o in row.get_children():
+				(o as Button).button_pressed = String(o.name) == "Group_" + key
+			_fill_paints(list, plist, inst, base))
+		row.add_child(b)
+	return row
+
+
+func _fill_paints(list: VBoxContainer, plist: Array[PartDef], inst: String, base: Dictionary) -> void:
+	for n in list.get_children():
+		list.remove_child(n)
+		n.queue_free()
+	preview_cards.clear()
+	var shown: Array[PartDef] = filter_paints(plist, paint_filter)
+	if shown.is_empty():
+		list.add_child(wl(Tr.t("garage.paint_group.empty"), 14, UiTheme.TEXT_DIM))
+	for d in shown:
+		list.add_child(part_card(d, d.id == StringName(inst), base))

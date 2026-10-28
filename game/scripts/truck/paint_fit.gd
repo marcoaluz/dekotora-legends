@@ -10,12 +10,21 @@ extends RefCounted
 ## A noite a pintura acende como o mural de fabrica (MuralGlow, com a emissao pronta de cada arte).
 
 const FIT := "paint"
+## T-258: grupos das pinturas na garagem. Sem o campo `group` no catalogo = "pinturas" (catalogos e saves antigos).
+const GROUPS: Array[String] = ["pinturas", "wallpapers"]
+const GROUP_SLOTS: Array[String] = ["mural", "rear_paint", "roof_paint"]
 ## Esticar/encolher a arte no maximo isso antes de cortar as bordas.
 const STRETCH: Vector2 = Vector2(0.8, 1.25)
 ## Quanto a malha fica para fora do plano ja vem no centro do retangulo (Blender, OFFSET = 5 mm).
 const ROUGHNESS: float = 0.42
 
 static var _mats: Dictionary = {}           # caminho da arte -> StandardMaterial3D (compartilhado entre caminhoes)
+
+
+## Grupo da pintura (T-258): "pinturas" (obras de museu, anime ja montados, arte por codigo) ou "wallpapers".
+static func group_of(entry: Dictionary) -> String:
+	var g: String = String(entry.get("group", ""))
+	return g if g in GROUPS else GROUPS[0]
 
 
 static func handles(entry: Dictionary) -> bool:

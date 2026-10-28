@@ -9,6 +9,7 @@ final (x 0..4, y 0..1 de cima para baixo), mesmas formas de `t242_registry.py`.
 from __future__ import annotations
 
 ORIGIN = "gerada pelo Marco (Gemini), uso por decisão dele (T-242)"
+GROUP = "wallpapers"        # T-258: imagens criadas (não pinturas): entram no grupo Wallpapers quando aprovadas
 MOON = "#fff2d0"
 NEON_P, NEON_C = "#ff5fd2", "#4fe8ff"
 LANTERN = "#ffb050"

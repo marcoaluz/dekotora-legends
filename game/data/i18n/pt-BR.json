@@ -814,5 +814,9 @@
  "garage.cab_art.12": "Ondas",
  "garage.cab_art.13": "Sakura",
  "garage.cab_art.14": "Raios",
- "garage.cab_art.15": "Nuvens"
+ "garage.cab_art.15": "Nuvens",
+ "garage.paint_group.all": "Todos",
+ "garage.paint_group.pinturas": "Pinturas",
+ "garage.paint_group.wallpapers": "Wallpapers",
+ "garage.paint_group.empty": "Nenhuma pintura neste grupo ainda (o Marco coloca os wallpapers em docs/Murais/wallpaper/)."
 }

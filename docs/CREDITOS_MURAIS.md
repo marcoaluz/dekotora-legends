@@ -123,3 +123,34 @@ Git). Recortes e brilho: `blender/scripts/lib/t242_anime.py`; folha para aprovar
 | `lateral.png` | 1536 x 1024 (tarja preta) | `mural_anime_lua` | direito | faixa do meio 19–62% da altura |
 | `lateral 2.png` | 1536 x 1024 (tarja preta) | `mural_anime_cyber` | direito | faixa do meio 17–60% da altura |
 | `lateral 3.png` (4 faixas) | 1536 x 1024 | `mural_anime_kitsune` (faixas 1 e 4), `mural_anime_cyber` (faixa 2), `mural_anime_lua` (faixa 3) | ver peça | cada faixa cortada em 4:1 mantendo a personagem |
+
+## T-258 — grupo "Wallpapers" (arte digital criada pelo Marco) — como colocar
+
+As pinturas da garagem (mural, traseira, teto) ficam em dois grupos: **Pinturas** (obras de museu, arte por código e os
+murais anime já montados) e **Wallpapers** (arte digital criada: ilustração, anime, neon, realista). Na garagem há os
+botões Todos / Pinturas / Wallpapers. Origem nos créditos: **"gerada pelo Marco (Gemini)"**, uso por decisão dele.
+Regras: só personagens adultas, sem nudez explícita; texto/kanji pode existir na imagem (o jogo nunca espelha a arte).
+
+1. Pasta: `docs/Murais/wallpaper/` (fora do Git).
+2. Nome do arquivo = `<nome>_<tipo>.png` (ou .jpg), `<nome>` em minúsculas, números e `_`:
+   | tipo | arquivo | tamanho ideal |
+   | --- | --- | --- |
+   | mural, lado direito | `<nome>_mural_d.png` | 2048 x 512 (4:1) |
+   | mural, lado esquerdo | `<nome>_mural_e.png` (obrigatório junto com o direito) | 2048 x 512 (4:1) |
+   | traseira (portas) | `<nome>_traseira.png` | 1280 x 1024 (5:4) |
+   | teto (o alto da imagem = frente do caminhão) | `<nome>_teto.png` | 512 x 2048 (1:4) |
+   Ex.: `dragao_neon_mural_d.png` + `dragao_neon_mural_e.png` viram o mural `wall_dragao_neon`.
+3. Brilho noturno (opcional): `<arquivo>_brilho.png` do mesmo tamanho, branco onde acende (lua, olhos, neon). Sem ela,
+   acende só o que já é luz forte e colorida na imagem (nunca a pele).
+4. O que eu (Claude) rodo:
+   ```
+   blender -b --factory-startup -P blender/scripts/build_t258_wallpapers.py -- --sheet <PASTA_ABS>/docs/capturas_t258
+   (o Marco aprova docs/capturas_t258/wallpaper_proposta.png; depois:)
+   blender -b --factory-startup -P blender/scripts/build_t258_wallpapers.py -- --install
+   python -I tools/gen_t258_data.py
+   bash tools/import_textures_3d.sh game/assets/vehicles/dekotora/paint_wall/mural game/assets/vehicles/dekotora/paint_wall/rear game/assets/vehicles/dekotora/paint_wall/roof
+   ```
+   Imagem com nome fora do padrão é ignorada (o build avisa qual).
+
+**Sugestão para os 5 murais anime pendentes (T-242, `anime_proposta.png`)**: entram no grupo **Wallpapers** (são imagens
+criadas, não pinturas), assim que o Marco aprovar.

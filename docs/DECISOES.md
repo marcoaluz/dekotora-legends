@@ -1604,3 +1604,14 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   — um conjunto em cada ponta da viseira (encaixes `horn_r`/`horn_l`). O deque de 2 níveis só desvia da buzina quando
   um canhão passa por cima dela: tabela igual (4.251 de 5.376). **Americana continua sem buzina** (motivo da T-234).
 - Rede: o estilo leva `side` e `art`; ações `set_part_side`/`set_part_art`. **Protocolo 22.**
+
+## 2026-10-28 · T-258 · Grupos de pinturas: Pinturas e Wallpapers
+
+- Campo `group` nas entradas de pintura do catálogo (`PaintFit.group_of`); **sem o campo = "pinturas"** (catálogo e
+  saves antigos continuam iguais; nenhuma peça mudou de id). Grupos: `pinturas`, `wallpapers`.
+- Garagem: no seletor de Mural, Pintura da traseira e Pintura do teto, botões **Todos / Pinturas / Wallpapers** com a
+  contagem (filtro lembrado entre os três). O interior (para-brisa) não entra nos grupos.
+- Pipeline dos wallpapers do Marco: `blender/scripts/build_t258_wallpapers.py` (nomes `<nome>_mural_d/_mural_e/
+  _traseira/_teto`, máscara opcional `_brilho`, brilho automático só em luz forte e colorida) e `tools/gen_t258_data.py`
+  (catálogo com `group: "wallpapers"`, .tres, texto). Guia em `docs/CREDITOS_MURAIS.md`. Ainda não há wallpaper no jogo.
+- Sugestão: os 5 murais anime pendentes (T-242) entram como **Wallpapers** quando aprovados.

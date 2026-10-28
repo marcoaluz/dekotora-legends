@@ -723,3 +723,10 @@ Formato em `docs/AGENTES.md`.
 - Feito: nota da T-256 acrescentada na seção "Oficina lote 5" da skill godot-dekotora (commit 0aa148c).
 - Arquivos: .claude/skills/godot-dekotora/SKILL.md, .claude/coordenacao/QUADRO.md
 - Observação: LOG não commitado (pedido era commitar só a skill e o QUADRO). Referências conferidas: lot5_grille.gd e capture_t256.sh existem; shot_t231.gd aceita --side= e --art=.
+
+## 2026-10-28 · T-258 · especialista · CONCLUÍDA
+- Feito: grupos de pinturas Pinturas/Wallpapers (campo `group`, padrão "pinturas"; saves e catálogo antigos iguais), botões Todos/Pinturas/Wallpapers com contagem no seletor de mural/traseira/teto, pipeline dos wallpapers do Marco (`build_t258_wallpapers.py` por nome de arquivo em docs/Murais/wallpaper/, máscara `_brilho` opcional ou brilho automático em luz forte e colorida, `gen_t258_data.py` com `--dry`), guia em CREDITOS_MURAIS. Nenhum wallpaper no jogo ainda; os 5 anime pendentes sugeridos como Wallpapers.
+- Arquivos: game/scripts/truck/paint_fit.gd, ui/garage_shop.gd, data/i18n/pt-BR.json, tests/test_paint_groups_t258.gd; blender/scripts/build_t258_wallpapers.py, lib/t242_anime.py; tools/gen_t258_data.py; docs (CREDITOS_MURAIS, DECISOES, ROADMAP), docs/capturas_t258/garagem_grupos.png.
+- Validação: suíte 585/585; pipeline testado com imagens de exemplo numa pasta temporária (mural 2 lados, traseira, teto longo/curto, nome errado ignorado); gen_t258 `--dry` sem gravar; print da garagem com os botões.
+- Armadilha: o 1º `--dry` do gen gravou o catálogo (o `return` não entrou por causa do escape `\n` no patch); restaurado do HEAD (só tinha a entrada de teste) e corrigido.
+- Decisão pendente: nenhuma.
