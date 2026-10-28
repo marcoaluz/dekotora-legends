@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"grille_slats_neon"
+display_key = "part.grille_slats_neon"
+slot = &"grille"
+zones = PackedStringArray("front")
+weight_kg = 58.0
+durability = 50.0
+fame = 14
+price = 19000
+accessory_id = "grille_slats_neon"
+rarity = &"comum"
+fame_min = 0

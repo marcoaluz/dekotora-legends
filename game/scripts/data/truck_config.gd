@@ -75,6 +75,9 @@ const BOT_ROOF_PAINT: Array[String] = ["roofpaint_01", "roofpaint_03", "roofpain
 const BOT_FRONT: Array[String] = ["fb_fan_plate", "fb_fan_amber", "fb_fan_red", "fb_fan_stripe", "fb_box_amber", "fb_smooth_chrome"]
 const BOT_SKIRT: Array[String] = ["skirt_neon_twin", "skirt_neon_dash", "skirt_chrome_rails", "skirt_neon_green"]
 const BOT_MIRROR: Array[String] = ["mirror_stay_l", "mirror_stay_frame", "mirror_stay_truss"]
+## T-234: calota nova em 1 de 3 e grade nova em 1 de 4 (o resto do lote 5 fica so para o jogador).
+const BOT_HUB: Array[String] = ["hub_led_ring", "hub_star_gold", "hub_neon_spinner"]
+const BOT_GRILLE: Array[String] = ["grille_bars_led", "grille_honey_sun", "grille_slats_neon"]
 
 
 ## Pecas de um bot pela semente (mesma semente = mesmas pecas no servidor e em todos os clientes).
@@ -93,6 +96,10 @@ static func bot_part_ids(seed_: int) -> Array[String]:
 		out.append(BOT_REAR_PAINT[(k / 4) % BOT_REAR_PAINT.size()])
 	if k % 4 == 1:
 		out.append(BOT_ROOF_PAINT[(k / 4) % BOT_ROOF_PAINT.size()])
+	if (k / 7) % 3 == 0:
+		out.append(BOT_HUB[(k / 21) % BOT_HUB.size()])
+	if (k / 5) % 4 == 2:
+		out.append(BOT_GRILLE[(k / 20) % BOT_GRILLE.size()])
 	return out
 
 

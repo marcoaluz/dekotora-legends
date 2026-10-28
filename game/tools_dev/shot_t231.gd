@@ -28,7 +28,7 @@ func _initialize() -> void:
 
 static func _parse(args: PackedStringArray) -> Dictionary:
 	var j: Dictionary = {"body": "base", "cab": "chata", "parts": PackedStringArray(), "view": "back34", "night": false,
-		"out": "", "styles": {}, "states": {}, "fov": 38.0, "signal": 0, "brake": false}
+		"out": "", "styles": {}, "states": {}, "fov": 38.0, "signal": 0, "brake": false, "decals": []}
 	for a in args:
 		var v: String = a.get_slice("=", 1)
 		if a.begins_with("--body="):
@@ -49,6 +49,13 @@ static func _parse(args: PackedStringArray) -> Dictionary:
 			j["brake"] = true
 		elif a.begins_with("--out="):
 			j["out"] = v
+		elif a.begins_with("--decal="):            # T-234: --decal=id:lugar:cor (lugar side_l|side_r|rear|cab)
+			var dd: Dictionary = DecalCatalog.make(v.get_slice(":", 0), v.get_slice(":", 1))
+			if v.get_slice_count(":") > 2:
+				dd["color"] = "#" + v.get_slice(":", 2)
+			if v.get_slice_count(":") > 3:
+				dd["size"] = float(v.get_slice(":", 3))
+			(j["decals"] as Array).append(dd)
 		elif a.begins_with("--state="):
 			j["states"][v.get_slice(":", 0)] = v.get_slice(":", 1)
 		elif a.begins_with("--color=") or a.begins_with("--led=") or a.begins_with("--neon="):
@@ -109,6 +116,8 @@ func _mount(j: Dictionary) -> void:
 			push_warning("shot_t231: peca desconhecida " + String(id))
 	t.apply_loadout(defs, j["styles"])
 	t.set_lights_on(bool(j["night"]), not bool(j["night"]))
+	if not (j["decals"] as Array).is_empty():
+		t.apply_decals(j["decals"])
 	t.set_mural_glow(0.5 if bool(j["night"]) else 0.0)
 	for pid in j["states"]:
 		t.set_part_state(String(pid), String(j["states"][pid]))
@@ -138,6 +147,13 @@ func _mount(j: Dictionary) -> void:
 		"skirt34": [Vector3(-6.5, 1.6, front + 0.5), Vector3(-1.0, 0.7, mid + 1.5)],
 		"skirt_close": [Vector3(3.6, 0.9, mid - 0.5), Vector3(1.2, 0.5, mid + 0.6)],
 		"skirt_top": [Vector3(3.2, 3.0, mid + 0.6), Vector3(1.2, 0.5, mid + 0.6)],
+		# T-234: grade e interior de perto, calota da frente, escapamento, buzina no topo da carga
+		"front_close": [Vector3(-1.7, 1.9, front - 3.4), Vector3(0.0, 1.7, front + 0.2)],
+		"wheel_close": [Vector3(3.4, 0.9, front + 0.6), Vector3(1.1, 0.5, front + 1.4)],
+		"stack34": [Vector3(4.6, 2.8, front + 1.0), Vector3(1.2, 2.1, front + 3.3)],
+		"horn34": [Vector3(-3.4, 5.4, front + 0.4), Vector3(0.0, 3.6, front + 4.0)],
+		"horn_back": [Vector3(-2.4, 5.6, front + 8.5), Vector3(0.0, 3.6, front + 3.8)],
+		"decal_side": [Vector3(-14.0, 2.6, mid), Vector3(0.0, 2.0, mid)],
 	}
 	var v: Array = views.get(String(j["view"]), views["back34"])
 	_world.add_child(cam)

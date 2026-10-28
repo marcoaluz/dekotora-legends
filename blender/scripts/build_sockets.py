@@ -22,7 +22,7 @@ import bpy
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lib import paint_measure as PM, socket_rules as R, truck_measure as TM  # noqa: E402
+from lib import paint_measure as PM, socket_rules as R, t234_measure as T234, truck_measure as TM  # noqa: E402
 
 TRUCK_DIR = "game/assets/vehicles/dekotora/truck"
 OUT_DIR = TRUCK_DIR + "/sockets"
@@ -118,6 +118,7 @@ def build_one(path: str) -> dict:
     m["paint"] = PM.paint_faces(data, m, m["edges"], zones["rear_doors"]["box"]) if "rear_doors" in zones else {}   # T-232
     sk = R.sockets(m, st)
     R.clear_mirror(sk, zones)                                   # T-233: haste por fora da viseira/lanterna da quina
+    R.lot5(sk, zones, m, T234.measure(m))                       # T-234: grade, buzina e interior (raios)
     probs = R.check(sk, zones)
     probs += [f"{k}: {v['problem']}" for k, v in sk.items() if "problem" in v]
     out = {
@@ -159,6 +160,10 @@ def build_one(path: str) -> dict:
         r = sk.get(k, {}).get("rect")
         if r:
             print(f"[sockets] {stem:34s} {k} {r['w']:.2f} x {r['h']:.2f} m centro {r['c']}")
+    g, hn, it = sk.get("grille", {}), sk.get("horn", {}), sk.get("interior", {}).get("rect", {})
+    print(f"[sockets] {stem:34s} T-234 grade {g.get('width', 0):.2f} x {g.get('height', 0):.2f} frente z {g.get('face_z', 0):.3f}"
+          f" | buzina {('y %.2f z %.2f' % (hn['anchor'][1], hn['anchor'][2])) if hn.get('anchor') else 'nao cabe'}"
+          f" | interior {('%.2f x %.2f' % (it['w'], it['h'])) if it else 'sem vidro'}")
     for p in probs:
         print("   PROBLEMA:", p)
     return out

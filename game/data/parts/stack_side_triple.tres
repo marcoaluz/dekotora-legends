@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"stack_side_triple"
+display_key = "part.stack_side_triple"
+slot = &"exhaust_stacks"
+zones = PackedStringArray("left", "right")
+weight_kg = 60.0
+durability = 50.0
+fame = 14
+price = 20000
+accessory_id = "stack_side_triple"
+rarity = &"comum"
+fame_min = 0

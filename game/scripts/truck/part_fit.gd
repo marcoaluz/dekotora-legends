@@ -149,6 +149,19 @@ static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalo
 			pn.get_parent().remove_child(pn)
 			pn.free()
 		return po
+	if Lot5Fit.is_wheel(e):                          # T-234: calota em cada roda de fora
+		return Lot5Fit.wheel_problems(model, data, catalog, id)
+	if Lot5Fit.handles(e):                           # T-234: grade, escapamento (2 lados) e buzina
+		var lo: Array[String] = []
+		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):
+			var ln: Node3D = catalog.attach(model, id, side)
+			if ln == null:
+				lo.append("nao montou (sem SOCKET_%s)" % Lot5Fit.socket_name(e, side))
+				continue
+			lo.append_array(Lot5Fit.problems(model, data, e, ln, side))
+			ln.get_parent().remove_child(ln)
+			ln.free()
+		return lo
 	if StripFit.handles(e) or FrameFit.handles(e):   # T-231/T-233: pecas por modulo/grupo, os 2 lados
 		var out: Array[String] = []
 		for side in (["R", "L"] if bool(e.get("mirror_for_left", false)) else ["R"]):

@@ -120,6 +120,7 @@ func part_transform(w: Node3D) -> Transform3D:
 ## Instancia a peca de roda `id` em todas as rodas externas (filha de cada roda). Devolve os nos criados.
 func attach_part(catalog: AccessoryCatalog, id: String) -> Array[Node3D]:
 	var out: Array[Node3D] = []
+	var nominal_r: float = float(catalog.entry(id).get("wheel_r", 0.0))    # T-234: calota feita para a roda de raio X
 	for w in outer_wheels():
 		var n: Node3D = catalog.instantiate(id)
 		if n == null:
@@ -128,6 +129,9 @@ func attach_part(catalog: AccessoryCatalog, id: String) -> Array[Node3D]:
 		n.set_meta("wheel_part", true)
 		w.add_child(n)
 		n.transform = part_transform(w)
+		var i: int = wheels.find(w)
+		if nominal_r > 0.0 and i >= 0:                 # T-234: escala pelo raio desta roda (Canter 0,44; frente da JAC)
+			n.transform.basis = n.transform.basis * Basis.from_scale(Vector3.ONE * (radii[i] / nominal_r))
 		for mi in n.find_children("*", "MeshInstance3D", true, false):
 			var m: MeshInstance3D = mi as MeshInstance3D
 			m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF   # fica dentro do arco: sombra imperceptivel

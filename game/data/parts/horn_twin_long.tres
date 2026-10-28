@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"horn_twin_long"
+display_key = "part.horn_twin_long"
+slot = &"horn"
+zones = PackedStringArray("roof")
+weight_kg = 20.0
+durability = 40.0
+fame = 10
+price = 12000
+accessory_id = "horn_twin_long"
+horn = "horn_dual_tone"
+rarity = &"comum"
+fame_min = 0

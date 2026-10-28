@@ -11,8 +11,8 @@ extends RefCounted
 const SECTIONS: Array = [["parts", "garage.parts"], ["paint", "garage.paint"], ["lights", "garage.lights"], ["decals", "garage.decals"]]
 ## Lugar do caminhao -> encaixes (mesma ordem do GameState.SLOT_ORDER). Encaixe fora daqui cai em "other".
 const AREAS: Array = [
-	["front", ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "mirror_stay"]],
-	["roof", ["visor", "andon", "rocket", "box_light_top", "roof_paint"]],   # T-232: pintura do teto          # T-231: foguete e contorno do teto do bau                       # T-215: roof_lights/frame/ornament/wing sairam (RetiredParts)
+	["front", ["front_bumper", "front_lip", "grille", "front_trim", "front_ornament", "aux_lights", "mirror_stay", "interior"]],   # T-234: interior
+	["roof", ["visor", "andon", "rocket", "box_light_top", "roof_paint", "horn"]],   # T-234: buzina no topo da carga   # T-232: pintura do teto          # T-231: foguete e contorno do teto do bau                       # T-215: roof_lights/frame/ornament/wing sairam (RetiredParts)
 	["side", ["body_ornament", "exhaust_stacks", "ladder", "side_skirts", "underglow", "fenders", "steps", "side_trim",
 			"side_box", "side_ornament", "mural", "box_light_r", "box_light_l", "hubcaps"]],
 	["rear", ["rear_bumper", "rear_lamps", "plate", "mudflaps", "rear_ornament", "rear_paint"]],   # T-232

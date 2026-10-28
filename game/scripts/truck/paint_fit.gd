@@ -72,22 +72,14 @@ static func build(data: Dictionary, entry: Dictionary, side: String) -> Node3D:
 	var v: Vector3 = _v(r["v"]) * (h * 0.5)
 	var n: Vector3 = _v(r["n"])
 	var win: Rect2 = uv_window(float(art.get("aspect", 1.0)), w / maxf(h, 0.001))
-	var verts := PackedVector3Array([c - u + v, c + u + v, c + u - v, c - u - v])
-	var uvs := PackedVector2Array([win.position, Vector2(win.end.x, win.position.y), win.end, Vector2(win.position.x, win.end.y)])
-	var arr: Array = []
-	arr.resize(Mesh.ARRAY_MAX)
-	arr[Mesh.ARRAY_VERTEX] = verts
-	arr[Mesh.ARRAY_NORMAL] = PackedVector3Array([n, n, n, n])
-	arr[Mesh.ARRAY_TEX_UV] = uvs
-	# frente = lado da normal: (0,1,2) (0,2,3) gira no sentido horario visto de fora (Godot: frente = horario)
-	arr[Mesh.ARRAY_INDEX] = PackedInt32Array([0, 1, 2, 0, 2, 3]) if u.cross(v).dot(n) > 0.0 else PackedInt32Array([0, 2, 1, 0, 3, 2])
+	var arr: Array = _surface(c, u, v, n, win, r.get("grid", []))
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
 	var mi := MeshInstance3D.new()
 	mi.name = "paint"
 	mi.mesh = mesh
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var mat: StandardMaterial3D = material(String(art["tex"]), String(art.get("emit", "")))
+	var mat: StandardMaterial3D = material(String(art["tex"]), String(art.get("emit", "")), bool(entry.get("alpha", false)))
 	mi.material_override = mat
 	var node := Node3D.new()
 	node.add_child(mi)
@@ -97,8 +89,43 @@ static func build(data: Dictionary, entry: Dictionary, side: String) -> Node3D:
 	return node
 
 
+## Malha da arte: um quadrado ou (T-234, interior no para-brisa) uma grade que segue a curvatura do vidro (`grid` =
+## linhas de baixo para cima, colunas de s = -1 a +1, deslocamento ao longo da normal em m).
+static func _surface(c: Vector3, u: Vector3, v: Vector3, n: Vector3, win: Rect2, grid: Array) -> Array:
+	var nv: int = maxi(grid.size() - 1, 1)
+	var nu: int = maxi((grid[0] as Array).size() - 1, 1) if not grid.is_empty() else 1
+	var verts := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var norms := PackedVector3Array()
+	for j in nv + 1:
+		var t: float = -1.0 + 2.0 * j / nv
+		for i in nu + 1:
+			var s: float = -1.0 + 2.0 * i / nu
+			var k: float = float((grid[j] as Array)[i]) if not grid.is_empty() else 0.0
+			verts.append(c + u * s + v * t + n * k)
+			uvs.append(Vector2(win.position.x + win.size.x * (s + 1.0) * 0.5, win.position.y + win.size.y * (1.0 - (t + 1.0) * 0.5)))
+			norms.append(n)
+	var idx := PackedInt32Array()
+	var front: bool = u.cross(v).dot(n) > 0.0
+	for j in nv:
+		for i in nu:
+			var d: int = j * (nu + 1) + i            # (s0, t0)
+			var cc: int = d + 1                      # (s1, t0)
+			var a: int = d + nu + 1                  # (s0, t1)
+			var b: int = a + 1                       # (s1, t1)
+			# frente = lado da normal: (a,b,cc) (a,cc,d) gira no sentido horario visto de fora (Godot: frente = horario)
+			idx.append_array([a, b, cc, a, cc, d] if front else [a, cc, b, a, d, cc])
+	var arr: Array = []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = verts
+	arr[Mesh.ARRAY_NORMAL] = norms
+	arr[Mesh.ARRAY_TEX_UV] = uvs
+	arr[Mesh.ARRAY_INDEX] = idx
+	return arr
+
+
 ## Material de uma arte (um so por arte, compartilhado): cor + emissao pronta para a noite (MuralGlow).
-static func material(tex_path: String, emit_path: String) -> StandardMaterial3D:
+static func material(tex_path: String, emit_path: String, alpha: bool = false) -> StandardMaterial3D:
 	if _mats.has(tex_path):
 		return _mats[tex_path]
 	var tex: Texture2D = load(tex_path) as Texture2D
@@ -109,6 +136,10 @@ static func material(tex_path: String, emit_path: String) -> StandardMaterial3D:
 	m.roughness = ROUGHNESS
 	m.metallic = 0.0
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	if alpha:                                       # T-234: interior pelo vidro (bordas somem aos poucos) e brilho de vidro
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.roughness = 0.12
+		m.metallic = 0.35
 	MuralGlow.setup(m, tex, emit)
 	_mats[tex_path] = m
 	return m
@@ -130,6 +161,11 @@ static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: N
 	var box: AABB = PartFit.aabb_in(node, model)
 	box = box.grow(0.001)
 	var bx: Dictionary = data.get("measure", {}).get("box", {})
+	if slot == "interior":                         # T-234: o interior fica no para-brisa (na frente do vidro, ate 3 cm)
+		var ws: AABB = TruckSockets.aabb_of(data.get("measure", {}).get("cab", {}).get("windshield", [[0, 0, 0], [0, 0, 0]]))
+		if not PartFit.inside(box, ws.grow(0.03), 0.0):
+			out.append("%s: sai do para-brisa" % slot)
+		bx = {}
 	if not bx.is_empty():
 		var lim := AABB(Vector3(-float(bx["half_w"]) - 0.05, float(bx["bottom_y"]) - 0.05, float(bx["front_z"]) - 0.05),
 				Vector3(2.0 * float(bx["half_w"]) + 0.1, float(bx["top_y"]) - float(bx["bottom_y"]) + 0.1,
@@ -150,7 +186,7 @@ static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: N
 
 
 ## Area minima de cada face (m2): o menor bau (Canter) tem lateral 4,4 x 1,7 e traseira 2,1 x 1,8.
-const MIN_AREA: Dictionary = {"mural": 6.0, "rear_paint": 3.0, "roof_paint": 8.0}
+const MIN_AREA: Dictionary = {"mural": 6.0, "rear_paint": 3.0, "roof_paint": 8.0, "interior": 0.6}
 
 
 static func _v(a: Array) -> Vector3:

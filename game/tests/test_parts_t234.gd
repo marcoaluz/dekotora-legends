@@ -1,0 +1,169 @@
+extends TestCase
+## Oficina lote 5 (T-234): as lacunas da secao 19 (calotas, escapamentos, grades, buzinas, interior e adesivos) em
+## TODOS os caminhoes jogaveis (a carreta guardada so entra no relatorio). Regras da decisao 12 do Marco: tudo
+## instalado junto, nada cobre farol, lanterna, placa, para-brisa (o interior e a arte NO vidro, isento so ele), porta
+## ou roda (a calota e isenta da roda); dano sem buraco; luzes acendem a noite; kanji dos adesivos nunca espelhado.
+
+const HUBS: Array[String] = ["hub_led_ring", "hub_star_gold", "hub_neon_spinner"]
+const STACKS: Array[String] = ["stack_neon_twin", "stack_j_amber", "stack_side_triple"]
+const GRILLES: Array[String] = ["grille_bars_led", "grille_honey_sun", "grille_slats_neon"]
+const HORNS: Array[String] = ["horn_triple", "horn_twin_long", "horn_ship"]
+const INTERIORS: Array[String] = ["interior_curtain", "interior_chandelier", "interior_tufted"]
+const DECALS: Array[String] = ["decal_frase_01", "decal_frase_02", "decal_frase_03", "decal_frase_04", "decal_frase_05",
+	"decal_frase_06", "decal_frase_07", "decal_frase_08", "decal_frase_09", "decal_labaredas", "decal_sol_nascente"]
+const PF := preload("res://tests/test_part_fit.gd")
+
+
+static func all_ids() -> Array[String]:
+	var out: Array[String] = []
+	for l in [HUBS, STACKS, GRILLES, HORNS, INTERIORS]:
+		out.append_array(l)
+	return out
+
+
+func test_catalog_and_data() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	var c := AccessoryCatalog.get_instance()
+	for id in all_ids():
+		var e: Dictionary = c.entry(id)
+		check(not e.is_empty(), "%s no catalogo" % id)
+		var d: PartDef = gs.part(id)
+		check(d != null, "PartDef %s" % id)
+		if d == null or e.is_empty():
+			continue
+		check(String(d.rarity) in ["comum", "incomum", "rara", "lendaria"] and d.fame_required == 0, "%s: raridade sem trava" % id)
+		check(d.price > 0 and d.fame > 0 and (d.weight_kg > 0.0 or id in INTERIORS), "%s: numeros" % id)
+		check(Tr.t(d.display_key) != d.display_key, "%s: nome pt-BR" % id)
+		check(Tr.t("slot." + String(d.slot)) != "slot." + String(d.slot), "%s: nome do encaixe" % id)
+		check(GarageDecoNav.area_of(String(d.slot)) != "other", "%s: encaixe tem lugar na garagem" % id)
+		check(int(e.get("triangles", 0)) <= 4500, "%s: %d triangulos (pior caso)" % [id, e.get("triangles", 0)])
+		if not id in INTERIORS:
+			check(DecoStyle.is_deco(e) and DecoColorDef.find(String(e["default_color"])) != null, "%s: cor de fabrica" % id)
+	for id in HORNS:
+		check(HornCatalog.is_valid((gs.part(id) as PartDef).horn), "%s: traz um som de buzina" % id)
+	for id in INTERIORS:
+		check(PaintFit.handles(c.entry(id)) and bool(c.entry(id).get("alpha", false)), "%s: arte no vidro (transparente)" % id)
+
+
+func test_every_truck_fits() -> void:
+	var c := AccessoryCatalog.get_instance()
+	var checked: int = 0
+	var no_horn: Array[String] = []
+	for m in PF.models():
+		if m["body"] == "carreta":
+			continue
+		var model: Node3D = PartFit.load_model(m["path"], m["body"], m["cab"])
+		for id in all_ids():
+			var e: Dictionary = c.entry(id)
+			var sk: Dictionary = TruckSockets.socket(m["data"], String(e["socket"]))
+			if id in HORNS and sk.is_empty():
+				if not m["stem"] in no_horn:
+					no_horn.append(m["stem"])
+				continue
+			check(not sk.is_empty(), "%s em %s: encaixe existe" % [id, m["stem"]])
+			var probs: Array[String] = PartFit.check_part(model, m["data"], c, id)
+			check(probs.is_empty(), "%s em %s: %s" % [id, m["stem"], "; ".join(probs)])
+			checked += 1
+		model.free()
+	for s in no_horn:          # so a cacamba aberta (dump) e a graneleira da cabine JAC ficam sem topo plano
+		check(s.contains("dump") or s.contains("graneleira"), "%s: sem lugar para a buzina" % s)
+	check(checked >= 50 * 14, "%d combinacoes conferidas" % checked)
+
+
+func test_grille_stretches_to_each_cab() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	for cab in ["chata", "flat_wide", "americana"]:
+		var t := TruckNode.new()
+		t.cab_kind = cab
+		t._ready()
+		t.apply_loadout([gs.part("grille_honey_sun")] as Array[PartDef])
+		var data: Dictionary = TruckSockets.for_model(TruckNode.model_path(t.body_kind, cab))
+		var sb: AABB = TruckSockets.aabb_of(TruckSockets.socket(data, "grille")["box"])
+		var node: Node3D = t._acc_nodes["grille_honey_sun"][0]
+		var box: AABB = PartFit.aabb_in(node, t.model)
+		check(box.size.x > sb.size.x * 0.85 and box.size.y > sb.size.y * 0.80, "%s: grade ocupa a caixa (%.2f x %.2f de %.2f x %.2f)" %
+				[cab, box.size.x, box.size.y, sb.size.x, sb.size.y])
+		var sun: Array = node.find_children("*_CEN_*", "MeshInstance3D", true, false)
+		check(not sun.is_empty(), "%s: sol do meio separado" % cab)
+		if not sun.is_empty():
+			var sbox: AABB = PartFit.aabb_in(sun[0] as Node3D, t.model)
+			check(absf(sbox.size.x - sbox.size.y) < 0.03, "%s: sol redondo (%.2f x %.2f)" % [cab, sbox.size.x, sbox.size.y])
+		t.free()
+
+
+func test_hubcaps_on_every_outer_wheel_scaled_by_radius() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	var sizes: Dictionary = {}
+	for body in ["base", "canter"]:
+		var t := TruckNode.new()
+		t.body_kind = body
+		t._ready()
+		t.apply_loadout([gs.part("hub_led_ring")] as Array[PartDef])
+		var nodes: Array = t._acc_nodes["hub_led_ring"]
+		check_eq(nodes.size(), t.wheels.outer_wheels().size(), "%s: uma calota por roda de fora" % body)
+		sizes[body] = PartFit.aabb_in(nodes[0] as Node3D, t.model).size.y
+		for n in nodes:
+			check((n as Node3D).get_parent().name.begins_with("wheel_"), "%s: calota presa na roda (gira junto)" % body)
+		t.free()
+	check(float(sizes["canter"]) < float(sizes["base"]) * 0.92, "calota menor na roda menor do Canter")
+
+
+func test_interior_on_windshield_and_glows_at_night() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	var t := TruckNode.new()
+	t._ready()
+	t.apply_loadout([gs.part("interior_chandelier")] as Array[PartDef])
+	var n: Node3D = t._acc_nodes["interior_chandelier"][0]
+	var mat: StandardMaterial3D = n.get_meta("paint_mat") as StandardMaterial3D
+	check(mat.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA, "interior com transparencia nas bordas")
+	t.set_mural_glow(0.8)
+	check(mat.emission_energy_multiplier > 0.5, "lustre acende a noite")
+	t.set_mural_glow(0.0)
+	check_eq(mat.emission_energy_multiplier, 0.0, "de dia sem brilho")
+	t.set_part_state("interior_chandelier", "broken")
+	check(n.visible, "interior nao some com dano")
+	t.free()
+
+
+func test_lights_and_broken_keep_geometry() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	var t := TruckNode.new()
+	t._ready()
+	var ids: Array[String] = ["hub_neon_spinner", "stack_j_amber", "grille_bars_led", "horn_ship"]
+	var defs: Array[PartDef] = []
+	for id in ids:
+		defs.append(gs.part(id))
+	t.apply_loadout(defs)
+	t.set_lights_on(true)
+	check(t._lamp_mats.has("lamp_amber"), "luz ambar (fendas do J, aro da buzina) acende")
+	for id in ids:
+		check(t._acc_nodes.has(id) and not (t._acc_nodes[id] as Array).is_empty(), "%s montada" % id)
+		t.set_part_state(id, "broken")
+		for nd in t._acc_nodes.get(id, []):
+			check((nd as Node3D).visible, "%s quebrada continua no lugar" % id)
+	t.free()
+
+
+func test_horn_part_sets_the_horn_sound() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	check_eq((gs.part("horn_ship") as PartDef).horn, "horn_ship_deep", "buzina de navio = som de navio")
+	check_eq((gs.part("horn_triple") as PartDef).horn, "horn_musical_dekotora", "corneta tripla = melodia")
+
+
+func test_decals_listed_with_names_and_white_ink() -> void:
+	var ids: Array[String] = DecalCatalog.ids()
+	for id in DECALS:
+		check(id in ids, "adesivo %s na lista" % id)
+		check(Tr.t("decal." + id) != "decal." + id, "adesivo %s com nome" % id)
+		var tex: Texture2D = DecalCatalog.texture(id)
+		check(tex != null and tex.get_width() >= 256, "adesivo %s carrega" % id)
+
+
+func test_bots_draw_new_hubs_and_grilles() -> void:
+	var seen: Dictionary = {}
+	for s in 120:
+		for p in TruckConfig.bot_part_ids(s):
+			seen[p] = true
+	check(seen.keys().any(func(i: String) -> bool: return String(i) in HUBS), "bots sorteiam calota nova")
+	check(seen.keys().any(func(i: String) -> bool: return String(i) in GRILLES), "bots sorteiam grade nova")
+	check(Protocol.VERSION >= 21, "protocolo 21 (lote 5 no descritor e nos bots)")

@@ -199,7 +199,7 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         s[k] = {"fit": "face"}
         if k in m.get("paint", {}):                  # T-232: retângulo medido por raios no plano real da face
             s[k]["rect"] = m["paint"][k]
-    for k in ("hubcaps", "horn", "interior", "decals"):
+    for k in ("hubcaps", "decals"):
         s[k] = {"fit": "none"}
     if m.get("open_body"):
         for k in BOX_ONLY:
@@ -412,3 +412,46 @@ def clear_mirror(sk: dict, zones: dict) -> None:
             else:
                 b[1][0] = round(min(b[1][0], -push), 3)
             sk[k]["anchor"][0] = round(sx * max(abs(sk[k]["anchor"][0]), push), 3)
+
+
+# ----------------------------------------------------------------------------- oficina lote 5 (T-234)
+GRILLE_DEPTH = 0.11                # m: quanto a grade nova pode sair da frente da cabine
+
+
+def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
+    """T-234: grade encostada na frente real da cabine (fit "grille": a peça estica na largura e na altura da caixa),
+    buzina no topo da carga (fit "horn"; carga sem topo plano = sem buzina) e o retângulo do interior no para-brisa
+    (fit "face" com `rect`, como as pinturas; o para-brisa é isento só para ele: a arte fica 4 mm na frente do vidro)."""
+    from . import t234_measure as T
+    g = sk.get("grille")
+    if g and "box" in g:
+        b = g["box"]
+        for _ in range(3):              # a grade fica ACIMA da placa/para-choque (cabines planas: farol baixo)
+            seat = T.grille_seat(l5["tree"], g, m["cab"]["front_z"])
+            if not seat:
+                break
+            z0 = round(min(g["box"][0][2], seat["face_z"] - GRILLE_DEPTH), 3)
+            trial = [[b[0][0], b[0][1], z0], [b[1][0], b[1][1], round(max(b[1][2], seat["face_z"] + 0.01), 3)]]
+            hit = [zv["box"] for zk, zv in zones.items() if "grille" not in zv["exempt"] and overlap(trial, zv["box"])]
+            low = [zb for zb in hit if zb[1][1] < (b[0][1] + b[1][1]) / 2]
+            if not low:
+                break
+            b[0][1] = round(max(zb[1][1] for zb in low) + 0.01, 3)
+        if seat:
+            g.update(seat)
+            b[0][2] = round(min(b[0][2], seat["face_z"] - GRILLE_DEPTH), 3)
+            b[1][2] = round(max(b[1][2], seat["face_z"] + 0.01), 3)
+            g["anchor"] = [g["anchor"][0], round((b[0][1] + b[1][1]) / 2, 3), seat["face_z"]]
+        g.update({"fit": "grille", "height": round(b[1][1] - b[0][1], 3)})
+    hs = l5.get("horn") or {}
+    if hs:
+        y = hs["y"]
+        lift = hs.get("lift", 0.0)
+        sk["horn"] = {"box": _box(-T.HORN_W, min(hs["low"], y - 0.07) - 0.005, hs["z0"], T.HORN_W, y + lift + T.HORN_H, hs["z1"]),
+                      "anchor": [0.0, y, round((hs["z0"] + hs["z1"]) / 2, 3)], "fit": "horn", "lift": lift,
+                      "drop": round(y - hs["low"], 3), "length": round(hs["z1"] - hs["z0"], 3)}
+    it = l5.get("interior") or {}
+    if it:
+        sk["interior"] = {"fit": "face", "rect": it}
+        if "windshield" in zones and "interior" not in zones["windshield"]["exempt"]:
+            zones["windshield"]["exempt"].append("interior")
