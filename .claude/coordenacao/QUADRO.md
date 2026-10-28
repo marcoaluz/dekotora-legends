@@ -5,7 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T-255 | Seção _lot5 no report_part_fit.gd, regerar REPORT_ENCAIXE.md; seções do lote 5 e murais nas skills blender-pixelart e godot-dekotora | delegado da T-234/T-242 | fácil | ajudante-rapido | escalada (partes 2 e 3 feitas; parte 1 bloqueada: `_lot3` sem a chave `interior`, ver LOG) | 2026-10-28 | |
+| T-255 | Seção _lot5 no report_part_fit.gd, regerar REPORT_ENCAIXE.md; seções do lote 5 e murais nas skills blender-pixelart e godot-dekotora | delegado da T-234/T-242 | fácil | ajudante-rapido | concluída (relatório de encaixe 798/798 no lote 5; skills nos commits f8a1762 e a89fffc) | 2026-10-28 | 2026-10-28 |
 | T-252 | Respostas do Marco à T-240: foguetes um pouco maiores e mais largos que na T-240; corrigir luzinhas soltas da cabine americana e andon alto dos baús leve e longo | pedido do Marco | difícil | especialista (o mesmo da T-240/T-251) | concluída (commits a1e844e, 74a4190; foguete 1,65× e 10% mais largo, andon leve/longo e luzes da americana corrigidos; precisa Marco: conferir folhas e APK) | 2026-10-27 | 2026-10-27 |
 | T-253 | APK de teste (protocolo 20) com T-251 e T-252, a partir de cópia limpa do commit 77d055f | delegado da T-251/T-252 | fácil | ajudante-rapido | cancelada (Marco: APK só sob pedido) | 2026-10-27 | 2026-10-27 |
 | T-254 | Atualizar skills godot-dekotora e blender-pixelart com notas da T-251/T-252 | delegado da T-251/T-252 | fácil | ajudante-rapido | concluída (commit 97546c9) | 2026-10-27 | 2026-10-27 |
