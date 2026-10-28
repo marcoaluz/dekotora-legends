@@ -314,3 +314,15 @@ um problema visual não puder ser entendido pelos renders.
   com a carga). `truck_measure.import_truck` aceita `(glb, dy, (y0, front, ext, shift))` para esticar a carga como o jogo.
 - **Armadilha (matriz velha)**: depois de esticar ou mover objetos, chame `bpy.context.view_layer.update()` antes de ler
   `matrix_world`. Sem isso o andon do leve/longo foi parar a ~7 m (T-252).
+
+## Oficina lote 5 (T-234)
+
+- Script: `blender/scripts/build_t234_parts.py` (grades, escapamentos, buzinas, calotas, interiores e adesivos). Rodar na raiz do projeto:
+  `blender -b --factory-startup -P blender/scripts/build_t234_parts.py -- [--only id1,id2] [--no-preview] [--no-art]`
+  (`--no-art`: não refaz interiores nem adesivos; `--no-preview`: não grava as folhas).
+- Capturas e folhas: `bash tools/capture_t234.sh [PASTA_ABS]` (Git Bash, com janela). Testes do jogo: `-- --only=t234`.
+- Encaixes no jogo: `Lot5Fit` (`fits` grille, stack, horn, wheel) e `PaintFit` (interior, com `alpha` e `grid`). Ver a skill do Godot.
+- **Armadilha (medida de peça de malha)**: `PartFit.aabb_in` de um MeshInstance3D devolve caixa vazia. No Blender a medida
+  certa vem de `M.torus`/objetos já girados: não sobrescreva `rotation_euler` depois de `M.torus(axis=...)` (ele já gira o objeto).
+- **Armadilha (commit compartilhado)**: se outra tarefa tem mudanças não commitadas no mesmo arquivo, não use `git add` (levaria tudo).
+  Monte o blob só com a sua parte: `git hash-object -w ARQ` e `git update-index --cacheinfo 100644,HASH,CAMINHO`; depois `git commit`.

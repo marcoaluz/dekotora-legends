@@ -723,3 +723,22 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   gravadas pelo `build_t240_kits.py`; malhas `frame_*` = chassi que não estica). Testes `-- --only=cab_gap`. Capturas
   antes/depois (T-251 e T-252): `bash tools/capture_t251.sh [cabines|t252|tudo]` → `docs/capturas_t251/` (o "antes" usa
   `../t251_antes/game`, cópia do commit 2a868b6; `SKIP_ANTES=1` refaz só os "depois", reaproveitando os "antes").
+
+## Oficina lote 5 (T-234)
+
+- Build dos modelos (Blender, raiz do projeto): `blender -b --factory-startup -P blender/scripts/build_t234_parts.py -- [--only id1,id2] [--no-preview] [--no-art]`
+  (`--no-art` não refaz interiores nem adesivos; `--no-preview` não grava as folhas).
+- Capturas: `bash tools/capture_t234.sh [PASTA_ABS]` (Git Bash; precisa de janela, sem `--headless`; padrão `docs/capturas_t234`).
+- Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=t234` (`tests/test_parts_t234.gd`).
+- Relatório de encaixe: `godot --headless --path game -s res://tools_dev/report_part_fit.gd` (seção `_lot5`, lote 5).
+- Classe `Lot5Fit` (`scripts/truck/lot5_fit.gd`): fits `grille` (grade entre os faróis, estica na caixa da cabine), `stack`
+  (escapamento no vão entre cabine e carga), `horn` (buzina no topo da carga) e `wheel` (calota em cada roda de fora).
+- Classe `PaintFit` (`scripts/truck/paint_fit.gd`) também cobre o interior: entrada com `"alpha": true` (bordas somem aos poucos,
+  brilho de vidro) e `"grid"` (malha curva que segue o para-brisa, em vez de um quadrado). `socket` = `interior`.
+- **Armadilha (AABB vazio)**: `PartFit.aabb_in(node, root)` com um `MeshInstance3D` devolve caixa vazia (ele procura só os
+  descendentes). Use `PartFit.rel_xform(mi) * mi.mesh.get_aabb()`.
+- **Armadilha (Blender, eixo)**: `M.torus(axis=...)` já gira o objeto. Não sobrescreva `rotation_euler` depois.
+- **Armadilha (relatório)**: `report_part_fit.gd` soma os lotes; um socket novo (como `interior` na `_lot3`) que não está na lista
+  de um lote derruba a função inteira com `SCRIPT ERROR` e o relatório sai incompleto. Confira "Total geral" e as linhas `Pinturas:`/`Lote`.
+- **Commit de arquivo compartilhado** (quando outra tarefa tem mudanças não commitadas no mesmo arquivo): monte o blob só com a
+  sua parte: `git hash-object -w arquivo` e depois `git update-index --cacheinfo 100644,<hash>,<caminho>`; então `git commit`.
