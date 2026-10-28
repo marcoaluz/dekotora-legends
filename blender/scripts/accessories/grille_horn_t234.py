@@ -76,6 +76,21 @@ def _led_row(m, name, face_y, zc, cols=26, h=0.034, x_in=0.05):
     return K.led_grid(name, face, 0.0, 0.0, 1.0, 1.0, cols, 1, m["led"], fill=0.72, off=0.004, depth=0.010)
 
 
+def _honey(inset, m, y=0.03):
+    """Colmeia dourada (textura de favos `deco_honey`, repetida pelo tamanho real no jogo)."""
+    hw, hh = GW / 2 - inset, GH / 2 - inset
+    o = M.box("honey", (2 * hw, 0.008, 2 * hh), (0, y, 0), m["honey"], bevel=0.0, seg=1)
+    me = o.data
+    if not me.uv_layers:
+        me.uv_layers.new()
+    uv = me.uv_layers.active.data
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            v = me.vertices[me.loops[li].vertex_index].co
+            uv[li].uv = ((v.x + hw) / Z.HONEY_CELL, (v.z + hh) / Z.HONEY_CELL)
+    return o
+
+
 def _art(m, cell, inset=0.07, y=0.014):
     """Painel de acrílico aceso por dentro com arte (atlas da T-211: 12 ondas, 13 sakura, 14 raios, 15 nuvens)."""
     face = K.Face((GW / 2 - inset, y, -GH / 2 + inset), (-(GW - 2 * inset), 0, 0), (0, 0, GH - 2 * inset))
@@ -84,7 +99,7 @@ def _art(m, cell, inset=0.07, y=0.014):
 
 def grille_bars_led(m):
     """Barras cromadas sobre painel aceso de ondas, fileiras de LED em cima e embaixo e emblema de asas."""
-    o = [_back(m), _art(m, 12)] + _frame(m, m["body"], bar=0.07, depth=0.065)
+    o = [_back(m)] + _frame(m, m["body"], bar=0.07, depth=0.065)      # T-259: sem painel de arte dentro
     n = 7
     for k in range(n):
         z = -GH / 2 + 0.12 + k * (GH - 0.24) / (n - 1)
@@ -100,7 +115,7 @@ def grille_bars_led(m):
 
 def grille_honey_sun(m):
     """Painel aceso de sakura numa moldura dourada cravejada de LED (4 lados), com emblema de asas grande."""
-    o = [_back(m, m["trim"]), _art(m, 13, inset=0.075)] + _frame(m, m["gold"], bar=0.075, depth=0.07)
+    o = [_back(m, m["trim"]), _honey(inset=0.075, m=m)] + _frame(m, m["gold"], bar=0.075, depth=0.07)   # T-259: colmeia
     o.append(_led_row(m, "led_top", 0.071, GH / 2 - 0.0375, cols=22))
     o.append(_led_row(m, "led_bot", 0.071, -GH / 2 + 0.0375, cols=22))
     for sx in (-1, 1):
@@ -116,7 +131,7 @@ def grille_honey_sun(m):
 
 def grille_slats_neon(m):
     """Lâminas douradas inclinadas sobre painel aceso de raios, colunas de neon e fileira de LED embaixo."""
-    o = [_back(m), _art(m, 14, inset=0.06)] + _frame(m, m["body"], bar=0.05, depth=0.05)
+    o = [_back(m)] + _frame(m, m["body"], bar=0.05, depth=0.05)        # T-259: sem painel de arte dentro
     n = 8
     inner = GH - 0.14
     for k in range(n):
@@ -182,9 +197,9 @@ def _h(pid, name, build, horn, color="cromo_ciano"):
 
 
 PARTS = [
-    _g("grille_bars_led", "Barras cromadas sobre painel aceso", grille_bars_led),
-    _g("grille_honey_sun", "Painel de sakura com moldura de LED", grille_honey_sun, "preto_ciano"),
-    _g("grille_slats_neon", "Lâminas douradas sobre painel de raios", grille_slats_neon, "preto_rosa"),
+    _g("grille_bars_led", "Barras cromadas com LED", grille_bars_led),
+    _g("grille_honey_sun", "Colmeia dourada com moldura de LED", grille_honey_sun, "preto_ciano"),
+    _g("grille_slats_neon", "Lâminas douradas com neon", grille_slats_neon, "preto_rosa"),
     _h("horn_triple", "Corneta tripla cromada", horn_triple, "horn_musical_dekotora"),
     _h("horn_twin_long", "Par de cornetas douradas", horn_twin_long, "horn_dual_tone", "preto_ciano"),
     _h("horn_ship", "Buzina de navio com aro âmbar", horn_ship, "horn_ship_deep"),

@@ -447,6 +447,7 @@ def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
             b[1][2] = round(max(b[1][2], seat["back_z"] + 0.01), 3)   # T-256: colar atrás da grade até a lataria
             g["anchor"] = [g["anchor"][0], round((b[0][1] + b[1][1]) / 2, 3), seat["face_z"]]
         g.update({"fit": "grille", "height": round(b[1][1] - b[0][1], 3)})
+        g["band"] = T.front_band(l5["tree"], m, b, zones)        # T-259: faixa do adesivo na lataria da frente
     # buzina (pedido do Marco depois da 1a versão no topo da carga): EM CIMA da viseira, encostada na testa da cabine,
     # cornetas deitadas apontando para a frente. Fica na frente do deque (não cruza a caixa dele) e acima da viseira.
     # Teto curto (americana, `max_depth`): o deque começa no fim do capô e os canhões do deque de 2 níveis descem pela

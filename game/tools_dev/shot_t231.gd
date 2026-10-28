@@ -153,6 +153,7 @@ func _mount(j: Dictionary) -> void:
 		"stack34": [Vector3(4.6, 2.8, front + 1.0), Vector3(1.2, 2.1, front + 3.3)],
 		"horn34": [Vector3(-3.4, 5.4, front + 0.4), Vector3(0.0, 3.6, front + 4.0)],
 		"horn_back": [Vector3(-2.4, 5.6, front + 8.5), Vector3(0.0, 3.6, front + 3.8)],
+		"ref34": [Vector3(-3.4, 2.4, front - 4.4), Vector3(0.0, 1.75, front + 1.0)],
 		"grille_side": [Vector3(-2.4, 1.5, front - 1.2), Vector3(0.0, 1.35, front + 0.25)],
 		"visor_close": [Vector3(-2.2, 3.7, front - 2.9), Vector3(0.0, 3.0, front + 0.4)],
 		"decal_side": [Vector3(-14.0, 2.6, mid), Vector3(0.0, 2.0, mid)],

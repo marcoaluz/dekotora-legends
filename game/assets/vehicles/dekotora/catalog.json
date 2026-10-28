@@ -9036,195 +9036,6 @@
       }
     },
     {
-      "id": "grille_bars_led",
-      "name": "Barras cromadas sobre painel aceso",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_bars_led.glb",
-      "dimensions_m": {
-        "x": 1.36,
-        "y": 0.86,
-        "z": 0.107
-      },
-      "bounds_godot": [
-        [
-          -0.68,
-          -0.43,
-          -0.107
-        ],
-        [
-          0.68,
-          0.43,
-          -0.0
-        ]
-      ],
-      "triangles": 3438,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "acrylic_art",
-        "chrome",
-        "deco_body",
-        "deco_led",
-        "deco_neon",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_bars_led_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
-      "id": "grille_honey_sun",
-      "name": "Painel de sakura com moldura de LED",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_honey_sun.glb",
-      "dimensions_m": {
-        "x": 1.36,
-        "y": 0.86,
-        "z": 0.112
-      },
-      "bounds_godot": [
-        [
-          -0.68,
-          -0.43,
-          -0.112
-        ],
-        [
-          0.68,
-          0.43,
-          -0.0
-        ]
-      ],
-      "triangles": 3574,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "acrylic_art",
-        "chrome",
-        "deco_led",
-        "deco_neon",
-        "deco_trim",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_honey_sun_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "preto_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
-      "id": "grille_slats_neon",
-      "name": "Lâminas douradas sobre painel de raios",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_slats_neon.glb",
-      "dimensions_m": {
-        "x": 1.36,
-        "y": 0.86,
-        "z": 0.066
-      },
-      "bounds_godot": [
-        [
-          -0.68,
-          -0.43,
-          -0.066
-        ],
-        [
-          0.68,
-          0.43,
-          -0.0
-        ]
-      ],
-      "triangles": 2958,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "acrylic_art",
-        "deco_body",
-        "deco_led",
-        "deco_neon",
-        "deco_trim",
-        "paint_gold"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_slats_neon_day.png",
-      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "fit": "grille",
-      "nominal_w": 1.3,
-      "default_color": "preto_rosa",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "proposta T-211 (seção 19)",
-      "pods": 0,
-      "stack": null,
-      "broken_tilt": [
-        2.0,
-        5.0
-      ],
-      "mount_point": "SOCKET_grille",
-      "socket": "grille",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "nominal": [
-        1.3,
-        0.8,
-        0.09
-      ]
-    },
-    {
       "id": "horn_triple",
       "name": "Corneta tripla cromada",
       "category": "lighting",
@@ -9397,6 +9208,193 @@
       "mirror_for_left": true,
       "socket_left": "horn_l",
       "horn": "horn_ship_deep"
+    },
+    {
+      "id": "grille_bars_led",
+      "name": "Barras cromadas com LED",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_bars_led.glb",
+      "dimensions_m": {
+        "x": 1.36,
+        "y": 0.86,
+        "z": 0.107
+      },
+      "bounds_godot": [
+        [
+          -0.68,
+          -0.43,
+          -0.107
+        ],
+        [
+          0.68,
+          0.43,
+          -0.0
+        ]
+      ],
+      "triangles": 3436,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_bars_led_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
+    },
+    {
+      "id": "grille_honey_sun",
+      "name": "Colmeia dourada com moldura de LED",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_honey_sun.glb",
+      "dimensions_m": {
+        "x": 1.36,
+        "y": 0.86,
+        "z": 0.112
+      },
+      "bounds_godot": [
+        [
+          -0.68,
+          -0.43,
+          -0.112
+        ],
+        [
+          0.68,
+          0.43,
+          -0.0
+        ]
+      ],
+      "triangles": 3584,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_honey",
+        "deco_led",
+        "deco_neon",
+        "deco_trim",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_honey_sun_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
+    },
+    {
+      "id": "grille_slats_neon",
+      "name": "Lâminas douradas com neon",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_slats_neon.glb",
+      "dimensions_m": {
+        "x": 1.36,
+        "y": 0.86,
+        "z": 0.066
+      },
+      "bounds_godot": [
+        [
+          -0.68,
+          -0.43,
+          -0.066
+        ],
+        [
+          0.68,
+          0.43,
+          -0.0
+        ]
+      ],
+      "triangles": 2956,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "deco_body",
+        "deco_led",
+        "deco_neon",
+        "deco_trim",
+        "paint_gold"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t234_grille_slats_neon_day.png",
+      "license": "original (gerado por script; desenho nosso pelas propostas da T-211, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "fit": "grille",
+      "nominal_w": 1.3,
+      "default_color": "preto_rosa",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "proposta T-211 (seção 19)",
+      "pods": 0,
+      "stack": null,
+      "broken_tilt": [
+        2.0,
+        5.0
+      ],
+      "mount_point": "SOCKET_grille",
+      "socket": "grille",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "nominal": [
+        1.3,
+        0.8,
+        0.09
+      ]
     }
   ]
 }

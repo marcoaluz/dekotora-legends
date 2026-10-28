@@ -730,3 +730,10 @@ Formato em `docs/AGENTES.md`.
 - Validação: suíte 585/585; pipeline testado com imagens de exemplo numa pasta temporária (mural 2 lados, traseira, teto longo/curto, nome errado ignorado); gen_t258 `--dry` sem gravar; print da garagem com os botões.
 - Armadilha: o 1º `--dry` do gen gravou o catálogo (o `return` não entrou por causa do escape `\n` no patch); restaurado do HEAD (só tinha a entrada de teste) e corrigido.
 - Decisão pendente: nenhuma.
+
+## 2026-10-28 · T-259 · especialista · CONCLUÍDA (Marco confere docs/capturas_t259/referencia_x_resultado.png)
+- Feito: grades sem painel de arte (barras / colmeia de favos / lâminas + contorno de LED + emblema); adesivo na lataria da frente (faixa de lado a lado abaixo do para-brisa, medida por raios, recortada em volta de farol/lanterna/seta/placa, LEDs em cima e embaixo com o material de LED da grade, brilho fraco à noite) — `Lot5Band`; escolha `art` mantida (sem migração).
+- Arquivos: game/scripts/truck/{lot5_band (novo), lot5_grille}.gd; blender/scripts/{lib/t234_measure (front_band), lib/socket_rules, accessories/grille_horn_t234}.py; sockets/*.json; grille .glb; tests/test_parts_t234.gd; tools/{capture_t259.sh, gen_t234_data.py}; tools_dev/shot_t231.gd (vista ref34); docs/capturas_t259/.
+- Validação: build_sockets 56/56 sem problema; testes t234 12/12; suíte 585 com 1 falha que NÃO é desta tarefa (test_t220_engine_synth: outro agente mexendo no som do motor, arquivos de áudio não commitados); REPORT_ENCAIXE 5994/5994; stack 4251/5376 (igual).
+- Armadilha: o pt-BR.json tinha mudanças do agente de áudio junto: commit montando o blob só com as chaves das grades.
+- Decisão pendente: nenhuma bloqueante (o Marco confere a semelhança com a referência).

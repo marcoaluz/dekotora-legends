@@ -185,6 +185,45 @@ def windshield_rect(glass, m: dict) -> dict:
             "grid": grid, "cover": round(float(ok[i0:i1, j0:j1].mean()), 3), "glass_w": round(wx1 - wx0, 3)}
 
 
+BAND_K = 0.38             # T-259: a faixa do adesivo ocupa esta fração de cima da área entre a grade e o para-brisa
+BAND_H = (0.14, 0.40)     # m: altura mínima/máxima da faixa
+BAND_STEP = 0.05          # m: passo da grade de raios da faixa (largura da cabine x altura da faixa)
+
+
+def front_band(tree, m: dict, grille_box: list, zones: dict) -> dict:
+    """T-259 (referência do Marco: a "pintura geral" do original): faixa do ADESIVO na lataria da frente da cabine, logo
+    abaixo do para-brisa, de lado a lado (a grade desce para baixo dela quando o adesivo está escolhido). Grade de
+    raios vindos da frente (z da chapa em cada vértice) e as células que ficam em cima de farol, lanterna, seta ou placa
+    marcadas como bloqueadas (o adesivo é recortado em volta delas, como um adesivo de verdade)."""
+    c = m["cab"]
+    w0 = c["windshield"][0]
+    y1 = w0[1] - 0.015
+    h = max(BAND_H[0], min(BAND_H[1], BAND_K * (y1 - grille_box[0][1])))
+    y0 = y1 - h
+    hw = c["half_w"] - 0.04
+    nx = max(8, int(round(2 * hw / BAND_STEP)))
+    ny = max(3, int(round(h / BAND_STEP)))
+    xs = np.linspace(-hw, hw, nx + 1)
+    ys = np.linspace(y0, y1, ny + 1)
+    zf = c["front_z"] - 3.0
+    z = []
+    for y in ys:
+        for x in xs:
+            hz = _ray_front(tree, float(x), float(y), zf)
+            z.append(round(hz, 4) if hz is not None and hz < c["front_z"] + 0.6 else None)
+    rects = [v["box"] for k, v in zones.items() if k.startswith(("headlight", "front_lamp", "blinker_front", "front_plate"))]
+    blocked = []
+    for j in range(ny):
+        for i in range(nx):
+            cx0, cx1, cy0, cy1 = xs[i], xs[i + 1], ys[j], ys[j + 1]
+            hit = any(cx1 > b[0][0] + 0.005 and cx0 < b[1][0] - 0.005 and cy1 > b[0][1] + 0.005 and cy0 < b[1][1] - 0.005
+                      for b in rects)
+            corners = [z[(j + dj) * (nx + 1) + i + di] for dj in (0, 1) for di in (0, 1)]
+            blocked.append(1 if hit or any(v is None for v in corners) else 0)
+    return {"x": [round(float(-hw), 4), round(float(hw), 4)], "y": [round(float(y0), 4), round(float(y1), 4)],
+            "nx": nx, "ny": ny, "z": z, "blocked": blocked}
+
+
 def measure(m: dict) -> dict:
     """Tudo do lote 5 para um caminhão já importado (`truck_measure.import_truck`). Use antes de `socket_rules.sockets`
     só o que não depende dos encaixes; a grade é medida depois (precisa da caixa do encaixe)."""

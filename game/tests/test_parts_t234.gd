@@ -205,16 +205,40 @@ func test_grille_follows_front_and_cab_art() -> void:
 		var node: Node3D = t._acc_nodes["grille_bars_led"][0]
 		check(absf(node.transform.basis.y.z - float(sk["lean"]) * node.transform.basis.y.y) < 0.001, "%s: grade inclinada pela frente" % cab)
 		var art: Array = node.find_children("cab_art", "MeshInstance3D", true, false)
-		check_eq(art.size(), 1, "%s: arte na lata" % cab)
+		check_eq(art.size(), 1, "%s: adesivo na lataria" % cab)
+		check_eq(node.find_children("cab_art_leds", "MeshInstance3D", true, false).size(), 1, "%s: LEDs do adesivo" % cab)
+		var inside_grille: int = 0
+		for mi in node.find_children("*", "MeshInstance3D", true, false):    # T-259: nada de arte DENTRO da grade
+			var m: MeshInstance3D = mi as MeshInstance3D
+			for k in m.mesh.get_surface_count():
+				var sm: Material = m.mesh.surface_get_material(k)
+				if sm != null and sm.resource_name in ["acrylic_art", "deco_art"]:
+					inside_grille += 1
+		check_eq(inside_grille, 0, "%s: grade sem painel de arte dentro" % cab)
 		if not art.is_empty():
 			var mi: MeshInstance3D = art[0] as MeshInstance3D
-			var ab: AABB = PartFit.rel_xform(mi, t.model) * mi.mesh.get_aabb()
-			var gb: AABB = PartFit.aabb_in(node, t.model)
-			check(PartFit.inside(ab, sb, 0.02), "%s: arte dentro da caixa da grade" % cab)
-			check(ab.position.y > sb.get_center().y, "%s: arte acima da grade" % cab)
-			for z in data.get("protected", {}):
-				check(not PartFit.overlap(ab, TruckSockets.aabb_of(data["protected"][z]["box"]), 0.002), "%s: arte fora da zona %s" % [cab, z])
-			check(PartFit.inside(gb, sb), "%s: grade + arte dentro da caixa" % cab)
+			var xf: Transform3D = PartFit.rel_xform(mi, t.model)
+			var gb := AABB()
+			var first: bool = true
+			for gm in node.find_children("*", "MeshInstance3D", true, false):     # so a grade (sem colar/adesivo)
+				if (gm as Node).has_meta("lot5_extra"):
+					continue
+				var bb: AABB = PartFit.rel_xform(gm as Node3D, t.model) * (gm as MeshInstance3D).mesh.get_aabb()
+				gb = bb if first else gb.merge(bb)
+				first = false
+			var ab: AABB = xf * mi.mesh.get_aabb()
+			var ws: AABB = TruckSockets.aabb_of(data["measure"]["cab"]["windshield"])
+			check(ab.position.y >= gb.end.y - 0.05 and ab.end.y <= ws.position.y, "%s: faixa entre a grade e o para-brisa" % cab)
+			check(ab.size.x > sb.size.x, "%s: faixa de lado a lado (mais larga que a grade)" % cab)
+			var faces: PackedVector3Array = mi.mesh.get_faces()
+			var bad: int = 0
+			for f in range(0, faces.size(), 3):
+				var c: Vector3 = xf * ((faces[f] + faces[f + 1] + faces[f + 2]) / 3.0)
+				for z in data.get("protected", {}):
+					if String(z).begins_with(("headlight")) or String(z).begins_with("front_lamp") or String(z).begins_with("front_plate"):
+						if TruckSockets.aabb_of(data["protected"][z]["box"]).grow(-0.01).has_point(c):
+							bad += 1
+			check_eq(bad, 0, "%s: adesivo recortado em volta das luzes e da placa" % cab)
 		t.set_mural_glow(0.8)
 		check((node.get_meta("cab_art") as StandardMaterial3D).emission_energy_multiplier > 0.0, "%s: arte acende fraco a noite" % cab)
 		t.free()
