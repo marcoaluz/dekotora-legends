@@ -718,3 +718,8 @@ Formato em `docs/AGENTES.md`.
 - Validação: build_sockets 56/56 sem problema (a caixa da grade sobe para cima da placa onde a grade inclinada chegaria nela); gen_stack_fit 4251/5376 (igual); suíte 582/582; REPORT_ENCAIXE 5994/5994 (lote 5 798/798); net_test PASSOU (protocolo 22); folhas conferidas.
 - Armadilhas: nó extra de uma peça escalada/cisalhada = filho com `transform = peca.transform.affine_inverse() * xf`; material criado depois do DecoStyle não é repintado (o colar recebe o material do papel `deco_trim` na hora); o relatório do lote 5 (T-255) usava o encaixe `horn`, agora `horn_r`.
 - Decisão pendente: nenhuma bloqueante (Marco confere: arte "raios" lembra a bandeira de raios; na americana a arte na lata cai na frente do capô).
+
+## 2026-10-28 10:04 · T-257 · ajudante-rapido · CONCLUÍDA
+- Feito: nota da T-256 acrescentada na seção "Oficina lote 5" da skill godot-dekotora (commit 0aa148c).
+- Arquivos: .claude/skills/godot-dekotora/SKILL.md, .claude/coordenacao/QUADRO.md
+- Observação: LOG não commitado (pedido era commitar só a skill e o QUADRO). Referências conferidas: lot5_grille.gd e capture_t256.sh existem; shot_t231.gd aceita --side= e --art=.
