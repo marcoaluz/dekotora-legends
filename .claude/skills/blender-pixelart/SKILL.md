@@ -336,3 +336,13 @@ um problema visual não puder ser entendido pelos renders.
 - Brilho `key` (`lib/t242_photo.py`, `g.key(col, ...)`): precisa da arte; a função recebe a arte carregada (`PH.load`) antes de ser chamada.
 - `docs/Murais/*` fica fora do Git (`.gitignore`; só `docs/Murais/README.md` entra). Não commite as artes do Marco.
 - Use caminho absoluto em `--sheets` e `--sheet`.
+
+## Wallpapers (T-258)
+
+- Build (raiz do projeto): `blender -b --factory-startup -P blender/scripts/build_t258_wallpapers.py -- [--src PASTA] [--sheet PASTA_ABS] [--install]`.
+  `--src` (padrão `docs/Murais/wallpaper`); `--sheet` grava `wallpaper_proposta.png` na PASTA_ABS dada (sem ele, não há folha);
+  a arte vai para `blender/renders/t258/`. Com `--install` grava no jogo (`paint_wall/`) e o `wallpapers.json`. Rode sem `--install` primeiro.
+- Dados: `python -I tools/gen_t258_data.py [--dry] [--manifest CAMINHO]`. `--dry` confere sem gravar nada; `--manifest` aponta outro
+  `wallpapers.json`. Sem o manifesto, o script para e pede para rodar o build antes.
+- **Armadilha (patch em Python)**: num patch feito com um script Python, a sequência `\\n` dentro do texto procurado pode não casar
+  com o arquivo (vira barra-invertida literal). Confira o trecho com `grep` antes de rodar o script que grava.
