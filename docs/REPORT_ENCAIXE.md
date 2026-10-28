@@ -266,7 +266,73 @@ nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a fa
 espelho de fábrica some. Escada: por fora do contorno de LED, até 0,16 m. Saia: só nos trechos livres (tanque e
 bateria de fábrica ficam de fora). Conferido vértice a vértice (`FrameFit.problems`).
 
-**Total geral (lotes 1, 2, 4 e pinturas): 5196 de 5196 combinações cabem.**
+## Matriz caminhão × lote 5 (T-234: grades, escapamentos, buzinas, calotas e interiores)
+
+| Caminhão | Grades OK | Escapamentos OK | Buzinas OK | Calotas OK | Interiores OK | Falhas |
+| --- | --- | --- | --- | --- | --- | --- |
+| alubox_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| alubox_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| alubox_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| alubox_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| alubox_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| alubox_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| base_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| base_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| base_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| base_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| base_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| base_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| canter | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| carreta (guardada) | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| dump_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| dump_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| dump_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| dump_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| dump_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| dump_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| graneleira_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| graneleira_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| graneleira_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| graneleira_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| graneleira_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| graneleira_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| leve_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| leve_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| leve_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| leve_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| leve_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| leve_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| longo_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| longo_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| longo_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| longo_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| longo_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| longo_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| pinkbox_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| pinkbox_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| pinkbox_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| pinkbox_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| pinkbox_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| pinkbox_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tanker_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| tanker_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tanker_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tanker_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tanker_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tanker_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tarp_americana | 3/3 | 3/3 | — | 3/3 | 3/3 | nenhuma |
+| tarp_chata | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tarp_curta | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tarp_flat_quad | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tarp_flat_wide | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+| tarp_jac | 3/3 | 3/3 | 3/3 | 3/3 | 3/3 | nenhuma |
+
+Lote 5: **798 de 798** combinações cabem (a carreta guardada não conta). Grade: encosta na frente da cabine entre os
+faróis e estica na caixa de cada cabine. Escapamento: no vão entre a cabine e a carga. Buzina: no topo da carga
+(caçamba sem topo plano não tem). Calota: em cada roda de fora. Interior: pintura no retângulo do para-brisa (`PaintFit`).
+Conferido vértice a vértice (`Lot5Fit.problems`, `Lot5Fit.wheel_problems`).
+
+**Total geral (lotes 1, 2, 4, 5 e pinturas): 5994 de 5994 combinações cabem.**
 
 ## Falhas
 
@@ -277,9 +343,9 @@ largura do teto. Imagem das caixas e zonas: `docs/capturas_t211/encaixes_zonas.p
 ## Zonas protegidas e encaixes (exemplos)
 
 **base_chata**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_L_3, wheel_r_R_1, wheel_r_R_3, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (grille), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), decals (none), horn (horn), interior (face)
 **canter**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_R_1, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (uniform), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), horn (none), interior (none), decals (none)
+encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (grille), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), decals (none), horn (horn), interior (face)
 
 Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo
 leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da

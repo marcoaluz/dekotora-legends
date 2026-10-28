@@ -1,5 +1,5 @@
 extends SceneTree
-## Relatorio de encaixe (T-211; lote 2 na T-231; pinturas na T-232): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
+## Relatorio de encaixe (T-211; lote 2 na T-231; pinturas na T-232; lote 5 na T-234): docs/REPORT_ENCAIXE.md com a matriz caminhao x peca (deque e viseira), a escala
 ## usada, os problemas de projeto dos encaixes e as zonas protegidas de cada caminhao.
 ## Uso (raiz do projeto): godot --headless --path game -s res://tools_dev/report_part_fit.gd
 
@@ -79,7 +79,8 @@ var _lot3_n: int = 0
 func _lot3(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
 	var ids: Array[String] = []
 	for e in c.data.get("accessories", []):
-		if PaintFit.handles(e):
+		# interior paint (T-234) is reported in _lot5
+		if PaintFit.handles(e) and String(e.get("socket", "")) in ["mural_r", "rear_paint", "roof_paint"]:
 			ids.append(String(e["id"]))
 	lines.append("## Matriz caminhão × pinturas (T-232: 12 murais com os 2 lados, 12 traseiras, 9 tetos)")
 	lines.append("")
@@ -191,6 +192,64 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("")
 
 
+var _lot5_ok: int = 0
+var _lot5_n: int = 0
+const LOT5: Array = ["grille", "exhaust_stacks_r", "horn", "hubcaps", "interior"]   # T-234
+
+
+## T-234: matriz caminhao x lote 5 (grades, escapamentos, buzinas, calotas e interiores).
+func _lot5(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
+	var ids: Array[String] = PartFit.socket_parts(c, LOT5)
+	lines.append("## Matriz caminhão × lote 5 (T-234: grades, escapamentos, buzinas, calotas e interiores)")
+	lines.append("")
+	lines.append("| Caminhão | Grades OK | Escapamentos OK | Buzinas OK | Calotas OK | Interiores OK | Falhas |")
+	lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
+	files.sort()
+	for f in files:
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
+			continue
+		var stem: String = String(f).get_basename()
+		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
+		var body: String = String(data.get("body", ""))
+		var model: Node3D = PartFit.load_model(TruckNode.MODEL_DIR + stem + ".glb", body, String(data.get("cab", "")))
+		var ok: Dictionary = {}
+		var n: Dictionary = {}
+		for k in LOT5:
+			ok[k] = 0
+			n[k] = 0
+		var here: int = 0
+		for id in ids:
+			var e: Dictionary = c.entry(id)
+			var k: String = String(e["socket"])
+			if TruckSockets.socket(data, k).is_empty():
+				continue                                    # so o caminhao que nao tem esse encaixe
+			n[k] += 1
+			var probs: Array[String] = PartFit.check_part(model, data, c, id)
+			if probs.is_empty():
+				ok[k] += 1
+			else:
+				here += 1
+				fails.append("- `%s` em `%s`: %s" % [id, stem, "; ".join(probs)])
+		model.free()
+		var cells: PackedStringArray = []
+		for k in LOT5:
+			cells.append(("%d/%d" % [ok[k], n[k]]) if n[k] > 0 else "—")
+		var name: String = stem.replace("dekotora_truck_", "") + (" (guardada)" if body == "carreta" else "")
+		lines.append("| %s | %s | %s | %s | %s | %s | %s |" % [name, cells[0], cells[1], cells[2], cells[3], cells[4],
+				"nenhuma" if here == 0 else str(here)])
+		if body != "carreta":
+			for k in LOT5:
+				_lot5_ok += int(ok[k])
+				_lot5_n += int(n[k])
+	lines.append("")
+	lines.append("Lote 5: **%d de %d** combinações cabem (a carreta guardada não conta). Grade: encosta na frente da cabine entre os" % [_lot5_ok, _lot5_n])
+	lines.append("faróis e estica na caixa de cada cabine. Escapamento: no vão entre a cabine e a carga. Buzina: no topo da carga")
+	lines.append("(caçamba sem topo plano não tem). Calota: em cada roda de fora. Interior: pintura no retângulo do para-brisa (`PaintFit`).")
+	lines.append("Conferido vértice a vértice (`Lot5Fit.problems`, `Lot5Fit.wheel_problems`).")
+	lines.append("")
+
+
 func _initialize() -> void:
 	var c := AccessoryCatalog.new()
 	c.reload()
@@ -262,7 +321,10 @@ func _initialize() -> void:
 	_lot4(c, lines, fails)
 	total_ok += _lot4_ok
 	total += _lot4_n
-	lines.append("**Total geral (lotes 1, 2, 4 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
+	_lot5(c, lines, fails)
+	total_ok += _lot5_ok
+	total += _lot5_n
+	lines.append("**Total geral (lotes 1, 2, 4, 5 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
 	lines.append("")
 	lines.append("## Falhas")
 	lines.append("")
