@@ -744,3 +744,13 @@ Formato em `docs/AGENTES.md`.
 - Validação: 28/30 loops CONFERE (2 só por "clareza" baixa: i4 on_700 e i4 on_2500, fundamental certa); sem estalos (picos ≤ os das gravações); rastreio conferido sobre o espectrograma; prévia offline segue o roteiro; suíte 589/589; `--quit-after 30` sem erro; cena de teste `--cycle-profiles --mode=rec` usa `rec_i6_*`; corrida `--synth-log` → `fonte=rec`.
 - Armadilhas: `python -I` esconde o numpy do usuário (use `-P`); o rastreio por YIN pula de oitava nessas gravações (o 2º harmônico é mais forte na lenta): use `t260_engine_lib.rpm_track` (soma de harmônicos + Viterbi); `sound_mode` agora pode ser "rec": o sintetizador só liga com `synth`/`mix`.
 - Decisão pendente: nenhuma bloqueante (Marco ouve `docs/audio_t260/demo_*_rec.wav` × `_syn.wav` e diz se fica a gravação; 6 cil. é recriado de um 4 cil., pode soar "pequeno").
+
+## 2026-10-28 16:46 · T-261 · ajudante-rapido · CONCLUÍDA
+- Feito: seção "Som do motor gravado (T-260)" na skill godot-dekotora; linha Som e nota do modo padrão "rec" no STATUS (Última atualização incluída).
+- Arquivos: .claude/skills/godot-dekotora/SKILL.md, docs/STATUS.md (commits 4ba92f4 e 22530e4; QUADRO e LOG não commitados).
+- Observação: a frase antiga "Padrão continua loops" ficou no STATUS, com a nota de que vale só até a T-260. Sem APK.
+
+## 2026-10-28 16:52 · T-262 · ajudante-rapido · CONCLUÍDA
+- Feito: notas da T-258/T-259 nas skills godot-dekotora (lote 5) e blender-pixelart (Wallpapers T-258: flags do build e do gen_t258_data, armadilha do `\n`); nomes e flags conferidos no código.
+- Arquivos: .claude/skills/godot-dekotora/SKILL.md (d9d902d), .claude/skills/blender-pixelart/SKILL.md (d2fa748), .claude/coordenacao/QUADRO.md e LOG.md (commit de QUADRO e LOG, T-258 a T-262).
+- Observação: nada. Sem APK.

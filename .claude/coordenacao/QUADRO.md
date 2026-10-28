@@ -5,6 +5,7 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-262 | Notas da T-258/T-259 nas skills godot-dekotora e blender-pixelart | delegado da T-258/T-259 | fácil | ajudante-rapido | concluída | 2026-10-28 | commits d9d902d, d2fa748 |
 | T-261 | Notas do som da T-260 na skill godot-dekotora e no STATUS | delegado da T-260 | fácil | ajudante-rapido | concluída | 2026-10-28 | commits 4ba92f4, 22530e4 |
 | T-260 | Som do caminhão: analisar os 4 mp3 de docs/som caminhão, verificar licença (sfxjar), aplicar no motor em camadas e recriar variações | pedido do Marco | difícil | especialista (novo, áudio) | concluída | 2026-10-28 | commits 5417dee, f104889, ce2fbe1 |
 | T-259 | REFAZER arte da grade (T-256): tirar imagens de dentro da grade; adesivo/arte na lataria da cabine na faixa dos LEDs, fiel à referência grider.docx | pedido do Marco | difícil | especialista (mesmo dos murais/grades) | concluída (commit e3ead50; grade só grade + adesivo na lataria da frente abaixo do para-brisa, recortado nas luzes, com LEDs; 589 testes; precisa Marco: conferir docs/capturas_t259/referencia_x_resultado.png) | 2026-10-28 | 2026-10-28 |
