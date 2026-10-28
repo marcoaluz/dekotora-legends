@@ -170,6 +170,8 @@ func set_mural_glow(energy: float) -> void:
 		for n in _acc_nodes[id]:
 			if is_instance_valid(n) and (n as Node3D).has_meta("paint_mat"):
 				MuralGlow.set_level((n as Node3D).get_meta("paint_mat") as StandardMaterial3D, _mural_glow)
+			elif is_instance_valid(n) and (n as Node3D).has_meta("cab_art"):          # T-256: arte na lata acende fraco
+				MuralGlow.set_level((n as Node3D).get_meta("cab_art") as StandardMaterial3D, _mural_glow)
 
 
 func mural_glow() -> float:
@@ -525,7 +527,10 @@ func apply_loadout(defs: Array[PartDef], styles: Dictionary = {}) -> void:
 		if TruckWheels.is_wheel_part(entry):            # calota/roda da loja: em TODAS as rodas externas, presa no pneu
 			made = wheels.attach_part(catalog, d.accessory_id)
 		else:
-			for side in (["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]):
+			var sides: Array = ["R", "L"] if bool(entry.get("mirror_for_left", false)) else ["R"]
+			if String(entry.get("fit", "")) == "horn":        # T-256: cornetas na esquerda, na direita ou nos dois lados
+				sides = Lot5Fit.horn_sides(styles.get(String(d.id), {}))
+			for side in sides:
 				made.append(catalog.attach(model, d.accessory_id, side))
 		for n in made:
 			if n != null:
@@ -595,6 +600,9 @@ func _finish_part(n: Node3D, d: PartDef, entry: Dictionary, styles: Dictionary) 
 	if chrome_mode != "":
 		ChromeMatcap.apply(n, chrome_mode)
 	_apply_light_materials(n)
+	Lot5Fit.apply_style(n, entry, styles.get(String(d.id), {}))     # T-256: arte na lata da cabine (grade)
+	if n.has_meta("cab_art"):
+		MuralGlow.set_level(n.get_meta("cab_art") as StandardMaterial3D, _mural_glow)
 	if DecoStyle.is_deco(entry):
 		n.set_meta("deco", true)
 		n.set_meta("deco_id", d.accessory_id)       # T-231: a peca quebrada le a inclinacao dela no catalogo

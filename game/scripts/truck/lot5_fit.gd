@@ -42,16 +42,8 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 	var nom: Array = entry.get("nominal", [1.0, 1.0, 1.0])
 	var sgn: float = -1.0 if side == "L" and bool(entry.get("mirror_for_left", false)) else 1.0
 	match String(entry.get("fit", "")):
-		"grille":
-			var sx: float = maxf(box.size.x - 2.0 * GRILLE_MARGIN, 0.2) / float(nom[0])
-			var sy: float = maxf(box.size.y - 2.0 * GRILLE_MARGIN, 0.2) / float(nom[1])
-			var c: Vector3 = box.get_center()
-			node.position = Vector3(c.x - anchor.x, c.y - anchor.y, float(s.get("face_z", anchor.z)) - anchor.z)
-			node.scale = Vector3(sx, sy, 1.0)
-			var k: float = minf(sx, sy)
-			for mi in node.find_children("*_CEN_*", "MeshInstance3D", true, false):
-				(mi as Node3D).scale = Vector3(k / sx, k / sy, 1.0)
-			_honey_override(node, sx, sy)
+		"grille":                                    # T-256: inclinada pela frente, colar e arte na lata (Lot5Grille)
+			Lot5Grille.apply(node, s, entry, anchor)
 		"stack":
 			var kxz: float = minf(1.0, minf(box.size.z / float(nom[2]), box.size.x / float(nom[0])))
 			var ky: float = minf(1.0, (box.end.y - anchor.y) / float(nom[1]))
@@ -61,10 +53,40 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 			var lift: float = float(s.get("lift", 0.0))
 			node.position = Vector3(0.0, lift, 0.0)
 			var h: float = float((entry.get("dimensions_m", {}) as Dictionary).get("y", 0.0))
-			if h > 0.0 and box.end.y - anchor.y - lift < h:      # T-234: caixa mais baixa (americana) = peca menor
-				node.scale = Vector3.ONE * maxf((box.end.y - anchor.y - lift) / h, 0.5)
+			if h > 0.0 and box.end.y - anchor.y - lift < h:      # T-234: caixa mais baixa = peca menor
+				var kh: float = maxf((box.end.y - anchor.y - lift) / h, 0.5)
+				node.scale = Vector3(sgn * kh, kh, kh)
 			if lift > 0.0:
 				_pedestal(node, lift)
+
+
+## T-256: disposicao das cornetas escolhida pelo jogador (estilo "side"): os dois lados da viseira (padrao), so o
+## esquerdo ou so o direito. Devolve os lados a montar ("R" = direita do caminhao, +x).
+const HORN_SIDES: Array[String] = ["both", "left", "right"]
+
+
+static func horn_sides(style: Dictionary) -> Array:
+	match String(style.get("side", "both")):
+		"left":
+			return ["L"]
+		"right":
+			return ["R"]
+	return ["R", "L"]
+
+
+## T-256: opcoes do jogador que mudam o encaixe depois de montada (arte na lata da grade). Chamar depois do DecoStyle.
+static func apply_style(node: Node3D, entry: Dictionary, style: Dictionary) -> void:
+	if String(entry.get("fit", "")) != "grille" or int(style.get("art", -1)) < 0:
+		return
+	var mount: Node3D = node.get_parent() as Node3D
+	if mount == null or not mount.has_meta("sockets"):
+		return
+	var s: Dictionary = TruckSockets.socket(mount.get_meta("sockets"), String(entry.get("socket", "")))
+	if s.has("box"):
+		var cd: DecoColorDef = DecoColorDef.find(String(style.get("color", DecoStyle.default_color(entry))))
+		var roles: Dictionary = cd.roles() if cd != null else {}
+		var trim: Material = DecoStyle.role_material("deco_trim", String(roles["deco_trim"])) if roles.has("deco_trim") else null
+		Lot5Grille.apply(node, s, entry, mount.position, int(style["art"]), trim)
 
 
 ## Pedestal da buzina (2 colunas na cor da peca) quando ha andon de fabrica na frente da carga: as cornetas passam por

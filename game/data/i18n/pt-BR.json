@@ -804,5 +804,15 @@
  "part.horn_ship": "Buzina de navio com aro âmbar",
  "part.interior_curtain": "Cortina franzida vermelha",
  "part.interior_chandelier": "Lustre de cristal âmbar",
- "part.interior_tufted": "Estofado capitonê com neon"
+ "part.interior_tufted": "Estofado capitonê com neon",
+ "garage.horn_side": "Cornetas:",
+ "garage.horn_side.both": "Dos dois lados",
+ "garage.horn_side.left": "Só à esquerda",
+ "garage.horn_side.right": "Só à direita",
+ "garage.cab_art": "Arte na lata da cabine (acima da grade):",
+ "garage.cab_art.none": "Sem arte",
+ "garage.cab_art.12": "Ondas",
+ "garage.cab_art.13": "Sakura",
+ "garage.cab_art.14": "Raios",
+ "garage.cab_art.15": "Nuvens"
 }

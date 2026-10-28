@@ -458,6 +458,36 @@ func set_part_sign(id: String, sign: int) -> bool:
 	return true
 
 
+## T-256: disposicao das cornetas da buzina ("both" | "left" | "right"), de graca.
+func set_part_side(id: String, side: String) -> bool:
+	var e: Dictionary = AccessoryCatalog.get_instance().entry(_acc_id(id))
+	if not owns(id) or String(e.get("fit", "")) != "horn" or not side in Lot5Fit.HORN_SIDES:
+		return false
+	if side == "both":
+		_style_of(id).erase("side")
+	else:
+		_style_of(id)["side"] = side
+	save_profile()
+	_act("set_part_side", "%s:%s" % [id, side])
+	profile_changed.emit()
+	return true
+
+
+## T-256: arte na lata da cabine acima da grade (celula do atlas, -1 = sem arte), de graca.
+func set_part_art(id: String, cell: int) -> bool:
+	var e: Dictionary = AccessoryCatalog.get_instance().entry(_acc_id(id))
+	if not owns(id) or String(e.get("fit", "")) != "grille" or not (cell == -1 or cell in Lot5Grille.ART_CELLS):
+		return false
+	if cell < 0:
+		_style_of(id).erase("art")
+	else:
+		_style_of(id)["art"] = cell
+	save_profile()
+	_act("set_part_art", "%s:%d" % [id, cell])
+	profile_changed.emit()
+	return true
+
+
 ## Luz atual de um papel ("led" | "neon") da peca (id de DecoLightDef): a escolhida ou a de fabrica da cor (T-214).
 func part_light(id: String, role: String) -> String:
 	var l: String = String(part_style(id).get(role, ""))
@@ -917,6 +947,12 @@ func apply_action(action: String, arg: String) -> bool:
 		"set_part_light":                             # T-214: "id:led|neon:luz"
 			var pl: PackedStringArray = arg.split(":")
 			return pl.size() == 3 and set_part_light(pl[0], pl[1], pl[2])
+		"set_part_side":                              # T-256: "id:both|left|right"
+			var pd: PackedStringArray = arg.split(":")
+			return pd.size() == 2 and set_part_side(pd[0], pd[1])
+		"set_part_art":                               # T-256: "id:celula" (-1 = sem arte)
+			var pa: PackedStringArray = arg.split(":")
+			return pa.size() == 2 and pa[1].is_valid_int() and set_part_art(pa[0], int(pa[1]))
 		"set_part_sign":                              # T-211: "id:celula"
 			var ps: PackedStringArray = arg.split(":")
 			return ps.size() == 2 and ps[1].is_valid_int() and set_part_sign(ps[0], int(ps[1]))

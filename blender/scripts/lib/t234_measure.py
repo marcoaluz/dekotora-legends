@@ -13,7 +13,8 @@ from mathutils import Vector
 
 from . import truck_measure as TM
 
-GRILLE_STEP = 0.04        # m: grade de raios na frente da grade
+GRILLE_NX, GRILLE_NY = 13, 9   # grade de raios na frente da grade (T-256)
+LEAN_MAX = 0.6            # dz/dy máximo da grade inclinada
 HORN_W = 0.32             # m: meia largura da caixa da buzina
 HORN_L = 0.64             # m: comprimento da caixa da buzina (para a frente da testa)
 HORN_H = 0.28             # m: altura da caixa da buzina acima da viseira
@@ -39,21 +40,38 @@ def _ray_down(tree, x, z, top):
 
 
 def grille_seat(tree, sock: dict, front_z: float) -> dict:
-    """Frente da cabine na área da grade: `face_z` = ponto mais à frente (a peça encosta nele), `back_z` = o mais
-    recuado (folga atrás da peça), `cover` = fração da área com lataria (o resto é vão)."""
+    """Frente da cabine na área da grade (raios vindos da frente numa grade GRILLE_NX x GRILLE_NY):
+    - `lean` (T-256): inclinação da frente (dz/dy, reta pelos pontos atingidos; JAC/curta são inclinadas) — a grade
+      inclina junto, e `face_z` = z das costas da grade no meio da altura, com a reta passada para a frente até encostar
+      no ponto mais saliente;
+    - `grid`: z da lataria em cada ponto (null = vão), linhas de baixo para cima; o jogo fecha a folga atrás da grade
+      com uma moldura (colar) e assenta a arte da lata nela;
+    - `back_z` = ponto mais recuado, `cover` = fração com lataria."""
     (x0, y0, _z0), (x1, y1, _z1) = sock["box"]
     zf = front_z - 3.0
-    zs = []
-    n = 0
-    for x in np.arange(x0 + 0.02, x1 - 0.019, GRILLE_STEP):
-        for y in np.arange(y0 + 0.02, y1 - 0.019, GRILLE_STEP):
-            n += 1
+    xs = np.linspace(x0 + 0.02, x1 - 0.02, GRILLE_NX)
+    ys = np.linspace(y0 + 0.02, y1 - 0.02, GRILLE_NY)
+    grid, pts = [], []
+    for y in ys:
+        row = []
+        for x in xs:
             z = _ray_front(tree, float(x), float(y), zf)
-            if z is not None and z < front_z + 0.6:
-                zs.append(z)
-    if not zs:
+            ok = z is not None and z < front_z + 0.6
+            row.append(round(z, 4) if ok else None)
+            if ok:
+                pts.append((float(y), z))
+        grid.append(row)
+    if len(pts) < 6:
         return {}
-    return {"face_z": round(min(zs), 3), "back_z": round(max(zs), 3), "cover": round(len(zs) / max(n, 1), 3)}
+    a = np.array(pts)
+    lean = float(np.polyfit(a[:, 0], a[:, 1], 1)[0]) if np.ptp(a[:, 0]) > 0.05 else 0.0
+    lean = max(-LEAN_MAX, min(LEAN_MAX, lean))
+    yc = (y0 + y1) / 2
+    # reta z = zc + lean * (y - yc) passando pelo ponto mais saliente
+    zc = min(z - lean * (y - yc) for y, z in pts)
+    return {"face_z": round(zc, 4), "back_z": round(float(a[:, 1].max()), 3), "cover": round(len(pts) / (GRILLE_NX * GRILLE_NY), 3),
+            "lean": round(lean, 4), "grid": grid, "grid_x": [round(float(xs[0]), 4), round(float(xs[-1]), 4)],
+            "grid_y": [round(float(ys[0]), 4), round(float(ys[-1]), 4)]}
 
 
 def horn_spot(tree, m: dict) -> dict:

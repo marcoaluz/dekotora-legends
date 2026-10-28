@@ -9041,23 +9041,23 @@
       "category": "front",
       "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_bars_led.glb",
       "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
+        "x": 1.36,
+        "y": 0.86,
         "z": 0.107
       },
       "bounds_godot": [
         [
-          -0.65,
-          -0.4,
+          -0.68,
+          -0.43,
           -0.107
         ],
         [
-          0.65,
-          0.4,
+          0.68,
+          0.43,
           -0.0
         ]
       ],
-      "triangles": 1534,
+      "triangles": 3438,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9104,23 +9104,23 @@
       "category": "front",
       "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_honey_sun.glb",
       "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
+        "x": 1.36,
+        "y": 0.86,
         "z": 0.112
       },
       "bounds_godot": [
         [
-          -0.65,
-          -0.4,
+          -0.68,
+          -0.43,
           -0.112
         ],
         [
-          0.65,
-          0.4,
+          0.68,
+          0.43,
           -0.0
         ]
       ],
-      "triangles": 1670,
+      "triangles": 3574,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9167,23 +9167,23 @@
       "category": "front",
       "model": "res://assets/vehicles/dekotora/accessories/grille_t234/grille_slats_neon.glb",
       "dimensions_m": {
-        "x": 1.3,
-        "y": 0.8,
+        "x": 1.36,
+        "y": 0.86,
         "z": 0.066
       },
       "bounds_godot": [
         [
-          -0.65,
-          -0.4,
+          -0.68,
+          -0.43,
           -0.066
         ],
         [
-          0.65,
-          0.4,
+          0.68,
+          0.43,
           -0.0
         ]
       ],
-      "triangles": 1054,
+      "triangles": 2958,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9246,7 +9246,7 @@
           -0.0
         ]
       ],
-      "triangles": 972,
+      "triangles": 1944,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9274,10 +9274,11 @@
         2.0,
         5.0
       ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
+      "mount_point": "SOCKET_horn_r",
+      "socket": "horn_r",
+      "mount_point_left": "SOCKET_horn_l",
+      "mirror_for_left": true,
+      "socket_left": "horn_l",
       "horn": "horn_musical_dekotora"
     },
     {
@@ -9302,7 +9303,7 @@
           -0.0
         ]
       ],
-      "triangles": 804,
+      "triangles": 1608,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9331,10 +9332,11 @@
         2.0,
         5.0
       ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
+      "mount_point": "SOCKET_horn_r",
+      "socket": "horn_r",
+      "mount_point_left": "SOCKET_horn_l",
+      "mirror_for_left": true,
+      "socket_left": "horn_l",
       "horn": "horn_dual_tone"
     },
     {
@@ -9359,7 +9361,7 @@
           -0.0
         ]
       ],
-      "triangles": 652,
+      "triangles": 1304,
       "compatibility": [
         "todos (encaixe por caminhão: truck/sockets/*.json)"
       ],
@@ -9389,10 +9391,11 @@
         2.0,
         5.0
       ],
-      "mount_point": "SOCKET_horn",
-      "socket": "horn",
-      "mount_point_left": null,
-      "mirror_for_left": false,
+      "mount_point": "SOCKET_horn_r",
+      "socket": "horn_r",
+      "mount_point_left": "SOCKET_horn_l",
+      "mirror_for_left": true,
+      "socket_left": "horn_l",
       "horn": "horn_ship_deep"
     }
   ]

@@ -160,7 +160,7 @@ def build_one(path: str) -> dict:
         r = sk.get(k, {}).get("rect")
         if r:
             print(f"[sockets] {stem:34s} {k} {r['w']:.2f} x {r['h']:.2f} m centro {r['c']}")
-    g, hn, it = sk.get("grille", {}), sk.get("horn", {}), sk.get("interior", {}).get("rect", {})
+    g, hn, it = sk.get("grille", {}), sk.get("horn_r", {}), sk.get("interior", {}).get("rect", {})
     print(f"[sockets] {stem:34s} T-234 grade {g.get('width', 0):.2f} x {g.get('height', 0):.2f} frente z {g.get('face_z', 0):.3f}"
           f" | buzina {('y %.2f z %.2f' % (hn['anchor'][1], hn['anchor'][2])) if hn.get('anchor') else 'nao cabe'}"
           f" | interior {('%.2f x %.2f' % (it['w'], it['h'])) if it else 'sem vidro'}")

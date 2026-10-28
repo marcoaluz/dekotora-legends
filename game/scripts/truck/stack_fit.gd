@@ -55,9 +55,10 @@ static func problems(model: Node3D, data: Dictionary, c: AccessoryCatalog, lower
 	var vs: Dictionary = TruckSockets.socket(data, "visor")
 	if vs.has("box") and PartFit.overlap(box, TruckSockets.aabb_of(vs["box"]), 0.002):
 		probs.append("entra no lugar da viseira")
-	var hs: Dictionary = TruckSockets.socket(data, "horn")   # T-234: buzina em cima da viseira
-	if hs.has("box") and PartFit.overlap(box, TruckSockets.aabb_of(hs["box"]), 0.002):
-		probs.append("entra no lugar da buzina")
+	for hk in ["horn_r", "horn_l"]:                        # T-234/T-256: buzina nas pontas da viseira
+		var hs: Dictionary = TruckSockets.socket(data, hk)
+		if hs.has("box") and PartFit.overlap(box, TruckSockets.aabb_of(hs["box"]), 0.002):
+			probs.append("entra no lugar da buzina")
 	if arranged and float(upper.get_meta("stack_offset", 0.0)) < StackArrange.AHEAD_MIN - 0.001:
 		probs.append("os canhoes nao ficam a frente da caixa (%.2f m)" % float(upper.get_meta("stack_offset", 0.0)))
 	if arranged:                                     # os pes de tras chegam no teto

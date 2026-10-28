@@ -194,7 +194,7 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 
 var _lot5_ok: int = 0
 var _lot5_n: int = 0
-const LOT5: Array = ["grille", "exhaust_stacks_r", "horn", "hubcaps", "interior"]   # T-234
+const LOT5: Array = ["grille", "exhaust_stacks_r", "horn_r", "hubcaps", "interior"]   # T-234 (T-256: buzina nas pontas da viseira)
 
 
 ## T-234: matriz caminhao x lote 5 (grades, escapamentos, buzinas, calotas e interiores).

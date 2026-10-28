@@ -68,6 +68,7 @@ static func build(v: VBoxContainer, gs: Node, d: PartDef, flash: Callable) -> vo
 	for role in DecoLightDef.ROLES:                   # T-214: cor das luzes separada da estrutura
 		if "deco_" + role in used:
 			_light_grid(v, gs, id, role, flash)
+	_lot5_options(v, gs, id, entry)
 	if not bool(entry.get("has_sign", false)):
 		return
 	var cell: int = int(gs.part_style(id).get("sign", DecoStyle.default_sign(entry)))
@@ -129,3 +130,36 @@ static func _swatch(cd: DecoColorDef, border: Color, bw: int) -> StyleBoxFlat:
 	sb.shadow_color = cd.swatch_b                     # a cor da luz aparece como brilho em volta da amostra
 	sb.shadow_size = 3
 	return sb
+
+
+## T-256: opcoes de graca do lote 5: disposicao das cornetas (buzina) e arte na lata da cabine (grade).
+static func _lot5_options(v: VBoxContainer, gs: Node, id: String, entry: Dictionary) -> void:
+	var fit: String = String(entry.get("fit", ""))
+	var opts: Array = []
+	var cur: String = ""
+	if fit == "horn":
+		cur = String(gs.part_style(id).get("side", "both"))
+		v.add_child(GarageShop.wl(Tr.t("garage.horn_side"), 14, UiTheme.GOLD))
+		for sd in Lot5Fit.HORN_SIDES:
+			opts.append([sd, Tr.t("garage.horn_side." + sd)])
+	elif fit == "grille":
+		cur = str(int(gs.part_style(id).get("art", -1)))
+		v.add_child(GarageShop.wl(Tr.t("garage.cab_art"), 14, UiTheme.GOLD))
+		opts.append(["-1", Tr.t("garage.cab_art.none")])
+		for c in Lot5Grille.ART_CELLS:
+			opts.append([str(c), Tr.t("garage.cab_art.%d" % c)])
+	else:
+		return
+	var row := HBoxContainer.new()
+	row.name = "Lot5_" + id
+	row.add_theme_constant_override("separation", 4)
+	v.add_child(row)
+	for o in opts:
+		var key: String = String(o[0])
+		var b: Button = GarageShop.small_button(String(o[1]) + (" ✔" if key == cur else ""), 74)
+		b.disabled = key == cur
+		b.pressed.connect(func() -> void:
+			var ok: bool = gs.set_part_side(id, key) if fit == "horn" else gs.set_part_art(id, int(key))
+			if ok:
+				AudioBus.play_ui("ui_select"))
+		row.add_child(b)

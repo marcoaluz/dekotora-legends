@@ -1588,3 +1588,19 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   (dir. faixa 1, esq. faixa 4 de "lateral 3"). As imagens 1536 x 1024 com tarja preta viraram a faixa do meio (perto do
   rosto) e "lateral 3" (4 faixas de 6:1) foi cortada em 4 murais de 4:1 mantendo a personagem. Brilho: cidade neon,
   lua, lanternas, luzes do caminhão/carro, olhos do lobo e a borboleta azul (nunca no rosto/pele das personagens).
+
+## 2026-10-28 · T-256 · Refino do lote 5: grade assentada, contorno de LED, arte na lata, disposição das cornetas
+
+- **Grades mantidas** e acrescentado:
+  - **Encaixe mais natural**: a grade inclina junto com a frente de cada cabine (`lean` medido por raios; JAC e curta
+    têm a frente inclinada até 0,5 m na altura da grade) e um **colar** fino na cor do painel fecha a folga entre as
+    costas da grade e a lataria em cada borda (no máximo 0,35 m). Grade de raios 13 x 9 gravada no encaixe (`grid`).
+  - **Contorno de LED** em volta da grade inteira (moldura de 3 cm com uma fileira de LEDs; a cor dos LEDs é a mesma
+    escolha separada da cor da peça, T-214).
+  - **Arte na lata da cabine** (opção extra, de graça, por grade): sem arte / ondas / sakura / raios / nuvens (atlas da
+    T-211). Com arte, a grade desce para os 58% de baixo da caixa e a arte é pintada NA CHAPA logo acima, seguindo a
+    curva da frente, repetindo o desenho sem esticar; acende fraco à noite como os murais.
+- **Cornetas da buzina**: opção do jogador (de graça) **dos dois lados** (padrão), **só à esquerda** ou **só à direita**
+  — um conjunto em cada ponta da viseira (encaixes `horn_r`/`horn_l`). O deque de 2 níveis só desvia da buzina quando
+  um canhão passa por cima dela: tabela igual (4.251 de 5.376). **Americana continua sem buzina** (motivo da T-234).
+- Rede: o estilo leva `side` e `art`; ações `set_part_side`/`set_part_art`. **Protocolo 22.**

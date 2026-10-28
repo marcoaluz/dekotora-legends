@@ -70,14 +70,26 @@ static func _ahead(lower: Node3D, pods: Array[Node3D], data: Dictionary, anchor:
 	var room: float = INF
 	if bottom <= vb.end.y + 0.005:
 		room = front - (vb.end.z + VISOR_GAP)                # quanto da para avancar sem entrar no lugar da viseira
-	var hs: Dictionary = TruckSockets.socket(data, "horn")  # T-234: nem no lugar da buzina (em cima da viseira)
-	if hs.has("box"):
+	for hk in ["horn_r", "horn_l"]:                       # T-234/T-256: nem no lugar da buzina (pontas da viseira)
+		var hs: Dictionary = TruckSockets.socket(data, hk)
+		if not hs.has("box"):
+			continue
 		var hb: AABB = TruckSockets.aabb_of(hs["box"])
-		if bottom <= hb.end.y - 0.002:
+		if bottom <= hb.end.y - 0.002 and _x_overlap(lower, pods, anchor, hb):
 			room = minf(room, front - (hb.end.z + VISOR_GAP))
 	if room == INF:
 		return AHEAD
 	return clampf(room / sc, 0.0, AHEAD)
+
+
+## Algum canhao cruza a faixa x da caixa `hb` (a buzina fica so nas pontas da viseira)?
+static func _x_overlap(lower: Node3D, pods: Array[Node3D], anchor: Vector3, hb: AABB) -> bool:
+	for pod in pods:
+		var b: AABB = lower.transform * PartFit.rel_xform(pod, lower) * SocketSeat._local_aabb(pod)
+		var x0: float = anchor.x + b.position.x
+		if minf(x0 + b.size.x, hb.end.x) - maxf(x0, hb.position.x) > 0.001:
+			return true
+	return false
 
 
 ## Pes de tras da caixa (filhos da caixa `upper`, ja posicionada): do fundo da caixa ate o teto, um de cada lado.

@@ -169,3 +169,85 @@ func test_bots_draw_new_hubs_and_grilles() -> void:
 	check(seen.keys().any(func(i: String) -> bool: return String(i) in HUBS), "bots sorteiam calota nova")
 	check(seen.keys().any(func(i: String) -> bool: return String(i) in GRILLES), "bots sorteiam grade nova")
 	check(Protocol.VERSION >= 21, "protocolo 21 (lote 5 no descritor e nos bots)")
+
+
+# ---------------------------------------------------------------------------------------------- T-256 (refino)
+
+func test_horn_sides_option() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	for opt in [["both", 2], ["left", 1], ["right", 1]]:
+		var t := TruckNode.new()
+		t._ready()
+		var st: Dictionary = {} if opt[0] == "both" else {"horn_triple": {"side": opt[0]}}
+		t.apply_loadout([gs.part("horn_triple")] as Array[PartDef], st)
+		var nodes: Array = t._acc_nodes["horn_triple"]
+		check_eq(nodes.size(), int(opt[1]), "buzina %s: %d conjunto(s)" % [opt[0], opt[1]])
+		for n in nodes:
+			var c: Vector3 = PartFit.aabb_in(n as Node3D, t.model).get_center()
+			if opt[0] == "left":
+				check(c.x < -0.3, "so a esquerda (x %.2f)" % c.x)
+			elif opt[0] == "right":
+				check(c.x > 0.3, "so a direita (x %.2f)" % c.x)
+		t.free()
+	check(Lot5Fit.HORN_SIDES == ["both", "left", "right"], "3 disposicoes")
+
+
+func test_grille_follows_front_and_cab_art() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	for cab in ["jac", "chata", "flat_wide"]:
+		var t := TruckNode.new()
+		t.cab_kind = cab
+		t._ready()
+		var data: Dictionary = TruckSockets.for_model(TruckNode.model_path(t.body_kind, cab))
+		var sk: Dictionary = TruckSockets.socket(data, "grille")
+		var sb: AABB = TruckSockets.aabb_of(sk["box"])
+		t.apply_loadout([gs.part("grille_bars_led")] as Array[PartDef], {"grille_bars_led": {"art": 13}})
+		var node: Node3D = t._acc_nodes["grille_bars_led"][0]
+		check(absf(node.transform.basis.y.z - float(sk["lean"]) * node.transform.basis.y.y) < 0.001, "%s: grade inclinada pela frente" % cab)
+		var art: Array = node.find_children("cab_art", "MeshInstance3D", true, false)
+		check_eq(art.size(), 1, "%s: arte na lata" % cab)
+		if not art.is_empty():
+			var mi: MeshInstance3D = art[0] as MeshInstance3D
+			var ab: AABB = PartFit.rel_xform(mi, t.model) * mi.mesh.get_aabb()
+			var gb: AABB = PartFit.aabb_in(node, t.model)
+			check(PartFit.inside(ab, sb, 0.02), "%s: arte dentro da caixa da grade" % cab)
+			check(ab.position.y > sb.get_center().y, "%s: arte acima da grade" % cab)
+			for z in data.get("protected", {}):
+				check(not PartFit.overlap(ab, TruckSockets.aabb_of(data["protected"][z]["box"]), 0.002), "%s: arte fora da zona %s" % [cab, z])
+			check(PartFit.inside(gb, sb), "%s: grade + arte dentro da caixa" % cab)
+		t.set_mural_glow(0.8)
+		check((node.get_meta("cab_art") as StandardMaterial3D).emission_energy_multiplier > 0.0, "%s: arte acende fraco a noite" % cab)
+		t.free()
+	var t2 := TruckNode.new()
+	t2.cab_kind = "jac"
+	t2._ready()
+	t2.apply_loadout([gs.part("grille_slats_neon")] as Array[PartDef])
+	check(not (t2._acc_nodes["grille_slats_neon"][0] as Node3D).find_children("collar", "MeshInstance3D", true, false).is_empty(),
+			"jac: colar fecha a folga atras da grade")
+	t2.free()
+
+
+func test_new_options_are_free_and_go_to_descriptor() -> void:
+	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
+	gs.new_profile()
+	gs.profile["money"] = 200000
+	check(gs.buy(gs.part("horn_ship")) and gs.buy(gs.part("grille_honey_sun")), "compra buzina e grade")
+	check(gs.install("horn_ship") and gs.install("grille_honey_sun"), "instala buzina e grade")
+	var m: int = gs.money()
+	check(gs.set_part_side("horn_ship", "left"), "escolhe so a esquerda")
+	check(not gs.set_part_side("horn_ship", "meio"), "disposicao invalida recusada")
+	check(gs.set_part_art("grille_honey_sun", 12), "escolhe a arte de ondas na lata")
+	check(not gs.set_part_art("grille_honey_sun", 3), "celula invalida recusada")
+	check_eq(gs.money(), m, "opcoes de graca")
+	var desc: Dictionary = gs.truck_descriptor()
+	var side: String = ""
+	var art: int = -1
+	for p in desc["parts"]:
+		if String(p["id"]) == "horn_ship":
+			side = String(p.get("style", {}).get("side", ""))
+		if String(p["id"]) == "grille_honey_sun":
+			art = int(p.get("style", {}).get("art", -1))
+	check(side == "left" and art == 12, "descritor da rede leva a disposicao e a arte")
+	check(gs.apply_action("set_part_side", "horn_ship:both"), "acao do servidor volta aos dois lados")
+	check(not gs.part_style("horn_ship").has("side"), "dois lados = padrao (nao grava)")
+	gs.new_profile()

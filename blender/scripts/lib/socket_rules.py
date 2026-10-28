@@ -416,6 +416,7 @@ def clear_mirror(sk: dict, zones: dict) -> None:
 
 # ----------------------------------------------------------------------------- oficina lote 5 (T-234)
 GRILLE_DEPTH = 0.11                # m: quanto a grade nova pode sair da frente da cabine
+HORN_SET_W = 0.25                  # m: meia largura do conjunto de cornetas (T-256: um em cada ponta da viseira)
 
 
 def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
@@ -430,8 +431,9 @@ def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
             seat = T.grille_seat(l5["tree"], g, m["cab"]["front_z"])
             if not seat:
                 break
-            z0 = round(min(g["box"][0][2], seat["face_z"] - GRILLE_DEPTH), 3)
-            trial = [[b[0][0], b[0][1], z0], [b[1][0], b[1][1], round(max(b[1][2], seat["face_z"] + 0.01), 3)]]
+            hh0 = (b[1][1] - b[0][1]) / 2
+            z0 = round(min(g["box"][0][2], seat["face_z"] - abs(seat["lean"]) * hh0 - GRILLE_DEPTH), 3)
+            trial = [[b[0][0], b[0][1], z0], [b[1][0], b[1][1], round(max(b[1][2], seat["back_z"] + 0.01), 3)]]
             hit = [zv["box"] for zk, zv in zones.items() if "grille" not in zv["exempt"] and overlap(trial, zv["box"])]
             low = [zb for zb in hit if zb[1][1] < (b[0][1] + b[1][1]) / 2]
             if not low:
@@ -439,8 +441,10 @@ def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
             b[0][1] = round(max(zb[1][1] for zb in low) + 0.01, 3)
         if seat:
             g.update(seat)
-            b[0][2] = round(min(b[0][2], seat["face_z"] - GRILLE_DEPTH), 3)
-            b[1][2] = round(max(b[1][2], seat["face_z"] + 0.01), 3)
+            hh = (b[1][1] - b[0][1]) / 2
+            front = seat["face_z"] - abs(seat["lean"]) * hh            # costas da grade no ponto mais à frente
+            b[0][2] = round(min(b[0][2], front - GRILLE_DEPTH), 3)
+            b[1][2] = round(max(b[1][2], seat["back_z"] + 0.01), 3)   # T-256: colar atrás da grade até a lataria
             g["anchor"] = [g["anchor"][0], round((b[0][1] + b[1][1]) / 2, 3), seat["face_z"]]
         g.update({"fit": "grille", "height": round(b[1][1] - b[0][1], 3)})
     # buzina (pedido do Marco depois da 1a versão no topo da carga): EM CIMA da viseira, encostada na testa da cabine,
@@ -452,9 +456,13 @@ def lot5(sk: dict, zones: dict, m: dict, l5: dict) -> None:
         zb = min(vi[1][2], an[0][2]) if an else vi[1][2]
         y0 = vi[1][1]
         y1 = y0 + T.HORN_H
-        sk["horn"] = {"box": _box(-T.HORN_W, y0, zb - T.HORN_L, T.HORN_W, y1, zb),
-                      "anchor": [0.0, round(y0, 3), round(zb - 0.004, 3)], "fit": "horn", "lift": 0.0,
-                      "length": T.HORN_L}
+        # T-256: um lugar em cada ponta da viseira (o jogador escolhe esquerda, direita ou os dois lados)
+        xr = min(vi[1][0], m["cab"]["half_w"]) - 0.02
+        xa = max(xr - HORN_SET_W, 0.0)
+        for side, sx in (("r", 1), ("l", -1)):
+            sk["horn_" + side] = {"box": _box(sx * max(xa - HORN_SET_W, 0.0), y0, zb - T.HORN_L, sx * xr, y1, zb),
+                                  "anchor": [sx * round(xa, 3), round(y0, 3), round(zb - 0.004, 3)], "fit": "horn",
+                                  "lift": 0.0, "length": T.HORN_L}
     it = l5.get("interior") or {}
     if it:
         sk["interior"] = {"fit": "face", "rect": it}

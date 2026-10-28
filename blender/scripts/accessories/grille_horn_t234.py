@@ -46,6 +46,31 @@ def _emblem(m, name, scale=1.0, y=0.075, z=0.0, fill="neon", frame="chrome"):
     return Z.tag(o, "CEN")
 
 
+RING = 0.03        # m: largura do contorno de LED por fora da moldura (T-256)
+
+
+def _led_ring(m):
+    """T-256 (pedido do Marco): contorno de LED em volta da grade inteira, numa moldura fina por fora (cor dos LEDs
+    separada da cor da peça, como as outras luzes). Fica dentro da folga de 3 cm que o jogo deixa em cada lado."""
+    o = []
+    W2, H2, d = GW / 2 + RING, GH / 2 + RING, 0.03
+    for k, (sx, sz, x, z) in enumerate(((2 * W2, RING, 0, H2 - RING / 2), (2 * W2, RING, 0, -H2 + RING / 2),
+                                        (RING, 2 * H2 - 2 * RING, W2 - RING / 2, 0), (RING, 2 * H2 - 2 * RING, -W2 + RING / 2, 0))):
+        o.append(M.box(f"ring_{k}", (sx, d, sz), (x, d / 2, z), m["trim"], bevel=0.004, seg=1))
+    rows = ((W2 - 0.005, H2 - RING, 2 * W2 - 0.01, 30, 1), (W2 - 0.005, -H2, 2 * W2 - 0.01, 30, 1))
+    for k, (x0, z0, w, cols, _r) in enumerate(rows):
+        face = K.Face((x0, d, z0), (-w, 0, 0), (0, 0, RING))
+        o.append(K.led_grid(f"ring_led_h{k}", face, 0.0, 0.1, 1.0, 0.9, cols, 1, m["led"], fill=0.6, off=0.004, depth=0.008))
+    for k, sx in enumerate((1, -1)):
+        face = K.Face((sx * W2 - (RING if sx > 0 else 0.0), d, -H2 + RING), (RING, 0, 0), (0, 0, 2 * H2 - 2 * RING))
+        if sx > 0:
+            face = K.Face((W2, d, -H2 + RING), (-RING, 0, 0), (0, 0, 2 * H2 - 2 * RING))
+        else:
+            face = K.Face((-W2 + RING, d, -H2 + RING), (-RING, 0, 0), (0, 0, 2 * H2 - 2 * RING))
+        o.append(K.led_grid(f"ring_led_v{k}", face, 0.1, 0.0, 0.9, 1.0, 1, 18, m["led"], fill=0.6, off=0.004, depth=0.008))
+    return o
+
+
 def _led_row(m, name, face_y, zc, cols=26, h=0.034, x_in=0.05):
     face = K.Face((GW / 2 - x_in, face_y, zc - h / 2), (-(GW - 2 * x_in), 0, 0), (0, 0, h))
     return K.led_grid(name, face, 0.0, 0.0, 1.0, 1.0, cols, 1, m["led"], fill=0.72, off=0.004, depth=0.010)
@@ -69,6 +94,7 @@ def grille_bars_led(m):
     o.append(_led_row(m, "led_top", 0.066, GH / 2 - 0.035))
     o.append(_led_row(m, "led_bot", 0.066, -GH / 2 + 0.035))
     o += _emblem(m, "emb", 1.0, y=0.08)
+    o += _led_ring(m)
     return o
 
 
@@ -84,6 +110,7 @@ def grille_honey_sun(m):
     face = K.Face((GW / 2 - 0.075, 0.03, -GH / 2 + 0.075), (-(GW - 0.15), 0, 0), (0, 0, GH - 0.15))
     o += K.frame_on("inner", face, 0.0, 0.0, 1.0, 1.0, 0.012 / (GW - 0.15), 0.012 / (GH - 0.15), m["chrome"], off=0.0, depth=0.02)
     o += _emblem(m, "emb", 1.25, y=0.085, fill="neon", frame="gold")
+    o += _led_ring(m)
     return o
 
 
@@ -100,6 +127,7 @@ def grille_slats_neon(m):
         o.append(M.box(f"col_{sx}", (0.06, 0.03, GH - 0.12), (x, 0.03, 0), m["trim"], bevel=0.006, seg=1))
         o.append(Z.Q.tubes(f"neon_{sx}", [((x, 0.05, -GH / 2 + 0.08), (x, 0.05, GH / 2 - 0.08))], 0.016, m["neon"], seg=8))
     o.append(_led_row(m, "led_bot", 0.052, -GH / 2 + 0.025, cols=20, x_in=0.16))
+    o += _led_ring(m)
     return o
 
 
@@ -148,7 +176,8 @@ def _g(pid, name, build, color="cromo_ciano"):
 
 
 def _h(pid, name, build, horn, color="cromo_ciano"):
-    return {"id": pid, "name": name, "build": build, "kind": "horn", "slot": "horn", "socket": "horn", "fit": "horn",
+    return {"id": pid, "name": name, "build": build, "kind": "horn", "slot": "horn", "socket": "horn_r",
+            "socket_left": "horn_l", "fit": "horn",
             "default_color": color, "folder": "horn_t234", "horn": horn}
 
 
