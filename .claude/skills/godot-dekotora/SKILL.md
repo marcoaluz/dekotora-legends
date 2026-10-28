@@ -438,6 +438,20 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Gravação real → loop: `tools/cut_loops.py` (lê mp3/flac pelo Blender). Saída `rec_<voz>_<on|off>_<rpm>.wav`; o jogo só usa
   quando os 10 existem (`EngineAudio.recordings_complete`).
 
+## Som do motor gravado (T-260)
+
+- Modo padrão = `rec` (gravação real, Iveco Daily, CC0). `EngineSoundMode.MODES = [rec, loops, synth, mix]`
+  (`scripts/audio/engine_sound_mode.gd`). `EngineAudio.loop_source()` devolve `"rec"` ou `"syn"` (o que está tocando
+  de fato; cai para `"syn"` se faltar arquivo `rec_*`).
+- Sintetizador (`DieselSynth`/`EngineSynthVoice`) só liga com `synth` ou `mix`. Em `rec` e `loops` ele fica desligado.
+- Loops `rec_i4/i6/i6t_*` em `game/assets/audio/engines/`: `python -P tools/rec_engine_t260.py` (fontes:
+  `bash tools/fetch_t260_sources.sh`, baixa as gravações CC0 em `audio_src/engine`).
+- Prévias sem Godot: `python -P tools/demo_engine_t260.py` → `docs/audio_t260/demo_*_rec.wav` e `demo_*_syn.wav`.
+- **Armadilha**: use `python -P` (não `-I`). Com `-I` o Python ignora o numpy instalado pelo usuário e o script quebra.
+- **Armadilha**: o YIN (detector de frequência) pula de oitava na marcha lenta dessas gravações. Para o RPM use
+  `t260_engine_lib.rpm_track` (`tools/t260_engine_lib.py`), não o YIN direto.
+- Testes: `godot --headless --path game -s res://tests/run_tests.gd -- --only=t260` (arquivo `game/tests/test_t260_engine_rec.gd`).
+
 ## Chegada "infinita", trem do Marco e serrilhado (T-195)
 
 - **Continuação só visual depois da chegada**: `TrackPath.new(track, ArrivalLayout.runout(rota))` estende a linha
