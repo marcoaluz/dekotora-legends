@@ -326,3 +326,13 @@ um problema visual não puder ser entendido pelos renders.
   certa vem de `M.torus`/objetos já girados: não sobrescreva `rotation_euler` depois de `M.torus(axis=...)` (ele já gira o objeto).
 - **Armadilha (commit compartilhado)**: se outra tarefa tem mudanças não commitadas no mesmo arquivo, não use `git add` (levaria tudo).
   Monte o blob só com a sua parte: `git hash-object -w ARQ` e `git update-index --cacheinfo 100644,HASH,CAMINHO`; depois `git commit`.
+
+## Murais com imagens prontas (T-242)
+
+- Fontes (obras de domínio público): `python -I tools/fetch_t242_sources.py [chave ...]` (Python do sistema, `-I`; só baixa o que falta;
+  links e licenças em `blender/scripts/lib/t242_sources.py`; o download vai para `blender/renders/t242/fontes/`).
+- Ukiyo-e (acervo): `blender -b --factory-startup -P blender/scripts/build_t242_ukiyoe.py -- --sheets PASTA_ABS` (`--only a,b` filtra).
+- Anime (arte do Marco): `blender -b --factory-startup -P blender/scripts/build_t242_anime.py -- [--grid] [--sheet PASTA_ABS]`.
+- Brilho `key` (`lib/t242_photo.py`, `g.key(col, ...)`): precisa da arte; a função recebe a arte carregada (`PH.load`) antes de ser chamada.
+- `docs/Murais/*` fica fora do Git (`.gitignore`; só `docs/Murais/README.md` entra). Não commite as artes do Marco.
+- Use caminho absoluto em `--sheets` e `--sheet`.
