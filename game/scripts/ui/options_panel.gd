@@ -117,7 +117,7 @@ func _show(id: String) -> void:
 		"audio":
 			_slider(Tr.t("options.music"), _s.music_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.music_volume = v, true)
 			_slider(Tr.t("options.sfx"), _s.sfx_volume, 0.0, 1.0, 0.05, func(v: float) -> void: _s.sfx_volume = v, true)
-			var es: Array[String] = ["", "loops", "synth", "mix"]          # T-220: som do motor (comparar)
+			var es: Array[String] = ["", "rec", "loops", "synth", "mix"]          # T-220: som do motor (comparar)
 			_choice(Tr.t("options.engine_sound"), es.map(func(k: String) -> String: return Tr.t("options.engine_sound_" + (k if k != "" else "default"))),
 					maxi(es.find(String(_s.engine_sound)), 0), func(i: int) -> void: _s.engine_sound = es[i])
 			_hint(Tr.t("options.engine_sound_hint"))

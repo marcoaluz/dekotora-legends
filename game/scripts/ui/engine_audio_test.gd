@@ -4,11 +4,11 @@ extends Control
 ## RPM, acelerador, turbo e dano, botoes ACELERAR 0->100% e SOLTAR, DIRIGIR (roteiro com marchas), buzinas.
 ## Direita (T-220): espectro ao vivo com a frequencia de ignicao esperada, CPU do sintetizador, ajuste do sintetizador
 ## e ANALISE DOS LOOPS (tabela + graficos de docs/audio_t220).
-## Linha de comando: -- --cycle-profiles | --sweep | --ramp [--mode=old|loops|synth|mix] [--synth-light]
+## Linha de comando: -- --cycle-profiles | --sweep | --ramp [--mode=old|rec|loops|synth|mix] [--synth-light]
 ##   --cfg=MOTOR:TURBO:ESCAPE:CARROCERIA:jake|nojake:new|old:out|cab [--quit-at-end]. Com --write-movie X.png o
 ##   Godot grava o som exato em X.wav (tools/render_t197_audio.sh, tools/render_t220_audio.sh).
 
-const MODES: Array = [["old", "Antigo (ElevenLabs)"], ["loops", "Loops T-197"], ["synth", "Sintetizador"], ["mix", "Mistura"]]
+const MODES: Array = [["old", "Antigo (ElevenLabs)"], ["rec", "Gravação real"], ["loops", "Loops T-197"], ["synth", "Sintetizador"], ["mix", "Mistura"]]
 const ACCEL_S: float = 6.0             # ACELERAR: lenta -> corte em 6 s (pé no fundo, uma marcha longa)
 const RELEASE_S: float = 3.0
 ## --ramp (gravacoes da T-220): lenta 2 s, acelera 8 s ate o corte, segura 1 s, solta 4 s, lenta 2 s.
@@ -35,7 +35,7 @@ var _cpu: Label
 var _sliders: Dictionary = {}
 var _body: String = ""
 var _legacy: bool = false
-var _mode: String = "loops"
+var _mode: String = "rec"
 var _interior: bool = false
 var _drive: AudioDriveDemo
 var _quit_at_end: bool = false
@@ -322,9 +322,11 @@ func _rebuild() -> void:
 	if _audio.proc != null and _voice_tune != null and String(s.get("voice", "")) == "i6":
 		_apply_tune.call_deferred()
 	var mode_txt: String = "antigo (ElevenLabs)" if _legacy else _audio.sound_mode
-	if not _legacy and _mode != "loops" and _audio.sound_mode == "loops":
+	if not _legacy and (_mode == "synth" or _mode == "mix") and not (_audio.sound_mode in ["synth", "mix"]):
 		mode_txt += " (sintetizador ainda não feito para este motor: só o 6 cil. padrão, até o Marco aprovar)"
-	_info.text = "Som: %s  |  arquivos: %s" % [mode_txt, String(s["set"])]
+	if not _legacy and _mode == "rec" and _audio.loop_source() != "rec":
+		mode_txt += " (sem gravação real para este motor: loops sintetizados)"
+	_info.text = "Som: %s  |  arquivos: %s  |  loops: %s" % [mode_txt, String(s["set"]), _audio.loop_source()]
 	_spec_view.cylinders = 8 if _engine_id == "eng_v8" else (4 if _body == "canter" else 6)
 
 

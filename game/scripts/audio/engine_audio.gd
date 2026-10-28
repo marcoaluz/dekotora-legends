@@ -10,6 +10,7 @@ extends Node
 ## T-220: modo do som (EngineSoundMode): "loops" (acima), "synth" (diesel procedural EngineSynthVoice no lugar dos
 ## loops ON/OFF) ou "mix" (procedural nos graves + loops so nos medios/agudos, barramento EngineLoopsHP). Gravacoes
 ## reais recortadas (rec_<voz>_<on|off>_<rpm>, tools/cut_loops.py) substituem os loops syn_ quando existem.
+## T-260: modo "rec" (padrao) = gravacoes reais (tools/rec_engine_t260.py); "loops" = so os sintetizados (comparar).
 
 const BANDS: Array[String] = ["idle", "low", "mid", "high"]
 const CENTERS: Array[float] = [0.0, 0.3, 0.62, 0.95]       # rpm normalizado (0..1) onde cada camada e mais forte
@@ -125,10 +126,12 @@ func _setup_diesel(s: Dictionary) -> void:
 	_gain_db = float(s.get("gain_db", 0.0)) + DIESEL_DB
 	_pops = bool(s.get("pops", false))
 	_pop_rng.seed = hash(_voice) + get_instance_id()
-	_src = "rec" if recordings_complete(_voice) else "syn"
+	var m: String = mode_override if mode_override in EngineSoundMode.MODES else EngineSoundMode.current()
+	# T-260: gravacoes reais (rec_*) em todo modo menos "loops" (= os sintetizados da T-197, para comparar)
+	_src = "rec" if m != "loops" and recordings_complete(_voice) else "syn"
+	sound_mode = "rec" if _src == "rec" else "loops"
 	var vdef: EngineVoiceDef = null
-	if not positional:                                   # T-220: outros caminhoes ficam nos loops (custo)
-		var m: String = mode_override if mode_override in EngineSoundMode.MODES else EngineSoundMode.current()
+	if not positional and (m == "synth" or m == "mix"):  # T-220: outros caminhoes ficam nos loops (custo)
 		vdef = EngineSoundMode.voice_def(_voice)
 		if vdef != null:
 			sound_mode = m
@@ -137,7 +140,7 @@ func _setup_diesel(s: Dictionary) -> void:
 		for r in DieselMix.RPM_POINTS:
 			_add_layer(DieselMix.layer(_voice, "on", r, _src), true, loop_bus)
 			_add_layer(DieselMix.layer(_voice, "off", r, _src), true, loop_bus)
-	if sound_mode != "loops":
+	if sound_mode == "synth" or sound_mode == "mix":
 		_add_proc(vdef)
 	if not positional and "--synth-log" in OS.get_cmdline_user_args():
 		print("ENGINE_SOUND voz=%s modo=%s fonte=%s" % [_voice, sound_mode, _src])
@@ -169,7 +172,13 @@ func active_layers() -> Array[String]:
 	return out
 
 
+## T-260: origem dos loops ON/OFF do diesel: "rec" (gravacoes reais) ou "syn" (sintetizados da T-197).
+func loop_source() -> String:
+	return _src
+
+
 ## T-220: gravacoes reais recortadas (tools/cut_loops.py) so entram com TODOS os pontos ON e OFF (sem buracos).
+## T-260: tools/rec_engine_t260.py gera os 10 de i4, i6 e i6t a partir das gravacoes do Iveco Daily (CC0).
 static func recordings_complete(voice: String) -> bool:
 	for r in DieselMix.RPM_POINTS:
 		for k in ["on", "off"]:

@@ -1,14 +1,15 @@
 class_name EngineAudioConfig
 extends Resource
 ## T-220: which engine sound the player's truck uses (game/data/audio/engine_audio.tres). Options > Audio and
-## `-- --engine-sound=loops|synth|mix` override it; `--engine-sound=old` = ElevenLabs loops (T-197).
-##   loops = recorded/synthesized loops mixed by RPM (T-197; recordings rec_* win over syn_* when present)
+## `-- --engine-sound=rec|loops|synth|mix` override it; `--engine-sound=old` = ElevenLabs loops (T-197).
+##   rec   = T-260 default: real recordings (rec_*, tools/rec_engine_t260.py) mixed by RPM; voices without them use syn_*
+##   loops = synthesized loops only (T-197), to compare
 ##   synth = procedural diesel (DieselSynth) for the engine core; turbo, jake brake, pops and rattle stay loops
 ##   mix   = procedural below `crossover_hz` + loops above it (body from the synth, texture from the loops)
 ## Rivals and other trucks always use loops (cost).
 
-@export_enum("loops", "synth", "mix") var mode: String = "loops"
-@export_enum("loops", "synth", "mix") var mode_mobile: String = "loops"
+@export_enum("rec", "loops", "synth", "mix") var mode: String = "rec"
+@export_enum("rec", "loops", "synth", "mix") var mode_mobile: String = "rec"
 @export var crossover_hz: float = 300.0
 ## Synth sample rate on PC and in the light version (phones).
 @export var rate_pc: int = 22050

@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_ea")
-mode = "loops"
-mode_mobile = "loops"
+mode = "rec"
+mode_mobile = "rec"
 crossover_hz = 300.0
 rate_pc = 22050
 rate_light = 11025

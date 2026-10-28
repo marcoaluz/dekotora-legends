@@ -121,7 +121,7 @@ func test_engine_audio_layers_per_mode() -> void:
 		e.mode_override = m
 		e.setup_spec(spec, false)
 		var names: Array[String] = e.layer_names()
-		var has_on: bool = names.has(DieselMix.layer("i6", "on", 1400.0))
+		var has_on: bool = names.has(DieselMix.layer("i6", "on", 1400.0, e.loop_source()))   # T-260: rec_ ou syn_
 		check_eq(e.sound_mode, m, "modo %s aplicado" % m)
 		check_eq(has_on, m != "synth", "%s: loops ON/OFF %s" % [m, "presentes" if m != "synth" else "fora"])
 		check_eq(e.proc != null, m != "loops", "%s: diesel procedural %s" % [m, "ligado" if m != "loops" else "desligado"])
@@ -135,7 +135,7 @@ func test_engine_audio_layers_per_mode() -> void:
 	r.positional = true
 	r.mode_override = "synth"
 	r.setup_spec(spec, false)
-	check(r.proc == null and r.sound_mode == "loops", "rivais ficam nos loops")
+	check(r.proc == null and not (r.sound_mode in ["synth", "mix"]), "rivais ficam nos loops")
 	r.free()
 	var v8 := EngineAudio.new()
 	v8.mode_override = "synth"

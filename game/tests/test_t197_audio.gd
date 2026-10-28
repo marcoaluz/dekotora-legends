@@ -82,6 +82,7 @@ func test_mix_rules() -> void:
 
 func test_engine_audio_diesel_layers_follow_state() -> void:
 	var e := EngineAudio.new()
+	e.mode_override = "loops"                      # T-260: este teste e dos loops sintetizados (syn_*)
 	Engine.get_main_loop().root.add_child(e)
 	e.setup_spec(EngineSounds.spec("eng_i6_std", "turbo_single", "exh_straight"), true)
 	for i in 40:

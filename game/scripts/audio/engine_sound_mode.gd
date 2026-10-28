@@ -5,7 +5,9 @@ extends RefCounted
 ## `-- --engine-sound=loops|synth|mix` > Options > Audio (Settings.engine_sound, "" = default) > data file
 ## game/data/audio/engine_audio.tres (mode on PC, mode_mobile on phones). Pure helpers (tests, no playback).
 
-const MODES: Array[String] = ["loops", "synth", "mix"]
+## T-260: "rec" = gravacoes reais (rec_*, tools/rec_engine_t260.py) onde existem, senao os loops sintetizados;
+## "loops" = so os loops sintetizados da T-197 (comparar).
+const MODES: Array[String] = ["rec", "loops", "synth", "mix"]
 const CONFIG_PATH: String = "res://data/audio/engine_audio.tres"
 const VOICE_PATH: String = "res://data/audio/voice_%s.tres"
 
