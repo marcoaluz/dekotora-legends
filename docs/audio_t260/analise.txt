@@ -1,0 +1,55 @@
+== bsb1145_truck_engine.wav
+   35.34 s, 48000 Hz, 1 canal(is), 16 bits; pico -0.3 dBFS, RMS -15.5 dBFS; faixa de volume (p10..p90) -15.8..-15.1 dB
+   rpm (4 cil.) com ritmo claro em 96% das janelas: min 683, mediana 853, max 889 (p5 846, p95 872)
+   energia < 300 Hz 80%, > 2 kHz 3%, centro do espectro 319 Hz
+   sobe      0.9- 34.5 s   754 ->  817 rpm
+== bsb1146_truck_engine_small_accelerations.wav
+   35.77 s, 48000 Hz, 1 canal(is), 16 bits; pico 0.0 dBFS, RMS -20.8 dBFS; faixa de volume (p10..p90) -26.0..-17.6 dB
+   rpm (4 cil.) com ritmo claro em 94% das janelas: min 950, mediana 1635, max 1874 (p5 1093, p95 1817)
+   energia < 300 Hz 79%, > 2 kHz 4%, centro do espectro 363 Hz
+   oscila    1.0-  3.1 s  1725 -> 1713 rpm
+   desce     2.9-  3.8 s  1406 -> 1319 rpm
+   desce     3.7-  4.5 s  1439 -> 1286 rpm
+   oscila    4.2-  6.7 s  1785 -> 1708 rpm
+   desce     6.5-  7.3 s  1328 -> 1211 rpm
+   oscila    7.2-  8.0 s  1238 -> 1306 rpm
+   estavel   7.8- 10.3 s  1681 -> 1681 rpm
+   desce    10.1- 11.5 s  1388 -> 1234 rpm
+   desce    11.3- 12.2 s  1571 -> 1346 rpm
+   desce    12.1- 13.9 s  1533 -> 1366 rpm
+   desce    13.8- 14.8 s  1534 -> 1252 rpm
+   oscila   14.6- 15.8 s  1760 -> 1725 rpm
+   desce    15.7- 17.2 s  1531 -> 1299 rpm
+   sobe     17.1- 18.3 s  1563 -> 1850 rpm
+   sobe     19.1- 20.4 s  1545 -> 1841 rpm
+   desce    20.4- 22.1 s  1867 -> 1222 rpm
+   estavel  21.9- 24.1 s  1656 -> 1656 rpm
+   desce    23.9- 25.2 s  1465 -> 1186 rpm
+   desce    25.0- 26.0 s  1600 -> 1250 rpm
+   desce    26.1- 28.2 s  1574 -> 1470 rpm
+   desce    27.9- 29.0 s  1674 -> 1317 rpm
+   desce    28.8- 29.9 s  1812 -> 1692 rpm
+   sobe     29.7- 31.2 s  1567 -> 1874 rpm
+   desce    31.1- 32.0 s  1869 -> 1294 rpm
+   estavel  31.8- 35.0 s  1654 -> 1654 rpm
+== bsb1147_truck_engine_big_accelerations.wav
+   22.27 s, 48000 Hz, 1 canal(is), 16 bits; pico -2.4 dBFS, RMS -18.0 dBFS; faixa de volume (p10..p90) -26.6..-15.1 dB
+   rpm (4 cil.) com ritmo claro em 93% das janelas: min 1784, mediana 2782, max 3507 (p5 1859, p95 3286)
+   energia < 300 Hz 46%, > 2 kHz 11%, centro do espectro 917 Hz
+   oscila    1.0-  1.8 s  1794 -> 1793 rpm
+   oscila    1.5-  2.3 s  3507 -> 3402 rpm
+   sobe      2.5-  3.3 s  1784 -> 2195 rpm
+   desce     3.0-  5.2 s  2462 -> 2301 rpm
+   desce     5.4-  6.4 s  3196 -> 2737 rpm
+   oscila    6.6-  9.9 s  2731 -> 2782 rpm
+   desce     9.6- 10.6 s  3226 -> 2873 rpm
+   desce    10.3- 12.1 s  3233 -> 2241 rpm
+   desce    11.8- 12.9 s  2524 -> 2244 rpm
+   sobe     12.6- 15.7 s  2548 -> 2902 rpm
+   desce    15.4- 17.1 s  2550 -> 1837 rpm
+   estavel  17.5- 21.2 s  3223 -> 3223 rpm
+== bsb1442_truck_engine_1.wav
+   14.60 s, 48000 Hz, 1 canal(is), 24 bits; pico 0.0 dBFS, RMS -9.3 dBFS; faixa de volume (p10..p90) -9.8..-8.8 dB
+   rpm (4 cil.) com ritmo claro em 100% das janelas: min 852, mediana 855, max 859 (p5 853, p95 858)
+   energia < 300 Hz 48%, > 2 kHz 6%, centro do espectro 626 Hz
+   estavel   0.0- 14.5 s   855 ->  855 rpm

@@ -60,3 +60,6 @@ docs/Referencias/grade_t234/
 # T-242: imagens dos murais (obras baixadas e as do Marco) ficam fora do Git; só o LEIA-ME entra
 docs/Murais/*
 !docs/Murais/README.md
+
+# Materia-prima de audio (gravacoes originais baixadas; tools/fetch_t260_sources.sh baixa de novo)
+audio_src/

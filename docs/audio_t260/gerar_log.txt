@@ -1,0 +1,31 @@
+fontes: marcha lenta 853 rpm (4 cil.), nivel -15.4 dB; quadros on/off/idle: idle_off 61/18/3379, idle_on 0/0/1461, small 846/1379/1200, big 606/988/459
+rec_i4_off_700      5 graos (6.0 s de material, x0.83..0.83)  f0 23.4 Hz (esperado 23.3)  deriva 0.01 st  clareza 0.92  RMS -23.5 dB  casamento 0.89  CONFERE
+rec_i4_on_700       4 graos (5.8 s de material, x0.82..0.82)  f0 23.3 Hz (esperado 23.3)  deriva 0.01 st  clareza 0.49  RMS -23.5 dB  casamento 0.65  NAO CONFERE (sem ritmo de ignicao claro (clareza 0.49))
+rec_i4_off_1000    20 graos (4.5 s de material, x0.90..1.06)  f0 33.6 Hz (esperado 33.3)  deriva 0.24 st  clareza 0.84  RMS -23.9 dB  casamento 0.65  CONFERE
+rec_i4_on_1000     14 graos (2.7 s de material, x0.90..1.05)  f0 33.1 Hz (esperado 33.3)  deriva 0.22 st  clareza 0.75  RMS -20.9 dB  casamento 0.60  CONFERE
+rec_i4_off_1400    17 graos (5.1 s de material, x0.90..1.10)  f0 47.0 Hz (esperado 46.7)  deriva 0.44 st  clareza 1.00  RMS -21.5 dB  casamento 0.94  CONFERE
+rec_i4_on_1400     25 graos (4.9 s de material, x0.83..1.14)  f0 46.3 Hz (esperado 46.7)  deriva 0.15 st  clareza 0.96  RMS -18.5 dB  casamento 0.59  CONFERE
+rec_i4_off_1900    15 graos (4.9 s de material, x0.91..1.16)  f0 63.8 Hz (esperado 63.3)  deriva 0.05 st  clareza 0.94  RMS -19.2 dB  casamento 0.70  CONFERE
+rec_i4_on_1900     16 graos (3.4 s de material, x0.90..1.23)  f0 63.8 Hz (esperado 63.3)  deriva 0.36 st  clareza 0.91  RMS -16.2 dB  casamento 0.63  CONFERE
+rec_i4_off_2500    12 graos (5.3 s de material, x0.89..1.08)  f0 82.9 Hz (esperado 83.3)  deriva 0.44 st  clareza 0.72  RMS -17.4 dB  casamento 0.49  CONFERE
+rec_i4_on_2500     21 graos (4.8 s de material, x0.83..1.18)  f0 80.9 Hz (esperado 83.3)  deriva 0.16 st  clareza 0.59  RMS -14.4 dB  casamento 0.31  NAO CONFERE (sem ritmo de ignicao claro (clareza 0.59))
+rec_i6_off_700      7 graos (5.5 s de material, x1.19..1.22)  f0 34.9 Hz (esperado 35.0)  deriva 0.04 st  clareza 0.93  RMS -21.0 dB  casamento 0.76  CONFERE
+rec_i6_on_700       6 graos (5.2 s de material, x1.22..1.22)  f0 35.0 Hz (esperado 35.0)  deriva 0.02 st  clareza 0.79  RMS -21.0 dB  casamento 0.88  CONFERE
+rec_i6_off_1000    15 graos (5.1 s de material, x0.91..1.10)  f0 49.5 Hz (esperado 50.0)  deriva 0.19 st  clareza 1.00  RMS -21.4 dB  casamento 0.89  CONFERE
+rec_i6_on_1000     22 graos (4.8 s de material, x0.87..1.17)  f0 49.4 Hz (esperado 50.0)  deriva 0.26 st  clareza 0.99  RMS -18.4 dB  casamento 0.69  CONFERE
+rec_i6_off_1400    19 graos (4.9 s de material, x0.84..1.19)  f0 70.3 Hz (esperado 70.0)  deriva 0.09 st  clareza 0.95  RMS -19.2 dB  casamento 0.70  CONFERE
+rec_i6_on_1400     18 graos (3.2 s de material, x0.84..1.22)  f0 70.3 Hz (esperado 70.0)  deriva 0.40 st  clareza 0.93  RMS -16.2 dB  casamento 0.63  CONFERE
+rec_i6_off_1900    13 graos (5.3 s de material, x0.91..1.11)  f0 94.0 Hz (esperado 95.0)  deriva 0.43 st  clareza 0.91  RMS -16.8 dB  casamento 0.61  CONFERE
+rec_i6_on_1900     19 graos (4.5 s de material, x0.93..1.19)  f0 92.8 Hz (esperado 95.0)  deriva 0.23 st  clareza 0.81  RMS -13.8 dB  casamento 0.55  CONFERE
+rec_i6_off_2500    16 graos (3.7 s de material, x1.16..1.37)  f0 123.5 Hz (esperado 125.0)  deriva 0.16 st  clareza 0.99  RMS -16.0 dB  casamento 0.87  CONFERE
+rec_i6_on_2500     13 graos (2.2 s de material, x1.22..1.38)  f0 122.9 Hz (esperado 125.0)  deriva 0.09 st  clareza 0.99  RMS -13.0 dB  casamento 0.64  CONFERE
+rec_i6t_off_700     7 graos (5.5 s de material, x1.19..1.22)  f0 34.8 Hz (esperado 35.0)  deriva 0.08 st  clareza 0.87  RMS -21.1 dB  casamento 0.77  CONFERE
+rec_i6t_on_700      6 graos (5.2 s de material, x1.22..1.22)  f0 34.9 Hz (esperado 35.0)  deriva 0.04 st  clareza 0.70  RMS -21.1 dB  casamento 0.88  CONFERE
+rec_i6t_off_1000   15 graos (5.1 s de material, x0.91..1.10)  f0 49.5 Hz (esperado 50.0)  deriva 0.17 st  clareza 1.00  RMS -21.6 dB  casamento 0.88  CONFERE
+rec_i6t_on_1000    22 graos (4.8 s de material, x0.87..1.17)  f0 49.5 Hz (esperado 50.0)  deriva 0.23 st  clareza 0.96  RMS -18.6 dB  casamento 0.69  CONFERE
+rec_i6t_off_1400   19 graos (4.9 s de material, x0.84..1.19)  f0 70.1 Hz (esperado 70.0)  deriva 0.24 st  clareza 0.90  RMS -19.2 dB  casamento 0.68  CONFERE
+rec_i6t_on_1400    18 graos (3.2 s de material, x0.84..1.22)  f0 70.4 Hz (esperado 70.0)  deriva 0.34 st  clareza 0.86  RMS -16.2 dB  casamento 0.59  CONFERE
+rec_i6t_off_1900   13 graos (5.3 s de material, x0.91..1.11)  f0 93.7 Hz (esperado 95.0)  deriva 0.27 st  clareza 0.83  RMS -17.1 dB  casamento 0.61  CONFERE
+rec_i6t_on_1900    19 graos (4.5 s de material, x0.93..1.19)  f0 92.5 Hz (esperado 95.0)  deriva 0.19 st  clareza 0.70  RMS -14.1 dB  casamento 0.49  CONFERE
+rec_i6t_off_2500   16 graos (3.7 s de material, x1.16..1.37)  f0 124.6 Hz (esperado 125.0)  deriva 0.10 st  clareza 0.92  RMS -15.0 dB  casamento 0.83  CONFERE
+rec_i6t_on_2500    13 graos (2.2 s de material, x1.22..1.38)  f0 123.4 Hz (esperado 125.0)  deriva 0.09 st  clareza 0.94  RMS -12.0 dB  casamento 0.56  CONFERE
