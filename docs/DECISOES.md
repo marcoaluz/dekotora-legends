@@ -1564,3 +1564,27 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Adesivos**: as 9 frases da decisão 7 (Yuji Syuku), labaredas e sol nascente sobre ondas (não a bandeira de 16
   raios), brancos com contorno: o jogo tinge pela cor escolhida. Na pasta `game/assets/decals/`.
 - **Bots**: calota nova em 1 de 3, grade nova em 1 de 4. **Protocolo 21**.
+
+## 2026-10-28 · T-242 · Murais com imagens prontas (domínio público/CC0) e murais anime do Marco
+
+- **9 pinturas da T-232 trocaram de arte** (mesmo id; quem comprou ganha a versão nova; rede igual): murais
+  `mural_tora_take`, `mural_tora_yuki`, `mural_kabuki`, `mural_musha`, `mural_bijin_ogi`, `mural_bijin_tsuki` e traseiras
+  `rearpaint_tora`, `rearpaint_kabuki`, `rearpaint_bijin`. 22 obras de 1668–1866 (Sharaku, Utamaro, Kuniyoshi, Kunisada,
+  Kishi Ganku, Yamaguchi Sekkei, Soga Nichokuan) do The Met Open Access e do Cleveland Museum of Art Open Access, com a
+  licença conferida na ficha de cada obra (lista em `docs/CREDITOS_MURAIS.md`). As imagens originais não vão para o Git
+  (`python -I tools/fetch_t242_sources.py`); só o recorte final entra no jogo. Murais em 2048 x 512.
+- **Brilho noturno só nos pontos escolhidos** (olhos dos tigres, lua, sol de Ise, vaga-lumes, feixe de luz, lâmina,
+  molduras de neon, kanji das traseiras); o resto acende fraco (20%). Folhas antes/depois em `docs/capturas_t242/`
+  (por peça: antes dia | depois dia, antes noite | depois noite, máscara) e no jogo `docs/capturas_t242/no_jogo.png`.
+- **Exceção do Marco à regra "nada de imagem feita por IA"**: os 7 murais estilo anime em `docs/Murais/` foram gerados
+  pelo PRÓPRIO Marco no Gemini e ele decidiu usá-los. Origem registrada como "gerada pelo Marco (Gemini)" em
+  `docs/CREDITOS_MURAIS.md`, sem link de museu. Conferido: só personagens adultas, sem nudez explícita (estilo
+  pin-up/capa de revista), nenhum texto ou kanji nas imagens (nada a espelhar). Arte de anime/mangá de terceiros continua
+  proibida.
+- **Murais anime = PROPOSTA, ainda fora do jogo** (o Marco aprova a folha `docs/capturas_t242/anime_proposta.png`
+  antes): 5 murais com um desenho em cada lado (`blender/scripts/build_t242_anime.py`, tabela `lib/t242_anime.py`):
+  neon (dir. "laterado D", esq. "lateral esquerdo"), quimono (dir. "lateral 4", esq. "lateral esquerdo 2"), lua
+  (dir. "lateral", esq. faixa 3 de "lateral 3"), cyber (dir. "lateral 2", esq. faixa 2 de "lateral 3") e kitsune
+  (dir. faixa 1, esq. faixa 4 de "lateral 3"). As imagens 1536 x 1024 com tarja preta viraram a faixa do meio (perto do
+  rosto) e "lateral 3" (4 faixas de 6:1) foi cortada em 4 murais de 4:1 mantendo a personagem. Brilho: cidade neon,
+  lua, lanternas, luzes do caminhão/carro, olhos do lobo e a borboleta azul (nunca no rosto/pele das personagens).

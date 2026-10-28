@@ -19,6 +19,11 @@ import numpy as np  # noqa: E402
 
 from lib import paint2d as p  # noqa: E402
 from lib import t232_glyphs, t232_rear, t232_registry as REG, t232_roof, t232_text, t232_texts  # noqa: E402
+from lib import t242_registry  # noqa: E402
+
+# T-242: estas peças agora vêm de obras prontas (build_t242_ukiyoe.py); o build da T-232 não as regrava
+# (a não ser com --t232-all, que volta a desenhar a arte por código, por exemplo para comparar).
+REPLACED = set(t242_registry.pieces())
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 GLYPHS = os.path.join(ROOT, "blender", "renders", "t232", "glyphs.npz")
@@ -27,7 +32,7 @@ SS = 2
 
 def _args():
     a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"only": None, "sheets": None, "art": True}
+    out = {"only": None, "sheets": None, "art": True, "all": False}
     i = 0
     while i < len(a):
         if a[i] == "--only":
@@ -38,6 +43,8 @@ def _args():
             i += 1
         elif a[i] == "--no-art":
             out["art"] = False
+        elif a[i] == "--t232-all":
+            out["all"] = True
         i += 1
     return out
 
@@ -48,12 +55,12 @@ def _save(col, emit, rel):
     p.save_png(emit, path[:-4] + "_emit.png")
 
 
-def render_all(only=None):
+def render_all(only=None, skip=frozenset()):
     glyphs = t232_text.load(GLYPHS)
     arts = {}
     for pid, mod, fn, *_ in REG.MURALS:
         for side in ("R", "L"):
-            if only and pid not in only:
+            if (only and pid not in only) or pid in skip:
                 continue
             t = time.time()
             cv = p.Canvas(4.0, REG.MURAL_PX[1], SS)
@@ -63,7 +70,7 @@ def render_all(only=None):
             arts[(pid, side)] = (col, emit)
             print(f"[t232] {pid} {side} {time.time() - t:.1f} s")
     for pid, kind, *_ in REG.REARS:
-        if only and pid not in only:
+        if (only and pid not in only) or pid in skip:
             continue
         cv = p.Canvas(REG.REAR_PX[0] / REG.REAR_PX[1], REG.REAR_PX[1], SS)
         t232_rear.make(cv, kind, glyphs)
@@ -150,7 +157,10 @@ def main():
     t = time.time()
     n = t232_glyphs.build(t232_texts.all_chars(), GLYPHS)
     print(f"[t232] letras: {len(n)} caracteres conferidos na fonte (sem tofu) -> {GLYPHS}")
-    arts = render_all(a["only"]) if a["art"] or a["sheets"] else {}
+    skip = frozenset() if a["all"] else frozenset(REPLACED)
+    if skip:
+        print("[t232] pulando (arte da T-242, build_t242_ukiyoe.py):", ", ".join(sorted(skip)))
+    arts = render_all(a["only"], skip) if a["art"] or a["sheets"] else {}
     if a["sheets"]:
         sheets(a["sheets"], arts)
     print(f"[t232] OK em {time.time() - t:.0f} s")

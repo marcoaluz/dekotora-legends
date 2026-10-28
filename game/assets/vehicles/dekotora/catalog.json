@@ -5257,7 +5257,7 @@
     },
     {
       "id": "mural_tora_take",
-      "name": "Tigre no bambuzal",
+      "name": "Tigres no bambuzal (biombos Edo)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5273,7 +5273,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Soga Nichokuan (ativo c. 1625–1660), Tiger (biombo), early to mid-1600s (Cleveland Museum of Art 1985.134.2); Yamaguchi Sekkei (1644–1732), Lions and Tigers in Peony and Bamboo (par de biombos; usamos o dos tigres), 1668 (Cleveland Museum of Art 1972.10); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5285,8 +5285,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5296,8 +5296,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_take_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5306,7 +5306,7 @@
     },
     {
       "id": "mural_tora_yuki",
-      "name": "Tigre na neve",
+      "name": "Família de tigres (Kishi Ganku)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5322,7 +5322,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Kishi Ganku (1749/56–1838), Tiger Family (biombo da direita do par), early 1800s (Cleveland Museum of Art 1983.3.1); Kishi Ganku (1749/56–1838), Tiger Family (biombo da esquerda do par), early 1800s (Cleveland Museum of Art 1983.3.2); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5334,8 +5334,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5345,8 +5345,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_tora_yuki_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5404,7 +5404,7 @@
     },
     {
       "id": "mural_kabuki",
-      "name": "Kabuki",
+      "name": "Kabuki de Sharaku",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5420,7 +5420,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Tōshūsai Sharaku, Ichikawa Omezō I as Yakko Ippei, 1794 (The Metropolitan Museum of Art JP196); Tōshūsai Sharaku, Bandō Hikosaburō III as Sagisaka Sanai, 1794 (The Metropolitan Museum of Art JP2823); Tōshūsai Sharaku, Ichikawa Komazō III as Shiga Daishichi, 1794 (The Metropolitan Museum of Art JP2649); Tōshūsai Sharaku, Ichikawa Ebizō (Danjūrō V) as Takemura Sadanoshin, 1794 (The Metropolitan Museum of Art JP3114); Tōshūsai Sharaku, Sakata Hangorō III as Fujikawa Mizuemon, 1794 (The Metropolitan Museum of Art JP1522); Tōshūsai Sharaku, Bandō Mitsugorō II as Ishii Genzō, ca. 1794 (The Metropolitan Museum of Art JP3113); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5432,8 +5432,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5443,8 +5443,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_kabuki_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5453,7 +5453,7 @@
     },
     {
       "id": "mural_musha",
-      "name": "Guerreiro samurai",
+      "name": "Guerreiros (Kunisada e Kuniyoshi)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5469,7 +5469,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Utagawa Kunisada, Battle of Awazugahara (tríptico), mid-19th century (The Metropolitan Museum of Art JP1115.5a–c); Utagawa Kuniyoshi, Shōtoku Taishi Destroying Mononobe no Moriya (tríptico), 1852 (The Metropolitan Museum of Art JP1115.3a–c); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5481,8 +5481,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5492,8 +5492,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_musha_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5502,7 +5502,7 @@
     },
     {
       "id": "mural_bijin_ogi",
-      "name": "Dama do leque",
+      "name": "Belas de Utamaro",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5518,7 +5518,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Kitagawa Utamaro, A Courtesan, c. 1790s (The Metropolitan Museum of Art JP1663); Kitagawa Utamaro, Woman Holding Up a Parasol (Ten Classes of Women's Physiognomy), ca. 1792–93 (The Metropolitan Museum of Art JP2730); Kitagawa Utamaro, The Courtesan Konosumi (Beauties of the Southern Quarter), ca. 1793–94 (The Metropolitan Museum of Art JP1367); Kitagawa Utamaro, Women Worshipping the Rising Sun between the Twin Rocks at Ise (tríptico), c. 1790s (The Metropolitan Museum of Art JP1680); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5530,8 +5530,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5541,8 +5541,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_ogi_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5551,7 +5551,7 @@
     },
     {
       "id": "mural_bijin_tsuki",
-      "name": "Dama sob a lua",
+      "name": "Damas da noite (lua e vaga-lumes)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_mural_r",
@@ -5567,7 +5567,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Utagawa Kuniyoshi, Autumn, from Women's Pleasures of the Four Seasons (tríptico), ca. 1844–46 (The Metropolitan Museum of Art JP3136); Kitagawa Utamaro, Catching Fireflies (Hotaru gari) (tríptico), ca. 1796–97 (The Metropolitan Museum of Art JP151); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "mural_r",
@@ -5579,8 +5579,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_r_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ],
@@ -5590,8 +5590,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/mural/mural_bijin_tsuki_l_emit.png",
             "aspect": 4.0,
             "px": [
-              1536,
-              384
+              2048,
+              512
             ]
           }
         ]
@@ -5784,7 +5784,7 @@
     },
     {
       "id": "rearpaint_tora",
-      "name": "Traseira: tigre",
+      "name": "Traseira: tigre (Kishi Ganku)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_rear_paint",
@@ -5800,7 +5800,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Kishi Ganku (1749–1838), Tiger (rolo vertical), early 19th century (The Metropolitan Museum of Art 36.100.11); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "rear_paint",
@@ -5812,8 +5812,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_tora_emit.png",
             "aspect": 1.25,
             "px": [
-              640,
-              512
+              800,
+              640
             ]
           }
         ]
@@ -6006,7 +6006,7 @@
     },
     {
       "id": "rearpaint_kabuki",
-      "name": "Traseira: kabuki",
+      "name": "Traseira: kabuki (Sharaku)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_rear_paint",
@@ -6022,7 +6022,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Tōshūsai Sharaku, Ōtani Oniji III as Yakko Edobei, 1794 (The Metropolitan Museum of Art JP2822); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "rear_paint",
@@ -6034,8 +6034,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_kabuki_emit.png",
             "aspect": 1.25,
             "px": [
-              640,
-              512
+              800,
+              640
             ]
           }
         ]
@@ -6043,7 +6043,7 @@
     },
     {
       "id": "rearpaint_bijin",
-      "name": "Traseira: gueixa",
+      "name": "Traseira: gueixa (Utamaro)",
       "category": "paint",
       "model": "",
       "mount_point": "SOCKET_rear_paint",
@@ -6059,7 +6059,7 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "license": "original (arte nossa feita por código, T-232; kanji na fonte Yuji Syuku, OFL)",
+      "license": "domínio público / CC0 (T-242; obras: Kitagawa Utamaro, Hanaōgi of the Gomeirō (Comparing the Charms of Beauties), ca. 1794–95 (The Metropolitan Museum of Art JP1676); tratamento de cor, recorte e brilho noturno nossos; ver docs/CREDITOS_MURAIS.md)",
       "fit_warnings": [],
       "tier": "oficina",
       "socket": "rear_paint",
@@ -6071,8 +6071,8 @@
             "emit": "res://assets/vehicles/dekotora/paint_t232/rear/rearpaint_bijin_emit.png",
             "aspect": 1.25,
             "px": [
-              640,
-              512
+              800,
+              640
             ]
           }
         ]

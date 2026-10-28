@@ -57,3 +57,6 @@ docs/capturas_t241/raw/
 
 # T-234: capturas de referência da grade enviadas pelo Marco (terceiros, só referência)
 docs/Referencias/grade_t234/
+# T-242: imagens dos murais (obras baixadas e as do Marco) ficam fora do Git; só o LEIA-ME entra
+docs/Murais/*
+!docs/Murais/README.md
