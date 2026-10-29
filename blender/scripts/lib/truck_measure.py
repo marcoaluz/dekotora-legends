@@ -499,6 +499,64 @@ SKIRT_H = 0.46                    # m: altura máxima da saia (embaixo do baú)
 SKIRT_MIN = 0.60                  # m: trecho livre mais curto que isto não leva saia
 
 
+WRAP_MAX = 0.80                   # m: (T-264) a aba lateral do para-choque grande vai no máximo isto para trás do nariz
+WRAP_MIN = 0.22                   # m: mais curta que isto, sem aba (o encaixe não ganha a caixa da aba)
+WRAP_WHEEL = 0.02                 # m: folga da aba até a zona protegida da roda (que já tem 3 cm)
+WRAP_DOOR = 0.02                  # m: folga até a frente da porta (quando o para-choque passa da altura da porta)
+WRAP_BUMP = 0.05                  # m: lataria que sai mais que isto da da frente = obstáculo (paralama, degrau): a aba para
+WRAP_STEP = 0.02                  # m: passo das colunas de raios
+WRAP_REF = 0.15                   # m: a quina arredondada da cabine fica nos primeiros WRAP_REF atrás do nariz
+WRAP_PROF = 0.30                  # m: perfil da quina guardado até aqui (o jogo fecha o vão entre a quina e a aba)
+
+
+def _wrap(tree, m: dict, nose: float, top: float, hw: float, sx: int) -> dict:
+    """T-264 (capturas 054–062): o para-choque grande dobra a quina e corre pela lateral da cabine até a roda da frente.
+    Raios de FORA para dentro em colunas (z) de FB_FLOOR até `top`, do nariz para trás: a lataria mais de fora na faixa
+    da aba (`x`, lado de dentro da aba) e onde ela tem de parar (`z1`): antes da zona da roda, antes da porta se o
+    para-choque passa da altura da porta (zona `door_*` começa em 0,62 m) e antes de um obstáculo (paralama/degrau
+    que sai mais que WRAP_BUMP). Coordenadas do Godot. `len` = 0 quando não cabe aba."""
+    from mathutils import Vector
+    c = m["cab"]
+    fw = [b for n, b in m["wheels"].items() if n.startswith("wheel_f") and (b[1][0] > 0) == (sx > 0)]
+    z1 = nose + WRAP_MAX
+    if fw:
+        z1 = min(z1, min(b[0][2] for b in fw) - 0.03 - WRAP_WHEEL)
+    d = c["door"]
+    if top > d["y"][0] - 0.01:
+        z1 = min(z1, d["z"][0] - WRAP_DOOR)
+    cols = []
+    z = nose + 0.01
+    while z <= z1 + 1e-6:
+        mx = -9.0
+        for yy in np.arange(FB_FLOOR, top + 1e-6, 0.03):
+            hit = tree.ray_cast(Vector((sx * 3.0, -z, float(yy))), Vector((-sx, 0, 0)), 3.0)
+            if hit[0] is not None:
+                mx = max(mx, hit[0].x * sx)
+        cols.append((round(z, 3), mx))
+        z += WRAP_STEP
+    # lateral de referência = mediana depois da quina arredondada; obstáculo = coluna que sai mais que isso + WRAP_BUMP
+    side_cols = [q[1] for q in cols if q[0] >= nose + WRAP_REF and q[1] > 0.0]
+    ref = float(np.median(side_cols)) if side_cols else max([q[1] for q in cols] + [hw])
+    end = z1
+    for zc, mx in cols:
+        if zc >= nose + WRAP_REF and mx > ref + WRAP_BUMP:
+            end = min(end, zc - WRAP_STEP)
+            break
+    xs = [q[1] for q in cols if q[0] <= end and q[1] > 0.0]
+    x = max(xs) if xs else hw
+    ln = round(end - nose, 3)
+    # perfil da quina (dz atrás do nariz, x da lataria) até encostar na lateral: o jogo fecha o vão em cima e embaixo
+    prof = []
+    for zc, mx in cols:
+        if zc - nose > WRAP_PROF:
+            break
+        prof.append([round(zc - nose, 3), round(max(mx, 0.0), 3)])
+        if mx >= x - 0.01:
+            break
+    return {"x": round(x, 3), "len": ln if ln >= WRAP_MIN else 0.0, "z1": round(end, 3), "ref": round(ref, 3),
+            "prof": prof}
+
+
 def front_side(data: dict, m: dict) -> dict:
     """Medidas da frente e das laterais (T-233), em coordenadas do Godot, por raios na malha real (BVH) e vértices:
     - nose: z do ponto mais à frente da lataria embaixo da linha dos faróis (o para-choque novo encosta ali, na frente
@@ -529,6 +587,9 @@ def front_side(data: dict, m: dict) -> dict:
             y += 0.02
         x += 0.02
     out["nose"] = {"z": round(nose, 3), "top_y": top, "floor_y": FB_FLOOR, "half_w": round(hw + FB_SIDE, 3)}
+    # --- T-264: aba lateral do para-choque grande (vai do nariz até a roda da frente, colada na lateral da cabine)
+    for side, sx in (("r", 1), ("l", -1)):
+        out["wrap_" + side] = _wrap(tree, m, nose, top, hw, sx)
     # --- retrovisor
     w0, w1 = c["windshield"]
     d0 = c["door"]["z"][0]

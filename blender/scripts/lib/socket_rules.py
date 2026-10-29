@@ -24,7 +24,10 @@ TM_LADDER_HALF = 0.17              # = truck_measure.LADDER_HALF
 LEDBOX_H = 0.16                    # = accessories/ladder_t233.LEDBOX_H (caixa com LED no alto da escada, T-263)
 LADDER_STEP = 0.165                # m: o estribo embaixo sai até isto da lataria (accessories/ladder_t233.STEP_OUT + folga)
 TM_FB_DEPTH = 0.62                 # = truck_measure.FB_DEPTH (para-choque da frente, T-233)
-TM_MIRROR_REACH = 0.50             # = truck_measure.MIRROR_REACH (haste do retrovisor, T-233)
+WRAP_T = 0.10                      # m: espessura nominal da aba lateral do para-choque grande (accessories/front_t264.WT)
+WRAP_GAP = 0.004                   # m: folga entre a aba e a lataria (T-264)
+CAP_T = 0.018                      # m: espessura da tampa que fecha o vão da quina (= BumperWrap.CAP_T no jogo)
+TM_MIRROR_REACH = 0.50            # = truck_measure.MIRROR_REACH (haste do retrovisor, T-233)
 PAD_BELOW, PAD_ABOVE = 0.06, 0.11  # m: o que a haste passa abaixo da chapa de baixo / acima da de cima (T-263)
 PAD_TOP = 0.10                     # m: a chapa de cima fica pelo menos isto abaixo do topo do para-brisa
 SKIRT_MIN = 0.60                   # = truck_measure.SKIRT_MIN
@@ -156,6 +159,31 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         s["front_bumper"] = {"box": _box(-ns["half_w"], ns["floor_y"], back - TM_FB_DEPTH, ns["half_w"], ns["top_y"], back),
                              "anchor": [0.0, ns["top_y"], back], "width": round(2 * hw, 3), "fit": "bumper",
                              "height": round(ns["top_y"] - ns["floor_y"], 3)}
+        # T-264: abas laterais do para-choque grande (capturas 054–062): da costa do para-choque até a roda da frente,
+        # coladas na lateral da cabine (`truck_measure._wrap`, raios). `wrap.<lado>` = x do lado de dentro da aba (lataria
+        # + WRAP_GAP) e comprimento atrás das costas; uma caixa por aba. Os para-choques da T-233 não usam (ficam na 1ª caixa).
+        wrap, boxes = {}, []
+        for side, sx in (("r", 1), ("l", -1)):
+            w = fs.get("wrap_" + side) or {}
+            if w.get("len", 0.0) <= 0.0:
+                continue
+            xin = round(w["x"] + WRAP_GAP, 3)
+            ln = round(w["z1"] - back, 3)
+            # perfil da quina arredondada da cabine (dz atrás das costas, x da lataria): o jogo fecha o vão entre a quina e
+            # a aba com uma tampa no topo do para-choque (BumperWrap.corner_cap), na caixa `corner`
+            prof = [[round(p[0] + (ns["z"] - back), 3), max(p[1], round(xin - 0.40, 3))] for p in w.get("prof", [])]
+            wrap[side] = {"x": xin, "len": ln, "prof": prof}
+            boxes.append(_box(sx * (w["x"] + 0.001), ns["floor_y"], back, sx * (xin + WRAP_T * SCALE_MAX + 0.012),
+                              ns["top_y"], w["z1"]))
+            if prof:
+                boxes.append(_box(sx * (min(p[1] for p in prof) - 0.006), ns["top_y"] - CAP_T - 0.006, back,
+                                  sx * (xin + 0.002), ns["top_y"], back + max(p[0] for p in prof) + 0.006))
+        if wrap:
+            fb_ = s["front_bumper"]
+            hx = max([ns["half_w"]] + [v["x"] + WRAP_T * SCALE_MAX + 0.012 for v in wrap.values()])
+            fb_["box"] = _box(-hx, ns["floor_y"], back - TM_FB_DEPTH, hx, ns["top_y"], back)
+            fb_["boxes"] = [fb_["box"]] + boxes
+            fb_["wrap"] = wrap
     else:
         s["front_bumper"] = {"box": _box(-(hw + 0.15), 0.16, fb[2] - 0.65, hw + 0.15, lamp_y - 0.03, fb[2] + 0.12),
                              "anchor": [0.0, round(fb[1], 3), round(fb[2], 3)], "width": round(2 * hw, 3), "fit": "uniform"}
