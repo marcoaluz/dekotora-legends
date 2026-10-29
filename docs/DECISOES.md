@@ -1679,3 +1679,26 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 ## 2026-10-28 — T-263: respostas do Marco
 - Escada na americana e no Canter: opção (b), na quina da frente da carga, só nesses dois (T-267).
 - Retrovisor fica como está (nasce na coluna, ~30 cm mais atrás); não esticar os braços por enquanto.
+
+## 2026-10-29 · T-264 · Para-choques GRANDES da frente (capturas 054–062)
+
+- **Leitura das capturas**: as 20 capturas 043–062 conferidas uma a uma. Os pares 054/055, 056/057, 059/060 e 061/062
+  são a **mesma forma em 2 cores** (prata + marinho × preto + ciano, o "Alterar cor - L/R"), não desenhos diferentes;
+  as "4 peças que faltavam" (055, 057, 060, 062) são as versões ALTAS dessas formas. A T-233 tinha feito versões baixas,
+  só na frente do nariz. Tabela captura → peça em `docs/REFERENCIA_PECAS.md` seção 3.
+- **5 peças novas** (`accessories/front_t264.py`): `fb_wrap_lamps` (054–055), `fb_wrap_tower` (056–057),
+  `fb_wrap_chrome` (058), `fb_wrap_deck4` (059–060), `fb_wrap_deck_wide` (061–062). As 11 da T-233 continuam (versões
+  baixas). Cor de fábrica = a da captura que o Marco citou (055/060 preto+ciano; 057/062 prata+marinho); a outra cor da
+  captura sai pelo L/R. Neon e LED são materiais próprios (`deco_neon`/`deco_led`): a cor da luz muda separada da peça.
+- **Encaixe**: a peça encosta no nariz (como a T-233), cresce até 0,62–0,82 m onde o farol deixa e **dobra a quina,
+  correndo pela lateral até a roda da frente** ("abas"), medidas por raios em cada cabine (`truck_measure._wrap`): a aba
+  para 2 cm antes da zona da roda, ou antes da porta quando o para-choque passa da altura dela (chata e JAC: ~0,39 m),
+  ou antes de paralama/degrau saliente. O lado de dentro da aba fica 4 mm fora da lataria; uma tampa fecha o vão da
+  quina arredondada. No jogo, `BumperWrap` estica só a faixa entre a placa e a aba (placa/grade não deformam) e só
+  desloca a ponta da aba (faixa da ponta não deforma). LOD: malha simples de 35 m em diante.
+- **Adaptações ao jogo**: a frente sai no máximo 0,62 m (a torre e os deques ficaram ~6 cm menos salientes que no
+  primeiro rascunho para caber em todas as cabines); cabines de farol baixo (HAYATE, Canter) ficam com a peça baixa
+  (0,34–0,37 m livres) e quem "cresce" é a aba e o deque; sem lâmpada na lateral da aba do cromado.
+- **Bots e chefe**: bots também sorteiam `fb_wrap_lamps` e `fb_wrap_deck4`; o chefe (Imperador da Estrada) troca o
+  `fb_deck_neon` pelo `fb_wrap_deck_wide`. Descritor/massa dos bots mudaram: **protocolo 23**.
+- Números (peso, preço, fama) em `docs/REFERENCIA_PECAS.md` seção 3 são **proposta**.

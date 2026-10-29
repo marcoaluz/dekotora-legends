@@ -169,6 +169,47 @@ O resto é desenho de neon por cima (barato: mesma malha, faixas emissivas difer
 
 > **FEITO na T-233**: as 11 peças no jogo (`accessories/front_t233.py`), na frente do nariz de fábrica de cada cabine, com a
 > faixa do meio que estica/encolhe até o farol mais baixo, seta da frente e caixa da placa na peça.
+>
+> **T-264 (pedido do Marco: "mais modelo de para-choque da frente, aqueles maiores")**: as 20 capturas conferidas de novo,
+> uma a uma e os pares lado a lado. Os pares 054/055, 056/057, 059/060 e 061/062 são a **mesma forma em 2 cores**
+> (prata + marinho × preto + ciano, o "Alterar cor - L/R"), não desenhos diferentes. O que faltava era o **tamanho**: as
+> peças da T-233 ficaram baixas e só na frente do nariz; nas capturas 054–062 o para-choque é ALTO (do farol até perto do
+> chão), sai bem para a frente (os deques) e **dobra a quina da cabine, correndo pela lateral até a roda da frente**.
+> Viraram 5 peças novas (`accessories/front_t264.py`, abas medidas em cada cabine); as 11 da T-233 continuam como as versões
+> baixas.
+>
+> | Captura | O que mostra | Peça no jogo |
+> | --- | --- | --- |
+> | 043 | de fábrica: cromado com placa (botão "De dia/De noite") | `fb_basic` (de fábrica) |
+> | 044 | leque baixo prata/marinho, placa no meio, par de lâmpadas âmbar | `fb_fan_plate` (T-233) |
+> | 045 | mesma forma da 044 (asa com 3 faixas azuis em vez de 1) | `fb_fan_plate` (variante) |
+> | 046, 047 | leque com 2 caixas de lâmpadas âmbar (iguais) | `fb_fan_amber` |
+> | 048 | leque mais estreito, fileira de lâmpadas vermelhas | `fb_fan_red` |
+> | 049, 050 | leque com 2 caixas douradas (iguais) | `fb_fan_gold` |
+> | 051, 053 | leque com faixas rosa e azul (iguais) | `fb_fan_stripe` |
+> | 052 | leque cromado com grade no meio | `fb_fan_chrome` |
+> | 054 | caixa ALTA prata/marinho: 2 lâmpadas âmbar quadradas em cima de cada painel, placa e grade no meio, faixa vertical na quina e na ponta junto à roda; dobra até a roda | **`fb_wrap_lamps`** (nova) na cor prata/marinho; `fb_box_amber` (T-233) é a versão baixa |
+> | 055 | a MESMA forma da 054 em preto + ciano (painéis acesos) | **`fb_wrap_lamps`** (cor de fábrica preto/ciano) |
+> | 056 | torre da placa saliente no meio; blocos dos lados com 2 faixas que dobram a quina e correm até a roda, fechando num colchete | **`fb_wrap_tower`** na cor preto/ciano |
+> | 057 | a MESMA forma da 056, prata + marinho | **`fb_wrap_tower`** (cor de fábrica prata/marinho); `fb_box_steps` (T-233) é a versão baixa |
+> | 058 | cromado liso, alto e envolvente, frisos, placa ("De dia/De noite") | **`fb_wrap_chrome`** (nova); `fb_smooth_chrome` (T-233) é a versão baixa |
+> | 059 | deque de chapa xadrez saliente, frente inclinada, 2 painéis empilhados de cada lado, grade com placa, faixa na quina e "/" na aba perto da roda; prata/marinho | **`fb_wrap_deck4`** na cor prata/marinho |
+> | 060 | a MESMA forma da 059, preto + ciano | **`fb_wrap_deck4`** (cor de fábrica preto/ciano); `fb_deck_checker` (T-233) é a versão baixa |
+> | 061 | deque xadrez com 1 painel largo de cada lado que dobra a quina, 3 faixas na aba até a roda; preto/ciano | **`fb_wrap_deck_wide`** na cor preto/ciano; `fb_deck_neon` (T-233) é a versão baixa |
+> | 062 | a MESMA forma da 061, prata + marinho | **`fb_wrap_deck_wide`** (cor de fábrica prata/marinho) |
+>
+> | id | Nome (pt-BR) | Capturas | Peso kg | Durab. | Destaque | Preço ¥ | Fama | Raridade |
+> | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+> | `fb_wrap_lamps` | Caixa alta de painéis de luz | 054–055 | 480 | 290 | 30 | 48.000 | 60 | Rara |
+> | `fb_wrap_tower` | Torre da placa com faixas | 056–057 | 500 | 300 | 32 | 54.000 | 120 | Lendária |
+> | `fb_wrap_chrome` | Cromado envolvente | 058 | 540 | 340 | 26 | 52.000 | 120 | Lendária |
+> | `fb_wrap_deck4` | Deque xadrez de 4 painéis | 059–060 | 540 | 300 | 38 | 68.000 | 120 | Lendária |
+> | `fb_wrap_deck_wide` | Deque xadrez de painéis largos | 061–062 | 560 | 300 | 40 | 72.000 | 120 | Lendária |
+>
+> Onde a captura cobriria algo protegido, o desenho foi adaptado: a aba **para antes da porta** quando o para-choque passa
+> da altura dela (chata e JAC: farol alto, aba de ~0,39 m em vez de ir até a roda), e antes da zona da roda (2 cm) nas
+> outras; na Canter e nas cabines HAYATE (farol baixo) a peça fica baixa (0,34–0,37 m livres) e quem "cresce" é a aba
+> e o deque. A placa vai em cima do para-choque (exceção já decidida no lote 1) e a seta vai na quina da peça.
 
 **O que as imagens mostram.** Câmera em 3/4 pela frente-esquerda, baixa, enquadrando a frente da cabine e a roda
 dianteira. 043 é o **de fábrica** (cromado com placa). As outras são para-choques **largos e baixos** que avançam
