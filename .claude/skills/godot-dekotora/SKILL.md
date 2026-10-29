@@ -759,3 +759,24 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - **T-256**: `Lot5Grille` (`game/scripts/truck/lot5_grille.gd`) inclina a grade e cria o colar e a arte na lata; as opções novas do estilo são `side` (both/left/right) e `art` (12–15), e as ações são `set_part_side` e `set_part_art`; a buzina usa os encaixes `horn_r`/`horn_l`; as capturas saem com `bash tools/capture_t256.sh`; o `shot_t231.gd` aceita `--side=id:left` e `--art=id:13`; armadilha: um nó extra dentro de uma peça escalada ou inclinada precisa de `transform = peca.transform.affine_inverse() * xf`.
 - **T-259**: a classe `Lot5Band` (`game/scripts/truck/lot5_band.gd`) monta o adesivo da lataria a partir dos dados `band` do encaixe da grade (lido em `lot5_grille.gd`); capturas com `bash tools/capture_t259.sh` (vista `ref34` do `shot_t231.gd`, dia e noite).
 - **T-258**: `PaintFit.group_of` (`game/scripts/truck/paint_fit.gd`) decide o grupo da pintura (`pinturas`/`wallpapers`; sem o campo `group` = `pinturas`); o filtro da garagem é `GarageShop.filter_paints` (`game/scripts/ui/garage_shop.gd`); testes com `-- --only=paint_groups` (`test_paint_groups_t258.gd`).
+
+## Retrovisor colado e escada ao lado da porta (T-263)
+
+- Retrovisor (fit `stay`): `StayFit` (`game/scripts/truck/stay_fit.gd`). O encaixe `mirror_stay_*` traz `pillar` (coluna do
+  para-brisa medida por raios: `[x, z, nx, nz]` por altura) e `pad_y` (faixa livre); a peça traz `vfit.pads` ([x, altura]
+  de cada braço). Cada ponto ganha uma chapa (grupo `PADF_`) encostada na lataria e um espaçador (`PADS_`, tubo de 1 m
+  esticado) até o braço, no nó `PADS` (espaço do ponto de encaixe, sem a escala da peça). Meta `pads` = ponto na lataria +
+  normal (para o teste).
+- Espelho de fábrica: `hide_parts` do encaixe = uma caixa por pedaço da malha + material (`m`). `FrameFit.stock_boxes` +
+  `stock_mats` + `boxes_for(malha)`; some o triângulo com os 3 vértices dentro (`tri_hidden`). Não use "centro na caixa":
+  abre buraco na lataria (T-263, cabine HAYATE).
+- Escada (fit `ladder` com `face_x`): `SideLadder` (`side_ladder.gd`): na lateral da cabine atrás da porta, base pela
+  `lean` (inclina com a lateral), largura `width` (encolhe até 0,6×), espaçadores no meio a cada 0,45 m pelos `gaps`
+  medidos; meta `contacts`. Sem `face_x` cai no jeito antigo.
+- Contato: `FrameContact` (`frame_contact.gd`), chamado por `FrameFit.problems` (e `PartFit.check_part` chama
+  `FrameFit.problems` para fits do lote 4). A malha do caminhão é montada sem o espelho de fábrica.
+- Prints: `shot_t231.gd` vistas `mirror_*` (relativas ao `SOCKET_mirror_stay_l`), `lad_*` (relativas ao `SOCKET_ladder_r`),
+  `ladder_ref` e `--ghost` (monta e esconde as peças). Capturas `bash tools/capture_t263.sh`. Sonda `tools_dev/probe_t263.gd`.
+- Armadilha: classe nova (`class_name`) só existe para `-s` depois de `godot --headless --path game --import`.
+- Armadilha: a comparação com as capturas do jogo original vai para `docs/Referencias/oficina/t263/` (fora do Git), nunca
+  para `docs/capturas_*`.

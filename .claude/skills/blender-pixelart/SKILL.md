@@ -346,3 +346,16 @@ um problema visual não puder ser entendido pelos renders.
   `wallpapers.json`. Sem o manifesto, o script para e pede para rodar o build antes.
 - **Armadilha (patch em Python)**: num patch feito com um script Python, a sequência `\\n` dentro do texto procurado pode não casar
   com o arquivo (vira barra-invertida literal). Confira o trecho com `grep` antes de rodar o script que grava.
+
+## Retrovisor colado e escada ao lado da porta (T-263)
+
+- Medidas em `lib/truck_measure.py`: `pillar` (coluna do para-brisa por raios, chapa inteira na lataria, nunca no vidro
+  nem na porta; 2 passadas: a 1ª acha a lateral de referência, a 2ª mede sem os pedaços do espelho de fábrica),
+  `_stock_islands` (pedaços do espelho de fábrica por ilha da malha + material; peça grande que só passa ali = só a parte
+  de fora da cabine; lanterna/vidro nunca), `ladder_side` (lateral atrás da porta e do vidro dela, acima da roda + 12 cm,
+  reta pela lateral = `lean`, vão por altura = `gaps`). `ladder_front` ficou (1ª leitura, não usada).
+- Regras em `lib/socket_rules.py`: `mirror_stay_*` com 2 caixas (base e braços) e `_clear_pads` (encolhe na altura);
+  `ladder_*` com caixa que inclui o estribo (`LADDER_STEP`) e a caixa de LED (`LEDBOX_H`), para embaixo do deque.
+- Peças: `accessories/mirror_t233.py` (grupos `PADF_`/`PADS_`, `pads` vão para o catálogo pelo `build_t233_parts.py`),
+  `accessories/ladder_t233.py` (estribo + caixa de LED no `TOP_`).
+- Ordem: `build_t233_parts.py -- --only ...` → `build_sockets.py` → `godot --headless --path game --import`.
