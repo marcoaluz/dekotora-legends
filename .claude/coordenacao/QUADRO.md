@@ -5,6 +5,9 @@ Mais recente no topo. Status: `fila` · `em andamento` · `escalada` · `precisa
 
 | ID | Tarefa | Prompt | Nível | Agente | Status | Aberta | Fechada |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| T-265 | Saias laterais maiores (quase no chão), contornando as rodas e também atrás da roda traseira, como nas capturas 085–094 | pedido do Marco | difícil | especialista (mesmo da T-263/T-264) | em andamento | 2026-10-28 | |
+| T-264 | Para-choque frontal: mais modelos, principalmente os MAIORES/altos das capturas 043–062 que não foram feitos; confirmar a referência da escada (capturas 111–113, seção Escada do documento) | pedido do Marco | difícil | especialista (mesmo da T-263, para não editar os mesmos arquivos em paralelo) | em andamento | 2026-10-28 | |
+| T-263 | Retrovisores colados na estrutura (sem vão) em todas as cabines; escada no modelo da referência, AO LADO DA PORTA da cabine (correção do Marco: não atrás), topo passa do teto com caixa de LED | pedido do Marco | difícil | especialista (mesmo do lote 4/5) | concluída (commits 3cd3991, 9ad37c8, 113a0d1, 4037ae4; 594 testes, encaixe 6036/6036; precisa Marco: escada na americana/Canter e retrovisor mais à frente) | 2026-10-28 | 2026-10-28 |
 | T-262 | Notas da T-258/T-259 nas skills godot-dekotora e blender-pixelart | delegado da T-258/T-259 | fácil | ajudante-rapido | concluída | 2026-10-28 | commits d9d902d, d2fa748 |
 | T-261 | Notas do som da T-260 na skill godot-dekotora e no STATUS | delegado da T-260 | fácil | ajudante-rapido | concluída | 2026-10-28 | commits 4ba92f4, 22530e4 |
 | T-260 | Som do caminhão: analisar os 4 mp3 de docs/som caminhão, verificar licença (sfxjar), aplicar no motor em camadas e recriar variações | pedido do Marco | difícil | especialista (novo, áudio) | concluída | 2026-10-28 | commits 5417dee, f104889, ce2fbe1 |
