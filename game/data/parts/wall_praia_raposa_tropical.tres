@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"wall_praia_raposa_tropical"
+display_key = "part.wall_praia_raposa_tropical"
+slot = &"mural"
+zones = PackedStringArray("left", "right")
+weight_kg = 0.0
+durability = 0.0
+fame = 22
+price = 30000
+accessory_id = "wall_praia_raposa_tropical"
+rarity = &"incomum"
+fame_min = 20

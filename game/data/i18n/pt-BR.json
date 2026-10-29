@@ -824,5 +824,11 @@
  "part.fb_wrap_tower": "Torre da placa com faixas",
  "part.fb_wrap_chrome": "Cromado envolvente",
  "part.fb_wrap_deck4": "Deque xadrez de 4 painéis",
- "part.fb_wrap_deck_wide": "Deque xadrez de painéis largos"
+ "part.fb_wrap_deck_wide": "Deque xadrez de painéis largos",
+ "part.wall_praia_raposa_dourada": "Wallpaper: Raposa dourada na praia",
+ "part.wall_praia_raposa_tropical": "Wallpaper: Raposa tropical",
+ "part.wall_praia_amigas": "Wallpaper: Gatinha e amigas na praia",
+ "part.wallrear_praia_verao": "Traseira (wallpaper): Praia, mar de verão 夏の海",
+ "part.wallrear_praia_amigas": "Traseira (wallpaper): Praia, raposa e coelhinhas",
+ "part.wallroof_praia_raposa": "Teto (wallpaper): Raposa na praia"
 }

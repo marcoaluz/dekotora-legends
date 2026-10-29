@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"wallroof_praia_raposa"
+display_key = "part.wallroof_praia_raposa"
+slot = &"roof_paint"
+zones = PackedStringArray("roof")
+weight_kg = 0.0
+durability = 0.0
+fame = 10
+price = 12000
+accessory_id = "wallroof_praia_raposa"
+rarity = &"incomum"
+fame_min = 20

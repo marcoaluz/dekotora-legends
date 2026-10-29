@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_pd"]
+
+[resource]
+script = ExtResource("1_pd")
+id = &"wallrear_praia_verao"
+display_key = "part.wallrear_praia_verao"
+slot = &"rear_paint"
+zones = PackedStringArray("rear")
+weight_kg = 0.0
+durability = 0.0
+fame = 12
+price = 14000
+accessory_id = "wallrear_praia_verao"
+rarity = &"incomum"
+fame_min = 20
