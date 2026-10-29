@@ -819,5 +819,10 @@
  "garage.paint_group.all": "Todos",
  "garage.paint_group.pinturas": "Pinturas",
  "garage.paint_group.wallpapers": "Wallpapers",
- "garage.paint_group.empty": "Nenhuma pintura neste grupo ainda (o Marco coloca os wallpapers em docs/Murais/wallpaper/)."
+ "garage.paint_group.empty": "Nenhuma pintura neste grupo ainda (o Marco coloca os wallpapers em docs/Murais/wallpaper/).",
+ "part.fb_wrap_lamps": "Caixa alta de painéis de luz",
+ "part.fb_wrap_tower": "Torre da placa com faixas",
+ "part.fb_wrap_chrome": "Cromado envolvente",
+ "part.fb_wrap_deck4": "Deque xadrez de 4 painéis",
+ "part.fb_wrap_deck_wide": "Deque xadrez de painéis largos"
 }

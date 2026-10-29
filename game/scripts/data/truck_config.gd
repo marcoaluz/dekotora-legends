@@ -72,7 +72,8 @@ const BOT_MURAL: Array[String] = ["mural_nami_fuji", "mural_koi", "mural_tora_ta
 const BOT_REAR_PAINT: Array[String] = ["rearpaint_koi", "rearpaint_noh", "rearpaint_kitsune", "rearpaint_tengu", "rearpaint_oni"]
 const BOT_ROOF_PAINT: Array[String] = ["roofpaint_01", "roofpaint_03", "roofpaint_06", "roofpaint_09"]
 ## T-233: para-choque da frente (sempre; 1 em 5 fica com o basico), saia em 1 de 2, retrovisor em 1 de 3.
-const BOT_FRONT: Array[String] = ["fb_fan_plate", "fb_fan_amber", "fb_fan_red", "fb_fan_stripe", "fb_box_amber", "fb_smooth_chrome"]
+const BOT_FRONT: Array[String] = ["fb_fan_plate", "fb_fan_amber", "fb_fan_red", "fb_fan_stripe", "fb_box_amber", "fb_smooth_chrome",
+		"fb_wrap_lamps", "fb_wrap_deck4"]   # T-264: 2 grandes (abas ate a roda)
 const BOT_SKIRT: Array[String] = ["skirt_neon_twin", "skirt_neon_dash", "skirt_chrome_rails", "skirt_neon_green"]
 const BOT_MIRROR: Array[String] = ["mirror_stay_l", "mirror_stay_frame", "mirror_stay_truss"]
 ## T-234: calota nova em 1 de 3 e grade nova em 1 de 4 (o resto do lote 5 fica so para o jogador).

@@ -3,13 +3,16 @@ extends RefCounted
 ## Conferencia de CONTATO (T-263) por raios na malha real do caminhao, para as pecas do lote 4 que encostam na lataria:
 ##  - retrovisor (fit "stay"): cada chapa de fixacao (meta "pads" do StayFit) encosta na coluna (folga <= TOUCH em algum
 ##    ponto da chapa, nenhum ponto com vao > GAP_MAX, nada entra > SINK) e nenhuma parte fica na frente do para-brisa;
-##  - escada (fit "ladder"): as costas encostam na chapa da frente do bau e nada encosta na cabine/no que fica na frente.
+##  - escada (fit "ladder"): as costas encostam na chapa da frente do bau e nada encosta na cabine/no que fica na frente;
+##  - para-choque grande (T-264, fit "bumper" com abas): as costas encostam no nariz e cada aba encosta na lateral da
+##    cabine (folga <= WRAP_TOUCH em algum ponto) sem entrar nela (raios de fora para dentro em toda a aba).
 ## A malha do caminhao e montada SEM os triangulos do espelho de fabrica (o jogo os esconde com a haste montada).
 
 const TOUCH: float = 0.006         # m: folga maxima no ponto que encosta
 const GAP_MAX: float = 0.022       # m: maior vao em qualquer canto da chapa (lataria curva embaixo dela)
 const SINK: float = 0.006          # m: o quanto a chapa pode entrar na lataria
 const FRONT_FREE: float = 0.004    # m: folga minima entre a frente da escada e a cabine
+const WRAP_TOUCH: float = 0.012    # m: (T-264) folga maxima no ponto da aba/das costas que encosta
 
 static var _cache: Dictionary = {}
 
@@ -20,6 +23,9 @@ static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: N
 			return _stay(model, data, node)
 		"ladder":
 			return _ladder(model, data, entry, node, side)
+		"bumper":
+			if BumperWrap.handles(entry):
+				return _bumper(model, data, node)
 	return []
 
 
@@ -140,4 +146,50 @@ static func _side_ladder(model: Node3D, data: Dictionary, node: Node3D) -> Array
 			out.append("espacador %d da escada a %.3f m da lataria" % [i, g])
 		elif g < -SINK - 0.004:
 			out.append("espacador %d da escada entra %.3f m na lataria" % [i, -g])
+	return out
+
+
+## T-264: para-choque grande: costas no nariz e abas coladas na lateral (sem entrar). Espaco do modelo.
+static func _bumper(model: Node3D, data: Dictionary, node: Node3D) -> Array[String]:
+	var out: Array[String] = []
+	var s: Dictionary = TruckSockets.socket(data, "front_bumper")
+	var tm: TriangleMesh = truck_mesh(model, data)
+	var box: AABB = PartFit.aabb_in(node, model)
+	var back: float = float(s["anchor"][2])
+	var y0: float = box.position.y + 0.03
+	var y1: float = box.end.y - 0.03
+	var best: float = INF
+	var hx: float = float(s.get("width", 2.0)) * 0.5 - 0.05
+	for qx in 45:                                     # (a frente da cabine e curva: grade fina em toda a largura)
+		for qy in 7:
+			var o := Vector3(lerpf(-hx, hx, qx / 44.0), lerpf(y0, y1, qy / 6.0), back - 0.05)
+			var r: Dictionary = tm.intersect_ray(o, Vector3.BACK)
+			if not r.is_empty():
+				best = minf(best, (r["position"] as Vector3).z - back)
+	if best > WRAP_TOUCH:
+		out.append("costas do para-choque a %.3f m do nariz" % best)
+	elif best < -SINK:
+		out.append("costas do para-choque entram %.3f m no nariz" % -best)
+	for side in ["r", "l"]:
+		var w: Dictionary = (s.get("wrap", {}) as Dictionary).get(side, {})
+		if w.is_empty():
+			continue
+		var sx: float = 1.0 if side == "r" else -1.0
+		var xin: float = float(w["x"])
+		var ln: float = float(w["len"])
+		var touch: float = INF
+		for qz in 14:
+			var z: float = back + lerpf(0.04, ln - 0.03, qz / 13.0)
+			for qy in 9:
+				var o2 := Vector3(sx * (xin + 0.4), lerpf(y0, y1, qy / 8.0), z)
+				var r2: Dictionary = tm.intersect_ray(o2, Vector3(-sx, 0, 0))
+				if r2.is_empty():
+					continue
+				var g: float = xin - absf((r2["position"] as Vector3).x)
+				touch = minf(touch, g)
+				if g < -SINK:
+					out.append("aba %s entra %.3f m na lataria (y %.2f, z %.2f)" % [side, -g, o2.y, z])
+					break
+		if touch > WRAP_TOUCH:
+			out.append("aba %s sem contato com a lateral (%.3f m)" % [side, touch])
 	return out

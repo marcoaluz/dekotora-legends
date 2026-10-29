@@ -40,18 +40,25 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 		var t: float = float(v.get("top", 0.13))
 		var m: float = float(v.get("mid", 0.2))
 		var b: float = float(v.get("bot", 0.09))
-		var k: float = bumper_k(float(s.get("height", t + m + b)), sc, t, m, b)
+		var k: float = bumper_k(float(s.get("height", t + m + b)), sc, t, m, b, float(v.get("target", BUMPER_TARGET_H)))
+		var jobs1: Array = []                     # T-264: malha simples (LOD, grupos L*)
 		for mi in StripFit._meshes(node):
 			var nm: String = String(mi.name)
 			var x: Transform3D = Transform3D.IDENTITY
-			if nm.contains("_MID_"):
+			if nm.contains("MID_"):              # (_MID_ e, na T-264, _LMID_)
 				x = Transform3D(Basis.from_scale(Vector3(1, k, 1)), Vector3(0, t * (k - 1.0), 0))
-			elif nm.contains("_BOT_"):
+			elif nm.contains("BOT_"):
 				x = Transform3D(Basis.IDENTITY, Vector3(0, m * (1.0 - k), 0))
-			elif nm.contains("_CEN_"):
+			elif nm.contains("CEN_"):
 				x = Transform3D(Basis.IDENTITY, Vector3(0, m * (1.0 - k) * 0.5, 0))
-			jobs.append([mi, [x]])
+			(jobs1 if BumperWrap.is_lod1(nm) else jobs).append([mi, [x]])
 		node.set_meta("bumper_k", k)
+		if BumperWrap.handles(entry):             # T-264: abas ate a roda, tampa da quina e LOD
+			StripFit._merge(node, jobs, pid)
+			if not jobs1.is_empty():
+				StripFit._merge(node, jobs1, pid + "_lod1")
+			BumperWrap.apply(node, s, entry, sc, pid)
+			return true
 	elif fit == "stay":                       # T-263: base colada na coluna medida (StayFit)
 		StayFit.apply(node, s, entry, sx)
 		_set_fade(node, entry)
@@ -110,8 +117,9 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 
 ## Fator da faixa do meio do para-choque: tenta BUMPER_TARGET_H (ou a altura nominal, se maior) sem passar da altura
 ## livre `avail` do encaixe.
-static func bumper_k(avail: float, sc: float, t: float, m: float, b: float) -> float:
-	var target: float = minf(avail, maxf((t + m + b) * sc, BUMPER_TARGET_H))
+## T-264: `want` = altura que a peca tenta ter (vfit.target; os grandes vao ate 0,82 m).
+static func bumper_k(avail: float, sc: float, t: float, m: float, b: float, want: float = BUMPER_TARGET_H) -> float:
+	var target: float = minf(avail, maxf((t + m + b) * sc, want))
 	return clampf((target / sc - t - b) / m, BUMPER_K.x, BUMPER_K.y)
 
 

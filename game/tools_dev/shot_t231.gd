@@ -172,6 +172,11 @@ func _mount(j: Dictionary) -> void:
 		"ladder_side": [Vector3(6.5, 2.6, front + 3.0), Vector3(0.6, 2.2, front + 3.0)],
 		"ladder_top": [Vector3(1.9, 7.2, front + 1.2), Vector3(0.6, 2.6, front + 3.0)],
 		"ladder_front": [Vector3(0.6, 3.4, front - 7.0), Vector3(0.0, 2.6, front + 2.0)],
+		# T-264: para-choque grande como nas capturas 054-062 (3/4 frente-esquerda, baixa e perto), frente, lado e topo
+		"fb_ref": [Vector3(-2.15, 1.3, front - 2.25), Vector3(0.5, 0.52, front + 0.5)],
+		"fb_front": [Vector3(0.0, 1.0, front - 4.6), Vector3(0.0, 0.62, front)],
+		"fb_side": [Vector3(-4.2, 0.8, front + 0.6), Vector3(0.0, 0.55, front + 0.6)],
+		"fb_top": [Vector3(-0.6, 3.6, front - 1.7), Vector3(0.0, 0.5, front + 0.25)],
 	}
 	var v: Array = views.get(String(j["view"]), views["back34"])
 	# T-263: vistas do retrovisor relativas ao ponto de encaixe da esquerda (cada cabine tem a coluna num lugar)

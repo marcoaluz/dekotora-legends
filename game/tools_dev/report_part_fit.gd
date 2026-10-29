@@ -137,7 +137,7 @@ const LOT4: Array = ["front_bumper", "mirror_stay_r", "ladder_r", "side_skirts_r
 
 ## T-233: matriz caminhao x lote 4 (11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias).
 func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
-	var ids: Array[String] = PartFit.socket_parts(c, LOT4)
+	var ids: Array[String] = PartFit.socket_parts(c, LOT4).filter(func(i: String) -> bool: return not BumperWrap.handles(c.entry(i)))
 	lines.append("## Matriz caminhão × lote 4 (T-233: 11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias)")
 	lines.append("")
 	lines.append("| Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |")
@@ -193,6 +193,61 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("(americana e Canter: sem lataria livre atrás da porta, sem escada). Saia: só nos trechos livres (tanque e bateria de fábrica ficam de")
 	lines.append("fora). Conferido vértice a vértice (`FrameFit.problems`) e, no retrovisor e na escada, CONTATO por raios na malha")
 	lines.append("real (`FrameContact`: haste ≤ 6 mm no ponto que encosta e canto solto ≤ 2,2 cm; espaçador da escada ≤ 1 cm).")
+	lines.append("")
+
+
+var _big_ok: int = 0
+var _big_n: int = 0
+
+
+## T-264: matriz caminhao x para-choques GRANDES (abas ate a roda, capturas 054-062).
+func _big(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
+	var ids: Array[String] = PartFit.socket_parts(c, ["front_bumper"]).filter(func(i: String) -> bool: return BumperWrap.handles(c.entry(i)))
+	lines.append("## Matriz caminhão × para-choques grandes (T-264: %d peças com abas até a roda, capturas 054–062)" % ids.size())
+	lines.append("")
+	lines.append("| Caminhão | Grandes OK | Altura livre | Aba (dir. / esq., m atrás das costas) | Lado de dentro da aba (x, m) | Para por | Falhas |")
+	lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+	var files: Array = Array(DirAccess.get_files_at(TruckSockets.DIR))
+	files.sort()
+	for f in files:
+		if not String(f).ends_with(".json") or String(f).ends_with(".surf.json"):
+			continue
+		var stem: String = String(f).get_basename()
+		var data: Dictionary = TruckSockets.for_model(stem + ".glb")
+		var body: String = String(data.get("body", ""))
+		var model: Node3D = PartFit.load_model(TruckNode.MODEL_DIR + stem + ".glb", body, String(data.get("cab", "")))
+		var ok: int = 0
+		var here: int = 0
+		for id in ids:
+			var probs: Array[String] = PartFit.check_part(model, data, c, id)
+			if probs.is_empty():
+				ok += 1
+			else:
+				here += 1
+				fails.append("- `%s` em `%s`: %s" % [id, stem, "; ".join(probs)])
+		model.free()
+		var fb: Dictionary = TruckSockets.socket(data, "front_bumper")
+		var w: Dictionary = fb.get("wrap", {})
+		var wr: Dictionary = w.get("r", {})
+		var wlf: Dictionary = w.get("l", {})
+		var door: Dictionary = (data.get("protected", {}) as Dictionary).get("door_r", {})
+		var top: float = float(fb.get("anchor", [0, 0, 0])[1])
+		var stop: String = "porta" if not door.is_empty() and top > float(door["box"][0][1]) - 0.01 and 				float(fb["anchor"][2]) + float(wr.get("len", 0.0)) >= float(door["box"][0][2]) - 0.05 else "roda/paralama"
+		var name: String = stem.replace("dekotora_truck_", "") + (" (guardada)" if body == "carreta" else "")
+		lines.append("| %s | %d/%d | %.2f m | %.2f / %.2f | %.3f / %.3f | %s | %s |" % [name, ok, ids.size(), float(fb.get("height", 0.0)),
+				float(wr.get("len", 0.0)), float(wlf.get("len", 0.0)), float(wr.get("x", 0.0)), float(wlf.get("x", 0.0)), stop,
+				"nenhuma" if here == 0 else str(here)])
+		if body != "carreta":
+			_big_ok += ok
+			_big_n += ids.size()
+	lines.append("")
+	lines.append("Para-choques grandes: **%d de %d** combinações cabem (a carreta guardada não conta). A peça encosta na frente do" % [_big_ok, _big_n])
+	lines.append("nariz (como a T-233) e cresce até 0,62–0,82 m de altura onde o farol deixa; as ABAS dobram a quina e correm pela")
+	lines.append("lateral até a roda da frente (zona da roda − 2 cm), ou até a frente da porta quando o para-choque passa da altura dela")
+	lines.append("(zona `door_*` começa em 0,62 m), ou antes de um paralama/degrau que sai mais de 5 cm (`truck_measure._wrap`, raios).")
+	lines.append("O lado de dentro da aba fica 4 mm fora da lataria mais saliente; uma tampa fecha o vão da quina arredondada (perfil")
+	lines.append("medido). Conferido vértice a vértice nas caixas (frente + 2 abas + 2 tampas) e CONTATO por raios (`FrameContact._bumper`:")
+	lines.append("costas ≤ 1,2 cm do nariz, aba ≤ 1,2 cm da lateral em algum ponto e sem entrar nela).")
 	lines.append("")
 
 
@@ -325,10 +380,13 @@ func _initialize() -> void:
 	_lot4(c, lines, fails)
 	total_ok += _lot4_ok
 	total += _lot4_n
+	_big(c, lines, fails)
+	total_ok += _big_ok
+	total += _big_n
 	_lot5(c, lines, fails)
 	total_ok += _lot5_ok
 	total += _lot5_n
-	lines.append("**Total geral (lotes 1, 2, 4, 5 e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
+	lines.append("**Total geral (lotes 1, 2, 4, 5, para-choques grandes e pinturas): %d de %d combinações cabem.**" % [total_ok, total])
 	lines.append("")
 	lines.append("## Falhas")
 	lines.append("")
