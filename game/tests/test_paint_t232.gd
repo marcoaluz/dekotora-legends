@@ -9,10 +9,10 @@ const ROOF_PHRASES: Array[String] = ["一番星", "男花道", "爆走", "御意
 const PF := preload("res://tests/test_part_fit.gd")
 
 
-static func paint_ids(slot: String = "") -> Array[String]:
+static func paint_ids(slot: String = "", group: String = "") -> Array[String]:
 	var out: Array[String] = []
 	for e in AccessoryCatalog.get_instance().data.get("accessories", []):
-		if PaintFit.handles(e):
+		if PaintFit.handles(e) and (group == "" or PaintFit.group_of(e) == group):
 			var d: PartDef = Engine.get_main_loop().root.get_node("GameState").part(String(e["id"]))
 			if d != null and (slot == "" or String(d.slot) == slot):
 				out.append(String(e["id"]))
@@ -21,9 +21,9 @@ static func paint_ids(slot: String = "") -> Array[String]:
 
 func test_catalog_art_and_data() -> void:
 	var gs: Node = Engine.get_main_loop().root.get_node("GameState")
-	check_eq(paint_ids("mural").size(), 12, "12 murais")
-	check_eq(paint_ids("rear_paint").size(), 12, "12 traseiras")
-	check_eq(paint_ids("roof_paint").size(), 9, "9 tetos")
+	check_eq(paint_ids("mural", "pinturas").size(), 12, "12 murais (grupo Pinturas; T-266: os Wallpapers tem teste proprio)")
+	check_eq(paint_ids("rear_paint", "pinturas").size(), 12, "12 traseiras")
+	check_eq(paint_ids("roof_paint", "pinturas").size(), 9, "9 tetos")
 	var seen_tex: Dictionary = {}
 	for id in paint_ids():
 		var e: Dictionary = AccessoryCatalog.get_instance().entry(id)
@@ -41,7 +41,7 @@ func test_catalog_art_and_data() -> void:
 		if String(d.slot) == "mural":
 			check(bool(e["mirror_for_left"]) and e["paint"].has("L"), "%s: lado esquerdo proprio" % id)
 			check(String(e["paint"]["R"][0]["tex"]) != String(e["paint"]["L"][0]["tex"]), "%s: esquerdo diferente do direito" % id)
-		if String(d.slot) == "roof_paint":
+		if String(d.slot) == "roof_paint" and PaintFit.group_of(e) == "pinturas":
 			check_eq((e["paint"]["R"] as Array).size(), 2, "%s: teto comprido e curto" % id)
 
 

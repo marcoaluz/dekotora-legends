@@ -447,13 +447,38 @@ def vnoise(X, Y, scale, seed=0, octaves=3):
 
 
 # ---------------------------------------------------------------------- PNG sem Pillow
-def save_png(arr: np.ndarray, path: str) -> None:
-    """Grava (h, w, 3) 0..1 sRGB como PNG RGB 8 bits (zlib nível 9, sem metadados: bytes determinísticos)."""
+def _png_filter_rows(a: np.ndarray) -> bytes:
+    """T-266: filtro adaptativo por linha do PNG (None/Sub/Up/Average/Paeth; escolhe a menor soma |byte com sinal|,
+    a regra do libpng). Mesmos pixels, arquivo ~30-40% menor em foto/ilustração."""
+    h, w, c = a.shape
+    x = a.reshape(h, w * c).astype(np.int16)
+    left = np.zeros_like(x)
+    left[:, c:] = x[:, :-c]
+    up = np.zeros_like(x)
+    up[1:] = x[:-1]
+    ul = np.zeros_like(x)
+    ul[1:, c:] = x[:-1, :-c]
+    p = left + up - ul
+    pa, pb, pc = np.abs(p - left), np.abs(p - up), np.abs(p - ul)
+    paeth = np.where((pa <= pb) & (pa <= pc), left, np.where(pb <= pc, up, ul))
+    cands = [x, x - left, x - up, x - ((left + up) >> 1), x - paeth]
+    cands = [(f & 0xFF).astype(np.uint8) for f in cands]
+    cost = np.stack([np.abs(f.astype(np.int8).astype(np.int16)).sum(1) for f in cands], 0)
+    best = np.argmin(cost, 0)
+    return b"".join(bytes([int(best[y])]) + cands[int(best[y])][y].tobytes() for y in range(h))
+
+
+def save_png(arr: np.ndarray, path: str, filtered: bool = False) -> None:
+    """Grava (h, w, 3) 0..1 sRGB como PNG RGB 8 bits (zlib nível 9, sem metadados: bytes determinísticos).
+    `filtered` (T-266): filtro adaptativo por linha (arquivo menor, mesmos pixels); padrão = sem filtro, como antes."""
     import os
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     a = np.clip(np.round(np.asarray(arr)[..., :3] * 255.0), 0, 255).astype(np.uint8)
     h, w = a.shape[:2]
-    raw = b"".join(b"\x00" + a[y].tobytes() for y in range(h))
+    if filtered:
+        raw = _png_filter_rows(a)
+    else:
+        raw = b"".join(b"\x00" + a[y].tobytes() for y in range(h))
 
     def chunk(t, d):
         return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xFFFFFFFF)

@@ -3,7 +3,9 @@
 `group: "wallpapers"`), .tres (PartDef) e nome pt-BR. Origem nos créditos: "gerada pelo Marco (Gemini)".
 Números = PROPOSTA (mesma faixa das pinturas da T-232). Idempotente.
 
-Uso (raiz do projeto, Python do sistema):  python -I tools/gen_t258_data.py
+Uso (raiz do projeto, Python do sistema):  python -I tools/gen_t258_data.py [--manifest LISTA.json] [--dry]
+T-266: a lista pode trazer por peça `label` (nome pronto), `origin`, `price`, `fame`, `rarity` e por arte `focus`/`keep`
+(blender/renders/t266/praia.json, `build_t266_praia.py -- --install`).
 """
 import json
 import os
@@ -20,7 +22,7 @@ LABEL = {"mural": "Wallpaper", "rear": "Traseira (wallpaper)", "roof": "Teto (wa
 ORIGIN = "gerada pelo Marco (Gemini), uso por decisão dele (grupo Wallpapers, T-258; ver docs/CREDITOS_MURAIS.md)"
 
 
-def tres(pid, slot, zone, fame, price):
+def tres(pid, slot, zone, fame, price, rarity="incomum"):
     return f'''[gd_resource type="Resource" script_class="PartDef" format=3]
 
 [ext_resource type="Script" path="{PART_SCRIPT}" id="1_pd"]
@@ -36,7 +38,7 @@ durability = 0.0
 fame = {fame}
 price = {price}
 accessory_id = "{pid}"
-rarity = &"incomum"
+rarity = &"{rarity}"
 fame_min = 20
 '''
 
@@ -59,24 +61,29 @@ def main():
         paint = {}
         for side, arts in pc["sides"].items():
             res = lambda st: "res://" + st[len("game/"):]          # noqa: E731
-            paint[side] = [{"tex": res(a["stem"]) + ".png", "emit": res(a["stem"]) + "_emit.png", "aspect": a["aspect"],
-                            "px": a["px"]} for a in arts]
-        name = "%s: %s" % (LABEL[pc["kind"]], pc["name"].replace("_", " "))
+            paint[side] = []
+            for a in arts:
+                art = {"tex": res(a["stem"]) + ".png", "emit": res(a["stem"]) + "_emit.png", "aspect": a["aspect"], "px": a["px"]}
+                for k in ("focus", "keep"):                     # T-266: rosto no centro do corte e fração mínima visível
+                    if k in a:
+                        art[k] = a[k]
+                paint[side].append(art)
+        name = pc.get("label") or "%s: %s" % (LABEL[pc["kind"]], pc["name"].replace("_", " "))   # T-266: nome pronto
         e = {"id": pc["id"], "name": name, "category": "paint", "model": "", "mount_point": mp, "mount_point_left": mp_l,
              "mirror_for_left": sock_l is not None, "dimensions_m": None, "triangles": 2,
              "compatibility": ["só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"],
-             "materials_used": ["paint_art"], "materials_available": {}, "customizable": None, "license": ORIGIN,
+             "materials_used": ["paint_art"], "materials_available": {}, "customizable": None, "license": pc.get("origin", ORIGIN),
              "fit_warnings": [], "tier": "oficina", "socket": sock, "fit": "paint", "group": "wallpapers", "paint": paint}
         if sock_l:
             e["socket_left"] = sock_l
         cat["accessories"] = [x for x in cat["accessories"] if x["id"] != pc["id"]] + [e]
-        price, fame = PRICE[pc["kind"]]
+        price, fame = pc.get("price", PRICE[pc["kind"]][0]), pc.get("fame", PRICE[pc["kind"]][1])
         if dry:
-            print(json.dumps(e, ensure_ascii=False)[:300])
+            print(json.dumps(e)[:300])                      # ASCII: o console do Windows nao quebra
             ids.append(pc["id"])
             continue
         with open(os.path.join(GAME, "data", "parts", pc["id"] + ".tres"), "w", encoding="utf-8", newline="\n") as f:
-            f.write(tres(pc["id"], slot, zone, fame, price))
+            f.write(tres(pc["id"], slot, zone, fame, price, pc.get("rarity", "incomum")))
         tr["part." + pc["id"]] = name
         ids.append(pc["id"])
     if dry:

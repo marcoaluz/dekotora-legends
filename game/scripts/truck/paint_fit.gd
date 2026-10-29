@@ -57,13 +57,24 @@ static func art_for(entry: Dictionary, side: String, rect_aspect: float) -> Dict
 
 
 ## Janela da arte (UV) que cabe no retangulo: Rect2(uv0, tamanho).
-static func uv_window(art_aspect: float, rect_aspect: float) -> Rect2:
-	var c: float = clampf(rect_aspect, art_aspect * STRETCH.x, art_aspect * STRETCH.y)
+## T-266 (opcionais, por arte no catalogo): `focus` = ponto da arte (u, v; v = 0 no topo) que a janela tenta deixar no
+## centro (rosto: o corte sai das bordas longe dele) e `keep` = fracao minima da arte que fica visivel antes de esticar
+## (padrao = STRETCH: corta ate 20% e depois estica). Sem os campos = janela central, como antes.
+static func uv_window(art_aspect: float, rect_aspect: float, focus: Vector2 = Vector2(0.5, 0.5), keep: float = -1.0) -> Rect2:
+	var lo: float = STRETCH.x if keep <= 0.0 else clampf(keep, 0.05, 1.0)
+	var hi: float = STRETCH.y if keep <= 0.0 else 1.0 / lo
+	var c: float = clampf(rect_aspect, art_aspect * lo, art_aspect * hi)
 	if c >= art_aspect:
 		var hf: float = art_aspect / c
-		return Rect2(0.0, (1.0 - hf) * 0.5, 1.0, hf)
+		return Rect2(0.0, clampf(focus.y - hf * 0.5, 0.0, 1.0 - hf), 1.0, hf)
 	var wf: float = c / art_aspect
-	return Rect2((1.0 - wf) * 0.5, 0.0, wf, 1.0)
+	return Rect2(clampf(focus.x - wf * 0.5, 0.0, 1.0 - wf), 0.0, wf, 1.0)
+
+
+## Janela de uma arte do catalogo (le `focus`/`keep` opcionais da variante).
+static func art_window(art: Dictionary, rect_aspect: float) -> Rect2:
+	var f: Array = art.get("focus", [0.5, 0.5])
+	return uv_window(float(art.get("aspect", 1.0)), rect_aspect, Vector2(float(f[0]), float(f[1])), float(art.get("keep", -1.0)))
 
 
 ## Monta o no da pintura (filho do ponto SOCKET_*, que fica na origem do modelo). Null se o caminhao nao tem a face.
@@ -80,7 +91,7 @@ static func build(data: Dictionary, entry: Dictionary, side: String) -> Node3D:
 	var u: Vector3 = _v(r["u"]) * (w * 0.5)
 	var v: Vector3 = _v(r["v"]) * (h * 0.5)
 	var n: Vector3 = _v(r["n"])
-	var win: Rect2 = uv_window(float(art.get("aspect", 1.0)), w / maxf(h, 0.001))
+	var win: Rect2 = art_window(art, w / maxf(h, 0.001))
 	var arr: Array = _surface(c, u, v, n, win, r.get("grid", []))
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)

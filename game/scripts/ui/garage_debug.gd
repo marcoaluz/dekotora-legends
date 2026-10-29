@@ -3,7 +3,7 @@ extends RefCounted
 ## Argumentos de depuracao da garagem (capturas): --demo (monta um caminhao cheio de pecas; --noparts = sem pecas;
 ## --cab=<estilo>; --body=<modelo>; --parts=a,b), --damage, --decals, --lights=<padrao>, --hideui, --day,
 ## --top=<peca> (T-215: 2o nivel do deque), --view=<vista>, --spin (rodas em movimento), --zoom=<z>, --tab=model|parts|mech|repair, --slot=<slot>,
-## --deco=parts|paint|lights|decals (secao da DECORACAO, T-177),
+## --deco=parts|paint|lights|decals (secao da DECORACAO, T-177), --paint-filter=all|pinturas|wallpapers (T-266),
 ## --shot=ARQUIVO.png (depois de 6 s; --shot-pair = mais um quadro seguido), --preview=<peca> e
 ## --preview-paint=<#hex> (T-171: previa antes de comprar).
 ## O --demo grava em user://demo_profile.json, NUNCA no perfil real do jogador.
@@ -93,6 +93,8 @@ static func apply(screen: Node, gs: Node, stage: GarageStage, ui_layer: CanvasLa
 		elif a.begins_with("--deco="):                     # T-177: secao da DECORACAO (parts|paint|lights|decals)
 			out["tab"] = "parts"
 			out["deco"] = a.substr(7)
+		elif a.begins_with("--paint-filter="):             # T-266: seletor de pintura em all|pinturas|wallpapers
+			GarageShop.paint_filter = a.substr(15)
 		elif a.begins_with("--slot="):
 			out["tab"] = "parts"
 			out["slot"] = a.substr(7)
