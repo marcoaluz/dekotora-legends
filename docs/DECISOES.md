@@ -1616,6 +1616,22 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   (catálogo com `group: "wallpapers"`, .tres, texto). Guia em `docs/CREDITOS_MURAIS.md`. Ainda não há wallpaper no jogo.
 - Sugestão: os 5 murais anime pendentes (T-242) entram como **Wallpapers** quando aprovados.
 
+## 2026-10-29 · T-266 · Imagens "Praia" do Marco no grupo Wallpapers
+
+- 8 imagens de `docs/Murais/Paria/` (arte do Marco, criada por ele): **3 murais** com um desenho por lado
+  (`wall_praia_raposa_dourada`, `wall_praia_raposa_tropical`, `wall_praia_amigas`), **2 traseiras** do arquivo
+  "parte de traz - praia.png" (`wallrear_praia_verao` = painel 夏の海; `wallrear_praia_amigas` = raposa + coelhinhas;
+  a folha tem dois painéis que servem sozinhos como porta, e o jogador escolhe) e **1 teto** (`wallroof_praia_raposa`, a 7ª
+  imagem, sem par). Escolha do Claude: rosto à direita no lado direito, rosto à esquerda no lado esquerdo (as duas olham
+  para a frente do caminhão). Preços: mural 30.000 ¥ / Destaque +22, traseira 14.000 ¥ / +12, teto 12.000 ¥ / +10.
+- `PaintFit.uv_window` ganhou `focus` (rosto no centro do corte) e `keep` (fração mínima visível antes de esticar),
+  opcionais por arte no catálogo; **sem os campos a janela é a central de antes** (pinturas antigas iguais).
+- Peso: murais em **1536 x 512** (a mesma densidade dos murais da T-232), teto 320 x 960, traseira 768 x 640; VRAM +
+  mipmaps. ETC2 (APK Android) 4,42 MB no total (eram 7,16 MB com 2048 x 684). PNG do Git com filtro por linha
+  (`paint2d.save_png(filtered=True)`, mesmos pixels): 10,85 MB. Teste `test_apk_weight_budget` segura < 5 MB.
+- Bots/rivais **não** usam os wallpapers (listas fixas em `TruckConfig`): protocolo não muda. Para ver no celular é
+  preciso um APK novo.
+
 ## 2026-10-28 · T-260 · Som do motor das gravações reais (Iveco Daily, CC0)
 
 - Os 4 mp3 do Marco (`docs/som caminhão/`, SFX Jar) são gravações de **Joseph Sardin / BigSoundBank, CC0** (licença lida

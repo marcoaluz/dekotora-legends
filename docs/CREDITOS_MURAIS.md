@@ -154,3 +154,33 @@ Regras: só personagens adultas, sem nudez explícita; texto/kanji pode existir 
 
 **Sugestão para os 5 murais anime pendentes (T-242, `anime_proposta.png`)**: entram no grupo **Wallpapers** (são imagens
 criadas, não pinturas), assim que o Marco aprovar.
+
+## T-266 — tema Praia (arte do Marco, criada por ele) — no jogo, grupo Wallpapers
+
+Origem: **arte do Marco (criada por ele)**, uso por decisão dele. 8 PNGs em `docs/Murais/Paria/` (fora do Git; os
+originais **não foram alterados nem apagados**). Personagens adultas, sem nudez explícita. Nenhuma das 7 imagens de mural
+tem texto; a traseira tem kanji (夏の海, キツネ, 仲間), e a traseira nunca é espelhada.
+Script próprio (recorte, rosto e brilho escolhidos à mão por imagem): `blender/scripts/build_t266_praia.py` com a tabela
+`blender/scripts/lib/t266_praia.py`; catálogo/.tres/nome pelo mesmo `tools/gen_t258_data.py --manifest` dos wallpapers.
+
+| arquivo (docs/Murais/Paria) | tamanho | serve melhor em | peça | por quê |
+| --- | --- | --- | --- | --- |
+| `Raposa Loira na Praia Tropical-4.png` | 2172 x 724 (3:1) | lateral **direita** | `wall_praia_raposa_dourada` (dir.) | rosto à direita = olha para a frente do caminhão |
+| `Raposa Dourada na Praia Tropical-3.png` | 2172 x 724 | lateral **esquerda** | `wall_praia_raposa_dourada` (esq.) | rosto à esquerda (a frente, nesse lado) |
+| `Raposa Tropical em Dia de Praia.png` | 2172 x 724 | lateral **direita** | `wall_praia_raposa_tropical` (dir.) | rosto à direita |
+| `Raposa Dourada na Praia Tropical-5.png` | 2172 x 724 | lateral **esquerda** | `wall_praia_raposa_tropical` (esq.) | rosto à esquerda |
+| `Gatinha Anime na Praia Tropical.png` | 2172 x 724 | lateral **direita** | `wall_praia_amigas` (dir.) | rosto à direita |
+| `Paraíso Tropical das Garotas Raposa.png` | 2172 x 724 | lateral **esquerda** (ou wallpaper de tela) | `wall_praia_amigas` (esq.) | as 4 personagens juntas: par com a gatinha (mesma personagem) |
+| `Garota Raposa na Praia Tropical-2.png` | 2172 x 724 | **teto** (girada 90°) | `wallroof_praia_raposa` | a 7ª imagem não tem par para o outro lado; no teto não precisa de par |
+| `parte de traz - praia.png` | 1536 x 1024 (folha com painéis) | **traseira** | `wallrear_praia_verao` (painel 夏の海) e `wallrear_praia_amigas` (raposa + coelhinhas) | só a faixa de cima (as fichas de personagem embaixo ficam de fora) |
+
+- **Murais 3:1** (o baú vai de 2,6:1 no Canter a 7:1 na carreta): o jogo corta seguindo o **rosto** (`focus`) e guarda pelo
+  menos 45% da altura (`keep`); só a carreta estica, 5,8% (nada visível). Os outros baús não esticam.
+- **Traseira**: cada painel tem 765 x 637 (1,20:1), quase a proporção real das portas (1,07 a 1,26:1): corta no máximo
+  11% das laterais, nunca o rosto, e não estica. No painel das amigas a linha branca entre a raposa e as coelhinhas cai
+  quase no meio, onde fica a fresta das duas portas.
+- **Brilho noturno** só em pontos escolhidos (flor roxa do cabelo, óculos de coração, drinques, lanterna, kanji); o resto
+  acende fraco (20%), como as outras pinturas.
+- **Peso** (medido): originais 20,61 MB (8 PNGs, fora do jogo). No Git: 10,85 MB (18 PNGs com filtro por linha, mesmos
+  pixels). No APK Android vai a textura ETC2 com mipmaps: **4,42 MB** (≈3,6 MB comprimidos no APK); antes da redução
+  (murais 2048 x 684) eram 7,16 MB. Murais em 1536 x 512 = a mesma densidade de pixels por metro dos murais da T-232.
