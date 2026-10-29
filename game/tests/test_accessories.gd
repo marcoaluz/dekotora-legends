@@ -3,6 +3,9 @@ extends TestCase
 ## Roda em headless depois de `godot --headless --path game --import` (que importa os .glb).
 
 const MAX_DIM: float = 6.0   # nenhuma peca passa de 6 m
+## T-265: a saia grande (fit "skirt") e montada por caminhao da frente do bau ate a traseira; o catalogo guarda a maior
+## saia montada num caminhao jogavel (um lado), que vai ate o comprimento do bau mais longo.
+const MAX_SKIRT_LEN: float = 11.5
 
 
 func _catalog() -> AccessoryCatalog:
@@ -53,7 +56,8 @@ func test_dimensions_and_budgets() -> void:
 			continue
 		var d: Dictionary = e["dimensions_m"]
 		for k in ["x", "y", "z"]:
-			check(float(d[k]) > 0.0 and float(d[k]) < MAX_DIM, "%s dimensao %s em metros (%.2f)" % [id, k, float(d[k])])
+			var lim: float = MAX_SKIRT_LEN if k == "z" and SkirtFit.handles(e) else MAX_DIM
+			check(float(d[k]) > 0.0 and float(d[k]) < lim, "%s dimensao %s em metros (%.2f)" % [id, k, float(d[k])])
 		var budget: int = 6000 if String(e.get("tier", "")) == "deluxe" else 4500      # T-172: deluxe gasta mais
 		check(int(e["triangles"]) <= budget, "%s dentro do orcamento de triangulos (%d)" % [id, e["triangles"]])
 		check((e["fit_warnings"] as Array).is_empty(), "%s sem avisos de encaixe %s" % [id, e["fit_warnings"]])

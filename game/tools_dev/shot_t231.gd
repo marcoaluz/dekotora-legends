@@ -177,6 +177,15 @@ func _mount(j: Dictionary) -> void:
 		"fb_front": [Vector3(0.0, 1.0, front - 4.6), Vector3(0.0, 0.62, front)],
 		"fb_side": [Vector3(-4.2, 0.8, front + 0.6), Vector3(0.0, 0.55, front + 0.6)],
 		"fb_top": [Vector3(-0.6, 3.6, front - 1.7), Vector3(0.0, 0.5, front + 0.25)],
+		# T-265: saia grande (quase no chao, arco nas rodas, atras da roda de tras): lado inteiro baixo, como as capturas
+		# 085-094 (bau + chassi), arcos da roda de tras de 3/4, da frente olhando o tanque, lado esquerdo e bem baixo
+		"sk_side": [Vector3(15.5, 1.3, mid), Vector3(0.0, 1.0, mid)],
+		"sk_ref": [Vector3(10.5, 1.5, -3.6), Vector3(0.0, 1.25, -3.6)],
+		"sk_arch": [Vector3(4.6, 1.0, 0.6), Vector3(1.2, 0.62, -2.3)],
+		"sk_front": [Vector3(4.8, 1.1, front + 2.4), Vector3(1.2, 0.6, front + 6.0)],
+		"sk_left": [Vector3(-15.5, 1.3, mid), Vector3(0.0, 1.0, mid)],
+		"sk_low": [Vector3(6.0, 0.35, -2.3), Vector3(0.0, 0.55, -2.3)],
+		"sk_far": [Vector3(46.0, 2.5, mid), Vector3(0.0, 1.0, mid)],          # (com --fov=12: malha de longe, LOD)
 	}
 	var v: Array = views.get(String(j["view"]), views["back34"])
 	# T-263: vistas do retrovisor relativas ao ponto de encaixe da esquerda (cada cabine tem a coluna num lugar)

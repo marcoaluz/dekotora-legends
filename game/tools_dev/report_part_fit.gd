@@ -138,7 +138,7 @@ const LOT4: Array = ["front_bumper", "mirror_stay_r", "ladder_r", "side_skirts_r
 ## T-233: matriz caminhao x lote 4 (11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias).
 func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArray) -> void:
 	var ids: Array[String] = PartFit.socket_parts(c, LOT4).filter(func(i: String) -> bool: return not BumperWrap.handles(c.entry(i)))
-	lines.append("## Matriz caminhão × lote 4 (T-233: 11 para-choques da frente, 6 retrovisores, 3 escadas, 8 saias)")
+	lines.append("## Matriz caminhão × lote 4 (T-233: 11 para-choques da frente, 6 retrovisores, 3 escadas; T-265: 8 saias grandes)")
 	lines.append("")
 	lines.append("| Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |")
 	lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
@@ -192,8 +192,11 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("vidro dela, inclinada com a lateral, com espaçadores até a lataria, estribo embaixo e caixa de LED acima do teto")
 	lines.append("(T-267: na americana e no Canter a porta vai até o fim da cabine e a escada vai na LATERAL DA CARGA, logo atrás da")
 	lines.append("quina da frente, por fora do contorno de LED e entre as luzes de marcação; o tanque fica sem escada: lateral curva).")
-	lines.append("Saia: só nos trechos livres (tanque e bateria de fábrica ficam de")
-	lines.append("fora). Conferido vértice a vértice (`FrameFit.problems`) e, no retrovisor e na escada, CONTATO por raios na malha")
+	lines.append("Saia (T-265, capturas 085–094): da frente do baú até a traseira (também atrás da roda de trás), de embaixo do baú até")
+	lines.append("0,22 m do chão, com recorte em ARCO em volta de cada roda (pneu + 7 cm, maior onde o para-lama de fábrica pede);")
+	lines.append("tanque, bateria, degraus e postes da lona cortam a saia (medido por raios na altura que a saia ocupa). A zona da roda")
+	lines.append("é o cilindro do pneu + 3 cm. Coluna \"Trechos da saia\": comprimento de cada trecho do lado direito, da frente para trás.")
+	lines.append("Conferido vértice a vértice (`FrameFit.problems`) e, no retrovisor e na escada, CONTATO por raios na malha")
 	lines.append("real (`FrameContact`: haste ≤ 6 mm no ponto que encosta e canto solto ≤ 2,2 cm; espaçador da escada ≤ 1 cm).")
 	lines.append("")
 
