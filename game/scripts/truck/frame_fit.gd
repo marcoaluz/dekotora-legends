@@ -5,9 +5,10 @@ extends RefCounted
 ##  - fit "bumper" (para-choque da frente): escala uniforme pela largura da cabine; TOP_ fica no topo (embaixo do farol
 ##    mais baixo), MID_ estica/encolhe na altura para a peca caber entre o chao e o farol e cobrir o para-choque de
 ##    fabrica, BOT_ acompanha o fundo e CEN_ fica no meio. Os pontos SIGNAL_L/R levam a seta da frente (TruckNode);
-##  - fit "stay" (haste do retrovisor): largura pela cabine, altura pelo vidro de cada cabine; o espelho de fabrica
-##    some (`hide_stock`, caixa `hide` do encaixe) enquanto a haste esta montada;
-##  - fit "ladder" (escada): o degrau MID_ se repete ate o topo do bau; TOP_ vai para o fim;
+##  - fit "stay" (haste do retrovisor): StayFit (T-263: base colada na coluna medida); o espelho de fabrica some
+##    (`hide_stock`, caixa `hide` do encaixe) enquanto a haste esta montada;
+##  - fit "ladder" (escada, T-263: na frente do bau, atras da cabine): o modulo MID_ se repete ate o topo medido; TOP_
+##    vai para o fim;
 ##  - fit "runs" (saia): um pedaco (HEAD_ + MID_ repetido + TAIL_) em cada trecho livre medido embaixo do bau.
 ## Tudo vira UMA malha por material (StripFit._merge), feita uma vez na montagem.
 
@@ -16,8 +17,6 @@ const FITS: Array[String] = ["bumper", "stay", "ladder", "runs"]
 ## da altura livre do encaixe nas de farol baixo (Canter, HAYATE).
 const BUMPER_TARGET_H: float = 0.55
 const BUMPER_K: Vector2 = Vector2(0.05, 2.2)        # limites do estica/encolhe da faixa do meio
-const STAY_S: Vector2 = Vector2(0.9, 1.05)          # escala da haste pela largura da cabine
-const STAY_K: Vector2 = Vector2(0.75, 1.3)          # altura da haste pelo vidro
 
 static var _hidden_cache: Dictionary = {}           # "rid|caixa" -> ArrayMesh sem os triangulos do espelho de fabrica
 
@@ -53,15 +52,15 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 				x = Transform3D(Basis.IDENTITY, Vector3(0, m * (1.0 - k) * 0.5, 0))
 			jobs.append([mi, [x]])
 		node.set_meta("bumper_k", k)
-	elif fit == "stay":
-		var sc2: float = clampf(float(s.get("width", 2.3)) / float(entry.get("nominal_w", 2.3)), STAY_S.x, STAY_S.y)
-		var hn: float = float((entry.get("vfit", {}) as Dictionary).get("nominal_h", 0.85))
-		var k2: float = clampf(float(s.get("window_h", hn)) / hn, STAY_K.x, STAY_K.y)
-		node.scale = Vector3(sx * sc2, k2, sc2)
+	elif fit == "stay":                       # T-263: base colada na coluna medida (StayFit)
+		StayFit.apply(node, s, entry, sx)
 		_set_fade(node, entry)
 		return true
 	elif fit == "ladder":
-		node.scale = Vector3(sx, 1, 1)
+		if s.has("face_x"):                       # T-263: na lateral da cabine, atras da porta (SideLadder)
+			node.transform.basis = SideLadder.basis(s, entry, sx)
+		else:
+			node.scale = Vector3(sx, 1, 1)
 		var st: Dictionary = entry.get("stretch", {})
 		var head: float = float(st.get("head", 0.15))
 		var mid: float = float(st.get("mid", 0.3))
@@ -76,6 +75,11 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 		for mi in StripFit._meshes(node):
 			var nm2: String = String(mi.name)
 			jobs.append([mi, mods if nm2.contains("_MID_") else ([top_x] if nm2.contains("_TOP_") else [Transform3D.IDENTITY])])
+		if s.has("face_x"):
+			StripFit._merge(node, jobs, pid)
+			SideLadder.add_spacers(node, s, float(s.get("height", 2.0)))
+			_set_fade(node, entry)
+			return true
 	else:                                   # runs (saia)
 		var st2: Dictionary = entry.get("stretch", {})
 		var hd: float = float(st2.get("head", 0.05))
@@ -122,8 +126,11 @@ static func _set_fade(node: Node3D, entry: Dictionary) -> void:
 
 
 ## Regras de encaixe (cada vertice dentro das caixas do encaixe e fora das zonas protegidas): as mesmas do StripFit.
+## T-263: retrovisor e escada tambem encostados (raios na malha real, FrameContact).
 static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: Node3D, side: String) -> Array[String]:
-	return StripFit.problems(model, data, entry, node, side)
+	var out: Array[String] = StripFit.problems(model, data, entry, node, side)
+	out.append_array(FrameContact.problems(model, data, entry, node, side))
+	return out
 
 
 # ----------------------------------------------------------------------------- espelho de fabrica
@@ -133,18 +140,48 @@ static func stock_boxes(data: Dictionary, sides: Array) -> Array[AABB]:
 	var out: Array[AABB] = []
 	for side in sides:
 		var s: Dictionary = TruckSockets.socket(data, "mirror_stay_" + String(side))
-		if s.get("hide") is Array:
+		if s.get("hide_parts") is Array and not (s["hide_parts"] as Array).is_empty():   # T-263: um por pedaco (bracos inteiros)
+			for d in s["hide_parts"]:
+				out.append(TruckSockets.aabb_of(d["b"] if d is Dictionary else d))
+		elif s.get("hide") is Array:
 			out.append(TruckSockets.aabb_of(s["hide"]))
 	return out
 
 
-## Esconde os triangulos de `model` (cabine, LODs) que ficam INTEIROS dentro de alguma caixa; caixas vazias = mostra
+## T-263: material de cada caixa de `stock_boxes` (mesma ordem; "" = qualquer malha). O jogo junta a malha por material:
+## o no da malha tem o nome do material (truck_plastic_black...), entao a caixa so vale para a malha certa.
+static func stock_mats(data: Dictionary, sides: Array) -> Array[String]:
+	var out: Array[String] = []
+	for side in sides:
+		var s: Dictionary = TruckSockets.socket(data, "mirror_stay_" + String(side))
+		if s.get("hide_parts") is Array and not (s["hide_parts"] as Array).is_empty():
+			for d in s["hide_parts"]:
+				out.append(String(d.get("m", "")).trim_prefix("truck_") if d is Dictionary else "")
+		elif s.get("hide") is Array:
+			out.append("")
+	return out
+
+
+## Caixas que valem para a malha `m` (pelo material no nome do no).
+static func boxes_for(m: Node, boxes: Array[AABB], mats: Array[String]) -> Array[AABB]:
+	if mats.size() != boxes.size():
+		return boxes
+	var out: Array[AABB] = []
+	var nm: String = String(m.name)
+	for i in boxes.size():
+		if mats[i] == "" or nm.contains(mats[i]):
+			out.append(boxes[i])
+	return out
+
+
+## Esconde os triangulos de `model` (cabine, LODs) com os 3 vertices dentro de alguma caixa (T-263: caixas por pedaco); caixas vazias = mostra
 ## tudo de novo. Nao mexe nas pecas (nos SOCKET_*/MOUNT_*). A malha original fica guardada no no (meta "stock_mesh").
-static func hide_stock(model: Node3D, boxes: Array[AABB]) -> void:
+static func hide_stock(model: Node3D, all_boxes: Array[AABB], mats: Array[String] = []) -> void:
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
 		var m: MeshInstance3D = mi as MeshInstance3D
 		if _in_part(m, model):
 			continue
+		var boxes: Array[AABB] = boxes_for(m, all_boxes, mats)
 		var orig: Mesh = m.get_meta("stock_mesh") if m.has_meta("stock_mesh") else m.mesh
 		if orig == null:
 			continue
@@ -185,19 +222,10 @@ static func _without(src: Mesh, t: Transform3D, boxes: Array[AABB]) -> ArrayMesh
 		if idx.is_empty():
 			for k in verts.size():
 				idx.append(k)
-		var inside: PackedByteArray = PackedByteArray()
-		inside.resize(verts.size())
-		for k in verts.size():
-			var w: Vector3 = t * verts[k]
-			var f: int = 0
-			for b in boxes:
-				if b.has_point(w):
-					f = 1
-					break
-			inside[k] = f
 		var keep := PackedInt32Array()
 		for k in range(0, idx.size(), 3):
-			if inside[idx[k]] == 1 and inside[idx[k + 1]] == 1 and inside[idx[k + 2]] == 1:
+			# T-263: caixas justas por pedaco (hide_parts), os 3 vertices dentro
+			if _center_in(t, verts, idx[k], idx[k + 1], idx[k + 2], boxes):
 				continue
 			keep.append_array([idx[k], idx[k + 1], idx[k + 2]])
 		arr[Mesh.ARRAY_INDEX] = keep
@@ -207,6 +235,19 @@ static func _without(src: Mesh, t: Transform3D, boxes: Array[AABB]) -> ArrayMesh
 		am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
 		am.surface_set_material(am.get_surface_count() - 1, src.surface_get_material(si))
 	return am
+
+
+## T-263: o triangulo some se os 3 vertices estao dentro de uma das caixas (uma caixa justa por pedaco do espelho de
+## fabrica, `hide_parts`: o braco inteiro ate a raiz some e a lataria em volta fica).
+static func tri_hidden(a: Vector3, b: Vector3, c: Vector3, boxes: Array[AABB]) -> bool:
+	for bx in boxes:
+		if bx.has_point(a) and bx.has_point(b) and bx.has_point(c):
+			return true
+	return false
+
+
+static func _center_in(t: Transform3D, verts: PackedVector3Array, a: int, b: int, c: int, boxes: Array[AABB]) -> bool:
+	return tri_hidden(t * verts[a], t * verts[b], t * verts[c], boxes)
 
 
 ## A seta da frente vai para os pontos SIGNAL_L/R do para-choque da oficina (lista vazia = sem para-choque com seta).

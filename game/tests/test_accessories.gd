@@ -72,6 +72,8 @@ func test_attach_and_mirror() -> void:
 			var l: Node3D = c.attach(truck, String(id), "L")
 			if PaintFit.handles(e):                  # T-232: o lado esquerdo do mural e outra arte (nunca espelhada)
 				check(l != null and l.scale.x > 0.0, "%s: lado L com arte propria, sem espelhar" % id)
+			elif String(e.get("fit", "")) == "ladder":   # T-263: escada simetrica, girada para fora de cada lado
+				check(l != null and l.transform.basis.z.x * r.transform.basis.z.x < 0.0, "%s virada para o lado L" % id)
 			else:
 				check(l != null and l.scale.x < 0.0, "%s espelhada no lado L" % id)
 	truck.free()

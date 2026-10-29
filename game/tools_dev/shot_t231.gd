@@ -47,6 +47,8 @@ static func _parse(args: PackedStringArray) -> Dictionary:
 			j["signal"] = int(v)
 		elif a == "--brake":
 			j["brake"] = true
+		elif a == "--ghost":                       # T-263: monta as pecas e as esconde (ver o que sobra da lataria)
+			j["ghost"] = true
 		elif a.begins_with("--out="):
 			j["out"] = v
 		elif a.begins_with("--decal="):            # T-234: --decal=id:lugar:cor (lugar side_l|side_r|rear|cab)
@@ -121,6 +123,9 @@ func _mount(j: Dictionary) -> void:
 	t.set_mural_glow(0.5 if bool(j["night"]) else 0.0)
 	for pid in j["states"]:
 		t.set_part_state(String(pid), String(j["states"][pid]))
+	if bool(j.get("ghost", false)):
+		for n in t.find_children("acc_*", "Node3D", true, false):
+			(n as Node3D).visible = false
 	var front: float = -11.5 - t.front_delta()
 	var mid: float = front * 0.5
 	var cam := Camera3D.new()
@@ -157,8 +162,45 @@ func _mount(j: Dictionary) -> void:
 		"grille_side": [Vector3(-2.4, 1.5, front - 1.2), Vector3(0.0, 1.35, front + 0.25)],
 		"visor_close": [Vector3(-2.2, 3.7, front - 2.9), Vector3(0.0, 3.0, front + 0.4)],
 		"decal_side": [Vector3(-14.0, 2.6, mid), Vector3(0.0, 2.0, mid)],
+		# T-263: retrovisor de perto (frente, lado, topo, de tras para ver o vao) e escada como na referencia 111-113
+		"mirror_close": [Vector3(-3.1, 2.7, front - 1.7), Vector3(-1.3, 2.1, front + 0.35)],
+		"mirror_front": [Vector3(-1.9, 2.3, front - 4.2), Vector3(-1.25, 2.1, front + 0.3)],
+		"mirror_side": [Vector3(-4.6, 2.3, front + 0.35), Vector3(-1.2, 2.15, front + 0.35)],
+		"mirror_top": [Vector3(-1.75, 5.4, front + 0.75), Vector3(-1.3, 2.2, front + 0.4)],
+		"mirror_back": [Vector3(-2.7, 2.5, front + 2.2), Vector3(-1.25, 2.1, front + 0.2)],
+		"ladder_ref": [Vector3(5.4, 5.3, front - 1.6), Vector3(0.2, 2.5, front + 2.6)],
+		"ladder_side": [Vector3(6.5, 2.6, front + 3.0), Vector3(0.6, 2.2, front + 3.0)],
+		"ladder_top": [Vector3(1.9, 7.2, front + 1.2), Vector3(0.6, 2.6, front + 3.0)],
+		"ladder_front": [Vector3(0.6, 3.4, front - 7.0), Vector3(0.0, 2.6, front + 2.0)],
 	}
 	var v: Array = views.get(String(j["view"]), views["back34"])
+	# T-263: vistas do retrovisor relativas ao ponto de encaixe da esquerda (cada cabine tem a coluna num lugar)
+	var sock: Node3D = t.model.find_child("SOCKET_mirror_stay_l", true, false) as Node3D if t.model != null else null
+	var lsock: Node3D = t.model.find_child("SOCKET_ladder_r", true, false) as Node3D if t.model != null else null
+	if String(j["view"]).begins_with("lad_") and lsock != null:      # T-263: escada de perto (ponto = pe da escada direita, na lateral da cabine)
+		var q: Vector3 = lsock.global_position
+		var lrel: Dictionary = {
+			"lad_close": [Vector3(2.6, 1.5, -2.6), Vector3(0.0, 0.9, 0.0)],
+			"lad_hi": [Vector3(1.9, 3.5, -1.9), Vector3(0.0, 1.3, 0.0)],
+			"lad_gap": [Vector3(3.4, 0.9, 0.0), Vector3(0.0, 0.9, 0.0)],
+			"lad_back": [Vector3(1.4, 1.0, 1.6), Vector3(0.0, 0.9, -0.1)],
+		}
+		if lrel.has(String(j["view"])):
+			v = [q + lrel[String(j["view"])][0], q + lrel[String(j["view"])][1]]
+	if String(j["view"]).begins_with("mirror_") and sock != null:
+		var p: Vector3 = sock.global_position
+		var rel: Dictionary = {
+			"mirror_close": [Vector3(-1.8, 0.6, -2.0), Vector3(-0.05, 0.0, -0.1)],
+			"mirror_front": [Vector3(-0.6, 0.2, -4.5), Vector3(0.0, 0.0, -0.1)],
+			"mirror_side": [Vector3(-3.4, 0.2, 0.0), Vector3(0.0, 0.0, -0.1)],
+			"mirror_top": [Vector3(-0.45, 3.2, -0.35), Vector3(-0.05, 0.0, -0.3)],
+			"mirror_back": [Vector3(-1.45, 0.4, 2.1), Vector3(0.0, 0.0, -0.1)],
+			"mirror_root": [Vector3(-0.9, 0.35, 1.1), Vector3(0.0, 0.0, 0.0)],
+			"mirror_upper": [Vector3(-0.9, 1.6, -0.5), Vector3(0.0, 0.7, -0.1)],
+		}
+		if rel.has(String(j["view"])):
+			var r: Array = rel[String(j["view"])]
+			v = [p + r[0], p + r[1]]
 	_world.add_child(cam)
 	cam.look_at_from_position(v[0], v[1])
 	cam.current = true

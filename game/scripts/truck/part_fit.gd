@@ -169,7 +169,10 @@ static func check_part(model: Node3D, data: Dictionary, catalog: AccessoryCatalo
 			if sn == null:
 				out.append("nao montou (sem SOCKET_%s)" % StripFit.socket_name(e, side))
 				continue
-			out.append_array(StripFit.problems(model, data, e, sn, side))
+			if FrameFit.handles(e):                  # T-263: retrovisor e escada tambem encostados (raios)
+				out.append_array(FrameFit.problems(model, data, e, sn, side))
+			else:
+				out.append_array(StripFit.problems(model, data, e, sn, side))
 			sn.get_parent().remove_child(sn)
 			sn.free()
 		return out

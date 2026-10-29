@@ -558,7 +558,7 @@ func _after_frame_parts(catalog: AccessoryCatalog, defs: Array[PartDef]) -> void
 		if String(catalog.entry(d.accessory_id).get("fit", "")) == "stay":
 			sides = ["r", "l"]
 	var data: Dictionary = TruckSockets.for_model(model_path(body_kind, cab_kind))
-	FrameFit.hide_stock(model, FrameFit.stock_boxes(data, sides))
+	FrameFit.hide_stock(model, FrameFit.stock_boxes(data, sides), FrameFit.stock_mats(data, sides))   # T-263: por material
 	_place_blinkers()
 
 

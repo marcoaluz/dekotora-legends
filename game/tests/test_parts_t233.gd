@@ -12,6 +12,7 @@ const LADDERS: Array[String] = ["ladder_neon", "ladder_green", "ladder_chrome"]
 const SKIRTS: Array[String] = ["skirt_chrome_rails", "skirt_neon_twin", "skirt_neon_diamond", "skirt_neon_dash", "skirt_neon_arch",
 	"skirt_neon_green", "skirt_neon_gems", "skirt_neon_arrows"]
 const OPEN_BODIES: Array[String] = ["graneleira", "tarp", "tanker", "dump"]
+const NO_LADDER_CABS: Array[String] = ["americana", "canter"]   # T-263: porta ate o fim da cabine
 const PF := preload("res://tests/test_part_fit.gd")
 
 
@@ -58,15 +59,16 @@ func test_every_truck_fits() -> void:
 		for id in all_ids():
 			var e: Dictionary = c.entry(id)
 			var has_socket: bool = TruckSockets.socket(m["data"], String(e["socket"])).size() > 0
-			if open and id in LADDERS:
-				check(not has_socket, "%s em %s: so para bau fechado" % [id, m["stem"]])
+			if id in LADDERS and String(m["cab"]) in NO_LADDER_CABS:
+				# T-263: a escada fica na lateral da cabine atras da porta; americana e Canter nao tem lataria livre ali
+				check(not has_socket, "%s em %s: sem lugar atras da porta" % [id, m["stem"]])
 				continue
 			check(has_socket, "%s em %s: encaixe existe" % [id, m["stem"]])
 			var probs: Array[String] = PartFit.check_part(model, m["data"], c, id)
 			check(probs.is_empty(), "%s em %s: %s" % [id, m["stem"], "; ".join(probs)])
 			checked += 1
 		model.free()
-	check(checked >= 15 * 28 + 7 * 25, "%d combinacoes conferidas" % checked)
+	check(checked >= 40 * 28, "%d combinacoes conferidas" % checked)
 
 
 func test_bumper_fits_height_and_carries_plate_and_signal() -> void:

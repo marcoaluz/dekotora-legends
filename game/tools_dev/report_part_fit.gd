@@ -177,7 +177,7 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 		var cell := func(k: String) -> String: return ("%d/%d" % [ok[k], n[k]]) if n[k] > 0 else "—"
 		lines.append("| %s | %s | %.2f m / ×%.2f | %s | %s | %s | %s | %s |" % [name, cell.call("front_bumper"), float(fb.get("height", 0.0)),
 				FrameFit.bumper_k(float(fb.get("height", 0.4)), sc, 0.13, 0.2, 0.09), cell.call("mirror_stay"),
-				cell.call("ladder") if n["ladder"] > 0 else "só baú fechado", cell.call("side_skirts"), " + ".join(runs) if runs.size() > 0 else "—",
+				cell.call("ladder") if n["ladder"] > 0 else "sem lugar atrás da porta", cell.call("side_skirts"), " + ".join(runs) if runs.size() > 0 else "—",
 				"nenhuma" if here == 0 else str(here)])
 		if body != "carreta":
 			for k in ok:
@@ -186,9 +186,13 @@ func _lot4(c: AccessoryCatalog, lines: PackedStringArray, fails: PackedStringArr
 	lines.append("")
 	lines.append("Lote 4: **%d de %d** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do" % [_lot4_ok, _lot4_n])
 	lines.append("nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a faixa do meio estica/encolhe (coluna")
-	lines.append("\"faixa do meio\", para o leque de 0,42 m). Retrovisor: até 0,50 m para fora da cabine e 0,60 m à frente; o")
-	lines.append("espelho de fábrica some. Escada: por fora do contorno de LED, até 0,16 m. Saia: só nos trechos livres (tanque e")
-	lines.append("bateria de fábrica ficam de fora). Conferido vértice a vértice (`FrameFit.problems`).")
+	lines.append("\"faixa do meio\", para o leque de 0,42 m). Retrovisor (T-263): base colada na coluna do para-brisa medida por")
+	lines.append("raios (chapa + espaçador em cada ponto de fixação, sem vão, nunca no vidro nem na porta), até 0,50 m para fora; o")
+	lines.append("espelho de fábrica some inteiro. Escada (T-263, capturas 111–113): na LATERAL da cabine, logo atrás da porta e do")
+	lines.append("vidro dela, inclinada com a lateral, com espaçadores até a lataria, estribo embaixo e caixa de LED acima do teto")
+	lines.append("(americana e Canter: sem lataria livre atrás da porta, sem escada). Saia: só nos trechos livres (tanque e bateria de fábrica ficam de")
+	lines.append("fora). Conferido vértice a vértice (`FrameFit.problems`) e, no retrovisor e na escada, CONTATO por raios na malha")
+	lines.append("real (`FrameContact`: haste ≤ 6 mm no ponto que encosta e canto solto ≤ 2,2 cm; espaçador da escada ≤ 1 cm).")
 	lines.append("")
 
 
