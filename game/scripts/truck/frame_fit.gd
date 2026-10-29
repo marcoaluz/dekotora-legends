@@ -9,10 +9,11 @@ extends RefCounted
 ##    (`hide_stock`, caixa `hide` do encaixe) enquanto a haste esta montada;
 ##  - fit "ladder" (escada, T-263: na frente do bau, atras da cabine): o modulo MID_ se repete ate o topo medido; TOP_
 ##    vai para o fim;
-##  - fit "runs" (saia): um pedaco (HEAD_ + MID_ repetido + TAIL_) em cada trecho livre medido embaixo do bau.
+##  - fit "runs" (saia da T-233, antiga): um pedaco (HEAD_ + MID_ repetido + TAIL_) em cada trecho livre medido;
+##  - fit "skirt" (saia grande da T-265): SkirtFit monta a saia ate quase o chao, com arco em volta das rodas.
 ## Tudo vira UMA malha por material (StripFit._merge), feita uma vez na montagem.
 
-const FITS: Array[String] = ["bumper", "stay", "ladder", "runs"]
+const FITS: Array[String] = ["bumper", "stay", "ladder", "runs", "skirt"]   # T-265: "skirt" = saia grande (SkirtFit)
 ## Altura que o para-choque tenta ter (m): cobre o para-choque de fabrica nas cabines de farol alto (chata), sem passar
 ## da altura livre do encaixe nas de farol baixo (Canter, HAYATE).
 const BUMPER_TARGET_H: float = 0.55
@@ -59,6 +60,9 @@ static func apply(node: Node3D, data: Dictionary, entry: Dictionary, side: Strin
 				StripFit._merge(node, jobs1, pid + "_lod1")
 			BumperWrap.apply(node, s, entry, sc, pid)
 			return true
+	elif fit == "skirt":                      # T-265: saia grande, quase no chao, com arco nas rodas (SkirtFit)
+		SkirtFit.apply(node, s, entry, sx)
+		return true
 	elif fit == "stay":                       # T-263: base colada na coluna medida (StayFit)
 		StayFit.apply(node, s, entry, sx)
 		_set_fade(node, entry)

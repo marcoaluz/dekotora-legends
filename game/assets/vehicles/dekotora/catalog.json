@@ -7389,45 +7389,45 @@
       "id": "skirt_chrome_rails",
       "name": "Trilhos cromados",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_chrome_rails.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_chrome_rails.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.06,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.06,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
           0.0,
-          0.001,
-          -0.0
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 2616,
+      "triangles": 1376,
+      "triangles_lod": 48,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
-        "chrome",
-        "deco_trim"
+        "chrome"
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_chrome_rails_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_chrome_rails_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "cromo_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7435,52 +7435,89 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 108,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 56,
-        "TAIL": 56
+      "motif_tris": {
+        "post_chrome": 44,
+        "rail_chrome": 20
       },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "skirt": {
+        "panel": false,
+        "trim": "chrome",
+        "rows": [
+          {
+            "k": "rail",
+            "t": 0.8,
+            "h": 0.038,
+            "o": "rail_chrome",
+            "m": "chrome",
+            "x": -0.034,
+            "gap_arch": 0.03,
+            "end": 0.0
+          },
+          {
+            "k": "rail",
+            "t": 0.55,
+            "h": 0.038,
+            "o": "rail_chrome",
+            "m": "chrome",
+            "x": -0.034,
+            "gap_arch": 0.03,
+            "end": 0.0
+          },
+          {
+            "k": "rail",
+            "t": 0.3,
+            "h": 0.038,
+            "o": "rail_chrome",
+            "m": "chrome",
+            "x": -0.034,
+            "gap_arch": 0.03,
+            "end": 0.0
+          }
+        ],
+        "posts": {
+          "o": "post_chrome",
+          "m": "chrome",
+          "pitch": 1.0,
+          "w": 0.04,
+          "x": -0.034,
+          "bottom": 0.1
+        }
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_twin",
       "name": "Neon de 2 linhas",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_twin.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_twin.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.055,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
           0.0,
-          0.001,
-          -0.0
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 1392,
+      "triangles": 864,
+      "triangles_lod": 112,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7489,14 +7526,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_twin_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_twin_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7504,52 +7540,62 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 32,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
-      },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "motif_tris": {},
+      "skirt": {
+        "rows": [
+          {
+            "k": "bar",
+            "t": [
+              0.6,
+              0.665
+            ],
+            "m": "deco_neon"
+          },
+          {
+            "k": "bar",
+            "t": [
+              0.38,
+              0.445
+            ],
+            "m": "deco_neon"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_diamond",
       "name": "Corrente de losangos",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_diamond.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_diamond.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.057,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
-          0.002,
-          0.001,
-          -0.0
+          0.0,
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 1608,
+      "triangles": 1020,
+      "triangles_lod": 116,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7559,14 +7605,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_diamond_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_diamond_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7574,52 +7619,67 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 44,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
+      "motif_tris": {
+        "diamond_neon": 16
       },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "skirt": {
+        "rows": [
+          {
+            "k": "bar",
+            "t": [
+              0.555,
+              0.57
+            ],
+            "m": "deco_trim",
+            "d": 0.006
+          },
+          {
+            "k": "motif",
+            "t": 0.56,
+            "h": 0.085,
+            "w": 0.3,
+            "pitch": 0.36,
+            "shrink": 0.5,
+            "o": "diamond_neon",
+            "m": "deco_neon"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_dash",
       "name": "Neon tracejado duplo",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_dash.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_dash.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.055,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
           0.0,
-          0.001,
-          -0.0
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 2364,
+      "triangles": 930,
+      "triangles_lod": 112,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7628,14 +7688,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_dash_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_dash_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7643,52 +7702,67 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 86,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
-      },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "motif_tris": {},
+      "skirt": {
+        "rows": [
+          {
+            "k": "dash",
+            "t": [
+              0.6,
+              0.665
+            ],
+            "len": 0.34,
+            "gap": 0.1,
+            "m": "deco_neon"
+          },
+          {
+            "k": "dash",
+            "t": [
+              0.39,
+              0.455
+            ],
+            "len": 0.34,
+            "gap": 0.1,
+            "shift": 0.5,
+            "m": "deco_neon"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_arch",
       "name": "Neon com arco da roda",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_arch.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_arch.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.061,
-        "y": 0.38,
-        "z": 0.9
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.9
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
-          0.006,
-          0.001,
-          -0.0
+          0.0,
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 2400,
+      "triangles": 1034,
+      "triangles_lod": 134,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7697,14 +7771,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_arch_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_arch_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7712,52 +7785,69 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 32,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 152,
-        "TAIL": 152
-      },
-      "stretch": {
-        "head": 0.2,
-        "mid": 0.5,
-        "tail": 0.2
+      "motif_tris": {},
+      "skirt": {
+        "rows": [
+          {
+            "k": "bar",
+            "t": [
+              0.66,
+              0.7
+            ],
+            "m": "deco_neon",
+            "gap_arch": 0.115
+          },
+          {
+            "k": "bar",
+            "t": [
+              0.46,
+              0.5
+            ],
+            "m": "deco_neon",
+            "gap_arch": 0.115
+          }
+        ],
+        "arch": {
+          "m": "deco_neon",
+          "w": 0.032,
+          "off": 0.06
+        }
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_green",
       "name": "Traços verdes e ciano",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_green.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_green.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.055,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
           0.0,
-          0.001,
-          -0.0
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 2112,
+      "triangles": 990,
+      "triangles_lod": 112,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7767,14 +7857,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_green_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_green_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7782,52 +7871,65 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 72,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
+      "motif_tris": {
+        "marker_led": 10
       },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "skirt": {
+        "rows": [
+          {
+            "k": "motif",
+            "t": 0.7,
+            "h": 0.045,
+            "w": 0.15,
+            "pitch": 0.25,
+            "o": "marker_led",
+            "m": "deco_led"
+          },
+          {
+            "k": "bar",
+            "t": [
+              0.36,
+              0.5
+            ],
+            "m": "deco_neon"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_gems",
       "name": "Pedras de luz",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_gems.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_gems.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.061,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
-          0.006,
-          0.001,
-          -0.0
+          0.0,
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 3192,
+      "triangles": 1342,
+      "triangles_lod": 122,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7837,14 +7939,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_gems_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_gems_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7852,52 +7953,76 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 132,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
+      "motif_tris": {
+        "gem_neon": 12,
+        "marker_led": 10
       },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "skirt": {
+        "rows": [
+          {
+            "k": "motif",
+            "t": 0.72,
+            "h": 0.035,
+            "w": 0.13,
+            "pitch": 0.24,
+            "o": "marker_led",
+            "m": "deco_led"
+          },
+          {
+            "k": "motif",
+            "t": 0.53,
+            "h": 0.17,
+            "w": 0.17,
+            "pitch": 0.32,
+            "o": "gem_neon",
+            "m": "deco_neon"
+          },
+          {
+            "k": "motif",
+            "t": 0.34,
+            "h": 0.035,
+            "w": 0.13,
+            "pitch": 0.24,
+            "o": "marker_led",
+            "m": "deco_led"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {
       "id": "skirt_neon_arrows",
       "name": "Setas duplas",
       "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/skirt_t233/skirt_neon_arrows.glb",
+      "model": "res://assets/vehicles/dekotora/accessories/skirt_t265/skirt_neon_arrows.glb",
       "mount_point": "SOCKET_side_skirts_r",
       "mount_point_left": "SOCKET_side_skirts_l",
       "mirror_for_left": true,
       "dimensions_m": {
-        "x": 0.057,
-        "y": 0.38,
-        "z": 0.6
+        "x": 0.1,
+        "y": 1.08,
+        "z": 10.934
       },
       "bounds_godot": [
         [
-          -0.055,
-          -0.379,
-          -0.6
+          -0.1,
+          -1.08,
+          -10.934
         ],
         [
-          0.002,
-          0.001,
-          -0.0
+          0.0,
+          0.0,
+          0.0
         ]
       ],
-      "triangles": 3696,
+      "triangles": 1144,
+      "triangles_lod": 124,
+      "lod_m": 35.0,
       "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
+        "todos (encaixe por caminhão: truck/sockets/*.json; montada no jogo, SkirtFit)"
       ],
       "materials_used": [
         "chrome",
@@ -7907,14 +8032,13 @@
       ],
       "materials_available": {},
       "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_skirt_neon_arrows_day.png",
+      "preview": "res://assets/vehicles/dekotora/previews/t265_skirt_neon_arrows_day.png",
       "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
       "fit_warnings": [],
       "tier": "oficina",
       "style": "deco",
       "socket": "side_skirts_r",
-      "fit": "runs",
-      "nominal_w": 0.055,
+      "fit": "skirt",
       "default_color": "preto_ciano",
       "has_sign": false,
       "sign_cell": -1,
@@ -7922,22 +8046,46 @@
       "pods": 0,
       "stack": null,
       "socket_left": "side_skirts_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 160,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 68,
-        "TAIL": 68
+      "motif_tris": {
+        "arrow_neon": 22,
+        "marker_led": 10
       },
-      "stretch": {
-        "head": 0.05,
-        "mid": 0.5,
-        "tail": 0.05
+      "skirt": {
+        "rows": [
+          {
+            "k": "motif",
+            "t": 0.8,
+            "h": 0.03,
+            "w": 0.07,
+            "pitch": 0.26,
+            "o": "marker_led",
+            "m": "deco_led"
+          },
+          {
+            "k": "motif",
+            "t": 0.62,
+            "h": 0.1,
+            "w": 0.86,
+            "pitch": 0.95,
+            "shrink": 0.35,
+            "o": "arrow_neon",
+            "m": "deco_neon"
+          },
+          {
+            "k": "motif",
+            "t": 0.44,
+            "h": 0.1,
+            "w": 0.86,
+            "pitch": 0.95,
+            "shrink": 0.35,
+            "o": "arrow_neon",
+            "m": "deco_neon"
+          }
+        ]
       },
       "broken_tilt": [
         0.0,
-        3.0
+        2.0
       ]
     },
     {

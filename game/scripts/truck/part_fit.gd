@@ -81,9 +81,30 @@ static func design_problems(data: Dictionary) -> Array[String]:
 			var zv: Dictionary = data["protected"][z]
 			if _exempt(String(vol[i][0]), zv):
 				continue
-			if overlap(vol[i][1], TruckSockets.aabb_of(zv["box"])):
+			if zone_overlaps(zv, vol[i][1]):
 				probs.append("encaixe %s entra na zona %s" % [vol[i][0], z])
 	return probs
+
+
+## T-265: a caixa `b` entra na zona `zv`? Zona da roda com `round` ([zc, yc, r], eixo X) = cilindro do pneu + 3 cm (a saia
+## com arco contorna a roda e usa os cantos da caixa da zona). Igual a socket_rules.zone_hit (Blender).
+static func zone_overlaps(zv: Dictionary, b: AABB, eps: float = 0.001) -> bool:
+	if not overlap(b, TruckSockets.aabb_of(zv["box"]), eps):
+		return false
+	var rd: Array = zv.get("round", [])
+	if rd.is_empty():
+		return true
+	var cz: float = clampf(float(rd[0]), b.position.z, b.end.z)
+	var cy: float = clampf(float(rd[1]), b.position.y, b.end.y)
+	return Vector2(cz - float(rd[0]), cy - float(rd[1])).length() < float(rd[2]) - eps
+
+
+## T-265: o ponto `w` esta dentro da zona (caixa encolhida 2 mm; na roda, tambem dentro do cilindro)?
+static func zone_has(zv: Dictionary, box: AABB, w: Vector3) -> bool:
+	if not box.grow(-0.002).has_point(w):
+		return false
+	var rd: Array = zv.get("round", [])
+	return rd.is_empty() or Vector2(w.z - float(rd[0]), w.y - float(rd[1])).length() < float(rd[2]) - 0.002
 
 
 static func _exempt(slot: String, zone: Dictionary) -> bool:
@@ -104,7 +125,7 @@ static func part_problems(data: Dictionary, entry: Dictionary, box: AABB) -> Arr
 		probs.append("sai da caixa do encaixe (peca %s, caixa %s)" % [_fmt(box), _fmt(sb)])
 	for z in data.get("protected", {}):
 		var zv: Dictionary = data["protected"][z]
-		if not _exempt(slot, zv) and overlap(box, TruckSockets.aabb_of(zv["box"]), 0.002):
+		if not _exempt(slot, zv) and zone_overlaps(zv, box, 0.002):
 			probs.append("cobre a zona protegida %s" % z)
 	var cab: Dictionary = data.get("measure", {}).get("cab", {})
 	if String(s.get("fit", "")) == "seat":           # T-214: assento real, conferido por raios (PartFitSeat)

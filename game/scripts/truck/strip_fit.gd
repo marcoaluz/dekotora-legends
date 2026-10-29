@@ -183,7 +183,7 @@ static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: N
 	for z in data.get("protected", {}):
 		var zv: Dictionary = data["protected"][z]
 		if not PartFit._exempt(slot, zv):
-			zones.append([String(z), TruckSockets.aabb_of(zv["box"])])
+			zones.append([String(z), TruckSockets.aabb_of(zv["box"]), zv])
 	var outside: int = 0
 	var hit: Dictionary = {}
 	var total: int = 0
@@ -200,7 +200,7 @@ static func problems(model: Node3D, data: Dictionary, entry: Dictionary, node: N
 			if not ok:
 				outside += 1
 			for z in zones:
-				if (z[1] as AABB).grow(-0.002).has_point(w):
+				if PartFit.zone_has(z[2], z[1], w):          # T-265: roda = cilindro (a saia contorna o pneu)
 					hit[z[0]] = true
 	if total == 0:
 		probs.append("peca sem malha")
