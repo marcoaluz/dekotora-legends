@@ -1,6 +1,8 @@
 class_name SideLadder
 extends RefCounted
-## Escada na LATERAL da cabine (T-263, correcao do Marco: "do lado da cabine, tipo do lado da porta"): o encaixe
+## Escada na LATERAL da cabine (T-263, correcao do Marco: "do lado da cabine, tipo do lado da porta"). T-267: na
+## americana e no Canter ela vai na lateral da CARGA logo atras da quina da frente (encaixe com "on": "cargo", medido por
+## `truck_measure.ladder_cargo`; mesma montagem, espacadores so em `sp_free`). O encaixe
 ## ladder_* (blender/scripts/lib/truck_measure.py `ladder_side`) da o ponto na lataria logo atras da porta, a largura
 ## livre (`width`), a inclinacao da lateral (`lean`, dx/dy: a cabine afina para cima) e o vao de cada altura (`gaps`,
 ## passo `gap_dy`). A escada fica em pe virada para fora, inclinada com a lateral, e leva ESPACADORES no meio, a cada
@@ -31,7 +33,27 @@ static func gap_at(s: Dictionary, y: float) -> float:
 		return -1.0
 	var i: int = clampi(floori(t), 0, gaps.size() - 1)
 	var j: int = mini(i + 1, gaps.size() - 1)
+	if s.has("sp_free"):
+		# T-267 (carga): vao medido a cada 1 cm; sem lataria (-1) ou degrau de mais de 1 cm (friso, nervura) = sem espacador
+		var lo: float = minf(float(gaps[maxi(i - 1, 0)]), float(gaps[mini(j + 1, gaps.size() - 1)]))
+		var hi: float = maxf(float(gaps[maxi(i - 1, 0)]), float(gaps[mini(j + 1, gaps.size() - 1)]))
+		for k in range(maxi(i - 1, 0), mini(j + 1, gaps.size() - 1) + 1):
+			lo = minf(lo, float(gaps[k]))
+			hi = maxf(hi, float(gaps[k]))
+		if lo < 0.0 or hi - lo > 0.01:
+			return -1.0
 	return lerpf(float(gaps[i]), float(gaps[j]), clampf(t - i, 0.0, 1.0))
+
+
+## T-267 (escada na quina da frente da carga): o espacador so fica nas faixas de altura `sp_free` (entre as faixas do
+## contorno de LED do bau, que passa por tras da escada). Sem `sp_free` (escada da cabine) vale qualquer altura.
+static func in_free(s: Dictionary, y: float) -> bool:
+	if not s.has("sp_free"):
+		return true
+	for f in s["sp_free"]:
+		if y - SP_W * 0.5 >= float(f[0]) and y + SP_W * 0.5 <= float(f[1]):
+			return true
+	return false
 
 
 ## Espacadores (uma malha, material de acabamento da peca) do pe ate o topo da lataria medida. Grava a meta "contacts"
@@ -51,14 +73,18 @@ static func add_spacers(node: Node3D, s: Dictionary, height: float) -> void:
 	var n: int = 0
 	while yl <= height:
 		var world: Vector3 = anchor + node.transform * Vector3(0.0, yl, 0.0)
-		var g: float = gap_at(s, world.y)
+		var g: float = gap_at(s, world.y) if in_free(s, world.y) else -1.0
 		if g >= 0.0:
 			var len: float = g + EMBED
 			_box(st, Vector3(0.0, yl, len * 0.5), Vector3(SP_W, SP_W, len))
 			var out_n: Vector3 = -(node.transform.basis.z.normalized())
 			contacts.append({"p": anchor + node.transform * Vector3(0.0, yl, g), "n": out_n})
 			n += 1
-		yl += SPACING
+			yl += SPACING
+		elif s.has("sp_free"):
+			yl += 0.03                      # T-267: (friso/faixa de LED aqui) tenta um pouco mais acima
+		else:
+			yl += SPACING
 	if n == 0:
 		return
 	st.generate_normals()

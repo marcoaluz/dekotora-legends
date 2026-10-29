@@ -119,6 +119,14 @@ def build_one(path: str) -> dict:
     trees = TM._pillar_trees([])
     for side, sx in (("r", 1), ("l", -1)):
         m["ladder_" + side] = TM.ladder_side(m, trees, sx, z_lim)
+    if cab in TM.CARGO_LADDER_CABS and m.get("box"):
+        # T-267 (Marco, opção b): americana e Canter (porta até o fim da cabine) levam a escada na quina da frente da
+        # carga, por fora do contorno de LED e atrás dos escapamentos (caixa deles + 2 cm)
+        edge_min = max(min(p[2] + 0.15, m["box"]["front_z"] - 0.01) for p in st) + 0.021
+        ct = TM._cargo_trees()
+        for side, sx in (("r", 1), ("l", -1)):
+            strips = [] if body in OPEN_BODIES else m["edges"].get("strips", {}).get("box_light_" + side, [])
+            m["ladder_" + side] = TM.ladder_cargo(m, ct, sx, strips, edge_min)
     zones = R.protected_zones(m, cab, st)
     m["paint"] = PM.paint_faces(data, m, m["edges"], zones["rear_doors"]["box"]) if "rear_doors" in zones else {}   # T-232
     sk = R.sockets(m, st)

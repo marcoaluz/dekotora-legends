@@ -221,6 +221,19 @@ def sockets(m: dict, extra_stacks: list) -> dict:
                                "anchor": [round(sx * lx, 3), ld["y0"], lz], "fit": "ladder", "face_x": round(sx * lx, 3),
                                "width": ld["w"], "height": round(ld["top"] - ld["y0"], 3), "lean": ld["lean"],
                                "gap_dy": ld["dy"], "gaps": ld["gaps"]}
+        if ld.get("on") == "cargo":
+            # T-267 (americana e Canter): na lateral da carga, por FORA do contorno de LED do baú. Duas partes: a escada
+            # (de 4 mm antes da linha dela para fora) e, só nas faixas de altura livres entre as faixas do contorno, os
+            # espaçadores até a lataria (o jogo só põe espaçador dentro de `sp_free`)
+            sk_ = s["ladder_" + side]
+            outer = _box(sx * (lx - 0.004), ld["y0"] - 0.005, lz - hw2 - 0.02, sx * (lx + LADDER_STEP),
+                         ld["top"] + LEDBOX_H + 0.01, lz + hw2 + 0.02)
+            inner = [_box(sx * xlo, f[0], lz - 0.03, sx * (lx - 0.004), f[1], lz + 0.03) for f in ld["sp_free"]]
+            sk_.pop("box")
+            sk_["boxes"] = [outer] + inner
+            sk_["box"] = outer          # (a peça inteira: PartFit.part_problems lê "box"; os vértices usam "boxes")
+            sk_["on"] = "cargo"
+            sk_["sp_free"] = ld["sp_free"]
     bx = m.get("box")
     if bx:
         bh, top, bot, bf, rz = bx["half_w"], bx["top_y"], bx["bottom_y"], bx["front_z"], bx["rear_z"]

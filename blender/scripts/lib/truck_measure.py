@@ -976,3 +976,149 @@ def ladder_side(m: dict, trees, sx: int, z_lim: float) -> dict | None:
                             "gaps": [round(float(g), 3) for g in (line - xc)]}
             z += 0.02
     return None
+
+
+# ----------------------------------------------------------------------------- escada na quina da frente da carga (T-267)
+
+# Decisão do Marco (T-263, opção b): na americana e no Canter a porta vai até o fim da cabine e não sobra chapa atrás
+# dela; nesses dois a escada vai na LATERAL DA CARGA (baú/carroceria), logo atrás da quina da frente.
+CARGO_LADDER_CABS = ("americana", "canter")
+CARGO_BAD = ("truck_lamp", "truck_glass", "truck_andon", "truck_led", "truck_neon")   # luz de marcação, vidro: nunca
+CARGO_REACH = 0.70                # m: a borda de trás da escada fica no máximo isto atrás da frente da carga (quina)
+CARGO_MIN = 0.80                  # m: lateral livre mais baixa que isto não leva escada
+CARGO_DEEP = 0.30                 # m: raio que bate mais fundo que isto (dentro da lateral) não conta como lataria
+CARGO_WMIN = 0.20                 # m: na carga a escada encolhe até aqui (graneleira: entre as lanternas da tampa)
+CARGO_LAMP_GAP = 0.015            # m: folga mínima entre a borda da escada e uma luz de marcação ao lado
+CARGO_GAP_DY = 0.01               # m: passo do vão medido atrás da escada da carga (espaçadores)
+CARGO_LIFT = 0.40                 # m: a escada pode começar até isto acima do fundo da carga (acima da fileira de luzes)
+STRIP_T = 0.03                    # = socket_rules.STRIP_T (contorno de LED do baú, T-231)
+STRIP_W = 0.025                   # = socket_rules.STRIP_W
+LEDBOX_H = 0.16                   # = accessories/ladder_t233.LEDBOX_H
+
+
+def _cargo_trees():
+    """T-267: BVHs (Blender) separadas: tudo o que é lataria/estrutura da carga ("ok") e lâmpadas/vidro ("bad")."""
+    import bmesh
+    from mathutils.bvhtree import BVHTree
+    bms = {"ok": bmesh.new(), "bad": bmesh.new()}
+    for o in sorted(bpy.data.objects, key=lambda o: o.name):
+        if o.type != "MESH" or o.name.startswith("wheel_"):
+            continue
+        base = o.name.split(".")[0]
+        me = o.to_mesh()
+        me.transform(o.matrix_world)
+        bms["bad" if base.startswith(CARGO_BAD) else "ok"].from_mesh(me)
+        o.to_mesh_clear()
+    out = {}
+    for k, bm in bms.items():
+        out[k] = BVHTree.FromBMesh(bm)
+        bm.free()
+    return out
+
+
+def ladder_cargo(m: dict, trees, sx: int, strips: list, edge_min: float, dbg: list | None = None) -> dict | None:
+    """T-267: escada em pé na LATERAL DA CARGA logo atrás da quina da frente (americana e Canter), virada para fora, do
+    fundo da carga até 10 cm acima da borda de cima (caixa de LED por cima), medida por raios de fora para dentro numa
+    grade z × y. A escada fica no primeiro lugar a partir da quina onde: as 3 colunas (bordas e meio) batem na lateral da
+    carga do fundo até pelo menos CARGO_MIN; nenhuma coluna (a cada 2 cm, com CARGO_LAMP_GAP de folga dos lados) bate em lâmpada ou
+    vidro (luz de marcação) em toda a altura da escada + caixa de LED; nada sai mais que a lateral acima da borda
+    (onde a escada fica livre; um poste mais para dentro fica atrás dela); a lateral é quase plana (espaçadores cobrem até LADDER_FLAT). A escada fica por FORA do contorno
+    de LED do baú (`strips` = trechos box_light_* deste lado, T-231) e o espaçador nunca cruza uma faixa dele (`sp_free`).
+    `edge_min` = onde a borda da frente da escada pode começar (atrás dos escapamentos). Devolve as mesmas chaves de
+    `ladder_side` (`lean` 0: a lateral da carga é vertical) + "on": "cargo" e "sp_free", ou None (não cabe)."""
+    bx = m["box"]
+    fz, bot, top, hw = bx["front_z"], bx["bottom_y"], bx["top_y"], bx["half_w"]
+    side = [g for g in strips if abs(g["n"][0]) > 0.5]
+    horiz = [g for g in side if abs(g["a"][1] - g["b"][1]) < 1e-3]
+    vert = [g for g in side if abs(g["a"][2] - g["b"][2]) < 1e-3 and g["a"][2] < fz + 0.5]
+    # (a frente da carga pode ter um poste/cabeceira na frente de `front_z`, como a graneleira: a escada pode montar nele)
+    edge0 = max([m["cab"]["roof_back_z"] + 0.05, edge_min] + [g["a"][2] + STRIP_W * 0.6 + 0.021 for g in vert])
+    y_bot = round(bot + 0.03, 3)
+    ys = [round(y_bot + 0.05 * i, 3) for i in range(int((top + 0.02 - y_bot) / 0.05) + 1)]
+    above = [round(top + 0.03 + 0.05 * i, 3) for i in range(int((LADDER_ROOF + LEDBOX_H + 0.02) / 0.05) + 2)]
+    cache: dict = {}
+
+    def hit(y, z):
+        k = (y, round(z, 3))
+        if k not in cache:
+            cache[k] = _side_hit(trees, sx, y, z)
+        return cache[k]
+
+    for w in (LADDER_W, 0.30, 0.26, LADDER_WMIN, CARGO_WMIN):
+        z = edge0 + w / 2
+        while z + w / 2 <= fz + CARGO_REACH + 1e-6:
+            cols = (z - w / 2 + 0.02, z, z + w / 2 - 0.02)
+            # colunas a cada 2 cm (uma lanterna de 8 cm passa entre as 3 colunas da lateral) com a folga dos lados
+            z_a = z - w / 2 - CARGO_LAMP_GAP
+            wide = [z_a + 0.02 * k for k in range(int((w + 2 * CARGO_LAMP_GAP) / 0.02) + 1)] + [z + w / 2 + CARGO_LAMP_GAP]
+            lamps = [y for y in ys + above if any((h := hit(y, q)) and h[1] == "bad" for q in wide)]
+            # fileira de luzes de marcação no friso de baixo da carga: a escada começa logo acima dela (sobe até CARGO_LIFT)
+            low = [y for y in lamps if y <= y_bot + CARGO_LIFT]
+            y_start = max(low) + 0.06 if low else y_bot
+            rows = []
+            for y in ys:                                                  # lateral da carga, do fundo para cima
+                if y < y_start - 1e-6:
+                    continue
+                r = [hit(y, q) for q in cols]
+                if not all(h and h[1] == "ok" and h[0] >= hw - CARGO_DEEP for h in r):
+                    if not rows and y < y_start + 0.2:
+                        continue                  # (vão entre o assoalho e o friso de baixo: a escada começa no friso)
+                    break
+                rows.append((y, r))
+            ok = len(rows) >= 2 and rows[-1][0] - rows[0][0] >= CARGO_MIN
+            if dbg is not None and not ok:
+                dbg.append((w, round(z, 3), "lateral curta", rows[-1][0] if rows else None))
+            if ok:
+                ltop = rows[-1][0]
+                face = max(h[0] for _, r in rows for h in r)
+                for y, _ in rows:                                         # o que sai mais, a cada 2 cm (dobradiça, friso)
+                    for q in wide:
+                        h = hit(y, q) if z - w / 2 - 1e-6 <= q <= z + w / 2 + 1e-6 else None
+                        if h and h[0] >= hw - CARGO_DEEP:
+                            face = max(face, h[0])
+                # luz de marcação (e vidro) em nenhuma coluna, da base da escada até a caixa de LED
+                up = [y for y in lamps if rows[0][0] - 0.03 <= y <= ltop + LADDER_ROOF + LEDBOX_H + 0.03]
+                if up:
+                    ok = False
+                    if dbg is not None:
+                        dbg.append((w, round(z, 3), "luz/vidro", up[0]))
+            if ok:
+                for y in [q for q in ys if q > ltop] + above:           # acima da borda: nada saindo da lateral
+                    if y > ltop + LADDER_ROOF + LEDBOX_H + 0.03:
+                        break
+                    if any((h := hit(y, q)) and h[0] > face - 0.005 for q in cols):
+                        ok = False
+                        if dbg is not None:
+                            dbg.append((w, round(z, 3), "acima da borda", y))
+                        break
+            if ok:
+                xc = [r[1][0] for _, r in rows]                           # coluna do meio (onde fica o espaçador)
+                # o espaçador fica na coluna do meio: é ela que precisa estar perto (as bordas só não podem sair mais)
+                if dbg is not None and face - min(xc) > LADDER_FLAT:
+                    dbg.append((w, round(z, 3), "torta", round(face - min(xc), 3)))
+                if face - min(xc) <= LADDER_FLAT:
+                    # por fora do contorno de LED da lateral (faixas que passam por esta escada)
+                    zs0, zs1 = z - w / 2 - 0.02, z + w / 2 + 0.02
+                    over = [g for g in horiz if min(g["a"][2], g["b"][2]) - 0.01 < zs1 and max(g["a"][2], g["b"][2]) + 0.01 > zs0]
+                    lx = max([face] + [abs(g["a"][0]) + STRIP_T + 0.004 for g in over])
+                    # faixas de altura onde o espaçador pode ficar (entre as faixas do contorno, dentro da lateral medida)
+                    bands = sorted((g["a"][1] - STRIP_W * 0.6 - 0.002, g["a"][1] + STRIP_W * 0.6 + 0.002) for g in over)
+                    y0 = rows[0][0]
+                    free, lo = [], y0
+                    for b0, b1 in bands:
+                        if b0 > lo:
+                            free.append([round(lo, 3), round(min(b0, ltop), 3)])
+                        lo = max(lo, b1)
+                    if lo < ltop:
+                        free.append([round(lo, 3), round(ltop, 3)])
+                    free = [f for f in free if f[1] - f[0] >= 0.05]
+                    # vão a cada 1 cm na coluna do meio (friso, nervura: o jogo não põe espaçador onde o vão muda de repente)
+                    fine = []
+                    for i in range(int(round((ltop - y0) / CARGO_GAP_DY)) + 1):
+                        h = hit(round(y0 + CARGO_GAP_DY * i, 3), z)
+                        fine.append(round(float(lx - h[0]), 3) if h and h[0] >= hw - CARGO_DEEP else -1.0)
+                    return {"x": round(lx, 3), "lean": 0.0, "z": round(z, 3), "w": w, "y0": y0,
+                            "top": round(ltop + LADDER_ROOF, 3), "dy": CARGO_GAP_DY,
+                            "gaps": fine, "on": "cargo", "sp_free": free}
+            z += 0.01
+    return None
