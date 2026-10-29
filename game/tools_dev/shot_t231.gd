@@ -186,6 +186,8 @@ func _mount(j: Dictionary) -> void:
 		var q: Vector3 = lsock.global_position
 		var lrel: Dictionary = {
 			"lad_close": [Vector3(2.6, 1.5, -2.6), Vector3(0.0, 0.9, 0.0)],
+			"lad_34": [Vector3(4.8, 3.2, -4.4), Vector3(0.0, 1.3, 0.8)],          # T-267: escada da carga com a cabine
+			"lad_side": [Vector3(5.2, 1.6, 0.4), Vector3(0.0, 1.3, 0.4)],         # T-267: de lado, a quina inteira
 			"lad_hi": [Vector3(1.9, 3.5, -1.9), Vector3(0.0, 1.3, 0.0)],
 			"lad_gap": [Vector3(3.4, 0.9, 0.0), Vector3(0.0, 0.9, 0.0)],
 			"lad_back": [Vector3(1.4, 1.0, 1.6), Vector3(0.0, 0.9, -0.1)],

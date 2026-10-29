@@ -12,7 +12,9 @@ const LADDERS: Array[String] = ["ladder_neon", "ladder_green", "ladder_chrome"]
 const SKIRTS: Array[String] = ["skirt_chrome_rails", "skirt_neon_twin", "skirt_neon_diamond", "skirt_neon_dash", "skirt_neon_arch",
 	"skirt_neon_green", "skirt_neon_gems", "skirt_neon_arrows"]
 const OPEN_BODIES: Array[String] = ["graneleira", "tarp", "tanker", "dump"]
-const NO_LADDER_CABS: Array[String] = ["americana", "canter"]   # T-263: porta ate o fim da cabine
+# T-263: americana e Canter tem porta ate o fim da cabine; T-267 (Marco, opcao b): nesses dois a escada vai na quina da
+# frente da CARGA. So o tanque (lateral curva) fica sem lugar.
+const NO_LADDER_STEMS: Array[String] = ["dekotora_truck_tanker_americana"]
 const PF := preload("res://tests/test_part_fit.gd")
 
 
@@ -59,9 +61,9 @@ func test_every_truck_fits() -> void:
 		for id in all_ids():
 			var e: Dictionary = c.entry(id)
 			var has_socket: bool = TruckSockets.socket(m["data"], String(e["socket"])).size() > 0
-			if id in LADDERS and String(m["cab"]) in NO_LADDER_CABS:
-				# T-263: a escada fica na lateral da cabine atras da porta; americana e Canter nao tem lataria livre ali
-				check(not has_socket, "%s em %s: sem lugar atras da porta" % [id, m["stem"]])
+			if id in LADDERS and String(m["stem"]) in NO_LADDER_STEMS:
+				# T-267: tanque com americana: a lateral do tanque e curva (nao cabe escada reta na quina)
+				check(not has_socket, "%s em %s: sem lugar (lateral curva)" % [id, m["stem"]])
 				continue
 			check(has_socket, "%s em %s: encaixe existe" % [id, m["stem"]])
 			var probs: Array[String] = PartFit.check_part(model, m["data"], c, id)
