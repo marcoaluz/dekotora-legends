@@ -810,3 +810,30 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   (rode depois do `build_sockets.py`); `test_accessories` aceita até 11,5 m só para fit "skirt".
 - Prints: vistas `sk_side`, `sk_ref`, `sk_arch`, `sk_front`, `sk_left`, `sk_low`, `sk_far` (com `--fov=12`) do
   `shot_t231.gd`; `bash tools/capture_t265.sh [rodada NOME|folhas|previas|tudo]`.
+
+## Para-choques grandes (T-264)
+
+- Cinco peças `fb_wrap_*` (`game/data/parts/`, fit `bumper` com `wrap`): `BumperWrap` (`game/scripts/truck/bumper_wrap.gd`) ajusta
+  altura, largura das abas e comprimento; `FrameContact` mede o contato (costas no nariz, abas na lateral sem entrar).
+  Ids: `fb_wrap_lamps` (054–055), `fb_wrap_tower` (056–057), `fb_wrap_chrome` (058), `fb_wrap_deck4` (059–060),
+  `fb_wrap_deck_wide` (061–062). Bots sorteiam lamps/deck4; o chefe usa deck_wide. Protocolo 23.
+- Testes `-- --only=t264` (`tests/test_parts_t264.gd`). Sonda: `godot --headless --path game -s res://tools_dev/probe_t264.gd`.
+- Prints: `bash tools/capture_t264.sh [rodada NOME|folhas|tudo]` (→ `docs/capturas_t264/`; `rodada` compara com a arte de
+  terceiros em `docs/Referencias/oficina/t264/`, fora do Git).
+- Armadilha: a faixa CEN não encolhe junto com a faixa do meio; o fundo da torre e da grade tem de ir em MID, senão passa
+  do chão nas cabines baixas.
+
+## Murais praia (T-266)
+
+- 8 imagens de `docs/Murais/Paria` no grupo Wallpapers: 3 murais (um desenho por lado), 2 traseiras e 1 teto, em
+  `game/assets/vehicles/dekotora/paint_wall/{mural,rear,roof}/`. Murais 1536x512.
+- O corte segue o rosto: `focus` e `keep` no `PaintFit` são opcionais (pinturas antigas ficam iguais).
+- Testes `-- --only=paint_t266` (`tests/test_paint_t266.gd`); prints `bash tools/capture_t266.sh [PASTA_ABS]`.
+- Armadilha: `catalog.json` e `pt-BR.json` podem ter mudanças de outra tarefa no disco; commite por blob (só as entradas da tarefa).
+
+## Modo de teste do Marco (T-268)
+
+- Opções > Avançado > "Modo de teste (dinheiro infinito, tudo liberado)". Guardado em `user://settings.cfg`, seção `[advanced]`,
+  chave `dev_unlock` (`Settings.dev_unlock`).
+- `GameState.set_dev_unlock(on)` guarda o dinheiro real ao ligar e devolve ao desligar (gastos do teste somem). Dinheiro
+  `DEV_CASH` 99.999.999; Fama `DEV_FAME` 99.999. Só local: o servidor online não muda.

@@ -385,3 +385,21 @@ um problema visual não puder ser entendido pelos renders.
 - Triângulos do catálogo: medir no jogo (`tools_dev/measure_t265.gd -- --out=ARQ.json`) e rodar `build_t265_parts.py --
   --tris ARQ.json`.
 - Armadilha: face côncava (rabo da seta) em leque a partir da PONTA (a ponta enxerga todos os cantos); não pule triângulo.
+
+## Para-choques grandes (T-264)
+
+- Peças: `blender -b --factory-startup -P blender/scripts/build_t264_parts.py -- [--only id1,id2] [--no-preview]` (gera
+  `accessories/front_t264/<id>.glb`, previews `t264_*` e entradas `deco` do `catalog.json`). Rode antes o `build_sockets.py`
+  (abas medidas por raios em `lib/truck_measure.py`; regras em `lib/socket_rules.py`).
+- Desenho das abas em `accessories/front_t264.py`; grupos TOP_/MID_/BOT_/CEN_ e LOD LTOP_/LMID_/LBOT_/LCEN_.
+- Folha genérica (Blender + numpy, sem Pillow): `blender -b --factory-startup -P tools/sheet_t264.py -- SAIDA.png COLUNAS LARGURA_CELULA img1.png ...`.
+- Armadilha: parafuso na face de CIMA no grupo CEN sobe acima do topo; a lâmpada na lateral da aba sai da caixa (a aba só tem a espessura).
+
+## Murais praia (T-266)
+
+- `blender -b --factory-startup -P blender/scripts/build_t266_praia.py -- [--sheet PASTA_ABS] [--install]`. Recortes, rosto e
+  brilho noturno em `lib/t266_praia.py`; ajuda de desenho 2D em `lib/paint2d.py`. Sem `--install` só saem as folhas e a arte em
+  `blender/renders/t266/arte`; com `--install` grava em `game/assets/vehicles/dekotora/paint_wall/` e o `blender/renders/t266/praia.json`.
+- Depois: `python -I tools/gen_t258_data.py --manifest blender/renders/t266/praia.json` e
+  `bash tools/import_textures_3d.sh game/assets/vehicles/dekotora/paint_wall/mural game/assets/vehicles/dekotora/paint_wall/rear game/assets/vehicles/dekotora/paint_wall/roof`.
+- Build determinístico (mesmas imagens = mesmos bytes).
