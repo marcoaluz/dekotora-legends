@@ -405,6 +405,11 @@ não dá para trocar o espelho sem regerar os `.glb` (seção 13).
 > **FEITO na T-233** (lateral do baú). **Refeito na T-263** pela correção do Marco: na LATERAL DA CABINE, logo atrás da
 > porta e do vidro dela, inclinada com a lateral, com espaçadores até a lataria, estribo embaixo e uma caixa de LED
 > passando do teto (cor do LED separada). Serve em todas as cargas; americana e Canter não têm lugar atrás da porta.
+> **T-267** (decisão do Marco, opção b): na **americana e no Canter** a escada vai na **lateral da carga, logo atrás da
+> quina da frente** (baú ou carroceria), por fora do contorno de LED do baú, entre as luzes de marcação (nunca por cima
+> delas), do fundo da carga até 10 cm acima da borda de cima, com a caixa de LED em cima. Medida por raios
+> (`truck_measure.ladder_cargo`); a largura encolhe até 0,20 m onde as luzes de marcação apertam. O tanque com americana
+> fica sem escada (lateral curva). As outras cabines continuam com a escada ao lado da porta.
 
 **O que as imagens mostram.** Câmera em 3/4 pela frente, alta. **Escadas verticais** na lateral da cabine, junto da
 porta (por cima da lataria da cabine), do estribo até passar do teto, com uma caixinha de luz no alto, 0,2–0,3 m de
@@ -513,7 +518,7 @@ Caixas-limite iniciais (caminhão base com cabine chata; o script calcula as dos
 | `visor` | sobre o para-brisa | 2,4 × 0,45 × 0,5 m |
 | `mirror_stay` (cada lado) | quina da frente da cabine | 0,6 × 1,4 × 1,0 m |
 | `front_bumper` | frente, embaixo | 2,7 × 0,8 × 0,7 m |
-| `ladder` (cada lado) | lateral da cabine, logo atrás da porta (T-263) | 0,34 × 2,4 × 0,16 m |
+| `ladder` (cada lado) | lateral da cabine, logo atrás da porta (T-263); americana e Canter: lateral da carga atrás da quina da frente (T-267) | 0,34 × 2,4 × 0,16 m |
 | `rocket` | bordas do teto do baú | largura do baú × 0,35 × comprimento do baú |
 | `box_light_*` | casca de 3 cm sobre cada face do baú | face inteira |
 | `side_skirts` (cada lado) | entre as rodas e atrás da roda | 0,35 × 0,6 × (vão entre eixos) |

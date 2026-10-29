@@ -1718,3 +1718,27 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
 - **Bots e chefe**: bots também sorteiam `fb_wrap_lamps` e `fb_wrap_deck4`; o chefe (Imperador da Estrada) troca o
   `fb_deck_neon` pelo `fb_wrap_deck_wide`. Descritor/massa dos bots mudaram: **protocolo 23**.
 - Números (peso, preço, fama) em `docs/REFERENCIA_PECAS.md` seção 3 são **proposta**.
+
+## 2026-10-29 · T-267 · Escada na quina da frente da carga (americana e Canter)
+
+- **Decisão do Marco (T-263, opção b)**: na cabine **americana** e no **Canter** a porta vai até o fim da cabine e não
+  sobra chapa atrás dela; só nesses dois a escada vai na **lateral da carga, logo atrás da quina da frente** (baú ou
+  carroceria). As outras cabines continuam com a escada ao lado da porta (T-263). Retrovisor não mudou.
+- **Medida por raios** (`truck_measure.ladder_cargo`, chamada pelo `build_sockets.py` só para essas cabines): grade de
+  raios de fora para dentro na lateral da carga, a partir da quina (atrás dos escapamentos e do contorno de LED da
+  frente), até 0,70 m para trás. A escada fica no 1º lugar onde a lateral é lataria do fundo até pelo menos 0,80 m,
+  quase plana na coluna do meio (espaçadores cobrem até 0,25 m), nada sai mais que ela acima da borda e **nenhuma luz
+  de marcação/lanterna/vidro** fica atrás dela (colunas a cada 2 cm + 1,5 cm de folga dos lados). Largura 0,34 m,
+  encolhendo até **0,20 m** onde as luzes de marcação apertam (baús base/leve/longo/rosa e graneleira: 0,20–0,22 m;
+  alumínio, lona, caçamba: 0,34 m). Sobe do fundo da carga até **10 cm acima da borda de cima**, com a caixa de LED em
+  cima (como a da cabine).
+- **Contorno de LED do baú**: a escada fica **por fora** dele (4 mm de folga) e os espaçadores só entram nas faixas de
+  altura entre as faixas do contorno (`sp_free`); o encaixe tem duas caixas (escada + espaçadores) para nunca cruzar o
+  contorno. Vão medido a cada 1 cm atrás da escada; onde o vão muda de repente (friso, nervura) o jogo não põe
+  espaçador ali e tenta 3 cm acima.
+- **Tanque com americana**: sem escada (a lateral do tanque é curva; a loja mostra "não cabe"). Os outros 8 caminhões
+  americana (base, leve, longo, graneleira, alumínio, lona, rosa, caçamba) e o Canter têm escada nos dois lados.
+- Deque, viseira, escapamentos, foguete, contorno, saias e zonas protegidas: conferidos (`build_sockets` sem problema,
+  `design_problems` vazio). Só os encaixes `ladder_r/l` desses 10 caminhões mudaram nos JSON.
+- Rede e save não mudam (o descritor já levava a escada; só o lugar dela): **protocolo continua 23**. Quem já
+  tinha escada com essas cabines (jogador, bots) passa a vê-la na carga.

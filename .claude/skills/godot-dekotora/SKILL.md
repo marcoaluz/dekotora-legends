@@ -780,3 +780,13 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
 - Armadilha: classe nova (`class_name`) só existe para `-s` depois de `godot --headless --path game --import`.
 - Armadilha: a comparação com as capturas do jogo original vai para `docs/Referencias/oficina/t263/` (fora do Git), nunca
   para `docs/capturas_*`.
+
+## Escada na quina da frente da carga (T-267)
+
+- Americana e Canter: encaixe `ladder_*` com `"on": "cargo"` (lateral da carga atrás da quina; mesmo `SideLadder`).
+  `SideLadder.in_free` só põe espaçador dentro de `sp_free`; com `sp_free`, `gap_at` devolve -1 onde o vão medido (a
+  cada 1 cm) muda mais de 1 cm (friso) e `add_spacers` tenta 3 cm acima.
+- Testes `-- --only=ladder_cargo` (`tests/test_ladder_cargo_t267.gd`: na quina, por fora, caixa de LED acima da borda,
+  não cobre lâmpada de fábrica, contato e vão de 4 cm detectado). `test_parts_t233` só espera "sem lugar" no tanque
+  com americana (`NO_LADDER_STEMS`).
+- Prints: `bash tools/capture_t267.sh [prints|folhas|tudo]` (vistas novas `lad_34` e `lad_side` do `shot_t231.gd`).

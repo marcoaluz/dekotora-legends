@@ -359,3 +359,14 @@ um problema visual não puder ser entendido pelos renders.
 - Peças: `accessories/mirror_t233.py` (grupos `PADF_`/`PADS_`, `pads` vão para o catálogo pelo `build_t233_parts.py`),
   `accessories/ladder_t233.py` (estribo + caixa de LED no `TOP_`).
 - Ordem: `build_t233_parts.py -- --only ...` → `build_sockets.py` → `godot --headless --path game --import`.
+
+## Escada na quina da frente da carga (T-267)
+
+- Só cabine `americana` e `canter` (`truck_measure.CARGO_LADDER_CABS`): `build_sockets.py` troca `ladder_side` por
+  `truck_measure.ladder_cargo(m, _cargo_trees(), sx, strips, edge_min)` (lateral da carga atrás da quina, por fora do
+  contorno de LED `box_light_*`, entre as luzes de marcação; `lean` 0, vão a cada 1 cm, `sp_free` = alturas livres
+  para espaçador). `socket_rules` grava 2+ caixas (`boxes`: escada + espaçadores) e `"on": "cargo"`.
+- Depurar por que não coube: `ladder_cargo(..., dbg=lista)` junta (largura, z, motivo, y): "lateral curta", "luz/vidro",
+  "acima da borda", "torta". Tanque com americana fica sem (lateral curva).
+- Regerar só esses: `blender -b --factory-startup -P blender/scripts/build_sockets.py -- --only base_americana,leve_americana,longo_americana,graneleira_americana,alubox_americana,tarp_americana,pinkbox_americana,tanker_americana,dump_americana,canter`
+- Armadilha: lanterna de 8 cm passa entre colunas de raio espaçadas de 9 cm. Para "não cobrir luz", use colunas a cada 2 cm.
