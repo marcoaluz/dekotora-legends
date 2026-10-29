@@ -39,7 +39,8 @@ Os intervalos conferidos no documento **batem exatamente** com a tabela do pedid
 Duas pequenas correções ao resumo do pedido (vale o documento):
 - No deque, **só as capturas 002 e 003** têm o botão "De dia/De noite" (são a mesma peça de dia e de noite); a 001 tem
   "Alterar cor - L/R".
-- A escada (111–113) fica **atrás da cabine, na quina da frente do baú**, não na traseira.
+- A escada (111–113) fica **na lateral da cabine, ao lado (logo atrás) da porta** (correção do Marco na T-263; a
+  leitura antiga "atrás da cabine, na quina do baú" estava errada), não na traseira.
 
 ### Regra que aparece em todas as seções
 
@@ -332,7 +333,8 @@ Cores (L/R): verde, ciano, rosa, âmbar.
 ## 8. Retrovisor (105–110)
 
 > **FEITO na T-233**: as 6 hastes no jogo (`accessories/mirror_t233.py`), até 0,50 m para fora e 0,60 m à frente da cabine;
-> o espelho de fábrica some quando a haste está montada.
+> o espelho de fábrica some quando a haste está montada. **T-263**: a base da haste encosta na coluna do para-brisa medida
+> em cada cabine (chapa de fixação + espaçador, sem vão) e o espelho de fábrica some inteiro.
 
 **O que as imagens mostram.** Câmera em 3/4 pela frente-esquerda, enquadrando a cabine. São **hastes grandes de retrovisor**
 (ミラーステー) que saem da quina da cabine e avançam ~0,4–0,9 m para a frente e para o lado: haste em L simples (105),
@@ -359,12 +361,14 @@ não dá para trocar o espelho sem regerar os `.glb` (seção 13).
 
 ## 9. Escada (111–113)
 
-> **FEITO na T-233**: as 3 escadas no jogo (`accessories/ladder_t233.py`), na lateral do baú atrás da quina da frente, por
-> fora do contorno de LED. Só baú fechado.
+> **FEITO na T-233** (lateral do baú). **Refeito na T-263** pela correção do Marco: na LATERAL DA CABINE, logo atrás da
+> porta e do vidro dela, inclinada com a lateral, com espaçadores até a lataria, estribo embaixo e uma caixa de LED
+> passando do teto (cor do LED separada). Serve em todas as cargas; americana e Canter não têm lugar atrás da porta.
 
-**O que as imagens mostram.** Câmera em 3/4 pela frente, alta. **Escadas verticais** presas na quina da frente do baú,
-logo atrás da cabine, do chassi até o topo do baú (~2,5 m), 0,2–0,3 m de largura: com **trilhos de neon ciano** (111),
-com **luzes verdes** nos degraus (112) e **cromada treliçada** (113). Aparece uma de cada lado.
+**O que as imagens mostram.** Câmera em 3/4 pela frente, alta. **Escadas verticais** na lateral da cabine, junto da
+porta (por cima da lataria da cabine), do estribo até passar do teto, com uma caixinha de luz no alto, 0,2–0,3 m de
+largura: **chapa preta com neon ciano** (111), **treliça de anéis com LEDs verdes** (112) e **grade cromada** (113).
+Aparece uma de cada lado.
 
 **Variantes distintas:** **3**.
 
@@ -468,7 +472,7 @@ Caixas-limite iniciais (caminhão base com cabine chata; o script calcula as dos
 | `visor` | sobre o para-brisa | 2,4 × 0,45 × 0,5 m |
 | `mirror_stay` (cada lado) | quina da frente da cabine | 0,6 × 1,4 × 1,0 m |
 | `front_bumper` | frente, embaixo | 2,7 × 0,8 × 0,7 m |
-| `ladder` (cada lado) | quina da frente do baú, atrás da cabine | 0,35 × 2,6 × 0,25 m |
+| `ladder` (cada lado) | lateral da cabine, logo atrás da porta (T-263) | 0,34 × 2,4 × 0,16 m |
 | `rocket` | bordas do teto do baú | largura do baú × 0,35 × comprimento do baú |
 | `box_light_*` | casca de 3 cm sobre cada face do baú | face inteira |
 | `side_skirts` (cada lado) | entre as rodas e atrás da roda | 0,35 × 0,6 × (vão entre eixos) |

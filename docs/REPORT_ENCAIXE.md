@@ -203,68 +203,72 @@ de `rear_doors`). Conferido por `PaintFit.problems`.
 
 | Caminhão | Para-choques OK | Altura livre / faixa do meio | Retrovisores OK | Escadas OK | Saias OK | Trechos da saia (dir., m) | Falhas |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| alubox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.62 + 1.48 | nenhuma |
+| alubox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.62 + 1.48 | nenhuma |
 | alubox_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
 | alubox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.71 + 1.48 | nenhuma |
 | alubox_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
 | alubox_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.63 + 1.48 | nenhuma |
 | alubox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.62 + 1.48 | nenhuma |
-| base_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| base_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.75 + 1.48 | nenhuma |
 | base_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | base_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.48 | nenhuma |
-| canter | 11/11 | 0.37 m / ×0.92 | 6/6 | 3/3 | 8/8 | 2.74 | nenhuma |
+| canter | 11/11 | 0.37 m / ×0.92 | 6/6 | sem lugar atrás da porta | 8/8 | 2.74 | nenhuma |
 | carreta (guardada) | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | — | — | nenhuma |
-| dump_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.68 + 0.78 + 1.78 | nenhuma |
-| dump_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
-| dump_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 0.78 + 1.78 + 0.83 + 1.83 | nenhuma |
-| dump_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
-| dump_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
-| dump_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 0.69 + 1.78 + 0.83 + 1.83 | nenhuma |
-| graneleira_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.46 + 1.48 | nenhuma |
-| graneleira_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.44 + 1.48 | nenhuma |
-| graneleira_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.61 + 1.48 | nenhuma |
-| graneleira_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.44 + 1.48 | nenhuma |
-| graneleira_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.44 + 1.48 | nenhuma |
-| graneleira_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.29 + 1.48 | nenhuma |
-| leve_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.46 | nenhuma |
+| dump_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.68 + 0.78 + 1.78 | nenhuma |
+| dump_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| dump_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 0.78 + 1.78 + 0.83 + 1.83 | nenhuma |
+| dump_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| dump_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.74 + 0.83 + 1.83 | nenhuma |
+| dump_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 0.69 + 1.78 + 0.83 + 1.83 | nenhuma |
+| graneleira_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.46 + 1.48 | nenhuma |
+| graneleira_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.44 + 1.48 | nenhuma |
+| graneleira_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.61 + 1.48 | nenhuma |
+| graneleira_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.44 + 1.48 | nenhuma |
+| graneleira_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.44 + 1.48 | nenhuma |
+| graneleira_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.48 | nenhuma |
+| leve_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.46 | nenhuma |
 | leve_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 | nenhuma |
 | leve_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.68 | nenhuma |
 | leve_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 | nenhuma |
 | leve_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 | nenhuma |
 | leve_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 | nenhuma |
-| longo_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.46 + 1.58 | nenhuma |
+| longo_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.46 + 1.58 | nenhuma |
 | longo_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.58 | nenhuma |
 | longo_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.68 + 1.58 | nenhuma |
 | longo_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.58 | nenhuma |
 | longo_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.58 | nenhuma |
 | longo_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.29 + 1.58 | nenhuma |
-| pinkbox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| pinkbox_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.48 + 1.48 | nenhuma |
 | pinkbox_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
 | pinkbox_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.38 + 1.48 | nenhuma |
-| tanker_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.49 + 1.58 | nenhuma |
-| tanker_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
-| tanker_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.59 + 1.58 | nenhuma |
-| tanker_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
-| tanker_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.50 + 1.58 | nenhuma |
-| tanker_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.50 + 1.58 | nenhuma |
-| tarp_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.53 | nenhuma |
-| tarp_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
-| tarp_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | só baú fechado | 8/8 | 2.53 + 1.48 | nenhuma |
-| tarp_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
-| tarp_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | só baú fechado | 8/8 | 1.48 + 1.48 | nenhuma |
-| tarp_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | só baú fechado | 8/8 | 2.43 + 1.48 | nenhuma |
+| tanker_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.49 + 1.58 | nenhuma |
+| tanker_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.59 + 1.58 | nenhuma |
+| tanker_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.50 + 1.58 | nenhuma |
+| tanker_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.50 + 1.58 | nenhuma |
+| tarp_americana | 11/11 | 0.75 m / ×1.58 | 6/6 | sem lugar atrás da porta | 8/8 | 1.48 + 1.53 | nenhuma |
+| tarp_chata | 11/11 | 0.89 m / ×1.64 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| tarp_curta | 11/11 | 0.45 m / ×1.04 | 6/6 | 3/3 | 8/8 | 2.53 + 1.48 | nenhuma |
+| tarp_flat_quad | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| tarp_flat_wide | 11/11 | 0.34 m / ×0.48 | 6/6 | 3/3 | 8/8 | 1.48 + 1.48 | nenhuma |
+| tarp_jac | 11/11 | 0.53 m / ×1.33 | 6/6 | 3/3 | 8/8 | 2.43 + 1.48 | nenhuma |
 
-Lote 4: **1468 de 1468** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do
+Lote 4: **1510 de 1510** combinações cabem (a carreta guardada não conta). Para-choque: encosta na frente do
 nariz de fábrica, entre 0,16 m do chão e 3 cm abaixo do farol mais baixo; a faixa do meio estica/encolhe (coluna
-"faixa do meio", para o leque de 0,42 m). Retrovisor: até 0,50 m para fora da cabine e 0,60 m à frente; o
-espelho de fábrica some. Escada: por fora do contorno de LED, até 0,16 m. Saia: só nos trechos livres (tanque e
-bateria de fábrica ficam de fora). Conferido vértice a vértice (`FrameFit.problems`).
+"faixa do meio", para o leque de 0,42 m). Retrovisor (T-263): base colada na coluna do para-brisa medida por
+raios (chapa + espaçador em cada ponto de fixação, sem vão, nunca no vidro nem na porta), até 0,50 m para fora; o
+espelho de fábrica some inteiro. Escada (T-263, capturas 111–113): na LATERAL da cabine, logo atrás da porta e do
+vidro dela, inclinada com a lateral, com espaçadores até a lataria, estribo embaixo e caixa de LED acima do teto
+(americana e Canter: sem lataria livre atrás da porta, sem escada). Saia: só nos trechos livres (tanque e bateria de fábrica ficam de
+fora). Conferido vértice a vértice (`FrameFit.problems`) e, no retrovisor e na escada, CONTATO por raios na malha
+real (`FrameContact`: haste ≤ 6 mm no ponto que encosta e canto solto ≤ 2,2 cm; espaçador da escada ≤ 1 cm).
 
 ## Matriz caminhão × lote 5 (T-234: grades, escapamentos, buzinas, calotas e interiores)
 
@@ -332,7 +336,7 @@ faróis e estica na caixa de cada cabine. Escapamento: no vão entre a cabine e 
 (caçamba sem topo plano não tem). Calota: em cada roda de fora. Interior: pintura no retângulo do para-brisa (`PaintFit`).
 Conferido vértice a vértice (`Lot5Fit.problems`, `Lot5Fit.wheel_problems`).
 
-**Total geral (lotes 1, 2, 4, 5 e pinturas): 5994 de 5994 combinações cabem.**
+**Total geral (lotes 1, 2, 4, 5 e pinturas): 6036 de 6036 combinações cabem.**
 
 ## Falhas
 
@@ -345,7 +349,7 @@ largura do teto. Imagem das caixas e zonas: `docs/capturas_t211/encaixes_zonas.p
 **base_chata**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_L_3, wheel_r_R_1, wheel_r_R_3, rear_doors
 encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (grille), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), decals (none), horn_r (horn), horn_l (horn), interior (face)
 **canter**: windshield, headlight_l, headlight_r, front_lamp_l, front_lamp_r, blinker_front_l, blinker_rear_l, blinker_front_r, blinker_rear_r, rear_lamp_l, rear_lamp_r, front_plate, rear_plate, door_l, door_r, wheel_f_L, wheel_f_R, wheel_r_L_1, wheel_r_R_1, rear_doors
-encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (grille), exhaust_stacks_r (point), exhaust_stacks_l (point), ladder_r (ladder), ladder_l (ladder), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), decals (none), horn_r (horn), horn_l (horn), interior (face)
+encaixes: andon (seat), visor (seat), mirror_stay_r (stay), mirror_stay_l (stay), front_bumper (bumper), grille (grille), exhaust_stacks_r (point), exhaust_stacks_l (point), rocket_r (stretch), rocket_l (stretch), box_light_r (strips), box_light_l (strips), box_light_top (strips), side_skirts_r (runs), side_skirts_l (runs), rear_bumper (uniform), mural_r (face), mural_l (face), roof_paint (face), rear_paint (face), hubcaps (none), decals (none), horn_r (horn), horn_l (horn), interior (face)
 
 Isenções declaradas: `front_plate` (a placa fica em cima do para-choque) e `blinker_front_*` (o para-choque novo
 leva a seta junto) para `front_bumper`; `rear_plate` e `rear_lamp_*` (T-231: a peça leva lanternas e caixa da

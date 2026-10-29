@@ -1649,3 +1649,29 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   nova; nada a migrar (protocolo 22 igual).
 - Observação: na referência a faixa parece ficar na parte de baixo do VIDRO; o Marco pediu na LATARIA, então ela fica
   na chapa logo abaixo do para-brisa. Na cabine chata a faixa é baixa (21 cm) porque o vidro desce muito.
+
+## 2026-10-28 · T-263 · Retrovisor colado na lataria e escada ao lado da porta (capturas 111–113)
+
+- **Retrovisor (o problema era o encaixe, não a peça)**: a haste era montada num ponto fixo (lateral da cabine na
+  altura do vidro) e escalada pela largura da cabine; nas cabines curvas ela ficava a alguns centímetros da coluna. Agora
+  a coluna do para-brisa é medida por raios em cada cabine (`truck_measure.pillar`, de fora para dentro, a cada altura,
+  sem o vidro lateral e sem o espelho de fábrica) e a haste ganha **chapas de fixação com espaçador** que encostam na
+  lataria (entram 3 mm), na altura certa (`StayFit`); o teste confere o contato por raios (`FrameContact`) e acusa vão
+  de 4 cm. O espelho de fábrica some por pedaço (as caixas por ilha da malha e por material: o braço inteiro some).
+- **Escada (correção do Marco: ao lado da porta, não atrás nem no baú)**: em pé na lateral da cabine, logo atrás da
+  porta e do vidro dela, virada para fora e inclinada com a lateral (`truck_measure.ladder_side`, `SideLadder`), com
+  espaçadores até a lataria; embaixo um **estribo** junto da soleira (acima do paralama quando a roda da frente fica
+  embaixo) e **passa do teto da cabine com uma caixa de LED** no alto (cor de LED separada da cor da peça), como nas
+  capturas 111–113. Onde o deque do teto passa por cima (cabines HAYATE planas, deque de largura total) a escada para
+  embaixo dele. Agora serve em todos os caminhões (não é mais "só baú fechado"), **menos americana e Canter**: nelas a
+  porta vai até o fim da cabine e não há chapa livre atrás dela (a loja mostra "não cabe"; ver PRECISA DECISÃO no LOG).
+  Os trilhos passam 0,10 m do teto e a caixa de LED (0,16 m) fica por cima. Texto: "Escada da cabine (ao lado da
+  porta)". Folhas (só prints nossos) em `docs/capturas_t263/`; a comparação lado a lado com as capturas 105–113 fica só
+  local em `docs/Referencias/oficina/t263/` (arte de terceiros).
+- **Histórico da escada nesta tarefa**: 1ª leitura (frente do baú, atrás da cabine, pelo catálogo da T-210) foi
+  descartada pela correção do Marco; a T-233 a punha na lateral do baú. A leitura final segue a imagem: nas capturas a
+  escada aparece POR CIMA da lateral da cabine, junto da porta.
+- **Zonas protegidas**: a zona do para-brisa ganhou isenção `mirror_stay` (a caixa do vidro passa da coluna nas quinas
+  arredondadas); em troca o teste novo reprova qualquer pedaço da haste na frente do vidro. Porta, roda, vidro da porta
+  e janela de trás continuam protegidos (a escada começa depois do vidro da porta + 3 cm e acima da roda + 12 cm).
+- Rede e save não mudam (só o encaixe visual e os modelos): **protocolo continua o mesmo**.
