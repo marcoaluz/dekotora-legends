@@ -184,11 +184,39 @@ func save_profile_cache_only() -> void:
 	profile["rev"] = rev
 
 
+## Modo de teste do Marco (Opcoes > Avancado): dinheiro e Fama infinitos, tudo liberado. So local: o servidor online nao muda.
+const DEV_CASH: int = 99_999_999
+const DEV_FAME: int = 99_999
+
+
+func dev_unlock() -> bool:
+	return Settings.dev_unlock
+
+
+## Liga/desliga o modo de teste. Ao ligar guarda o dinheiro real; ao desligar devolve (os gastos do teste somem).
+func set_dev_unlock(on: bool) -> void:
+	if on == Settings.dev_unlock:
+		return
+	if on:
+		profile["money_real"] = int(profile.get("money", 0))
+	else:
+		profile["money"] = int(profile.get("money_real", profile.get("money", 0)))
+		profile.erase("money_real")
+	Settings.dev_unlock = on
+	Settings.save_settings()
+	save_profile()
+	profile_changed.emit()
+
+
 func money() -> int:
+	if Settings.dev_unlock:
+		return DEV_CASH
 	return int(profile["money"])
 
 
 func fame() -> int:
+	if Settings.dev_unlock:
+		return DEV_FAME
 	return int(profile["fame"])
 
 
@@ -280,7 +308,7 @@ func body_owned(id: String) -> bool:
 	var bd: BodyDef = BodyDef.find(id)
 	if bd == null:
 		return false
-	return bd.price <= 0 or bool((profile.get("owned_bodies", {}) as Dictionary).get(id, false))
+	return bd.price <= 0 or Settings.dev_unlock or bool((profile.get("owned_bodies", {}) as Dictionary).get(id, false))
 
 
 ## Motivo para nao poder comprar o modelo ("" = pode).
@@ -1079,7 +1107,7 @@ func rival_refusal(route_id: String) -> Dictionary:
 	var rv: RivalDef = load("res://data/rivals/%s.tres" % rd.rival_id) as RivalDef
 	if rv == null:
 		return {"ok": true}
-	var ok: bool = fame() >= rv.min_fame and destaque() >= rv.min_destaque
+	var ok: bool = Settings.dev_unlock or (fame() >= rv.min_fame and destaque() >= rv.min_destaque)
 	return {"ok": ok, "name": rv.display_name, "min_fame": rv.min_fame, "min_destaque": rv.min_destaque,
 		"line": "" if ok else Tr.t(rv.refuse_key) if rv.refuse_key != "" else "..."}
 

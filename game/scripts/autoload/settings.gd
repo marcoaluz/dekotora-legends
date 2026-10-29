@@ -31,6 +31,7 @@ var race_cam: String = "standard"       # T-198: camera da corrida (RaceCamRig.I
 var race_cam_routes: Dictionary = {}    # T-198: rota -> camera usada nela da ultima vez
 var mirror_mode: int = 0                # T-198: retrovisor 0 automatico (RaceCamView.mirror_auto_on), 1 ligado, 2 desligado
 var cam_letterbox: bool = true          # T-198: faixas pretas da camera cinema
+var dev_unlock: bool = false            # modo de teste: dinheiro/Fama infinitos e tudo liberado (GameState.set_dev_unlock)
 ## T-189: versao do arquivo de opcoes. Quem vinha de antes (sem a chave) e estava em Alta num PC com Forward+ sobe uma vez para Ultra.
 const GRAPHICS_VERSION: int = 2
 
@@ -90,6 +91,7 @@ func load_settings(path: String = PATH) -> void:
 	fx_impact = bool(cfg.get_value("graphics", "fx_impact", fx_impact))
 	menu_bg = String(cfg.get_value("graphics", "menu_bg", menu_bg))
 	explorer_mode = bool(cfg.get_value("advanced", "explorer_mode", explorer_mode))
+	dev_unlock = bool(cfg.get_value("advanced", "dev_unlock", dev_unlock))
 	fx_life = bool(cfg.get_value("graphics", "fx_life", fx_life))
 	fx_motion_blur = bool(cfg.get_value("graphics", "fx_motion_blur", fx_motion_blur))
 	fx_reduce_flash = bool(cfg.get_value("graphics", "fx_reduce_flash", fx_reduce_flash))
@@ -122,6 +124,7 @@ func save_settings(path: String = PATH) -> void:
 	cfg.set_value("graphics", "fx_impact", fx_impact)
 	cfg.set_value("graphics", "menu_bg", menu_bg)
 	cfg.set_value("advanced", "explorer_mode", explorer_mode)
+	cfg.set_value("advanced", "dev_unlock", dev_unlock)
 	cfg.set_value("graphics", "fx_life", fx_life)
 	cfg.set_value("graphics", "fx_motion_blur", fx_motion_blur)
 	cfg.set_value("graphics", "fx_reduce_flash", fx_reduce_flash)

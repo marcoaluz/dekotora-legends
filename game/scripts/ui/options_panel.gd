@@ -124,6 +124,8 @@ func _show(id: String) -> void:
 		"account":
 			_account()
 		"advanced":                                   # T-181: camera livre de exploracao
+			_toggle(Tr.t("options.dev_unlock"), _s.dev_unlock, func(on: bool) -> void: GameState.set_dev_unlock(on))
+			_hint(Tr.t("options.dev_unlock_hint"))
 			_toggle(Tr.t("options.explorer_mode"), _s.explorer_mode, func(on: bool) -> void: _s.explorer_mode = on)
 			_hint(Tr.t("options.explorer_hint"))
 			_hint(Tr.t("options.explorer_keys"))

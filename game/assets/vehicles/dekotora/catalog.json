@@ -9633,6 +9633,313 @@
       "depth": 0.075
     },
     {
+      "id": "wall_praia_raposa_dourada",
+      "name": "Wallpaper: Raposa dourada na praia",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_r_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.63,
+              0.45
+            ],
+            "keep": 0.45
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_l_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.33,
+              0.42
+            ],
+            "keep": 0.45
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "wall_praia_raposa_tropical",
+      "name": "Wallpaper: Raposa tropical",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_r_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.62,
+              0.4
+            ],
+            "keep": 0.45
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_l_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.33,
+              0.38
+            ],
+            "keep": 0.45
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "wall_praia_amigas",
+      "name": "Wallpaper: Gatinha e amigas na praia",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_mural_r",
+      "mount_point_left": "SOCKET_mural_l",
+      "mirror_for_left": true,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "mural_r",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_r.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_r_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.6,
+              0.4
+            ],
+            "keep": 0.45
+          }
+        ],
+        "L": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_l.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_l_emit.png",
+            "aspect": 3.0,
+            "px": [
+              1536,
+              512
+            ],
+            "focus": [
+              0.58,
+              0.36
+            ],
+            "keep": 0.45
+          }
+        ]
+      },
+      "socket_left": "mural_l"
+    },
+    {
+      "id": "wallrear_praia_verao",
+      "name": "Traseira (wallpaper): Praia, mar de verão 夏の海",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_verao.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_verao_emit.png",
+            "aspect": 1.2,
+            "px": [
+              768,
+              640
+            ],
+            "focus": [
+              0.44,
+              0.5
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "wallrear_praia_amigas",
+      "name": "Traseira (wallpaper): Praia, raposa e coelhinhas",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_rear_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "rear_paint",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_amigas.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_amigas_emit.png",
+            "aspect": 1.2,
+            "px": [
+              768,
+              640
+            ],
+            "focus": [
+              0.54,
+              0.5
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "wallroof_praia_raposa",
+      "name": "Teto (wallpaper): Raposa na praia",
+      "category": "paint",
+      "model": "",
+      "mount_point": "SOCKET_roof_paint",
+      "mount_point_left": null,
+      "mirror_for_left": false,
+      "dimensions_m": null,
+      "triangles": 2,
+      "compatibility": [
+        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
+      ],
+      "materials_used": [
+        "paint_art"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "socket": "roof_paint",
+      "fit": "paint",
+      "group": "wallpapers",
+      "paint": {
+        "R": [
+          {
+            "tex": "res://assets/vehicles/dekotora/paint_wall/roof/wallroof_praia_raposa.png",
+            "emit": "res://assets/vehicles/dekotora/paint_wall/roof/wallroof_praia_raposa_emit.png",
+            "aspect": 0.3333,
+            "px": [
+              320,
+              960
+            ],
+            "focus": [
+              0.4,
+              0.4
+            ],
+            "keep": 0.45
+          }
+        ]
+      }
+    },
+    {
       "id": "fb_wrap_lamps",
       "name": "Caixa alta de painéis de luz",
       "category": "front",
@@ -10040,313 +10347,6 @@
         1.5,
         2.5
       ]
-    },
-    {
-      "id": "wall_praia_raposa_dourada",
-      "name": "Wallpaper: Raposa dourada na praia",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_mural_r",
-      "mount_point_left": "SOCKET_mural_l",
-      "mirror_for_left": true,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "mural_r",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_r.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_r_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.63,
-              0.45
-            ],
-            "keep": 0.45
-          }
-        ],
-        "L": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_l.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_dourada_l_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.33,
-              0.42
-            ],
-            "keep": 0.45
-          }
-        ]
-      },
-      "socket_left": "mural_l"
-    },
-    {
-      "id": "wall_praia_raposa_tropical",
-      "name": "Wallpaper: Raposa tropical",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_mural_r",
-      "mount_point_left": "SOCKET_mural_l",
-      "mirror_for_left": true,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "mural_r",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_r.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_r_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.62,
-              0.4
-            ],
-            "keep": 0.45
-          }
-        ],
-        "L": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_l.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_raposa_tropical_l_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.33,
-              0.38
-            ],
-            "keep": 0.45
-          }
-        ]
-      },
-      "socket_left": "mural_l"
-    },
-    {
-      "id": "wall_praia_amigas",
-      "name": "Wallpaper: Gatinha e amigas na praia",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_mural_r",
-      "mount_point_left": "SOCKET_mural_l",
-      "mirror_for_left": true,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "mural_r",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_r.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_r_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.6,
-              0.4
-            ],
-            "keep": 0.45
-          }
-        ],
-        "L": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_l.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/mural/wall_praia_amigas_l_emit.png",
-            "aspect": 3.0,
-            "px": [
-              1536,
-              512
-            ],
-            "focus": [
-              0.58,
-              0.36
-            ],
-            "keep": 0.45
-          }
-        ]
-      },
-      "socket_left": "mural_l"
-    },
-    {
-      "id": "wallrear_praia_verao",
-      "name": "Traseira (wallpaper): Praia, mar de verão 夏の海",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_rear_paint",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "rear_paint",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_verao.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_verao_emit.png",
-            "aspect": 1.2,
-            "px": [
-              768,
-              640
-            ],
-            "focus": [
-              0.44,
-              0.5
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": "wallrear_praia_amigas",
-      "name": "Traseira (wallpaper): Praia, raposa e coelhinhas",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_rear_paint",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "rear_paint",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_amigas.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/rear/wallrear_praia_amigas_emit.png",
-            "aspect": 1.2,
-            "px": [
-              768,
-              640
-            ],
-            "focus": [
-              0.54,
-              0.5
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": "wallroof_praia_raposa",
-      "name": "Teto (wallpaper): Raposa na praia",
-      "category": "paint",
-      "model": "",
-      "mount_point": "SOCKET_roof_paint",
-      "mount_point_left": null,
-      "mirror_for_left": false,
-      "dimensions_m": null,
-      "triangles": 2,
-      "compatibility": [
-        "só baú fechado (retângulo medido por caminhão: truck/sockets/*.json, rect)"
-      ],
-      "materials_used": [
-        "paint_art"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "license": "arte do Marco (criada por ele), uso por decisão dele (grupo Wallpapers, T-266; ver docs/CREDITOS_MURAIS.md)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "socket": "roof_paint",
-      "fit": "paint",
-      "group": "wallpapers",
-      "paint": {
-        "R": [
-          {
-            "tex": "res://assets/vehicles/dekotora/paint_wall/roof/wallroof_praia_raposa.png",
-            "emit": "res://assets/vehicles/dekotora/paint_wall/roof/wallroof_praia_raposa_emit.png",
-            "aspect": 0.3333,
-            "px": [
-              320,
-              960
-            ],
-            "focus": [
-              0.4,
-              0.4
-            ],
-            "keep": 0.45
-          }
-        ]
-      }
     }
   ]
 }
