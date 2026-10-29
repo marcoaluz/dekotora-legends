@@ -370,3 +370,18 @@ um problema visual não puder ser entendido pelos renders.
   "acima da borda", "torta". Tanque com americana fica sem (lateral curva).
 - Regerar só esses: `blender -b --factory-startup -P blender/scripts/build_sockets.py -- --only base_americana,leve_americana,longo_americana,graneleira_americana,alubox_americana,tarp_americana,pinkbox_americana,tanker_americana,dump_americana,canter`
 - Armadilha: lanterna de 8 cm passa entre colunas de raio espaçadas de 9 cm. Para "não cobrir luz", use colunas a cada 2 cm.
+
+## Saias grandes (T-265)
+
+- Medida: `truck_measure.skirt_band(tree, m, sx)` (chamada no `front_side`): colunas de 2 cm da frente à traseira do baú;
+  em cada coluna a saia vai de max(`SKIRT_FLOOR` 0,22, arco da roda) até 2 cm abaixo do baú; raios de fora só nessa
+  altura. Arcos `skirt_arcs` (pneu + `SKIRT_CLR` 7 cm, um por eixo) crescem de 1 em 1 cm até `SKIRT_ARC_GROW` para
+  contornar o para-lama de fábrica (`truck_plastic_black`, anel ~0,61 m nos baús antigos). `blocked` = o que cortou.
+- Regras: `socket_rules.skirt_boxes` (degraus de 3 cm, maior caixa primeiro) e `zone_hit` (zona da roda com `round` =
+  cilindro). O print do `build_sockets` tem a linha `T-265 saia dir ... arcos ... bloqueado ...`.
+- Peças: `build_t265_parts.py` + `accessories/skirt_t265.py` exportam só os enfeites `MOTIF_<forma>_<material>` e as
+  amostras `MAT_<material>`; o desenho (`skirt`) vai para o catálogo e o jogo monta o resto. Apague os objetos depois
+  de exportar cada peça, senão a próxima sai com `.001` no nome e o jogo não acha o enfeite.
+- Triângulos do catálogo: medir no jogo (`tools_dev/measure_t265.gd -- --out=ARQ.json`) e rodar `build_t265_parts.py --
+  --tris ARQ.json`.
+- Armadilha: face côncava (rabo da seta) em leque a partir da PONTA (a ponta enxerga todos os cantos); não pule triângulo.

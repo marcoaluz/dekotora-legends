@@ -790,3 +790,23 @@ Leia também `docs/ARQUITETURA.md` (estrutura) e `CLAUDE.md` (regras). Esta skil
   não cobre lâmpada de fábrica, contato e vão de 4 cm detectado). `test_parts_t233` só espera "sem lugar" no tanque
   com americana (`NO_LADDER_STEMS`).
 - Prints: `bash tools/capture_t267.sh [prints|folhas|tudo]` (vistas novas `lad_34` e `lad_side` do `shot_t231.gd`).
+
+## Saias grandes (T-265)
+
+- Fit `"skirt"` (em `FrameFit.FITS`): `SkirtFit.apply` lê os `MOTIF_*`/`MAT_*` do .glb, apaga o .glb e monta com
+  `SkirtMesh` (quad/ribbon/bar/copy, uma malha por material) a partir do encaixe (`runs`, `arcs`, `floor_y`, `depth`) e do
+  desenho do catálogo (`skirt.rows`: `bar`/`dash`/`motif`/`rail`, `t` em fração da altura; `arch`, `posts`). Contas puras
+  em `SkirtShape` (`col_lo`, `columns` com coluna dupla na lateral do arco, `spans`, `arch_lines`, `spread`, `dashes`).
+- LOD: malhas `<pid>_lod1_*` com `visibility_range_begin` 35 m (meta `part_lod`); metas `skirt_tris`/`skirt_tris_lod`.
+- Zona protegida com `round` (roda): `PartFit.zone_overlaps` (caixa) e `PartFit.zone_has` (vértice). Use sempre essas
+  duas em vez de `overlap(... zv["box"])`.
+- Godot: frente = vértices em sentido HORÁRIO; `SkirtMesh.quad` recebe anti-horário visto da normal e inverte.
+- Testes `-- --only=t265` (`tests/test_parts_t265.gd`: fundo ≤ 0,25 m, saia atrás da última roda, nenhum vértice a menos
+  de 5 cm do pneu, raios na espessura da saia sem bater na lataria/tanque, LOD, luzes, quebrada, cor do neon).
+- Armadilha: trecho que começa DENTRO do arco (poste da lona em cima da roda) tem a borda quase vertical; a fita de
+  largura fixa (friso do recorte) saía 2 cm para fora do trecho. Friso de borda usa `SkirtMesh.ribbon(..., clip_z=true)`.
+  Depurar vértice fora da caixa: `-s res://tools_dev/probe_t265_out.gd -- --stem=dekotora_truck_tarp_americana[,..] [--part=ID] [--side=R]`.
+- `dimensions_m` da saia = a maior saia montada (um lado) num caminhão jogável, lida dos encaixes pelo `build_t265_parts.py`
+  (rode depois do `build_sockets.py`); `test_accessories` aceita até 11,5 m só para fit "skirt".
+- Prints: vistas `sk_side`, `sk_ref`, `sk_arch`, `sk_front`, `sk_left`, `sk_low`, `sk_far` (com `--fov=12`) do
+  `shot_t231.gd`; `bash tools/capture_t265.sh [rodada NOME|folhas|previas|tudo]`.

@@ -1742,3 +1742,34 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   `design_problems` vazio). Só os encaixes `ladder_r/l` desses 10 caminhões mudaram nos JSON.
 - Rede e save não mudam (o descritor já levava a escada; só o lugar dela): **protocolo continua 23**. Quem já
   tinha escada com essas cabines (jogador, bots) passa a vê-la na carga.
+
+## 2026-10-29 · T-265 · Saias laterais grandes (quase no chão, arco nas rodas, atrás da roda de trás)
+
+- **Pedido do Marco**: saias MAIORES, quase no chão, contornando as rodas e também atrás da roda traseira, como nas
+  capturas 085–094. As 8 saias da T-233 eram baixas (0,36 m) e só entre as rodas.
+- **Mesmos ids, peça nova**: as 8 saias (`skirt_chrome_rails`, `skirt_neon_twin`, `_diamond`, `_dash`, `_arch`,
+  `_green`, `_gems`, `_arrows`) foram TROCADAS pela versão grande, sem criar peças novas (as capturas mostram a saia
+  grande; a versão baixa era a leitura errada). Quem já comprou fica com a peça; bots, rivais, pesos, preços e fama não
+  mudaram: **protocolo continua 23** (só visual). Os `.glb` antigos (`accessories/skirt_t233/`) ficam no disco, sem uso.
+  Se o Marco quiser as baixas de volta como opção, é só reativar `skirt_t233.py` com outros ids.
+- **Forma (medida por raios em cada caminhão, `truck_measure.skirt_band`)**: da frente do baú (atrás dos escapamentos)
+  até 2 cm antes da traseira; de 2 cm abaixo do baú até **0,22 m do chão** (o baú afunda até ~0,12 m nas lombadas,
+  T-219); em cada roda um **recorte em arco** = círculo do pneu + **7 cm** (o baú balança e afunda com a mola), que cresce
+  de 1 em 1 cm (até +8 cm) até contornar o para-lama de fábrica; abaixo do centro da roda o recorte desce reto até o chão
+  (forma de caixa de roda). Tanque, bateria, degraus e os postes da lona **cortam** a saia (trecho para antes e volta
+  depois): zonas protegidas por raios na altura que a saia ocupa naquela coluna. Entre as rodas do eixo duplo sobra um
+  "pilar" de saia; atrás da última roda a saia vai até a traseira.
+- **Zona protegida da roda = cilindro** (`round`: pneu + 3 cm) em vez da caixa: a saia usa os cantos da caixa da roda
+  sem tocar o pneu. Vale para todas as peças (só afrouxa; nada que passava deixou de passar). As caixas do encaixe da
+  saia são "degraus" de 3 cm em volta do arco (`socket_rules.skirt_boxes`).
+- **Montada no jogo** (`SkirtFit` + `SkirtShape` + `SkirtMesh`): o painel com o recorte, os frisos cromados (topo,
+  pontas e em volta do recorte) e as fileiras (faixa, traços, enfeite repetido, trilho) são feitos no jogo a partir do
+  desenho no catálogo (`skirt`); os enfeites (losango, pedra, seta comprida, marcador, trilho e poste) vêm modelados do
+  Blender (`accessories/skirt_t265.py`, `MOTIF_*`). Assim a mesma peça serve em todos os 55 caminhões sem um `.glb` por
+  caminhão. Malha de longe (LOD) de 35 m em diante (≤ 10% dos triângulos). Pior caso 1.376 triângulos por lado.
+- **Luzes**: neon (`deco_neon`) e LED (`deco_led`) com cor separada da estrutura (garagem: cores L/R + cor do neon/LED);
+  acendem à noite; quebrada fica no lugar (inclina 2° de lado), luzes apagam e o cromo vira aço.
+- Garagem: o texto do encaixe da escada virou "Escada (ao lado da porta ou na quina da carga)" (T-267).
+- Catálogo: `dimensions_m` da saia = a maior saia montada (um lado) num caminhão jogável (0,10 × 1,08 × 10,93 m, baú
+  longo com cabine curta), lida dos encaixes; o teste aceita até 11,5 m de comprimento só para a saia (as outras peças
+  continuam até 6 m).

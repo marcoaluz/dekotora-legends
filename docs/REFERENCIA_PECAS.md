@@ -288,6 +288,31 @@ de um lado. Lanternas vermelhas, aros cromados.
 
 > **FEITO na T-233**: as 8 saias no jogo (`accessories/skirt_t233.py`), só nos trechos livres entre as rodas (o tanque e a
 > bateria de fábrica ficam de fora), em todos os caminhões.
+>
+> **T-265 (pedido do Marco: "saias maiores, quase no chão, contornando as rodas e também atrás da roda traseira")**: as
+> capturas 085–094 mostram a saia do baú inteiro (da cabine até a traseira, também atrás da roda de trás) e a roda
+> "dentro" dela; a versão da T-233 era baixa (0,36 m) e só entre as rodas. As **8 saias continuam com os mesmos ids**
+> (quem já comprou fica com a peça; bots e rivais iguais), mas agora são GRANDES e montadas pelo jogo em cada caminhão
+> (`game/scripts/truck/skirt_fit.gd`): da frente do baú (atrás dos escapamentos) até 2 cm antes da traseira, de embaixo
+> do baú até **0,22 m do chão**, com **recorte em arco** em volta de cada roda (pneu + 7 cm; cresce até contornar o
+> para-lama de fábrica) e laterais retas até o chão abaixo do centro da roda; friso cromado no topo, nas pontas e em
+> volta do recorte. Tanque, bateria, degraus e postes da lona **cortam** a saia (medido por raios). Os enfeites (losango,
+> pedra, seta comprida, marcador, trilho, poste) são modelados no Blender (`accessories/skirt_t265.py`).
+>
+> | Captura | O que mostra | Peça no jogo (T-265) |
+> | --- | --- | --- |
+> | 085 | de fábrica: sem saia (trilhos do chassi aparecendo) | sem peça |
+> | 086 | 3 trilhos cromados com postes, do baú inteiro, "De dia/De noite" | `skirt_chrome_rails` (3 trilhos + postes a cada ~1 m e nas pontas, cor cromo) |
+> | 087 | a MESMA forma da 086 num baú prateado | `skirt_chrome_rails` (mesma peça; a cor do baú é do caminhão) |
+> | 088 | 2 linhas de neon ciano corridas | `skirt_neon_twin` |
+> | 089 | corrente de losangos alongados ciano | `skirt_neon_diamond` (losangos de 0,30 m sobre um friso) |
+> | 090 | 2 fileiras de traços, a de baixo intercalada | `skirt_neon_dash` |
+> | 091 | 2 linhas + neon que contorna o arco da roda (pernas retas até embaixo) | `skirt_neon_arch` (neon do arco em todas as rodas) |
+> | 092 | traços verdes em cima, faixa ciano larga embaixo | `skirt_neon_green` (marcadores de LED verdes + faixa de neon) |
+> | 093 | pedras de luz ciano entre traços verdes em cima e embaixo | `skirt_neon_gems` |
+> | 094 | 2 fileiras de setas compridas ciano com marcadores verdes em cima | `skirt_neon_arrows` (setas de 0,86 m; encolhem nos trechos curtos) |
+>
+> Pesos, preços e fama **não mudaram** (proposta da T-210): o protocolo de rede continua o mesmo.
 
 **O que as imagens mostram.** Câmera **de lado, reta**, enquadrando o baú inteiro e o chassi. A peça vai **embaixo do baú,
 entre as rodas** e depois da roda de trás (em 2 pedaços), ~0,3–0,5 m de altura, colada à longarina. 085 é **sem peça**
@@ -521,7 +546,7 @@ Caixas-limite iniciais (caminhão base com cabine chata; o script calcula as dos
 | `ladder` (cada lado) | lateral da cabine, logo atrás da porta (T-263); americana e Canter: lateral da carga atrás da quina da frente (T-267) | 0,34 × 2,4 × 0,16 m |
 | `rocket` | bordas do teto do baú | largura do baú × 0,35 × comprimento do baú |
 | `box_light_*` | casca de 3 cm sobre cada face do baú | face inteira |
-| `side_skirts` (cada lado) | entre as rodas e atrás da roda | 0,35 × 0,6 × (vão entre eixos) |
+| `side_skirts` (cada lado) | entre as rodas e atrás da roda (T-265: do baú inteiro, até 0,22 m do chão, arco nas rodas) | espessura medida × (fundo do baú − 0,22 m) × (frente do baú até a traseira, em trechos) |
 | `rear_bumper` (com lanternas) | traseira, embaixo das portas | 2,5 × 1,0 × 0,45 m |
 | `mural`, `roof_paint`, `rear_paint` | material da face do baú | sem volume (textura) |
 
