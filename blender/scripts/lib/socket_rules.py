@@ -18,13 +18,19 @@ SCALE_MIN, SCALE_MAX = 0.85, 1.15  # escala automática "uniform"
 ROCKET_H = 0.38                    # m: altura máxima do foguete acima do teto do baú (T-231)
 RB_DEPTH = 0.55                    # m: fundo máximo do para-choque traseiro com as lanternas (T-231)
 STRIP_W, STRIP_T = 0.025, 0.03     # m: largura e espessura reservadas ao contorno de LED (T-231)
-LADDER_OUT = 0.16                  # m: quanto a escada sai da lateral do baú (por fora do contorno), T-233
+LADDER_OUT = 0.16                  # m: (T-233, antigo) quanto a escada saía da lateral do baú
+TM_LADDER_DEPTH = 0.085            # = truck_measure.LADDER_DEPTH (escada na frente do baú, T-263)
+TM_LADDER_HALF = 0.17              # = truck_measure.LADDER_HALF
+LEDBOX_H = 0.16                    # = accessories/ladder_t233.LEDBOX_H (caixa com LED no alto da escada, T-263)
+LADDER_STEP = 0.165                # m: o estribo embaixo sai até isto da lataria (accessories/ladder_t233.STEP_OUT + folga)
 TM_FB_DEPTH = 0.62                 # = truck_measure.FB_DEPTH (para-choque da frente, T-233)
 TM_MIRROR_REACH = 0.50             # = truck_measure.MIRROR_REACH (haste do retrovisor, T-233)
+PAD_BELOW, PAD_ABOVE = 0.06, 0.11  # m: o que a haste passa abaixo da chapa de baixo / acima da de cima (T-263)
+PAD_TOP = 0.10                     # m: a chapa de cima fica pelo menos isto abaixo do topo do para-brisa
 SKIRT_MIN = 0.60                   # = truck_measure.SKIRT_MIN
 # Encaixes que só existem em baú fechado (a graneleira é aberta).
 # T-232: o mural também (a graneleira/lona/tanque/caçamba não têm lateral de baú fechado)
-BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "ladder_r", "ladder_l", "roof_paint", "rear_paint",
+BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "roof_paint", "rear_paint",
             "mural_r", "mural_l")
 
 
@@ -41,7 +47,9 @@ def protected_zones(m: dict, cab: str, extra_stacks: list) -> dict:
     c = m["cab"]
     z = {}
     w0, w1 = c["windshield"]
-    z["windshield"] = {"box": _box(w0[0], w0[1], w0[2] - 1.2, w1[0], w1[1] - 0.04, w1[2]), "exempt": []}
+    # T-263: a base da haste do retrovisor encosta na coluna, ao lado do vidro (a caixa do vidro passa da coluna nas
+    # quinas arredondadas); o teste do jogo confere que a haste não fica na frente do vidro (FrameContact)
+    z["windshield"] = {"box": _box(w0[0], w0[1], w0[2] - 1.2, w1[0], w1[1] - 0.04, w1[2]), "exempt": ["mirror_stay"]}
     for kind, key in (("headlights", "headlight"), ("front_lamps", "front_lamp")):
         for side, b in m[kind].items():
             z[f"{key}_{side}"] = {"box": _box(b[0][0], b[0][1], b[0][2] - 1.0, b[1][0], b[1][1], b[1][2]), "exempt": []}
@@ -108,6 +116,28 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         if fs:
             mr = fs["mirror_" + side]
             xs = mr["x_side"]
+            pl = mr.get("pillar")
+            ok = [(round(pl["y0"] + i * pl["dy"], 3), p) for i, p in enumerate(pl["pts"]) if p] if pl else []
+            ok = [q for q in ok if q[0] <= w1[1] - PAD_TOP]
+            if ok:
+                # T-263: a base da haste encosta na coluna medida (chapa + espaçador). Duas caixas: a da base (junto da
+                # lataria, entre a coluna e a porta) e a dos braços/espelho (por fora). `pad_y` = faixa de altura onde as
+                # chapas podem ficar (`clear_mirror` encolhe as caixas na altura em vez de empurrá-las para fora)
+                x_in = min(abs(p[0]) for _, p in ok) - 0.02
+                x_top = max(abs(p[0]) for _, p in ok)
+                ylo, yhi = ok[0][0], ok[-1][0]
+                zp = min(p[1] for _, p in ok)
+                base = _box(sx * x_in, ylo - PAD_BELOW, zp - 0.06, sx * (x_top + 0.09), yhi + PAD_ABOVE, mr["z"][1])
+                arms = _box(sx * (x_top + 0.03), ylo - PAD_BELOW, mr["z"][0], sx * (max(xs, x_top) + TM_MIRROR_REACH),
+                            yhi + PAD_ABOVE, mr["z"][1])
+                zc = round(sum(p[1] for _, p in ok) / len(ok), 3)
+                s["mirror_stay_" + side] = {"boxes": [base, arms], "anchor": [round(sx * x_top, 3), mr["anchor"][1], zc],
+                                            "width": round(2 * hw, 3), "fit": "stay", "window_h": mr["window_h"],
+                                            "hide": mr["stock"], "hide_parts": mr.get("stock_parts", []),
+                                            "pillar": pl, "pad_y": [ylo, yhi],
+                                            "box": [[min(base[0][i], arms[0][i]) for i in range(3)],
+                                                    [max(base[1][i], arms[1][i]) for i in range(3)]]}
+                continue
             b = _box(sx * (xs + 0.004), mr["y"][0], mr["z"][0], sx * (xs + TM_MIRROR_REACH), mr["y"][1], mr["z"][1])
             s["mirror_stay_" + side] = {"box": b, "anchor": mr["anchor"], "width": round(2 * hw, 3), "fit": "stay",
                                         "window_h": mr["window_h"], "hide": mr["stock"]}
@@ -140,19 +170,33 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         b = _box(p[0] - 0.17, p[1] - 0.10, p[2] - 0.15, p[0] + 0.17, p[1] + 3.0, min(p[2] + 0.15, bf_lim))
         s["exhaust_stacks_" + side] = {"box": b, "anchor": [round(p[0], 3), round(p[1], 3), round(p[2], 3)], "fit": "point"}
         stack_zmax = max(stack_zmax, b[1][2])
+    # escada (T-263, capturas 111–113; correção do Marco: "do lado da cabine, tipo do lado da porta"): em pé na lateral
+    # da cabine logo atrás da porta e do vidro dela, virada para fora, do alto da roda da frente até acima do teto
+    # (truck_measure.ladder_side). Ponto = lataria, embaixo, no meio da largura (a peça cresce para fora e para cima).
+    # Antes: T-233 na lateral do baú; 1ª versão da T-263 na frente do baú.
+    for side, sx in (("r", 1), ("l", -1)):
+        ld = m.get("ladder_" + side)
+        if not ld:
+            continue
+        lx, lz, hw2 = ld["x"], ld["z"], ld["w"] / 2
+        top = ld["top"]
+        xlo = lx + min(0.0, ld["lean"] * (top - ld["y0"])) - max(ld["gaps"] + [0.0]) - 0.004
+        for _ in range(3):                                   # (o deque do teto passa por cima: a escada para embaixo dele)
+            lb = _box(sx * xlo, ld["y0"] - 0.005, lz - hw2 - 0.02, sx * (lx + LADDER_STEP), top + LEDBOX_H + 0.01, lz + hw2 + 0.02)
+            hit = [ob for ob in boxes_of(s.get("andon", {})) if overlap(lb, ob)]
+            if not hit:
+                break
+            top = min(top, round(min(ob[0][1] for ob in hit) - 0.016 - LEDBOX_H, 3))
+        ld = dict(ld, top=top)
+        s["ladder_" + side] = {"box": _box(sx * xlo, ld["y0"] - 0.005, lz - hw2 - 0.02, sx * (lx + LADDER_STEP),
+                                           ld["top"] + LEDBOX_H + 0.01, lz + hw2 + 0.02),
+                               "anchor": [round(sx * lx, 3), ld["y0"], lz], "fit": "ladder", "face_x": round(sx * lx, 3),
+                               "width": ld["w"], "height": round(ld["top"] - ld["y0"], 3), "lean": ld["lean"],
+                               "gap_dy": ld["dy"], "gaps": ld["gaps"]}
     bx = m.get("box")
     if bx:
         bh, top, bot, bf, rz = bx["half_w"], bx["top_y"], bx["bottom_y"], bx["front_z"], bx["rear_z"]
         ed = m.get("edges", {})
-        # escada: na lateral do baú, logo atrás da quina da frente (e atrás dos escapamentos); T-231: por fora do
-        # contorno de LED da lateral; T-233: encostada nele (4 mm de folga), do fundo ao topo do baú
-        lz0 = max(bf + 0.08, stack_zmax + 0.03)
-        for side, sx in (("r", 1), ("l", -1)):
-            segs = ed.get("strips", {}).get("box_light_" + side, [])
-            lx = max([bh + 0.01] + [abs(g["a"][0]) + STRIP_T + 0.004 for g in segs])
-            s["ladder_" + side] = {"box": _box(sx * lx, bot, lz0, sx * (lx + LADDER_OUT), top, lz0 + 0.34),
-                                   "anchor": [sx * round(lx, 3), round(bot, 3), round(lz0 + 0.17, 3)], "fit": "ladder",
-                                   "height": round(top - bot, 3)}
         if not m.get("open_body"):
             # T-231: foguete = uma faixa em cada borda do teto (entre o andon de fábrica do teto e a borda), medida por
             # raios; a peça estica no comprimento (fit "stretch") e encolhe na largura da faixa
@@ -394,7 +438,12 @@ def clear_mirror(sk: dict, zones: dict) -> None:
     farol): empurra a borda de dentro para fora até não cruzar nenhuma caixa nem zona sem isenção."""
     for side, sx in (("r", 1), ("l", -1)):
         k = "mirror_stay_" + side
-        if k not in sk or "box" not in sk[k]:
+        if k not in sk:
+            continue
+        if "pillar" in sk[k]:                    # T-263: com a coluna medida, encolhe na altura (a base fica na lataria)
+            _clear_pads(sk, zones, k)
+            continue
+        if "box" not in sk[k]:
             continue
         for _ in range(4):
             b = sk[k]["box"]
@@ -412,6 +461,37 @@ def clear_mirror(sk: dict, zones: dict) -> None:
             else:
                 b[1][0] = round(min(b[1][0], -push), 3)
             sk[k]["anchor"][0] = round(sx * max(abs(sk[k]["anchor"][0]), push), 3)
+
+
+def _clear_pads(sk: dict, zones: dict, k: str) -> None:
+    """T-263: as caixas da haste (base e braços) não cruzam outra caixa nem zona sem isenção: o que está acima corta o
+    topo, o que está abaixo corta o fundo; `pad_y` (faixa das chapas) acompanha."""
+    v = sk[k]
+    others = [b for kk, vv in sk.items() if kk != k for b in boxes_of(vv)]
+    others += [z["box"] for z in zones.values() if k[:-2] not in z["exempt"] and k not in z["exempt"]]
+    for _ in range(6):
+        hit = False
+        for b in v["boxes"]:
+            for o in others:
+                if not overlap(b, o):
+                    continue
+                hit = True
+                mid = (b[0][1] + b[1][1]) / 2
+                if (o[0][1] + o[1][1]) / 2 >= mid:
+                    top = round(o[0][1] - 0.002, 3)
+                    for bb in v["boxes"]:
+                        bb[1][1] = min(bb[1][1], top)
+                else:
+                    low = round(o[1][1] + 0.002, 3)
+                    for bb in v["boxes"]:
+                        bb[0][1] = max(bb[0][1], low)
+        if not hit:
+            break
+    lo, hi = v["boxes"][0][0][1] + PAD_BELOW, v["boxes"][0][1][1] - PAD_ABOVE
+    v["pad_y"] = [round(max(v["pad_y"][0], lo), 3), round(min(v["pad_y"][1], hi), 3)]
+    if v["pad_y"][1] - v["pad_y"][0] < 0.25:
+        v["problem"] = "coluna livre curta demais para a haste (%.2f m)" % (v["pad_y"][1] - v["pad_y"][0])
+    v["box"] = [[min(b[0][i] for b in v["boxes"]) for i in range(3)], [max(b[1][i] for b in v["boxes"]) for i in range(3)]]
 
 
 # ----------------------------------------------------------------------------- oficina lote 5 (T-234)

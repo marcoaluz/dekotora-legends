@@ -551,6 +551,22 @@ def front_side(data: dict, m: dict) -> dict:
                                  "z": [zmin, round(d0 - 0.02, 3)],
                                  "anchor": [round(sx * x_side, 3), round(w0[1], 3), round(w0[2], 3)],
                                  "window_h": round(w1[1] - w0[1], 3)}
+    # T-263: o espelho de fábrica some INTEIRO (braços até a raiz): uma caixa por pedaço solto da malha que sai da
+    # lateral da cabine nessa região (antes uma caixa só dos vértices de fora: a raiz dos braços ficava). A lateral de
+    # referência é a coluna medida (1ª passada, sem o espelho pela caixa antiga): na americana a cabine é mais estreita
+    # que o capô. Depois a coluna é medida de novo sem os pedaços do espelho.
+    old_boxes = [out["mirror_" + s]["stock"] for s in ("r", "l") if out["mirror_" + s]["stock"]]
+    trees = _pillar_trees(old_boxes)
+    for side, sx in (("r", 1), ("l", -1)):
+        st = out["mirror_" + side]["stock"]
+        pts = [abs(q[0]) for q in pillar(trees, c, sx)["pts"] if q]
+        xr = min(pts) if pts and hw - min(pts) > 0.10 else hw     # (só quando a cabine é bem mais estreita que o capô)
+        out["mirror_" + side]["stock_parts"] = _stock_islands(st, sx, xr, w0[1] - 0.30) if st else []
+    # T-263: coluna do para-brisa medida por raios (a base da haste encosta na lataria, sem vão)
+    stock_boxes = [d["b"] for s in ("r", "l") for d in out["mirror_" + s]["stock_parts"]] or old_boxes
+    trees = _pillar_trees(stock_boxes)
+    for side, sx in (("r", 1), ("l", -1)):
+        out["mirror_" + side]["pillar"] = pillar(trees, c, sx)
     # --- saias: faixa embaixo do baú, trechos livres entre a roda da frente e a primeira de trás (raios de fora)
     bx = m.get("box")
     if bx:
@@ -591,3 +607,311 @@ def front_side(data: dict, m: dict) -> dict:
             out["skirt_" + side] = {"x_in": x_in, "x_out": x_out, "y": [y_lo, y_hi], "runs": runs,
                                     "span": [round(za, 3), round(zb, 3)], "line": round(line, 3)}
     return out
+
+
+# ----------------------------------------------------------------------------- coluna do retrovisor (T-263)
+
+PILLAR_DY = 0.02                  # m: passo vertical da coluna medida
+PILLAR_DZ = 0.01                  # m: passo das tentativas ao longo do comprimento
+PAD_HALF = (0.02, 0.035)          # m: meia largura (z) e meia altura (y) da chapa de fixação da haste
+PAD_FLAT = 0.02                   # m: a lataria embaixo da chapa pode variar no máximo isto (senão é quina)
+PAD_DOOR = 0.015                  # m: a chapa fica pelo menos isto na frente da porta / do vidro lateral
+# Onde a chapa pode encostar: lataria pintada, plástico, aço e cromo da cabine. Vidro, lanternas, faróis etc. não.
+PAD_OK = ("truck_paint", "truck_plastic", "truck_steel", "truck_chrome")
+
+
+def _pillar_trees(stock_boxes):
+    """BVHs (Blender) separadas: lataria onde a chapa pode encostar, vidro lateral (`truck_glass`) e o resto. Os
+    triângulos do espelho de fábrica (3 vértices dentro de uma caixa, como o jogo esconde) ficam de fora."""
+    import bmesh
+    from mathutils.bvhtree import BVHTree
+    bms = {"ok": bmesh.new(), "side_glass": bmesh.new(), "other": bmesh.new()}
+    for o in sorted(bpy.data.objects, key=lambda o: o.name):
+        if o.type != "MESH" or o.name.startswith("wheel_"):
+            continue
+        base = o.name.split(".")[0]
+        kind = "side_glass" if base == "truck_glass" else ("ok" if base.startswith(PAD_OK) else "other")
+        me = o.to_mesh()
+        me.transform(o.matrix_world)
+        tmp = bmesh.new()
+        tmp.from_mesh(me)
+        o.to_mesh_clear()
+        if stock_boxes:
+            dead = []
+            for f in tmp.faces:
+                for (x0, y0, z0), (x1, y1, z1) in stock_boxes:
+                    if all(x0 <= v.co.x <= x1 and y0 <= v.co.z <= y1 and z0 <= -v.co.y <= z1 for v in f.verts):
+                        dead.append(f)
+                        break
+            if dead:
+                bmesh.ops.delete(tmp, geom=dead, context="FACES")
+        me2 = bpy.data.meshes.new("_pillar_tmp")
+        tmp.to_mesh(me2)
+        tmp.free()
+        bms[kind].from_mesh(me2)
+        bpy.data.meshes.remove(me2)
+    out = {}
+    for k, bm in bms.items():
+        out[k] = BVHTree.FromBMesh(bm)
+        bm.free()
+    return out
+
+
+def _side_hit(trees, sx, y, z):
+    """Raio de fora para dentro na altura y (Godot), posição z: (x para fora, tipo, normal Godot) do 1º ponto."""
+    from mathutils import Vector
+    best = None
+    for k, t in trees.items():
+        h = t.ray_cast(Vector((sx * 3.0, -z, y)), Vector((-sx, 0, 0)), 3.0)
+        if h[0] is not None and (best is None or h[0].x * sx > best[0]):
+            n = h[1]
+            best = (float(h[0].x * sx), k, (float(n.x), float(n.z), float(-n.y)))
+    return best
+
+
+def pillar(trees, c: dict, sx: int) -> dict:
+    """T-263: onde a base da haste do retrovisor encosta, para cada altura y (passo PILLAR_DY) da borda de baixo do
+    para-brisa − 0,30 até a de cima + 0,15: a posição z na lataria da coluna logo na frente da porta / do vidro lateral
+    (nunca no vidro, na porta, em lanterna ou na quina da frente), com a chapa inteira apoiada (variação ≤ PAD_FLAT).
+    `pts[i]` = [x da lataria embaixo da chapa (o ponto mais saliente), z, nx, nz] (Godot, com o sinal do lado) ou None."""
+    w0, w1 = c["windshield"]
+    d0 = c["door"]["z"][0]
+    y0 = round(w0[1] - 0.30, 3)
+    ny = int(round((w1[1] + 0.15 - y0) / PILLAR_DY)) + 1
+    ys = [round(y0 + PILLAR_DY * i, 3) for i in range(ny)]
+    z0 = c["front_z"]
+    nz = int((d0 - z0) / PILLAR_DZ) + 1
+    zs = [round(z0 + PILLAR_DZ * j, 3) for j in range(nz)]
+    grid = [[_side_hit(trees, sx, y, z) for z in zs] for y in ys]
+    dyi, dzi = int(round(PAD_HALF[1] / PILLAR_DY)), int(round(PAD_HALF[0] / PILLAR_DZ))
+    pts = []
+    for i, y in enumerate(ys):
+        sg = [zs[j] for j in range(nz) if grid[i][j] and grid[i][j][1] == "side_glass" and grid[i][j][0] >= 0.6]
+        z_pref = min([d0] + sg) - PAD_DOOR - PAD_HALF[0]
+        best = None
+        for j, z in enumerate(zs):
+            if z > z_pref + 1e-6:
+                break
+            cells = [grid[a][b] for a in range(i - dyi, i + dyi + 1) for b in range(j - dzi, j + dzi + 1)
+                     if 0 <= a < ny and 0 <= b < nz]
+            if len(cells) < (2 * dyi + 1) * (2 * dzi + 1) or any(cc is None or cc[1] != "ok" for cc in cells):
+                continue
+            xs = [cc[0] for cc in cells]
+            if min(xs) < 0.6 or max(xs) - min(xs) > PAD_FLAT:
+                continue
+            nxs = sum(cc[2][0] for cc in cells) * sx
+            nzs = sum(cc[2][2] for cc in cells)
+            ln = max(1e-6, (nxs * nxs + nzs * nzs) ** 0.5)
+            if nxs / ln < 0.8:                          # (quina: a lataria vira para a frente)
+                continue
+            best = [round(sx * max(xs), 3), z, round(sx * nxs / ln, 3), round(nzs / ln, 3)]   # o mais perto da porta
+        if best:
+            # a chapa encosta no ponto mais saliente EMBAIXO dela (mesmos 7 pontos do teste do jogo, FrameContact)
+            fx = [_side_hit(trees, sx, y + dy, best[1] + dz) for dz, dy in
+                  ((0, 0), (-0.016, -0.03), (0.016, -0.03), (-0.016, 0.03), (0.016, 0.03), (0, -0.03), (0, 0.03))]
+            if all(f is not None for f in fx):
+                best[0] = round(sx * max(f[0] for f in fx), 3)
+        pts.append(best)
+    return {"y0": y0, "dy": PILLAR_DY, "pts": pts}
+
+
+# ----------------------------------------------------------------------------- escada na frente do baú (T-263)
+
+LADDER_DEPTH = 0.075              # m: quanto a escada sai da frente do baú (= accessories/ladder_t233.DEPTH)
+LADDER_HALF = 0.17                # m: meia largura reservada (a escada cromada tem 0,155)
+LADDER_IN = 0.60                  # m: centro da escada a esta distância da quina do baú (capturas 111–113)
+LADDER_MIN = 0.80                 # m: trecho livre mais curto que isto (até o topo) não leva escada
+LADDER_DY = 0.05
+
+
+def ladder_front(m: dict, x_max: float, sx: int = 1) -> dict | None:
+    """T-263: onde a escada encosta na FRENTE do baú (atrás da cabine), por raios na malha real. Para cada centro x
+    candidato (de LADDER_IN da quina para dentro/fora, sem passar de `x_max` = antes dos escapamentos), mede em 5 colunas
+    (de -0,15 a +0,15) e a cada 5 cm de altura: a chapa da frente (raio de dentro do baú para a frente; plana, ±1 cm) e o
+    vão livre na frente dela até a cabine/o que houver (precisa de LADDER_DEPTH + 1 cm). A escada ocupa o trecho livre mais baixo que
+    chega perto do topo (um friso na borda de cima do baú encurta a escada). `sx` = lado (1 direita, -1 esquerda). Devolve {"x" (sem sinal),
+    "face_z", "y0", "top"} ou None."""
+    from mathutils import Vector
+    bx = m["box"]
+    tree = _bvh()
+    bf, bot, top, bh = bx["front_z"], bx["bottom_y"], bx["top_y"], bx["half_w"]
+    ys = [round(bot + 0.03 + LADDER_DY * i, 3) for i in range(int((top - 0.03 - bot - 0.03) / LADDER_DY) + 1)]
+    pref = bh - LADDER_IN
+    cands = sorted({round(min(x_max, pref + d), 3) for d in (0.0, -0.05, 0.05, -0.10, 0.10, -0.15, -0.20, -0.25, -0.30)},
+                   key=lambda c: abs(c - pref))
+    best = None
+    for cx in cands:
+        if cx - LADDER_HALF < 0.15:
+            continue
+        rows = []
+        for y in ys:
+            faces, gaps = [], []
+            for x in (cx - 0.15, cx - 0.075, cx, cx + 0.075, cx + 0.15):
+                h = tree.ray_cast(Vector((sx * x, -(bf + 0.06), y)), Vector((0, 1, 0)), 0.3)
+                if h[0] is None:
+                    break
+                fz = -h[0].y
+                g = tree.ray_cast(Vector((sx * x, -(fz - 0.003), y)), Vector((0, 1, 0)), 3.0)
+                faces.append(fz)
+                gaps.append(g[3] + 0.003 if g[0] is not None else 9.9)
+            ok = len(faces) == 5 and max(faces) - min(faces) <= 0.01 and min(gaps) >= LADDER_DEPTH + 0.01
+            rows.append((y, ok, min(faces) if faces else None))
+        # trechos livres; o que serve termina perto do topo (pode haver um friso na borda de cima do baú)
+        runs, start = [], None
+        for i, r in enumerate(rows + [(None, False, None)]):
+            if r[1] and start is None:
+                start = i
+            elif not r[1] and start is not None:
+                runs.append((start, i - 1))
+                start = None
+        runs = [(a, b) for a, b in runs if rows[b][0] >= top - 0.25 and rows[b][0] - rows[a][0] >= LADDER_MIN - 0.06]
+        if not runs:
+            continue
+        a, b = min(runs, key=lambda r: r[0])
+        free = rows[a:b + 1]
+        y0 = bot if a == 0 else round(free[0][0] - 0.02, 3)
+        ty = round(min(top - 0.01, free[-1][0] + 0.02), 3)
+        face = round(min(r[2] for r in free), 3)
+        score = (y0 - bot) * 10.0 + abs(cx - pref)
+        if best is None or score < best[0] - 1e-9:
+            best = (score, {"x": cx, "face_z": face, "y0": y0, "top": ty})
+    return best[1] if best else None
+
+
+def _stock_islands(stock, sx: int, hw: float, y_min: float) -> list:
+    """T-263: pedaços soltos (ilhas da malha, vértices iguais juntados) que ficam pelo menos 20% dentro da caixa `stock` do
+    espelho de fábrica e com 10% dos vértices por fora da lateral da cabine: braços, cabeças e suportes. Uma caixa (Godot, +4 mm) por pedaço,
+    com o material (`m`): o jogo esconde os triângulos DESSE material com os 3 vértices dentro (FrameFit.hide_stock). Pedaço maior que 1,6 m = lataria, fica."""
+    import bmesh
+    (x0, y0, z0), (x1, y1, z1) = stock
+    out, near = [], []
+    for o in sorted(bpy.data.objects, key=lambda o: o.name):
+        if o.type != "MESH" or o.name.startswith("wheel_"):
+            continue
+        base = o.name.split(".")[0]
+        bm = bmesh.new()
+        me = o.to_mesh()
+        me.transform(o.matrix_world)
+        bm.from_mesh(me)
+        o.to_mesh_clear()
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0005)
+        bm.faces.ensure_lookup_table()
+        seen = set()
+        for f in bm.faces:
+            if f.index in seen:
+                continue
+            isl, stack = [], [f]
+            seen.add(f.index)
+            while stack:
+                g = stack.pop()
+                isl.append(g)
+                for e in g.edges:
+                    for h in e.link_faces:
+                        if h.index not in seen:
+                            seen.add(h.index)
+                            stack.append(h)
+            if base.startswith(("truck_lamp", "truck_glass", "truck_mural", "truck_andon")):
+                continue                                     # (lanterna, vidro, painel: nunca são o espelho)
+            vs = np.array([(v.co.x, v.co.z, -v.co.y) for g in isl for v in g.verts])
+            mn, mx = vs.min(0), vs.max(0)
+            outside = vs[:, 0] * sx > hw + 0.025
+            box = {"b": [[round(float(v) - 0.004, 3) for v in mn], [round(float(v) + 0.004, 3) for v in mx]], "m": base}
+            if (mx - mn).max() > 0.6:
+                if base.startswith(("truck_paint", "truck_glass")):
+                    continue
+                # pedaço grande (ex.: os braços da americana fazem parte da faixa preta do capô): só a parte por fora da
+                # cabine perto do espelho, e só deste material
+                sel = vs[outside & (vs[:, 1] >= y0 - 0.15) & (vs[:, 1] <= y1 + 0.15) & (vs[:, 2] >= z0 - 0.15) & (vs[:, 2] <= z1 + 0.15)]
+                if len(sel) >= 3:
+                    lo2, hi2 = sel.min(0), sel.max(0)
+                    xa = (hw + 0.005) if sx > 0 else float(lo2[0]) - 0.004
+                    xb = float(hi2[0]) + 0.004 if sx > 0 else -(hw + 0.005)
+                    out.append({"b": [[round(xa, 3), round(float(lo2[1]) - 0.004, 3), round(float(lo2[2]) - 0.004, 3)],
+                                      [round(xb, 3), round(float(hi2[1]) + 0.004, 3), round(float(hi2[2]) + 0.004, 3)]], "m": base})
+                continue
+            # pelo menos 20% da caixa do pedaço dentro da caixa do espelho (puxadores e lanternas vizinhos ficam)
+            lo = np.maximum(mn, (x0, y0, z0))
+            hi = np.minimum(mx, (x1, y1, z1))
+            dim = np.maximum(mx - mn, 0.01)
+            frac = float(np.prod(np.clip(hi - lo, 0.0, None) / dim))
+            if outside.mean() >= 0.10 and frac >= 0.2:
+                out.append(box)
+            elif (mx - mn).max() < 0.3 and (vs[:, 0] * sx > hw - 0.06).mean() > 0.3:
+                near.append(box)                             # (base do braço colada na lataria: entra se encostar)
+        bm.free()
+    for _ in range(3):                                       # pedaços pequenos encostados num pedaço do espelho
+        add = [b for b in near if any(all(b["b"][0][i] <= c["b"][1][i] + 0.01 and c["b"][0][i] <= b["b"][1][i] + 0.01
+                                          for i in range(3)) for c in out)]
+        near = [b for b in near if b not in add]
+        out += add
+        if not add:
+            break
+    out = [d for d in out if (d["b"][0][1] + d["b"][1][1]) / 2 >= y_min]   # (acabamento da porta embaixo fica)
+    out.sort(key=lambda d: (d["m"], d["b"]))
+    merged = []
+    for d in out:                                            # caixas iguais/contidas (mesmo material) viram uma
+        if any(c["m"] == d["m"] and all(c["b"][0][i] <= d["b"][0][i] and d["b"][1][i] <= c["b"][1][i] for i in range(3)) for c in merged):
+            continue
+        merged.append(d)
+    return merged
+
+
+# ----------------------------------------------------------------------------- escada na lateral da cabine (T-263, correção do Marco)
+
+LADDER_W = 0.34                   # m: largura reservada (a escada cromada tem 0,31); encolhe até LADDER_WMIN onde não cabe
+LADDER_WMIN = 0.22
+LADDER_DOOR = 0.03                # m: folga entre a escada e a porta (ou o fim do vidro da porta)
+LADDER_ROOF = 0.10                # m: os trilhos passam um pouco do teto da cabine; a caixa de LED fica em cima (capturas 111–113)
+LADDER_FLAT = 0.25                # m: vão máximo entre a escada (inclinada com a lateral) e a lataria (espaçadores cobrem)
+
+
+def ladder_side(m: dict, trees, sx: int, z_lim: float) -> dict | None:
+    """T-263 (Marco: "as escadas são do lado da cabine, tipo do lado da porta"): escada em pé na LATERAL da cabine, logo
+    atrás da porta (e do vidro da porta), virada para fora, do alto da roda da frente até um pouco acima do teto. Raios
+    de fora para dentro numa grade z × y: a escada fica no primeiro lugar atrás da porta onde a lataria embaixo dela é
+    chapa (sem vidro, sem lanterna) e quase plana; `z_lim` = onde ela tem que acabar (escapamentos, baú). Devolve
+    {"x" (sem sinal, a lataria mais saliente embaixo dela), "z" (centro), "w" (largura útil), "y0", "top"} ou None."""
+    c = m["cab"]
+    d0, d1 = c["door"]["z"]
+    roof = c["roof_shell_y"]
+    y_bot = 0.62
+    for n, b in m["wheels"].items():                                   # acima da zona da roda da frente
+        if n.startswith("wheel_f") and b[0][2] - 0.03 < z_lim and b[1][2] + 0.03 > d1:
+            y_bot = max(y_bot, b[1][1] + 0.12)       # (acima do paralama também)
+    y_cap = min(roof - 0.40, 2.95)
+    if y_cap - y_bot < 0.8:
+        return None
+    ys = [round(y_bot + 0.05 * i, 3) for i in range(int((y_cap - y_bot) / 0.05) + 1)]
+    zs = [round(d1 - 0.1 + 0.02 * j, 3) for j in range(int((z_lim - (d1 - 0.1)) / 0.02) + 1)]
+    col = {z: [_side_hit(trees, sx, y, z) for y in ys] for z in zs}
+    glass = {z: any(h and h[1] == "side_glass" for h in col[z]) for z in zs}
+    door_end = d1
+    for z in zs:                                                       # o vidro da porta pode passar da porta medida
+        if z >= d1 and not glass[z]:
+            break
+        if glass[z]:
+            door_end = max(door_end, z)
+    for w in (LADDER_W, 0.30, 0.26, LADDER_WMIN):
+        z = door_end + LADDER_DOOR + w / 2
+        while z + w / 2 <= z_lim + 1e-6:
+            cols = [min(zs, key=lambda q: abs(q - zz)) for zz in (z - w / 2 + 0.02, z, z + w / 2 - 0.02)]
+            rows = [[col[q][i] for q in cols] for i in range(len(ys))]
+            flat = [h for r in rows for h in r]
+            hit = [h for h in flat if h]
+            if all(h[1] == "ok" for h in hit) and len(hit) >= 0.85 * len(flat) and all(any(r) for r in rows):
+                # a lateral recolhe para cima (a cabine afina): a escada inclina junto (reta pelos pontos mais salientes)
+                xr = np.array([max(h[0] for h in r if h) for r in rows])
+                xc = np.array([r[1][0] if r[1] else max(h[0] for h in r if h) for r in rows])   # coluna do meio (espaçador)
+                yv = np.array(ys)
+                k, a0 = np.polyfit(yv, xr, 1)
+                k = float(np.clip(k, -0.15, 0.05))
+                off = float((xr - (a0 + k * yv)).max())
+                line = a0 + k * yv + off
+                if float((line - xr).max()) <= LADDER_FLAT:
+                    x0 = float(a0 + k * y_bot + off)
+                    # vão de cada altura (a escada leva espaçadores até a lataria: FrameFit, fit "ladder")
+                    return {"x": round(x0, 3), "lean": round(k, 4), "z": round(z, 3), "w": w, "y0": round(y_bot, 3),
+                            "top": round(roof + LADDER_ROOF, 3), "dy": 0.05,
+                            "gaps": [round(float(g), 3) for g in (line - xc)]}
+            z += 0.02
+    return None

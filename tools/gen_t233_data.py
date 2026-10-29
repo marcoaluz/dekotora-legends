@@ -44,7 +44,7 @@ PARTS = [
 ]
 TEXTS = {
     "slot.mirror_stay": "Retrovisor",
-    "slot.ladder": "Escada do baú",
+    "slot.ladder": "Escada da cabine (ao lado da porta)",
 }
 
 

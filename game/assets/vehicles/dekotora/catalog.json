@@ -7386,631 +7386,6 @@
       ]
     },
     {
-      "id": "mirror_stay_l",
-      "name": "Haste em L",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_l.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.46,
-        "y": 0.677,
-        "z": 0.385
-      },
-      "bounds_godot": [
-        [
-          0.001,
-          0.06,
-          -0.335
-        ],
-        [
-          0.461,
-          0.737,
-          0.05
-        ]
-      ],
-      "triangles": 512,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_l_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "105",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "mirror_stay_truss",
-      "name": "Haste treliçada",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_truss.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.46,
-        "y": 0.696,
-        "z": 0.385
-      },
-      "bounds_godot": [
-        [
-          0.001,
-          0.046,
-          -0.335
-        ],
-        [
-          0.461,
-          0.741,
-          0.05
-        ]
-      ],
-      "triangles": 1104,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_truss_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "106",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "mirror_stay_frame",
-      "name": "Moldura retangular",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_frame.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.48,
-        "y": 0.751,
-        "z": 0.492
-      },
-      "bounds_godot": [
-        [
-          0.001,
-          0.02,
-          -0.442
-        ],
-        [
-          0.481,
-          0.771,
-          0.05
-        ]
-      ],
-      "triangles": 544,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_frame_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "107",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "mirror_stay_box",
-      "name": "Moldura grossa",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_box.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.491,
-        "y": 0.751,
-        "z": 0.485
-      },
-      "bounds_godot": [
-        [
-          -0.005,
-          0.02,
-          -0.435
-        ],
-        [
-          0.485,
-          0.771,
-          0.05
-        ]
-      ],
-      "triangles": 464,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_box_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "preto_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "108",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "mirror_stay_chain",
-      "name": "Treliça vazada",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_chain.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.447,
-        "y": 0.751,
-        "z": 0.499
-      },
-      "bounds_godot": [
-        [
-          0.001,
-          0.02,
-          -0.449
-        ],
-        [
-          0.448,
-          0.771,
-          0.05
-        ]
-      ],
-      "triangles": 1680,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_chain_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "109",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "mirror_stay_grand",
-      "name": "Moldura gigante",
-      "category": "front",
-      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_grand.glb",
-      "mount_point": "SOCKET_mirror_stay_r",
-      "mount_point_left": "SOCKET_mirror_stay_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.484,
-        "y": 0.843,
-        "z": 0.625
-      },
-      "bounds_godot": [
-        [
-          0.001,
-          0.006,
-          -0.575
-        ],
-        [
-          0.485,
-          0.85,
-          0.05
-        ]
-      ],
-      "triangles": 1984,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_mirror",
-        "deco_neon",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_grand_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "mirror_stay_r",
-      "fit": "stay",
-      "nominal_w": 2.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "110",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "mirror_stay_l",
-      "module_tris": {
-        "TOP": 0,
-        "MID": 0,
-        "BOT": 0,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "vfit": {
-        "nominal_h": 0.85
-      },
-      "broken_tilt": [
-        0.0,
-        9.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "ladder_neon",
-      "name": "Escada de neon",
-      "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_neon.glb",
-      "mount_point": "SOCKET_ladder_r",
-      "mount_point_left": "SOCKET_ladder_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.131,
-        "y": 0.63,
-        "z": 0.32
-      },
-      "bounds_godot": [
-        [
-          0.0,
-          0.0,
-          -0.16
-        ],
-        [
-          0.131,
-          0.63,
-          0.16
-        ]
-      ],
-      "triangles": 1336,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_body",
-        "deco_neon",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_neon_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "ladder_r",
-      "fit": "ladder",
-      "nominal_w": 0.3,
-      "default_color": "preto_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "111",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "ladder_l",
-      "module_tris": {
-        "TOP": 180,
-        "MID": 44,
-        "BOT": 180,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "stretch": {
-        "head": 0.15,
-        "mid": 0.3,
-        "tail": 0.18
-      },
-      "broken_tilt": [
-        0.0,
-        4.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "ladder_green",
-      "name": "Escada de luzes verdes",
-      "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_green.glb",
-      "mount_point": "SOCKET_ladder_r",
-      "mount_point_left": "SOCKET_ladder_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.134,
-        "y": 0.63,
-        "z": 0.305
-      },
-      "bounds_godot": [
-        [
-          0.0,
-          0.0,
-          -0.153
-        ],
-        [
-          0.134,
-          0.63,
-          0.153
-        ]
-      ],
-      "triangles": 2188,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "deco_body",
-        "deco_led",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_green_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "ladder_r",
-      "fit": "ladder",
-      "nominal_w": 0.3,
-      "default_color": "preto_verde",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "112",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "ladder_l",
-      "module_tris": {
-        "TOP": 184,
-        "MID": 114,
-        "BOT": 112,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "stretch": {
-        "head": 0.15,
-        "mid": 0.3,
-        "tail": 0.18
-      },
-      "broken_tilt": [
-        0.0,
-        4.0
-      ],
-      "fade_end": 110.0
-    },
-    {
-      "id": "ladder_chrome",
-      "name": "Escada cromada",
-      "category": "sides",
-      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_chrome.glb",
-      "mount_point": "SOCKET_ladder_r",
-      "mount_point_left": "SOCKET_ladder_l",
-      "mirror_for_left": true,
-      "dimensions_m": {
-        "x": 0.148,
-        "y": 0.649,
-        "z": 0.29
-      },
-      "bounds_godot": [
-        [
-          0.0,
-          -0.01,
-          -0.145
-        ],
-        [
-          0.148,
-          0.639,
-          0.145
-        ]
-      ],
-      "triangles": 2592,
-      "compatibility": [
-        "todos (encaixe por caminhão: truck/sockets/*.json)"
-      ],
-      "materials_used": [
-        "chrome",
-        "deco_trim"
-      ],
-      "materials_available": {},
-      "customizable": null,
-      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_chrome_day.png",
-      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
-      "fit_warnings": [],
-      "tier": "oficina",
-      "style": "deco",
-      "socket": "ladder_r",
-      "fit": "ladder",
-      "nominal_w": 0.3,
-      "default_color": "cromo_ciano",
-      "has_sign": false,
-      "sign_cell": -1,
-      "captures": "113",
-      "pods": 0,
-      "stack": null,
-      "socket_left": "ladder_l",
-      "module_tris": {
-        "TOP": 204,
-        "MID": 132,
-        "BOT": 168,
-        "CEN": 0,
-        "HEAD": 0,
-        "TAIL": 0
-      },
-      "stretch": {
-        "head": 0.15,
-        "mid": 0.3,
-        "tail": 0.18
-      },
-      "broken_tilt": [
-        0.0,
-        4.0
-      ],
-      "fade_end": 110.0
-    },
-    {
       "id": "skirt_chrome_rails",
       "name": "Trilhos cromados",
       "category": "sides",
@@ -9395,6 +8770,719 @@
         0.8,
         0.09
       ]
+    },
+    {
+      "id": "mirror_stay_l",
+      "name": "Haste em L",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_l.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.748,
+        "z": 0.357
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.335
+        ],
+        [
+          1.0,
+          0.713,
+          0.022
+        ]
+      ],
+      "triangles": 536,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_l_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "105",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.1
+          ],
+          [
+            0.04,
+            0.697
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_truss",
+      "name": "Haste treliçada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_truss.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.776,
+        "z": 0.355
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.335
+        ],
+        [
+          1.0,
+          0.741,
+          0.02
+        ]
+      ],
+      "triangles": 1128,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_truss_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "106",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.095
+          ],
+          [
+            0.04,
+            0.697
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_frame",
+      "name": "Moldura retangular",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_frame.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.782,
+        "z": 0.463
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.441
+        ],
+        [
+          1.0,
+          0.747,
+          0.021
+        ]
+      ],
+      "triangles": 568,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_frame_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "107",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.06
+          ],
+          [
+            0.04,
+            0.731
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_box",
+      "name": "Moldura grossa",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_box.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.791,
+        "z": 0.471
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.435
+        ],
+        [
+          1.0,
+          0.756,
+          0.035
+        ]
+      ],
+      "triangles": 488,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_box_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "108",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.06
+          ],
+          [
+            0.04,
+            0.731
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_chain",
+      "name": "Treliça vazada",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_chain.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.778,
+        "z": 0.469
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.449
+        ],
+        [
+          1.0,
+          0.743,
+          0.02
+        ]
+      ],
+      "triangles": 1704,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_chain_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "109",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.06
+          ],
+          [
+            0.04,
+            0.731
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "mirror_stay_grand",
+      "name": "Moldura gigante",
+      "category": "front",
+      "model": "res://assets/vehicles/dekotora/accessories/mirror_t233/mirror_stay_grand.glb",
+      "mount_point": "SOCKET_mirror_stay_r",
+      "mount_point_left": "SOCKET_mirror_stay_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 1.0,
+        "y": 0.885,
+        "z": 0.61
+      },
+      "bounds_godot": [
+        [
+          0.0,
+          -0.035,
+          -0.575
+        ],
+        [
+          1.0,
+          0.85,
+          0.035
+        ]
+      ],
+      "triangles": 2008,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_mirror",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_mirror_stay_grand_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "mirror_stay_r",
+      "fit": "stay",
+      "nominal_w": 2.3,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "110",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "mirror_stay_l",
+      "module_tris": {
+        "TOP": 0,
+        "MID": 0,
+        "BOT": 0,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 84,
+        "PADS": 16
+      },
+      "vfit": {
+        "nominal_h": 0.85,
+        "pads": [
+          [
+            0.04,
+            0.02
+          ],
+          [
+            0.04,
+            0.765
+          ]
+        ]
+      },
+      "broken_tilt": [
+        0.0,
+        9.0
+      ],
+      "fade_end": 110.0
+    },
+    {
+      "id": "ladder_neon",
+      "name": "Escada de neon",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_neon.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.3,
+        "y": 1.02,
+        "z": 0.15
+      },
+      "bounds_godot": [
+        [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        [
+          0.15,
+          1.02,
+          -0.0
+        ]
+      ],
+      "triangles": 2184,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_checker",
+        "deco_led",
+        "deco_neon",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_neon_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.26,
+      "default_color": "preto_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "111",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 428,
+        "MID": 136,
+        "BOT": 256,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 0,
+        "PADS": 0
+      },
+      "stretch": {
+        "head": 0.12,
+        "mid": 0.62,
+        "tail": 0.12
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0,
+      "depth": 0.075
+    },
+    {
+      "id": "ladder_green",
+      "name": "Escada de luzes verdes",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_green.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.3,
+        "y": 0.57,
+        "z": 0.15
+      },
+      "bounds_godot": [
+        [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        [
+          0.15,
+          0.57,
+          -0.0
+        ]
+      ],
+      "triangles": 4360,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_checker",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_green_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.26,
+      "default_color": "preto_verde",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "112",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 408,
+        "MID": 156,
+        "BOT": 212,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 0,
+        "PADS": 0
+      },
+      "stretch": {
+        "head": 0.1,
+        "mid": 0.21,
+        "tail": 0.1
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0,
+      "depth": 0.075
+    },
+    {
+      "id": "ladder_chrome",
+      "name": "Escada cromada",
+      "category": "sides",
+      "model": "res://assets/vehicles/dekotora/accessories/ladder_t233/ladder_chrome.glb",
+      "mount_point": "SOCKET_ladder_r",
+      "mount_point_left": "SOCKET_ladder_l",
+      "mirror_for_left": true,
+      "dimensions_m": {
+        "x": 0.35,
+        "y": 0.66,
+        "z": 0.15
+      },
+      "bounds_godot": [
+        [
+          -0.175,
+          0.0,
+          -0.15
+        ],
+        [
+          0.175,
+          0.66,
+          -0.0
+        ]
+      ],
+      "triangles": 3608,
+      "compatibility": [
+        "todos (encaixe por caminhão: truck/sockets/*.json)"
+      ],
+      "materials_used": [
+        "chrome",
+        "deco_body",
+        "deco_checker",
+        "deco_led",
+        "deco_trim"
+      ],
+      "materials_available": {},
+      "customizable": null,
+      "preview": "res://assets/vehicles/dekotora/previews/t233_ladder_chrome_day.png",
+      "license": "original (gerado por script; desenho nosso inspirado nas capturas da oficina, nada copiado)",
+      "fit_warnings": [],
+      "tier": "oficina",
+      "style": "deco",
+      "socket": "ladder_r",
+      "fit": "ladder",
+      "nominal_w": 0.31,
+      "default_color": "cromo_ciano",
+      "has_sign": false,
+      "sign_cell": -1,
+      "captures": "113",
+      "pods": 0,
+      "stack": null,
+      "socket_left": "ladder_l",
+      "module_tris": {
+        "TOP": 512,
+        "MID": 136,
+        "BOT": 340,
+        "CEN": 0,
+        "HEAD": 0,
+        "TAIL": 0,
+        "PADF": 0,
+        "PADS": 0
+      },
+      "stretch": {
+        "head": 0.1,
+        "mid": 0.3,
+        "tail": 0.1
+      },
+      "broken_tilt": [
+        0.0,
+        4.0
+      ],
+      "fade_end": 110.0,
+      "depth": 0.075
     }
   ]
 }

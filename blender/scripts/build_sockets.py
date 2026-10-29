@@ -114,18 +114,24 @@ def build_one(path: str) -> dict:
     m["edges"] = TM.box_edges(data, m)                          # T-231: traseira, foguete e contorno do baú
     m["front"] = TM.front_side(data, m)                         # T-233: frente, retrovisor e saias
     st = stacks(body, cab)
+    # T-263: escada na lateral da cabine, logo atrás da porta (antes dos escapamentos e do baú); serve em todas as cargas
+    z_lim = min(min(p[2] for p in st) - 0.15 - 0.02, m["box"]["front_z"] - 0.02 if m.get("box") else 99.0)
+    trees = TM._pillar_trees([])
+    for side, sx in (("r", 1), ("l", -1)):
+        m["ladder_" + side] = TM.ladder_side(m, trees, sx, z_lim)
     zones = R.protected_zones(m, cab, st)
     m["paint"] = PM.paint_faces(data, m, m["edges"], zones["rear_doors"]["box"]) if "rear_doors" in zones else {}   # T-232
     sk = R.sockets(m, st)
     R.clear_mirror(sk, zones)                                   # T-233: haste por fora da viseira/lanterna da quina
     R.lot5(sk, zones, m, T234.measure(m))                       # T-234: grade, buzina e interior (raios)
+    R.clear_mirror(sk, zones)                                   # T-263: de novo (a buzina entrou depois)
     probs = R.check(sk, zones)
     probs += [f"{k}: {v['problem']}" for k, v in sk.items() if "problem" in v]
     out = {
         "model": stem, "body": body, "cab": cab, "version": 1,
         "units": "metros; Godot: x direita, y cima, frente = -z, traseira do bau em z = 0",
         "scale_limits": [R.SCALE_MIN, R.SCALE_MAX],
-        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges", "paint", "front")},
+        "measure": {k: v for k, v in m.items() if k not in ("mounts", "surf", "edges", "paint", "front", "ladder_r", "ladder_l")},
         "sockets": sk, "protected": zones, "design_problems": probs,
         "surfaces": stem + ".surf.json",
     }

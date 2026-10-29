@@ -35,7 +35,7 @@ LONGEST_RUNS = 4.4          # m: soma dos trechos de saia de um lado no caminhã
 MAX_RUNS = 3                # trechos por lado (pontas)
 LEGEND = ("fb_deck_checker", "fb_deck_neon")
 KINDS = (("front", front_t233), ("mirror", mirror_t233), ("ladder", ladder_t233), ("skirt", skirt_t233))
-GROUPS = ("TOP", "MID", "BOT", "CEN", "HEAD", "TAIL")
+GROUPS = ("TOP", "MID", "BOT", "CEN", "HEAD", "TAIL", "PADF", "PADS")   # PADF/PADS: chapa e espaçador da haste (T-263)
 
 
 def log(*a):
@@ -125,6 +125,8 @@ def build_one(p, m, rel):
     """Constrói, junta por material (por grupo) e exporta. Devolve (raiz, objetos, tamanho, mn, mx, tris, tris por grupo,
     materiais)."""
     built = p["build"](m)
+    if isinstance(built, tuple):                       # T-263: haste do retrovisor devolve também os pontos de fixação
+        built, p["pads"] = built
     empties = [o for o in built if o.type == "EMPTY"]
     objs = [o for o in built if o.type == "MESH"]
     M.apply_transforms(objs)
@@ -195,12 +197,12 @@ def build_all(todo_ids):
                 worst = tris
             elif kind == "mirror":
                 worst = 2 * tris
-                extra.update({"vfit": dict(p["vfit"]), "broken_tilt": [0.0, 9.0], "fade_end": 110.0})
+                extra.update({"vfit": dict(p["vfit"], pads=p.get("pads", [])), "broken_tilt": [0.0, 9.0], "fade_end": 110.0})
             elif kind == "ladder":
                 st = p["stretch"]
                 n = max(1, round((TALLEST_BOX - st["head"] - st["tail"]) / st["mid"]))
                 worst = 2 * (tg["BOT"] + tg["TOP"] + n * tg["MID"])
-                extra.update({"stretch": dict(st), "broken_tilt": [0.0, 4.0], "fade_end": 110.0})
+                extra.update({"stretch": dict(st), "broken_tilt": [0.0, 4.0], "fade_end": 110.0, "depth": p.get("depth", 0.0)})
             else:
                 st = p["stretch"]
                 n = max(1, round(LONGEST_RUNS / st["mid"]))
