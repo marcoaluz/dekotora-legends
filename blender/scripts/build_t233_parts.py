@@ -7,7 +7,7 @@ Gera (dentro de game/assets/vehicles/dekotora/):
   accessories/front_t233/<id>.glb    para-choques (grupos TOP_/MID_/BOT_/CEN_ + pontos SIGNAL_L/R: o jogo ajusta a altura)
   accessories/mirror_t233/<id>.glb   hastes de retrovisor (uma por lado; o jogo ajusta a altura pelo vidro da cabine)
   accessories/ladder_t233/<id>.glb   escadas (grupos BOT_/MID_/TOP_: o jogo repete o degrau até o topo do baú)
-  accessories/skirt_t233/<id>.glb    saias (grupos HEAD_/MID_/TAIL_: o jogo monta um pedaço em cada trecho livre)
+  (saias: desde a T-265 em build_t265_parts.py)
   catalog.json                       entradas "style": "deco" (encaixe, fit, grupos)
   previews/t233_<id>_{day,night}.png + previews/t233_sheet_<tipo>.png   (sem --no-preview)
 Determinístico (mesma entrada, mesmos arquivos). Encaixes: `build_sockets.py` (rodar antes, se os caminhões mudarem).
@@ -34,7 +34,9 @@ TALLEST_BOX = 2.35          # m: baú mais alto jogável (altura da escada)
 LONGEST_RUNS = 4.4          # m: soma dos trechos de saia de um lado no caminhão mais comprido (REPORT/sockets)
 MAX_RUNS = 3                # trechos por lado (pontas)
 LEGEND = ("fb_deck_checker", "fb_deck_neon")
-KINDS = (("front", front_t233), ("mirror", mirror_t233), ("ladder", ladder_t233), ("skirt", skirt_t233))
+# T-265: as saias sairam daqui (agora grandes, montadas no jogo: build_t265_parts.py); skirt_t233.py e os .glb antigos
+# ficam no disco só como histórico. Rodar este script NÃO mexe mais nas entradas skirt_* do catálogo.
+KINDS = (("front", front_t233), ("mirror", mirror_t233), ("ladder", ladder_t233))
 GROUPS = ("TOP", "MID", "BOT", "CEN", "HEAD", "TAIL", "PADF", "PADS")   # PADF/PADS: chapa e espaçador da haste (T-263)
 
 

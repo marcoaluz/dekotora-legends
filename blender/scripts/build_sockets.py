@@ -171,6 +171,9 @@ def build_one(path: str) -> dict:
           f" | retrovisor lado x {mr.get('anchor', [0])[0]:.2f} vidro {mr.get('window_h', 0):.2f} m espelho de fabrica {'sim' if mr.get('hide') else 'nao'}"
           f" | saia dir {[r for r in sr.get('runs', [])]} | escada {sk.get('ladder_r', {}).get('anchor')}")
     wf = m["front"]
+    sr2 = wf.get("skirt_r") or {}
+    print(f"[sockets] {stem:34s} T-265 saia dir x {sr2.get('x_in')}..{sr2.get('x_out')} y {sr2.get('y')} arcos {sr2.get('arcs')}"
+          f" | bloqueado {sr2.get('blocked')} | caixas {len(sr.get('boxes', []))}")
     print(f"[sockets] {stem:34s} T-264 aba dir {wf['wrap_r']} | esq {wf['wrap_l']} | encaixe {fb.get('wrap')}")
     for k in ("mural_r", "mural_l", "rear_paint", "roof_paint"):
         r = sk.get(k, {}).get("rect")

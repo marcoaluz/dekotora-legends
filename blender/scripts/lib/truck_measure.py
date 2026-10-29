@@ -6,6 +6,7 @@ Usado por `build_sockets.py` (que transforma as medidas em encaixes e zonas prot
 """
 from __future__ import annotations
 
+import math
 import os
 
 import bpy
@@ -495,8 +496,18 @@ MIRROR_REACH = 0.50               # m: quanto a haste do retrovisor pode sair da
 MIRROR_AHEAD = 0.60               # m: quanto ela pode avançar além da frente da cabine
 SKIRT_DEPTH = 0.10                # m: espessura máxima reservada à saia
 SKIRT_OUT = 0.03                  # m: quanto a saia pode passar da lateral do baú
-SKIRT_H = 0.46                    # m: altura máxima da saia (embaixo do baú)
-SKIRT_MIN = 0.60                  # m: trecho livre mais curto que isto não leva saia
+SKIRT_H = 0.46                    # m: (T-233, antigo) altura máxima da saia (embaixo do baú)
+SKIRT_MIN = 0.40                  # m: trecho livre mais curto que isto não leva saia (T-233: 0,60)
+# T-265 (capturas 085–094, pedido do Marco: "saias maiores, quase no chão, contornando as rodas e atrás da roda de trás"):
+# a saia vai da frente do baú até a traseira, de logo embaixo do baú até SKIRT_FLOOR, com um ARCO em volta de cada roda
+# (círculo do pneu + SKIRT_CLR); tanque, bateria, degraus e para-lamas de fábrica que saem da linha do chassi cortam a
+# saia (trecho para antes e volta depois), medidos por raios só na altura que a saia ocupa naquela coluna.
+SKIRT_FLOOR = 0.22                # m: altura do fundo da saia (vão livre: o baú afunda até ~0,12 m nas lombadas)
+SKIRT_CLR = 0.07                  # m: folga entre o pneu e o arco da saia (o baú balança e afunda com a mola, T-219)
+SKIRT_STEP = 0.02                 # m: passo das colunas de raios ao longo do baú
+SKIRT_MIN_H = 0.06                # m: coluna com menos saia que isto (em cima do arco) não conta
+SKIRT_REAR = 0.02                 # m: a saia termina isto antes da traseira do baú (lanternas e para-choque de trás)
+SKIRT_ARC_GROW = 0.08             # m: o arco cresce até isto para contornar o para-lama de fábrica da roda
 
 
 WRAP_MAX = 0.80                   # m: (T-264) a aba lateral do para-choque grande vai no máximo isto para trás do nariz
@@ -628,45 +639,120 @@ def front_side(data: dict, m: dict) -> dict:
     trees = _pillar_trees(stock_boxes)
     for side, sx in (("r", 1), ("l", -1)):
         out["mirror_" + side]["pillar"] = pillar(trees, c, sx)
-    # --- saias: faixa embaixo do baú, trechos livres entre a roda da frente e a primeira de trás (raios de fora)
-    bx = m.get("box")
-    if bx:
-        y_hi = round(bx["bottom_y"] - 0.02, 3)
-        y_lo = round(max(0.26, y_hi - SKIRT_H), 3)
-        fw = [b for n, b in m["wheels"].items() if n.startswith("wheel_f")]
-        rw = [b for n, b in m["wheels"].items() if n.startswith("wheel_r")]
-        za = max(b[1][2] for b in fw) + 0.08
-        zb = min(b[0][2] for b in rw) - 0.08
+    # --- saias (T-265): da frente do baú até a traseira, de embaixo do baú até quase o chão, com arco nas rodas
+    if m.get("box"):
         for side, sx in (("r", 1), ("l", -1)):
-            # linha de fora do chassi em cada célula (raio de fora): o que é fino e corre o vão inteiro (trilho de
-            # fábrica, longarina) fica atrás da saia; o que sai mais que a mediana (tanque, bateria, degrau) a saia
-            # contorna (o trecho para antes dele)
-            cells = []
-            z = za
-            while z < zb - 1e-6:
+            out["skirt_" + side] = skirt_band(tree, m, sx)
+    return out
+
+
+def skirt_arcs(m: dict, sx: int) -> list:
+    """Arcos das rodas de um lado (T-265): [zc, yc, raio do arco] (círculo do pneu, pela caixa da malha da roda, +
+    SKIRT_CLR). Rodado duplo (mesmo eixo) = um arco só, o maior."""
+    by_axle = {}
+    for n, b in sorted(m["wheels"].items()):
+        if (b[0][0] + b[1][0]) * sx <= 0.0:
+            continue
+        zc = round((b[0][2] + b[1][2]) / 2, 3)
+        yc = round((b[0][1] + b[1][1]) / 2, 3)
+        r = max(b[1][2] - b[0][2], b[1][1] - b[0][1]) / 2
+        k = round(zc, 1)
+        if k not in by_axle or r > by_axle[k][2] - SKIRT_CLR:
+            by_axle[k] = [zc, yc, round(r + SKIRT_CLR, 3)]
+    return [by_axle[k] for k in sorted(by_axle)]
+
+
+def arch_top(z: float, arcs: list) -> float:
+    """Altura do arco da saia na coluna z (o que fica abaixo disso é a roda); -9 fora dos arcos. Igual a SkirtShape."""
+    top = -9.0
+    for zc, yc, ra in arcs:
+        d = z - zc
+        if abs(d) < ra:
+            top = max(top, yc + math.sqrt(ra * ra - d * d))
+    return top
+
+
+def skirt_band(tree, m: dict, sx: int) -> dict:
+    """Faixa da saia de um lado (T-265), em coordenadas do Godot. Colunas de SKIRT_STEP da frente à traseira do baú; em
+    cada coluna a saia ocupa de max(SKIRT_FLOOR, arco da roda) até embaixo do baú. Raios de FORA para dentro só nessa
+    altura: a linha do chassi (mediana) fica atrás da saia; o que sai mais (tanque, bateria, degrau, para-lama) corta a
+    saia. `runs` = trechos livres (z0, z1) com saia; `arcs` = rodas daquele lado (o jogo recorta o arco igual)."""
+    from mathutils import Vector
+    bx = m["box"]
+    y_hi = round(bx["bottom_y"] - 0.02, 3)
+    y_lo = round(min(SKIRT_FLOOR, y_hi - 0.3), 3)
+    za, zb = bx["front_z"], round(bx["rear_z"] - SKIRT_REAR, 3)
+    arcs = [a for a in skirt_arcs(m, sx) if a[0] + a[2] > za and a[0] - a[2] < zb]
+
+    def scan(z_from, z_to, arcs_):
+        out_ = []
+        z = z_from
+        while z < z_to - 1e-6:
+            z1 = min(z + SKIRT_STEP, z_to)
+            lo = max(y_lo, arch_top(z, arcs_), arch_top(z1, arcs_))
+            if lo > y_hi - SKIRT_MIN_H:
+                out_.append((round(z, 3), None))          # coluna em cima da roda: sem saia
+            else:
                 mx = -9.0
-                for yy in np.arange(y_lo, y_hi + 1e-6, 0.04):
-                    for dz in (0.005, 0.025, 0.045):
+                ys = list(np.arange(lo, y_hi, 0.04)) + [y_hi - 0.004]
+                for yy in ys:
+                    for dz in (0.003, (z1 - z) / 2, z1 - z - 0.003):
                         hit = tree.ray_cast(Vector((sx * 3.0, -(z + dz), float(yy))), Vector((-sx, 0, 0)), 3.0)
                         if hit[0] is not None:
                             mx = max(mx, hit[0].x * sx)
-                cells.append((round(z, 3), mx))
-                z += 0.05
-            line = float(np.median([c[1] for c in cells])) if cells else 0.0
-            x_out = round(bx["half_w"] + SKIRT_OUT, 3)
-            x_in = round(max(line + 0.008, x_out - SKIRT_DEPTH), 3)
-            x_out = max(x_out, round(x_in + 0.04, 3))
-            runs, start = [], None
-            for zc, mx in cells + [(round(z, 3), 99.0)]:
-                b = mx > x_in - 0.002
-                if not b and start is None:
-                    start = zc
-                elif b and start is not None:
-                    if zc - start >= SKIRT_MIN:
-                        runs.append([round(start + 0.01, 3), round(zc - 0.01, 3)])
-                    start = None
-            out["skirt_" + side] = {"x_in": x_in, "x_out": x_out, "y": [y_lo, y_hi], "runs": runs,
-                                    "span": [round(za, 3), round(zb, 3)], "line": round(line, 3)}
+                out_.append((round(z, 3), mx))
+            z = z1
+        return out_
+
+    cells = scan(za, zb, arcs)
+    line = float(np.median([c[1] for c in cells if c[1] is not None and c[1] > -9.0] or [0.0]))
+    x_out = round(bx["half_w"] + SKIRT_OUT, 3)
+    x_in = round(max(line + 0.008, x_out - SKIRT_DEPTH), 3)
+    x_out = max(x_out, round(x_in + 0.04, 3))
+    # para-lama de fábrica em volta da roda (anel um pouco maior que o arco): o arco cresce de 1 em 1 cm até contornar
+    # o para-lama (no máximo SKIRT_ARC_GROW), em vez de a saia parar antes da roda
+    for i, a in enumerate(arcs):
+        for k in range(int(round(SKIRT_ARC_GROW / 0.01)) + 1):
+            trial = [list(b) for b in arcs]
+            trial[i][2] = round(a[2] + 0.01 * k, 3)
+            near = scan(max(za, a[0] - trial[i][2] - 0.04), min(zb, a[0] + trial[i][2] + 0.04), trial)
+            if not any(c[1] is not None and c[1] > x_in - 0.002 for c in near):
+                arcs[i] = trial[i]
+                break
+    cells = scan(za, zb, arcs)
+    runs, start, blocks = [], None, []
+    for zc, mx in cells + [(round(zb, 3), 99.0)]:
+        bad = mx is None or mx > x_in - 0.002
+        if mx is not None and mx > x_in - 0.002 and zc < zb:
+            blocks.append(zc)
+        if not bad and start is None:
+            start = zc
+        elif bad and start is not None:
+            a, b = start, zc
+            # nas pontas que encostam num obstáculo (não no arco): 1 cm de folga
+            a = a + (0.01 if a > za + 1e-6 and _blocked_before(cells, a, x_in) else 0.0)
+            b = b - (0.01 if mx is not None else 0.0)
+            if b - a >= SKIRT_MIN:
+                runs.append([round(a, 3), round(b, 3)])
+            start = None
+    return {"x_in": x_in, "x_out": x_out, "y": [y_lo, y_hi], "runs": runs, "arcs": arcs,
+            "span": [round(za, 3), round(zb, 3)], "line": round(line, 3),
+            "blocked": _ranges(blocks, SKIRT_STEP)}
+
+
+def _blocked_before(cells: list, z: float, x_in: float) -> bool:
+    prev = [c for c in cells if c[0] < z - 1e-6]
+    return bool(prev) and prev[-1][1] is not None and prev[-1][1] > x_in - 0.002
+
+
+def _ranges(zs: list, step: float) -> list:
+    """Células bloqueadas juntas em faixas [z0, z1] (para o relatório e a depuração)."""
+    out = []
+    for z in zs:
+        if out and z - out[-1][1] <= step + 1e-6:
+            out[-1][1] = round(z + step, 3)
+        else:
+            out.append([z, round(z + step, 3)])
     return out
 
 

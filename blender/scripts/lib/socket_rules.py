@@ -30,7 +30,7 @@ CAP_T = 0.018                      # m: espessura da tampa que fecha o vão da q
 TM_MIRROR_REACH = 0.50            # = truck_measure.MIRROR_REACH (haste do retrovisor, T-233)
 PAD_BELOW, PAD_ABOVE = 0.06, 0.11  # m: o que a haste passa abaixo da chapa de baixo / acima da de cima (T-263)
 PAD_TOP = 0.10                     # m: a chapa de cima fica pelo menos isto abaixo do topo do para-brisa
-SKIRT_MIN = 0.60                   # = truck_measure.SKIRT_MIN
+SKIRT_MIN = 0.40                   # = truck_measure.SKIRT_MIN (T-265; T-233: 0,60)
 # Encaixes que só existem em baú fechado (a graneleira é aberta).
 # T-232: o mural também (a graneleira/lona/tanque/caçamba não têm lateral de baú fechado)
 BOX_ONLY = ("rocket_r", "rocket_l", "box_light_top", "box_light_r", "box_light_l", "roof_paint", "rear_paint",
@@ -83,7 +83,10 @@ def protected_zones(m: dict, cab: str, extra_stacks: list) -> dict:
         sx = 1 if b[1][0] > 0 else -1
         out = b[1][0] + 0.25 if sx > 0 else b[0][0] - 0.25
         x0, x1 = (b[0][0] - 0.02, out) if sx > 0 else (out, b[1][0] + 0.02)
-        z["wheel_" + n[6:]] = {"box": _box(x0, b[0][1], b[0][2] - 0.03, x1, b[1][1] + 0.03, b[1][2] + 0.03), "exempt": ["hubcaps"]}
+        # T-265: `round` = cilindro do pneu + 3 cm (o eixo é X): a saia com arco contorna a roda e usa os cantos da caixa
+        r = max(b[1][2] - b[0][2], b[1][1] - b[0][1]) / 2 + 0.03
+        z["wheel_" + n[6:]] = {"box": _box(x0, b[0][1], b[0][2] - 0.03, x1, b[1][1] + 0.03, b[1][2] + 0.03), "exempt": ["hubcaps"],
+                               "round": [round((b[0][2] + b[1][2]) / 2, 3), round((b[0][1] + b[1][1]) / 2, 3), round(r, 3)]}
     if "box" in m and not m.get("open_body"):
         bx = m["box"]
         z["rear_doors"] = {"box": _box(-(bx["half_w"] - 0.1), bx["bottom_y"] + 0.12, bx["rear_z"] + 0.01,
@@ -256,20 +259,24 @@ def sockets(m: dict, extra_stacks: list) -> dict:
                 if not segs:
                     continue
                 s[k] = {"anchor": [0.0, 0.0, 0.0], "strips": segs, "boxes": [strip_box(g) for g in segs], "fit": "strips"}
-        # saia lateral (T-233): embaixo do baú, na faixa da lateral do baú para dentro, só nos trechos livres entre a
-        # roda da frente e a 1ª de trás (tanque, bateria e degraus de fábrica ficam de fora: medido por raios); uma caixa
-        # por trecho. Ponto = lado de fora, topo, z = 0 (cada trecho tem z próprio; o jogo monta um pedaço por trecho,
-        # fit "runs": a peça cresce para a frente, para baixo e para dentro)
+        # saia lateral (T-265, antes T-233 só entre as rodas e baixa): embaixo do baú, na faixa da lateral do baú para
+        # dentro, da frente do baú (atrás dos escapamentos) até a traseira, de embaixo do baú até quase o chão, com um
+        # ARCO em volta de cada roda (`arcs`: [zc, yc, raio]); só nos trechos livres (tanque, bateria e degraus de fábrica
+        # ficam de fora: medido por raios). Caixas em degraus em volta dos arcos (`skirt_boxes`). Ponto = lado de fora,
+        # topo, z = 0; o jogo monta a saia em cada trecho (fit "skirt", SkirtFit) recortando os mesmos arcos.
         for side, sx in (("r", 1), ("l", -1)):
             sk = (fs or {}).get("skirt_" + side)
             runs = [[max(r[0], round(stack_zmax + 0.03, 3)), r[1]] for r in (sk or {}).get("runs", [])]
             runs = [r for r in runs if r[1] - r[0] >= SKIRT_MIN]       # (atrás dos escapamentos e da cabine)
             if not runs:
                 continue
-            boxes = [_box(sx * sk["x_in"], sk["y"][0], r[0], sx * sk["x_out"], sk["y"][1], r[1]) for r in runs]
+            boxes = []
+            for r in runs:
+                boxes += skirt_boxes(sk, r, sx)
             s["side_skirts_" + side] = {"anchor": [sx * sk["x_out"], sk["y"][1], 0.0], "boxes": boxes,
-                                        "runs": runs, "depth": round(sk["x_out"] - sk["x_in"], 3),
-                                        "height": round(sk["y"][1] - sk["y"][0], 3), "fit": "runs"}
+                                        "runs": runs, "arcs": sk["arcs"], "floor_y": sk["y"][0],
+                                        "depth": round(sk["x_out"] - sk["x_in"], 3),
+                                        "height": round(sk["y"][1] - sk["y"][0], 3), "fit": "skirt"}
         # para-choque de trás (T-231): largura do baú, atrás de tudo o que fica embaixo dele (substitui o para-choque e
         # as lanternas de fábrica, levando lanternas próprias), topo abaixo das setas de trás; a placa vai na caixa da
         # placa da peça. Antes (T-211) a caixa ficava entre as lanternas de fábrica (1,5 m; 8 cm no Canter).
@@ -290,6 +297,67 @@ def sockets(m: dict, extra_stacks: list) -> dict:
         for k in BOX_ONLY:
             s.pop(k, None)
     return s
+
+
+SK_BAND = 0.03                     # m: altura de cada degrau das caixas da saia em volta do arco (T-265)
+SK_DZ = 0.005                      # m: passo ao longo do trecho para achar onde o arco corta cada degrau
+SK_PAD = 0.006                     # m: folga das caixas em z (o jogo faz o arco com segmentos retos)
+
+
+def skirt_col_lo(z: float, sk: dict) -> float:
+    """Fundo da saia na coluna z: o chão da saia ou o arco da roda (= SkirtShape.col_lo no jogo)."""
+    top = sk["y"][0]
+    for zc, yc, ra in sk["arcs"]:
+        d = z - zc
+        if abs(d) < ra:
+            top = max(top, yc + (ra * ra - d * d) ** 0.5)
+    return top
+
+
+def skirt_boxes(sk: dict, run: list, sx: int) -> list:
+    """Caixas da saia num trecho (T-265): degraus de SK_BAND na altura; em cada degrau, os pedaços do trecho onde a saia
+    chega àquela altura (fora do arco da roda), com SK_PAD de folga. Degraus iguais seguidos viram uma caixa só. A
+    primeira caixa é a maior (o teste do jogo procura nela primeiro)."""
+    z0, z1 = run
+    y_lo, y_hi = sk["y"]
+    n = max(1, int(round((z1 - z0) / SK_DZ)))
+    zs = [z0 + (z1 - z0) * i / n for i in range(n + 1)]
+    lows = [skirt_col_lo(z, sk) for z in zs]
+    bands, yb = [], y_hi
+    while yb > y_lo + 1e-6:
+        ya = max(y_lo, round(yb - SK_BAND, 4))
+        segs, cur = [], None
+        for z, lo in zip(zs, lows):
+            if lo <= yb + 1e-9:
+                cur = [z, z] if cur is None else [cur[0], z]
+            elif cur is not None:
+                segs.append(cur)
+                cur = None
+        if cur is not None:
+            segs.append(cur)
+        segs = [(round(max(z0, a - SK_PAD), 3), round(min(z1, b + SK_PAD), 3)) for a, b in segs]
+        if bands and bands[-1][2] == segs:
+            bands[-1][0] = ya
+        else:
+            bands.append([ya, yb, segs])
+        yb = ya
+    boxes = [_box(sx * sk["x_in"], ya, a, sx * sk["x_out"], yb, b) for ya, yb, segs in bands for a, b in segs]
+    vol = lambda b: (b[1][0] - b[0][0]) * (b[1][1] - b[0][1]) * (b[1][2] - b[0][2])   # noqa: E731
+    return sorted(boxes, key=lambda b: -vol(b))
+
+
+def zone_hit(box: list, zv: dict) -> bool:
+    """A caixa entra na zona? T-265: zona da roda com `round` ([zc, yc, r]) = cilindro (o arco da saia contorna o
+    pneu; os cantos da caixa da roda ficam livres)."""
+    if not overlap(box, zv["box"]):
+        return False
+    rd = zv.get("round")
+    if not rd:
+        return True
+    zc, yc, r = rd
+    cz = min(max(zc, box[0][2]), box[1][2])
+    cy = min(max(yc, box[0][1]), box[1][1])
+    return (cz - zc) ** 2 + (cy - yc) ** 2 < (r - 0.001) ** 2
 
 
 def strip_box(g: dict) -> list:
@@ -331,7 +399,7 @@ def check(sk: dict, zones: dict) -> list:
             base = ka[:-2] if ka[-2:] in ("_r", "_l") else ka
             if base in zv["exempt"] or ka in zv["exempt"]:
                 continue
-            if overlap(a, zv["box"]):
+            if zone_hit(a, zv):
                 probs.append(f"encaixe {ka} entra na zona {zk}")
     return probs
 
