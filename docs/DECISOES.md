@@ -1675,3 +1675,7 @@ antigo era mais pesado), +0,7 MB de textura, FPS 147–161 contra 159–172 sem 
   arredondadas); em troca o teste novo reprova qualquer pedaço da haste na frente do vidro. Porta, roda, vidro da porta
   e janela de trás continuam protegidos (a escada começa depois do vidro da porta + 3 cm e acima da roda + 12 cm).
 - Rede e save não mudam (só o encaixe visual e os modelos): **protocolo continua o mesmo**.
+
+## 2026-10-28 — T-263: respostas do Marco
+- Escada na americana e no Canter: opção (b), na quina da frente da carga, só nesses dois (T-267).
+- Retrovisor fica como está (nasce na coluna, ~30 cm mais atrás); não esticar os braços por enquanto.
